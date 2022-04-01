@@ -1,0 +1,16 @@
+FROM node:16
+
+WORKDIR /usr/src/app-front
+
+
+
+COPY front/package*.json ./
+
+RUN npm install -g npm@8.5.5
+RUN npm install -g @vue/cli
+
+COPY front/ .
+
+EXPOSE 8080
+
+CMD ["npm", "run", "serve"]
