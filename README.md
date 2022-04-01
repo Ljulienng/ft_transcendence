@@ -73,7 +73,7 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 Nest is [MIT licensed](LICENSE).
 
 ## Sources
-Dockerize NestJS: https://www.youtube.com/watch?v=BrlQthcUHGw
-Docker-compose with Postgres using TypeORM from NestJS: https://www.youtube.com/watch?v=jYFyLLqvHy8
-Get data from api for vue JS: https://www.section.io/engineering-education/how-to-interact-with-an-api-from-a-vuejs-application/
+[Dockerize NestJS](https://www.youtube.com/watch?v=BrlQthcUHGw)
+[Docker-compose with Postgres using TypeORM from NestJS](https://www.youtube.com/watch?v=jYFyLLqvHy8)
+[Get data from api for vue JS](https://www.section.io/engineering-education/how-to-interact-with-an-api-from-a-vuejs-application/)
 
