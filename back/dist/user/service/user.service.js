@@ -26,7 +26,7 @@ let UserService = class UserService {
         return (0, rxjs_1.from)(this.userRepository.save(user));
     }
     findAll() {
-        return (0, rxjs_1.from)(this.userRepository.find());
+        return [{ id: 1, name: "test" }, { id: 2, name: "test" }, { id: 3, name: "julien" }];
     }
 };
 UserService = __decorate([
