@@ -14,6 +14,11 @@ export class UserController {
 		return this.userService.add(user);
 	}
 
+	@Post('/delete')
+	delete(@Body() idToDelete: string): any {
+		return this.userService.delete(idToDelete);
+	}
+
 	@Get()
 	findAll() {
 		return this.userService.findAll();
