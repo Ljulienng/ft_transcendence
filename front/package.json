@@ -11,7 +11,11 @@
     "axios": "^0.26.1",
     "core-js": "^3.8.3",
     "gallium": "^0.2.1",
-    "vue": "^3.2.13"
+    "material-icons": "^1.10.8",
+    "vue": "^3.2.13",
+    "vue-material": "^1.0.0-beta-15",
+    "vue-router": "^4.0.13",
+    "vue-sidebar-menu": "^5.2.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -20,7 +24,11 @@
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^8.0.3"
+    "eslint-plugin-vue": "^8.0.3",
+    "google-fonts-webpack-plugin": "^0.4.4",
+    "sass": "^1.49.11",
+    "sass-loader": "^12.6.0",
+    "webpack": "^5.71.0"
   },
   "eslintConfig": {
     "root": true,

@@ -6,5 +6,8 @@ export declare class UserService {
     private userRepository;
     constructor(userRepository: Repository<UserEntity>);
     add(user: UserI): Observable<UserI>;
-    findAll(): Observable<UserI[]>;
+    findAll(): {
+        id: number;
+        name: string;
+    }[];
 }

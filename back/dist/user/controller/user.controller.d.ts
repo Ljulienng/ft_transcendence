@@ -5,5 +5,8 @@ export declare class UserController {
     private userService;
     constructor(userService: UserService);
     add(user: UserI): Observable<UserI>;
-    findAll(): Observable<UserI[]>;
+    findAll(): {
+        id: number;
+        name: string;
+    }[];
 }

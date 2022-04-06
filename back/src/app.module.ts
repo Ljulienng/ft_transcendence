@@ -3,7 +3,12 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { FortyTwoService } from './auth/fortytwo.service';
+import { FortyTwoStrategy } from './auth/strategy/fortytwo.strategy';
+import { UserService } from './user/service/user.service';
 import { UserModule } from './user/user.module';
+
 // import { ServeStaticModule } from '@nestjs/serve-static'; // for VueJs
 // import { join } from 'path'; // for VueJs
 
@@ -19,9 +24,10 @@ import { UserModule } from './user/user.module';
       autoLoadEntities: true,
       synchronize: true
     }),
-    UserModule
+    UserModule,
+    AuthModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService]
 })
 export class AppModule {}
