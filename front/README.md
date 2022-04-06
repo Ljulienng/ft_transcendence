@@ -22,3 +22,9 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+### Things installed
+
+npm install vue-router@next
+npm install sass-loader sass webpack --save-dev
+npm install vue-material --save

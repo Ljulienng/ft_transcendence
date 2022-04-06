@@ -1,39 +1,58 @@
 
 <template>
-  <div>
-    <div v-for="user in users" v-bind:key="user.id">
-      <h2>{{ user.id }}</h2>
-      <p>{{ user.name }}</p>
-    </div>
+  <div class="app">
+    <Sidebar/>
+
+		<!-- Content -->
+		<router-view />
   </div>
 </template>
 
-<script>
-import axios from 'axios'
-export default {
-  data() {
-    return {
-      users: []
-    };
-  },
-  // async setype() {
-  //   this.users = await fetch('http://localhost:3000/users').then(res => res.json()
-  //   );
-  // }
-  methods: {
-    async getData() {
-      try {
-        const response  = await axios.get('http://localhost:3000/users');
-
-        this.users = response.data;
-      } catch (error) {
-        console.log(error);
-      }
-    },
-  },
-
-  created() {
-    this.getData();
-  },
-}
+<script setup>
+  /* tslint:disable:no-unused-variable */
+import Sidebar from './components/Sidebar.vue'
 </script>
+
+<script>
+</script>
+
+<style lang="scss">
+@import "https://fonts.googleapis.com/icon?family=Material+Icons";
+:root {
+	--primary: #dedc4a;
+	--primary-alt: #dedc4a;
+	--grey: #64748b;
+	--dark: #1e293b;
+	--dark-alt: #334155;
+	--light: #f1f5f9;
+	--sidebar-width: 250px;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Fira sans', sans-serif;
+}
+body {
+	background: var(--light);
+}
+button {
+	cursor: pointer;
+	appearance: none;
+	border: none;
+	outline: none;
+	background: none;
+}
+
+.app {
+	display: flex;
+	main {
+		flex: 1 1 0;
+		padding: 2rem;
+		@media (max-width: 1024px) {
+			padding-left: 6rem;
+		}
+  }
+}
+</style>
