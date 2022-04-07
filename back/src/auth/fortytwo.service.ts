@@ -1,6 +1,6 @@
 import { Injectable  } from "@nestjs/common";
 import { UserService } from "src/user/service/user.service";
-import { UserEntity } from "src/user/models/user.entity";
+import { User } from "src/user/models/user.entity";
 import { Student } from "src/user/dto/student.dto";
 import { Observable } from "rxjs";
 
@@ -8,11 +8,11 @@ import { Observable } from "rxjs";
 export class FortyTwoService {
 	constructor(private userService: UserService) {}
 
-	createUser(user: Student): Observable<UserEntity> {
+	createUser(user: Student): Observable<User> {
 		return this.userService.add(user);
 	}
 
-	async validateUser(user: Student): Promise<UserEntity> {
+	async validateUser(user: Student): Promise<User> {
 		return this.userService.validateStudent(user);
 	}
 }
