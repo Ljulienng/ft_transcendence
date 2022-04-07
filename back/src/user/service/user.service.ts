@@ -31,7 +31,7 @@ export class UserService {
 	}
 
 	async validateStudent(user: UserDto): Promise<any> {
-		let userTmp: UserDto = undefined;
+		let userTmp: User = undefined;
 		
 		const { username } = user;
 		userTmp = await this.userRepository.findOne({username: username});
