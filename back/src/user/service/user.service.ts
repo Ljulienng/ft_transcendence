@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { from, Observable } from 'rxjs';
 import { Repository } from 'typeorm';
-import { Student } from '../dto/student.dto';
+import { UserDto } from '../models/user.dto';
 import { User } from '../models/user.entity';
 
 @Injectable()
@@ -30,8 +30,8 @@ export class UserService {
 		return this.userRepository.findOne(id)
 	}
 
-	async validateStudent(user: Student): Promise<any> {
-		let userTmp: User = undefined;
+	async validateStudent(user: UserDto): Promise<any> {
+		let userTmp: UserDto = undefined;
 		
 		const { username } = user;
 		userTmp = await this.userRepository.findOne({username: username});

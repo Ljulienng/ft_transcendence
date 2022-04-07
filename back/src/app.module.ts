@@ -8,6 +8,8 @@ import { FortyTwoService } from './auth/fortytwo.service';
 import { FortyTwoStrategy } from './auth/strategy/fortytwo.strategy';
 import { UserService } from './user/service/user.service';
 import { UserModule } from './user/user.module';
+import { ChannelModule } from './channel/channel.module';
+import { MessageModule } from './message/message.module';
 
 // import { ServeStaticModule } from '@nestjs/serve-static'; // for VueJs
 // import { join } from 'path'; // for VueJs
@@ -25,7 +27,8 @@ import { UserModule } from './user/user.module';
       synchronize: true
     }),
     UserModule,
-    AuthModule
+    AuthModule,
+    MessageModule
   ],
   controllers: [AppController],
   providers: [AppService]
