@@ -1,8 +1,9 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { IsOptional } from 'class-validator';
 import { Message } from "src/message/models/message.entity";
+import { User } from "src/user/models/user.entity";
 
-@Entity('channels')
+@Entity('channels') 
 export class Channel {
 
 	@PrimaryGeneratedColumn()
@@ -23,5 +24,11 @@ export class Channel {
 
 	@OneToMany(() => Message, message => message.channel)
 	messages: Message[];
+
+    @ManyToOne(() => User, owner => owner.id, {
+        eager: true,
+        onDelete: 'CASCADE',
+    })
+    owner: User;
 
 }

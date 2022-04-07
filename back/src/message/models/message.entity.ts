@@ -4,7 +4,7 @@ import { Channel } from "src/channel/models/channel.entity";
 import { UserController } from "src/user/controller/user.controller";
 import { User } from 'src/user/models/user.entity'
 
-@Entity('messages')
+@Entity('messages') 
 export class Message {
 	
     @PrimaryGeneratedColumn()
