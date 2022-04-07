@@ -3,32 +3,36 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { from, Observable } from 'rxjs';
 import { Repository } from 'typeorm';
 import { Student } from '../dto/student.dto';
-import { UserEntity } from '../models/user.entity';
+import { User } from '../models/user.entity';
 
 @Injectable()
 export class UserService {
 
 	constructor(
-		@InjectRepository(UserEntity)
-		private userRepository: Repository<UserEntity>
+		@InjectRepository(User)
+		private userRepository: Repository<User>
 	) {}
 
-	add(user: UserEntity): any {
+	add(user: User): any {
 		return from(this.userRepository.save(user));
+	}
+
+	async delete(id: string): Promise<any>{
+		console.log(id)
+		await this.userRepository.delete(id);
 	}
 
 	findAll(): any {
 		return from(this.userRepository.find());
 	}
 
-	async findOne(user: string): Promise<UserEntity> {
-		return this.userRepository.findOne(user)
+	async findOne(id: string): Promise<User> {
+		return this.userRepository.findOne(id)
 	}
 
 	async validateStudent(user: Student): Promise<any> {
-		let userTmp: UserEntity = undefined;
+		let userTmp: User = undefined;
 		
-		console.log("went here");
 		const { username } = user;
 		userTmp = await this.userRepository.findOne({username: username});
 		if (userTmp)

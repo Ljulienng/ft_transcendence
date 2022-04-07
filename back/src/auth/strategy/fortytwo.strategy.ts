@@ -1,7 +1,7 @@
  import { Injectable } from "@nestjs/common"
 import { PassportStrategy } from "@nestjs/passport"
  import { Strategy, VerifyCallback } from 'passport-42'
-import { UserEntity } from "src/user/models/user.entity"
+import { User } from "src/user/models/user.entity"
 import { FortyTwoService } from "../fortytwo.service"
 
  @Injectable()
@@ -16,7 +16,7 @@ import { FortyTwoService } from "../fortytwo.service"
 			})
 	 }
 
-	 async validate(accessToken: string, refreshToken: string, profile: any, cb: VerifyCallback): Promise<UserEntity> {
+	 async validate(accessToken: string, refreshToken: string, profile: any, cb: VerifyCallback): Promise<User> {
 		const { name } = profile
 		const userIdentity =  {
 			username: name['givenName'],

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { UserEntity } from '../models/user.entity';
+import { User } from '../models/user.entity';
 import { UserService } from '../service/user.service';
 // import { UserI } from '../models/user.interface';
 
@@ -10,8 +10,13 @@ export class UserController {
 	constructor(private userService: UserService) {}
 
 	@Post()
-	add(@Body() user: UserEntity): any {
+	add(@Body() user: User): any {
 		return this.userService.add(user);
+	}
+
+	@Post('/delete')
+	delete(@Body() idToDelete: string): any {
+		return this.userService.delete(idToDelete);
 	}
 
 	@Get()
