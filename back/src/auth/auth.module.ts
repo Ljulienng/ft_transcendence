@@ -5,7 +5,7 @@ import { FortyTwoService } from "./fortytwo.service";
 import { FortyTwoStrategy } from "./strategy/fortytwo.strategy";
 import { SessionSerializer } from "./session.serializer";
 import { UserService } from "src/user/service/user.service";
-import { UserEntity } from "src/user/models/user.entity";
+import { User } from "src/user/models/user.entity";
 
 @Module({
 	imports: [ forwardRef(() => UserModule), PassportModule.register({ session :true })],
