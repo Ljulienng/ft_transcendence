@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import { HelloWorld } from './components/HelloWorld.vue'
-import { Sidebar } from './components/Sidebar.vue'
+import HelloWorld from './components/HelloWorld.vue'
+import Sidebar from './components/Sidebar.vue'
 import router from './router'
 // import { use } from 'passport/lib'
 

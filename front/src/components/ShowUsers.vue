@@ -71,6 +71,7 @@ export default {
     };
   },
   methods: {
+
     async getData() {
       try {
         const response  = await axios.get('http://localhost:3000/users');
@@ -87,7 +88,7 @@ export default {
       axios.post("http://localhost:3000/users/delete", this.idToDelete);
     }
   },
-  created() {
+  updated: function () {
     this.getData();
   },
   
