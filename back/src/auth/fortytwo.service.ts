@@ -9,7 +9,7 @@ export class FortyTwoService {
 	constructor(private userService: UserService) {}
 
 	createUser(user: Student): Observable<User> {
-		return this.userService.add(user);
+		return this.userService.addStudent(user);
 	}
 
 	async validateUser(user: Student): Promise<User> {

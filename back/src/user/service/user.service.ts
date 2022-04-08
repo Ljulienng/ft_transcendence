@@ -17,6 +17,15 @@ export class UserService {
 		return from(this.userRepository.save(user));
 	}
 
+	addStudent(user: Student): any {
+		const tmp: User = this.userRepository.create(user);
+
+		tmp.username = user.username;
+		tmp.email = user.email;
+
+		return from(this.userRepository.save(user));
+	}
+
 	async delete(id: string): Promise<any>{
 		console.log(id)
 		await this.userRepository.delete(id);
@@ -30,7 +39,7 @@ export class UserService {
 		return this.userRepository.findOne(id)
 	}
 
-	async validateStudent(user: Student): Promise<any> {
+	async validateStudent(user: Student): Promise<User> {
 		let userTmp: User = undefined;
 		
 		const { username } = user;
@@ -42,7 +51,7 @@ export class UserService {
 		userTmp = await this.userRepository.findOne({email: email});
 		if (userTmp)
 			return userTmp;
-		const newUser = await this.add(user);
+		const newUser = await this.addStudent(user);
 		return newUser;
 
 	}
