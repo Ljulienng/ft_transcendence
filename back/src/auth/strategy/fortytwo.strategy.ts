@@ -1,6 +1,6 @@
- import { Injectable } from "@nestjs/common"
+import { Injectable } from "@nestjs/common"
 import { PassportStrategy } from "@nestjs/passport"
- import { Strategy, VerifyCallback } from 'passport-42'
+import { Strategy, VerifyCallback } from 'passport-42'
 import { User } from "src/user/models/user.entity"
 import { FortyTwoService } from "../fortytwo.service"
 
@@ -18,12 +18,15 @@ import { FortyTwoService } from "../fortytwo.service"
 
 	 async validate(accessToken: string, refreshToken: string, profile: any, cb: VerifyCallback): Promise<User> {
 		const { name } = profile
+
 		const userIdentity =  {
 			username: name['givenName'],
+			// firstname: name['firstName'],
+			// lastname: name['lastName'],
 			email: profile['emails'][0]['value'],
 
 		}
-		console.log(userIdentity);
+		console.log("VALIDATE: ", userIdentity);
 		return this.fortyTwoService.validateUser(userIdentity);
 	 }
  }

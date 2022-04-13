@@ -1,12 +1,14 @@
-import { Injectable  } from "@nestjs/common";
+import { Injectable, Res, Req } from "@nestjs/common";
 import { UserService } from "src/user/service/user.service";
 import { User } from "src/user/models/user.entity";
-import { Student } from "src/user/dto/student.dto";
+import { UserDto } from "src/user/models/user.dto";
+import { JwtService } from "@nestjs/jwt"
+import { Student } from "src/user/dto/student.dto"
 import { Observable } from "rxjs";
 
 @Injectable()
 export class FortyTwoService {
-	constructor(private userService: UserService) {}
+	constructor(private userService: UserService, private jwtService: JwtService) {}
 
 	createUser(user: Student): Observable<User> {
 		return this.userService.addStudent(user);
@@ -15,4 +17,5 @@ export class FortyTwoService {
 	async validateUser(user: Student): Promise<User> {
 		return this.userService.validateStudent(user);
 	}
+
 }

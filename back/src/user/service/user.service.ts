@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { from, Observable } from 'rxjs';
 import { Repository } from 'typeorm';
-import { Student } from '../dto/student.dto';
+import { UserDto } from '../models/user.dto';
+import { Student } from "src/user/dto/student.dto"
 import { User } from '../models/user.entity';
 
 @Injectable()
@@ -20,6 +21,7 @@ export class UserService {
 	addStudent(user: Student): any {
 		const tmp: User = this.userRepository.create(user);
 
+		console.log('Student Added');
 		tmp.username = user.username;
 		tmp.email = user.email;
 
@@ -35,22 +37,28 @@ export class UserService {
 		return from(this.userRepository.find());
 	}
 
-	async findOne(id: string): Promise<User> {
-		return this.userRepository.findOne(id)
+	async findByUsername(name: string): Promise<User> {
+		return this.userRepository.findOne({username: name});
+	}
+
+	async findOne(id: any): Promise<User> {
+		return this.userRepository.findOne(id);
 	}
 
 	async validateStudent(user: Student): Promise<User> {
 		let userTmp: User = undefined;
 		
 		const { username } = user;
+		console.log('Went there');
 		userTmp = await this.userRepository.findOne({username: username});
 		if (userTmp)
 			return userTmp;
-		
+		console.log('Went there2');
 		const { email } = user;
 		userTmp = await this.userRepository.findOne({email: email});
 		if (userTmp)
 			return userTmp;
+		console.log('Went there3');
 		const newUser = await this.addStudent(user);
 		return newUser;
 
