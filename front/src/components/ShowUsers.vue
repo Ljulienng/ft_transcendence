@@ -74,7 +74,7 @@ export default {
 
     async getData() {
       try {
-        const response  = await axios.get('http://localhost:3000/users');
+        const response  = await axios.get('users');
 
         this.users = response.data;
       } catch (error) {
@@ -82,11 +82,14 @@ export default {
       }
     },
     checkForm() {
-      axios.post("http://localhost:3000/users", this.createUser)
+      axios.post("users", this.createUser)
     },
     deleteForm() {
-      axios.post("http://localhost:3000/users/delete", this.idToDelete);
+      axios.post("users/delete", this.idToDelete);
     }
+  },
+  mounted() {
+    this.getData();
   },
   updated: function () {
     this.getData();

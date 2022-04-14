@@ -3,8 +3,7 @@
   <div class="app">
     <Sidebar/>
 
-		<!-- Content -->
-		<router-view />
+	<router-view />
   </div>
 </template>
 
@@ -17,7 +16,8 @@ import Sidebar from './components/Sidebar.vue'
 </script>
 
 <style lang="scss">
-@import "https://fonts.googleapis.com/icon?family=Material+Icons";
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+
 :root {
 	--primary: #dedc4a;
 	--primary-alt: #dedc4a;

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HelloWorld from '@/components/HelloWorld.vue'
 import ShowUsers from '@/components/ShowUsers.vue'
+import AuthModal from '@/components/AuthModal.vue'
 import Home from '@/views/Home.vue'
 
 const routes = [
@@ -18,6 +19,11 @@ const routes = [
 		name: 'ShowUsers',
 		path: '/showusers',
 		component: ShowUsers
+	},
+	{
+		name: 'AuthModal',
+		path: '/authmodal',
+		component: AuthModal
 	}
 ];
 
