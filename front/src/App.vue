@@ -35,7 +35,9 @@ import Sidebar from './components/Sidebar.vue'
 	font-family: 'Fira sans', sans-serif;
 }
 body {
-	background: var(--light);
+	background-image: url('~@/assets/background.jpg');
+	background-repeat: no-repeat;
+	background-size: cover;
 }
 button {
 	cursor: pointer;
