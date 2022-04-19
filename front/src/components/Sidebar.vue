@@ -24,7 +24,10 @@
 				<span class="material-icons">people</span>
 				<span class="text">Show users</span>
 			</router-link>
-
+			<router-link to="/play" class="button">
+				<span class="material-icons">videogame_asset</span>
+				<span class="text">Play</span>
+			</router-link>
 		</div>
 
 		<div class="flex"></div>
