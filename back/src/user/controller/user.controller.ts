@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Req, UnauthorizedException, ConsoleLogger, UseGuards} from '@nestjs/common';
+import { Controller, Get, Post, Body, Req, UnauthorizedException, ConsoleLogger, UseGuards, Param} from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { User } from '../models/user.entity';
 import { JwtService } from "@nestjs/jwt"
@@ -26,6 +26,13 @@ export class UserController {
 	findAll() {
 		return this.userService.findAll();
 	}
+
+	@Get(':userId')
+	findUserById(@Param('userId') userId: number): Observable<User> {
+		return this.userService.findByUserId(userId);
+	}
+
+	
 
 	@UseGuards(JwtAuthGuard)
 	@Get('/userinfo')
