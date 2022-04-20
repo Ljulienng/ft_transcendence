@@ -10,6 +10,7 @@ import { UserService } from './user/service/user.service';
 import { UserModule } from './user/user.module';
 import { ChannelModule } from './channel/channel.module';
 import { MessageModule } from './message/message.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { MessageModule } from './message/message.module';
     }),
     UserModule,
     AuthModule,
-    MessageModule
+    MessageModule,
+    ChatModule
   ],
   controllers: [AppController],
   providers: [AppService]

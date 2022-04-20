@@ -9,20 +9,75 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserEntity = void 0;
+exports.User = void 0;
 const typeorm_1 = require("typeorm");
-let UserEntity = class UserEntity {
+const message_entity_1 = require("../../message/models/message.entity");
+const channel_entity_1 = require("../../channel/models/channel.entity");
+const friend_request_entity_1 = require("./friend-request.entity");
+let User = class User {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], UserEntity.prototype, "id", void 0);
+], User.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true, default: null, }),
     __metadata("design:type", String)
-], UserEntity.prototype, "name", void 0);
-UserEntity = __decorate([
+], User.prototype, "firsname", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true, default: null, }),
+    __metadata("design:type", String)
+], User.prototype, "lastname", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true, default: null, }),
+    __metadata("design:type", String)
+], User.prototype, "username", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true, default: null, }),
+    __metadata("design:type", String)
+], User.prototype, "email", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: false, }),
+    __metadata("design:type", Boolean)
+], User.prototype, "admin", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: false, }),
+    __metadata("design:type", Boolean)
+], User.prototype, "banned", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true, default: null, }),
+    __metadata("design:type", String)
+], User.prototype, "twoFASecret", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true, default: null, }),
+    __metadata("design:type", Boolean)
+], User.prototype, "twoFAEnabled", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)({ type: 'timestamp', default: () => 'now()' }),
+    __metadata("design:type", Date)
+], User.prototype, "createdTime", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => message_entity_1.Message, message => message.channel),
+    __metadata("design:type", Array)
+], User.prototype, "messages", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => channel_entity_1.Channel, channel => channel.owner),
+    __metadata("design:type", Array)
+], User.prototype, "channels", void 0);
+__decorate([
+    (0, typeorm_1.Column)("int", { array: true, nullable: true, default: null, }),
+    __metadata("design:type", Array)
+], User.prototype, "friends", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => friend_request_entity_1.FriendRequest, (FriendRequest) => FriendRequest.creator),
+    __metadata("design:type", Array)
+], User.prototype, "sentFriendRequests", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => friend_request_entity_1.FriendRequest, (FriendRequest) => FriendRequest.receiver),
+    __metadata("design:type", Array)
+], User.prototype, "receivedFriendRequests", void 0);
+User = __decorate([
     (0, typeorm_1.Entity)()
-], UserEntity);
-exports.UserEntity = UserEntity;
+], User);
+exports.User = User;
 //# sourceMappingURL=user.entity.js.map

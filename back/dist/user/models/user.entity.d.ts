@@ -1,4 +1,20 @@
-export declare class UserEntity {
+import { Message } from "src/message/models/message.entity";
+import { Channel } from "src/channel/models/channel.entity";
+import { FriendRequest } from "./friend-request.entity";
+export declare class User {
     id: number;
-    name: string;
+    firsname: string;
+    lastname: string;
+    username: string;
+    email: string;
+    admin: boolean;
+    banned: boolean;
+    twoFASecret: string;
+    twoFAEnabled: boolean;
+    readonly createdTime: Date;
+    messages: Message[];
+    channels: Channel[];
+    friends: number[];
+    sentFriendRequests: FriendRequest[];
+    receivedFriendRequests: FriendRequest[];
 }

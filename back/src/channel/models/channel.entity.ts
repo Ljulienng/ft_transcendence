@@ -15,8 +15,7 @@ export class Channel {
     @Column()
     type: string;   // private, protected or public
 
-	@IsOptional()
-    @Column()
+    @Column({ nullable: true, default: null })
 	password: string;
 
 	@CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
