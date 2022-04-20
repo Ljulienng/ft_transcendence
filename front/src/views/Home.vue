@@ -5,29 +5,30 @@
 <script>
 import {onMounted, ref} from 'vue'
 import axios from 'axios'
-// import {useStore} from 'vuex'
+import {useStore, store} from 'vuex'
 
 export default {
 	setup() {
-		// try {
-			const msg = ref('you are not logged in');
+		const msg = ref('you are not logged in');
+		try {
+			const store = useStore();
 
 			onMounted( async() => {
-			const response = await axios.get('/users/userinfo');
+			const response = await axios.get('http://localhost:3000/users/userinfo');
 			
 			console.log(response.data);
 			const content = await response.data;
 	
 			msg.value = content.username;
-			// await store.dispatch('setAuth', true);
+			await store.dispatch('setAuth', true)
 			})
 
-			return {
-				msg
-			}
-		// } catch(e) {
-		// 	await store.dispatch('setAuth', false);
-		// }
+		} catch(e) {
+			store.dispatch('setAuth', false);
+		}
+		return {
+			msg
+		}
 	}
 }
 </script>

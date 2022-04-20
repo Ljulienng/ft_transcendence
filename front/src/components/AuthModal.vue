@@ -3,7 +3,7 @@
 	<div class="signup">
 		<div class="signup-connect">
 			<h1>Create your account</h1>
-			<a href="#" class="btn btn-social btn-42" v-on:click="ftAuth"><i class="fa fa-user"></i> Sign in with 42</a>
+			<a href="http://localhost:3000/auth/42" class="btn btn-social btn-42" v-on:click="ftAuth"><i class="fa fa-user"></i> Sign in with 42</a>
 			<a href="#" class="btn btn-social btn-google"><i class="fa fa-google"></i> Sign in with Google</a>
 		</div>	
 	</div>
@@ -12,12 +12,12 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 
 export default {
   methods:{
     ftAuth() {
-      axios.get('http://locahost/auth/42');
+      return ('http://localhost:3000/auth/42');
     }
   }
 }
