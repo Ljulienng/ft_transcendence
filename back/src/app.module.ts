@@ -11,14 +11,8 @@ import { UserModule } from './user/user.module';
 import { ChannelModule } from './channel/channel.module';
 import { MessageModule } from './message/message.module';
 
-// import { ServeStaticModule } from '@nestjs/serve-static'; // for VueJs
-// import { join } from 'path'; // for VueJs
-
 @Module({
   imports: [
-    // ServeStaticModule.forRoot({ // for VueJs
-    //   rootPath: join(__dirname, '..', 'front/dist'), // for VueJs
-    // }), // for VueJs
     ConfigModule.forRoot({isGlobal: true}),
     TypeOrmModule.forRoot({ // for PostGres
       type: 'postgres',
