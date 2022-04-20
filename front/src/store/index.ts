@@ -14,3 +14,13 @@ const store = createStore({
 })
 
 export default store;
+// import { createStore } from "vuex";
+// import authModule from './modules/auth';
+ 
+// const store = createStore({
+//     modules:{
+//         auth: authModule
+//     }
+// });
+ 
+// export default store;
