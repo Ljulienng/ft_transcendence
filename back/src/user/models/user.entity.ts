@@ -43,7 +43,7 @@ export class User {
 	@OneToMany(() => Channel, channel => channel.owner)
 	channels: Channel[];
 
-	@Column({ nullable: true, default: null,})
+	@Column("int", {array: true, nullable: true, default: null,})
 	friends: number[];
 
 	@OneToMany(() => FriendRequest, (FriendRequest) => FriendRequest.creator)

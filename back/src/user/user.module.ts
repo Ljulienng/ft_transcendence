@@ -8,11 +8,13 @@ import { ChannelModule } from 'src/channel/channel.module';
 import { PassportModule } from "@nestjs/passport";
 import { MessageModule } from 'src/message/message.module';
 import { JwtModule } from "@nestjs/jwt"
+import { FriendRequest } from './models/friend-request.entity';
 
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([FriendRequest]),
     forwardRef(() => AuthModule),
     forwardRef(() => ChannelModule),
     forwardRef(() => MessageModule),
