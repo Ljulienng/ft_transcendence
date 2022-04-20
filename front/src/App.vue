@@ -19,11 +19,11 @@ import Sidebar from './components/Sidebar.vue'
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 
 :root {
-	--primary: #dedc4a;
-	--primary-alt: #dedc4a;
-	--grey: #64748b;
-	--dark: #1e293b;
-	--dark-alt: #334155;
+	--primary: #fff774;
+	--primary-alt: #fff774;
+	--grey: #c4c4c4;
+	--dark: #2e2e2e;
+	--dark-alt: #595959;
 	--light: #f1f5f9;
 	--sidebar-width: 250px;
 }
@@ -35,7 +35,9 @@ import Sidebar from './components/Sidebar.vue'
 	font-family: 'Fira sans', sans-serif;
 }
 body {
-	background: var(--light);
+	background-image: url('~@/assets/background.jpg');
+	background-repeat: no-repeat;
+	background-size: cover;
 }
 button {
 	cursor: pointer;
