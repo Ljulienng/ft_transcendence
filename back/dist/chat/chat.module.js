@@ -8,10 +8,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatModule = void 0;
 const common_1 = require("@nestjs/common");
+const chat_gateway_1 = require("./chat.gateway");
 let ChatModule = class ChatModule {
 };
 ChatModule = __decorate([
-    (0, common_1.Module)({})
+    (0, common_1.Module)({
+        providers: [chat_gateway_1.ChatGateway],
+    })
 ], ChatModule);
 exports.ChatModule = ChatModule;
 //# sourceMappingURL=chat.module.js.map
