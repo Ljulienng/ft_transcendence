@@ -25,8 +25,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     private logger: Logger = new Logger('ChatGateway');
 
     @SubscribeMessage('msgToServer')    // listen to the 'msgToServer' event
-    handlemessage(client: Socket, payload: string): void {
-        this.server.emit('msgToClient', payload);   // send data to all connected clients
+    handlemessage(client: Socket, message: string): void {
+        this.server.emit('msgToClient', message);   // send data to all connected clients
     }
 
     afterInit(server: any) {
