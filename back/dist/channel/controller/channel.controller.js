@@ -27,10 +27,10 @@ let ChannelController = class ChannelController {
         return this.channelService.findChannelById(id);
     }
     createChannel(channelDto) {
-        return this.channelService.create(channelDto);
+        return this.channelService.createChannel(channelDto);
     }
     deleteChannel(id) {
-        return this.channelService.delete(id);
+        return this.channelService.deleteChannel(id);
     }
 };
 __decorate([

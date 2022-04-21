@@ -50,7 +50,7 @@ export class ChannelService {
     /*
     ** create one channel
     */
-   create(createChannelDto: CreateChannelDto) {
+   createChannel(createChannelDto: CreateChannelDto) {
        const channel = this.channelRepository.create(createChannelDto);
        return this.channelRepository.save(channel);
    }
@@ -58,7 +58,7 @@ export class ChannelService {
     /*
     ** remove one channel
     */
-    async delete(channelId: string) {
+    async deleteChannel(channelId: string) {
         const channel = await this.findChannelById(channelId);
         if (!channel) {
             throw new NotFoundException();

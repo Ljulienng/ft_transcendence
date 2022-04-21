@@ -9,10 +9,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Channel = void 0;
+exports.Channel = exports.ChannelType = void 0;
 const typeorm_1 = require("typeorm");
 const message_entity_1 = require("../../message/models/message.entity");
 const user_entity_1 = require("../../user/models/user.entity");
+var ChannelType;
+(function (ChannelType) {
+    ChannelType[ChannelType["private"] = 0] = "private";
+    ChannelType[ChannelType["protected"] = 1] = "protected";
+    ChannelType[ChannelType["public"] = 2] = "public";
+})(ChannelType = exports.ChannelType || (exports.ChannelType = {}));
 let Channel = class Channel {
 };
 __decorate([
@@ -24,8 +30,8 @@ __decorate([
     __metadata("design:type", String)
 ], Channel.prototype, "name", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
+    (0, typeorm_1.Column)({ nullable: false, default: ChannelType.private }),
+    __metadata("design:type", Number)
 ], Channel.prototype, "type", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: true, default: null }),

@@ -11,19 +11,35 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
+const common_1 = require("@nestjs/common");
 const socket_io_1 = require("socket.io");
 let ChatGateway = class ChatGateway {
+    constructor() {
+        this.logger = new common_1.Logger('ChatGateway');
+    }
+    handlemessage(client, payload) {
+        this.server.emit('msgToClient', payload);
+    }
     afterInit(server) {
+        this.logger.log('Init');
     }
     handleConnection(client, ...args) {
+        this.logger.log(`Client connected: ${client.id}`);
     }
     handleDisconnect(client) {
+        this.logger.log(`Client disconnected: ${client.id}`);
     }
 };
 __decorate([
     (0, websockets_1.WebSocketServer)(),
     __metadata("design:type", socket_io_1.Server)
 ], ChatGateway.prototype, "server", void 0);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('msgToServer'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket, String]),
+    __metadata("design:returntype", void 0)
+], ChatGateway.prototype, "handlemessage", null);
 ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         namespace: '/chat',

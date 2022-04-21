@@ -36,11 +36,11 @@ let ChannelService = class ChannelService {
             where: { name: channelName }
         });
     }
-    create(createChannelDto) {
+    createChannel(createChannelDto) {
         const channel = this.channelRepository.create(createChannelDto);
         return this.channelRepository.save(channel);
     }
-    async delete(channelId) {
+    async deleteChannel(channelId) {
         const channel = await this.findChannelById(channelId);
         if (!channel) {
             throw new common_1.NotFoundException();

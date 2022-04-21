@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateChannelDto = void 0;
 const class_validator_1 = require("class-validator");
+const channel_entity_1 = require("./channel.entity");
 class CreateChannelDto {
 }
 __decorate([
@@ -21,8 +22,7 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsIn)(["private", "protected", "public"]),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], CreateChannelDto.prototype, "type", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),

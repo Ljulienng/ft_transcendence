@@ -3,6 +3,12 @@ import { IsOptional } from 'class-validator';
 import { Message } from "src/message/models/message.entity";
 import { User } from "src/user/models/user.entity";
 
+export enum ChannelType {
+	private,
+	protected,
+	public,
+}
+
 @Entity('channels') 
 export class Channel {
 
@@ -12,8 +18,8 @@ export class Channel {
 	@Column()
 	name: string;
 
-    @Column()
-    type: string;   // private, protected or public
+    @Column({ nullable: false, default: ChannelType.private })
+    type: ChannelType;
 
     @Column({ nullable: true, default: null })
 	password: string;

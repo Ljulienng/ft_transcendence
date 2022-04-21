@@ -25,11 +25,11 @@ export class ChannelController {
 
     @Post()
     createChannel(@Body() channelDto: CreateChannelDto) {
-        return this.channelService.create(channelDto);
+        return this.channelService.createChannel(channelDto);
     }
 
     @Delete(':id')
     deleteChannel(@Param('id') id: string) {
-        return this.channelService.delete(id);
+        return this.channelService.deleteChannel(id);
     }
 }
