@@ -4,13 +4,17 @@ import { UserController } from './controller/user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './models/user.entity';
 import { AuthModule } from 'src/auth/auth.module';
-import { FortyTwoStrategy } from 'src/auth/strategy/fortytwo.strategy';
 import { ChannelModule } from 'src/channel/channel.module';
+import { PassportModule } from "@nestjs/passport";
 import { MessageModule } from 'src/message/message.module';
+import { JwtModule } from "@nestjs/jwt"
+import { FriendRequest } from './models/friend-request.entity';
+
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([FriendRequest]),
     forwardRef(() => AuthModule),
     forwardRef(() => ChannelModule),
     forwardRef(() => MessageModule),

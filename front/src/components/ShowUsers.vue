@@ -88,6 +88,9 @@ export default {
       axios.post("http://localhost:3000/users/delete", this.idToDelete);
     }
   },
+  mounted() {
+    this.getData();
+  },
   updated: function () {
     this.getData();
   },

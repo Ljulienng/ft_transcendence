@@ -53,8 +53,8 @@ const ToggleMenu = () => {
 </script>
 
 
-<style lang="scss" scoped>
-@import "https://fonts.googleapis.com/icon?family=Material+Icons";
+<style lang="scss">
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 aside {
 	display: flex;
 	flex-direction: column;

@@ -3,16 +3,28 @@ import { PassportModule } from "@nestjs/passport";
 import { UserModule } from "src/user/user.module";
 import { FortyTwoService } from "./fortytwo.service";
 import { FortyTwoStrategy } from "./strategy/fortytwo.strategy";
-import { SessionSerializer } from "./session.serializer";
-import { UserService } from "src/user/service/user.service";
-import { User } from "src/user/models/user.entity";
+import { JwtModule } from "@nestjs/jwt"
+import { AuthController } from './auth.controller'
+import { JwtStrategy } from "./strategy/jwt.strategy";
 
 @Module({
-	imports: [ forwardRef(() => UserModule), PassportModule.register({ session :true })],
+	imports: [
+		PassportModule.register({ defaultStrategy: 'jwt' }),
+		JwtModule.register({
+			secret: 'SECRET',
+			signOptions: {expiresIn: '1d'}
+		}),
+		UserModule,
+	],
+	controllers: [AuthController],
 	providers: [
 		FortyTwoStrategy,
+		JwtStrategy,
 		FortyTwoService,
-		SessionSerializer
 	],
+	exports: [
+		JwtModule,
+		PassportModule
+	]
 })
 export class AuthModule {}
