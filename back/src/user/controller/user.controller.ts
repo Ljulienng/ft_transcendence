@@ -32,11 +32,11 @@ export class UserController {
 		return this.userService.findByUserId(userId);
 	}
 
-	
+
 
 	@UseGuards(JwtAuthGuard)
-	@Get('/userinfo')
-	async userInfo(@Req() req) {
+	@Post('/setusername')
+	async userInfo(@Req() req, @Body() userName: any) {
 	  try {
 		const cookie = req.cookies['jwt'];
   
@@ -45,12 +45,14 @@ export class UserController {
 		  throw new UnauthorizedException("User not found");
 		}
   
-		const user = await this.userService.findOne(data['email']); //A changer 
+		const user = await this.userService.findOne(data['email']); //A changer
+		// console.log(userName);
+		// console.log("username name = ", userName.username)
   
-		return data;
+		this.userService.setUsername(user.id, userName.username);
 	  }
 	  catch (e) {
-		throw new UnauthorizedException();
+		throw new UnauthorizedException("Username is already set.");
 	  }
 	}
 

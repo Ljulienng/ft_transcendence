@@ -29,7 +29,7 @@
 
 		<div class="flex"></div>
 		
-		<div class="menu">
+		<div class="menu" v-if="getUserProfile.id === 0">
 			<router-link to="/settings" class="button">
 				<span class="material-icons">settings</span>
 				<span class="text">Settings</span>
@@ -37,6 +37,19 @@
 		</div>
 	</aside>
 </template>
+
+<script>
+import { mapGetters } from "vuex";
+
+export default {
+  name: "App",
+  computed: {
+    ...mapGetters("auth", {
+      getUserProfile: "getUserProfile",
+    }),
+  },
+}
+</script>
 
 <script setup>
 import { ref } from 'vue'

@@ -1,7 +1,6 @@
 import { IsOptional, IsString } from 'class-validator';
 import { Message } from "src/message/models/message.entity";
 import { Channel } from "src/channel/models/channel.entity";
-import { FriendRequest } from './friend-request.entity';
 
 export class UserDto {
 	
@@ -9,7 +8,7 @@ export class UserDto {
 
 	// @Isoptional() decorators for tests
 	@IsOptional()
-	firsname: string;
+	firstname: string;
 
 	@IsOptional()
 	lastname: string;
@@ -43,11 +42,5 @@ export class UserDto {
 
 	@IsOptional()
 	friends: number[];
-
-	@IsOptional()
-	sentFriendRequests: FriendRequest[];
-
-	@IsOptional()
-	receivedFriendRequests: FriendRequest[];
 
 }

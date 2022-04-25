@@ -7,7 +7,7 @@
 		</li>
 	</ul>
   <br/>
-  <form v-on:submit.prevent="checkForm">
+  <form v-on:submit.prevent="sendForm">
   <p>
     <label for="username">Username</label>
     <input
@@ -54,9 +54,10 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 
 export default {
+  inject:['http'],
   data() {
     return {
       users: [],
@@ -71,21 +72,20 @@ export default {
     };
   },
   methods: {
-
     async getData() {
       try {
-        const response  = await axios.get('http://localhost:3000/users');
+        const response  = await this.http.get('http://localhost:3000/users');
 
         this.users = response.data;
       } catch (error) {
         console.log(error);
       }
     },
-    checkForm() {
-      axios.post("http://localhost:3000/users", this.createUser)
+    sendForm() {
+      this.http.post("/users", this.createUser)
     },
     deleteForm() {
-      axios.post("http://localhost:3000/users/delete", this.idToDelete);
+      this.http.post("http://localhost:3000/users/delete", this.idToDelete);
     }
   },
   mounted() {
