@@ -35,3 +35,10 @@
     margin-top: 20%;
     top: 0;
 }
+.point2win {
+    display: inline-block;
+    vertical-align: -30%;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 64px;
+    color: #fff774;
+}
