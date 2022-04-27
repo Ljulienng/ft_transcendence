@@ -19,46 +19,31 @@ export class ChannelService {
         private messageService: MessageService,
     ) {}
 
-    /*
-    ** get all channels
-    */
+    /* get all channels */
     async findAll(): Promise<Channel[]> {
         return await this.channelRepository.find();
     }
 
-    /*
-    ** get one channel by its id
-    */
+    /* get one channel by its id */
    async findChannelById(channelId: string): Promise<Channel> {
         return await this.channelRepository.findOneOrFail({
            where: { id: Number(channelId) }
        });
    }
 
-    /* 
-    ** get one channel by its id
-    */
+    /* get one channel by its name */
    async findChannelByName(channelName: string): Promise<Channel> {
         return await this.channelRepository.findOneOrFail({
         where: { name: channelName }
         });
     }
 
-    /* 
-    ** get messages by channel id
-    */ // TEST A MODIFIER - RETOURNE TOUS LES MESSAGES
-    // async findMessagesByChannelId(channelId: string): Promise<Message[]> {
-    //     return await this.messageService.findAll();
-    // }
-
-    /*
-    ** create one channel
-    */
+    /* create one channel */
    async createChannel(createChannel: CreateChannelDto, userId: number) {
         const user = await this.userService.findByUserId(userId);
 
         if (!user) {
-            throw new UnauthorizedException('user doesn\'t exist');
+            throw new UnauthorizedException('user does not exist');
         }
 
         const newChannel = this.channelRepository.create({
@@ -69,21 +54,20 @@ export class ChannelService {
             // owner: user,
        });
 
-       if (newChannel.type == ChannelType.protected || newChannel.type == ChannelType.private) {
+       if (newChannel.type === ChannelType.protected || newChannel.type === ChannelType.private) {
            if (!newChannel.password) {
                throw new BadRequestException('need a password for private or protected channel');
            }
            else {
-               newChannel.password = bcrypt.
+               const saltOrRounds = await bcrypt.genSalt();
+               newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);
            }
        }
 
        return await this.channelRepository.save(newChannel);
    }
 
-    /*
-    ** remove one channel
-    */
+    /* remove one channel */
     async deleteChannel(channelId: string) {
         const channel = await this.findChannelById(channelId);
         if (!channel) {
