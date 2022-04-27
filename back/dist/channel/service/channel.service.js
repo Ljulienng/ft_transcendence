@@ -19,6 +19,7 @@ const typeorm_2 = require("typeorm");
 const channel_entity_1 = require("../models/channel.entity");
 const message_service_1 = require("../../message/service/message.service");
 const user_service_1 = require("../../user/service/user.service");
+const bcrypt = require("bcrypt");
 let ChannelService = class ChannelService {
     constructor(channelRepository, userService, messageService) {
         this.channelRepository = channelRepository;
@@ -40,12 +41,24 @@ let ChannelService = class ChannelService {
     }
     async createChannel(createChannel, userId) {
         const user = await this.userService.findByUserId(userId);
+        if (!user) {
+            throw new common_1.UnauthorizedException('user does not exist');
+        }
         const newChannel = this.channelRepository.create({
             name: createChannel.name,
             type: createChannel.type,
             password: createChannel.password,
             messages: [],
         });
+        if (newChannel.type === channel_entity_1.ChannelType.protected || newChannel.type === channel_entity_1.ChannelType.private) {
+            if (!newChannel.password) {
+                throw new common_1.BadRequestException('need a password for private or protected channel');
+            }
+            else {
+                const saltOrRounds = await bcrypt.genSalt();
+                newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);
+            }
+        }
         return await this.channelRepository.save(newChannel);
     }
     async deleteChannel(channelId) {
