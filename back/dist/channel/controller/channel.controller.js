@@ -26,8 +26,8 @@ let ChannelController = class ChannelController {
     findChannelById(id) {
         return this.channelService.findChannelById(id);
     }
-    createChannel(channelDto) {
-        return this.channelService.createChannel(channelDto);
+    createChannel(channelDto, response) {
+        return this.channelService.createChannel(channelDto, response.locals.id);
     }
     deleteChannel(id) {
         return this.channelService.deleteChannel(id);
@@ -49,8 +49,9 @@ __decorate([
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [createChannel_dto_1.CreateChannelDto]),
+    __metadata("design:paramtypes", [createChannel_dto_1.CreateChannelDto, Object]),
     __metadata("design:returntype", void 0)
 ], ChannelController.prototype, "createChannel", null);
 __decorate([

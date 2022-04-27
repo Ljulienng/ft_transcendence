@@ -1,16 +1,20 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Channel} from '../models/channel.entity'
+import { Channel, ChannelType} from '../models/channel.entity'
 import { CreateChannelDto } from '../models/createChannel.dto';
 import { Message } from 'src/message/models/message.entity';
 import { MessageService } from 'src/message/service/message.service';
+import { UserService } from 'src/user/service/user.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChannelService {
     constructor(
         @InjectRepository(Channel)
         private channelRepository: Repository<Channel>,
+        @Inject(UserService)
+        private userService: UserService,
         @Inject(MessageService)
         private messageService: MessageService,
     ) {}
@@ -50,8 +54,12 @@ export class ChannelService {
     /*
     ** create one channel
     */
-   async createChannel(createChannel: CreateChannelDto) {
-        // const user;// = await this.userservice.findUserById();
+   async createChannel(createChannel: CreateChannelDto, userId: number) {
+        const user = await this.userService.findByUserId(userId);
+
+        if (!user) {
+            throw new UnauthorizedException('user doesn\'t exist');
+        }
 
         const newChannel = this.channelRepository.create({
             name: createChannel.name,
@@ -60,6 +68,15 @@ export class ChannelService {
             messages: [],
             // owner: user,
        });
+
+       if (newChannel.type == ChannelType.protected || newChannel.type == ChannelType.private) {
+           if (!newChannel.password) {
+               throw new BadRequestException('need a password for private or protected channel');
+           }
+           else {
+               newChannel.password = bcrypt.
+           }
+       }
 
        return await this.channelRepository.save(newChannel);
    }

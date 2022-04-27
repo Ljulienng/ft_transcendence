@@ -45,7 +45,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     */
     @SubscribeMessage('addChannel')
     async createChannel(socket: Socket, createChannel: CreateChannelDto) {
-        const newChannel = await this.channelService.createChannel(createChannel);
+        const newChannel = await this.channelService.createChannel(createChannel, socket.data.user);
         console.log(newChannel);
     }
 

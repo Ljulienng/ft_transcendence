@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res } from '@nestjs/common';
 import { ChannelService } from '../service/channel.service';
 import { CreateChannelDto } from '../models/createChannel.dto';
 import { MessageDto } from 'src/message/models/message.dto';
@@ -24,8 +24,10 @@ export class ChannelController {
     // }
 
     @Post()
-    createChannel(@Body() channelDto: CreateChannelDto) {
-        return this.channelService.createChannel(channelDto);
+    createChannel(
+        @Body() channelDto: CreateChannelDto,
+        @Res() response: Response) {
+        return this.channelService.createChannel(channelDto, response.locals.id);
     }
 
     @Delete(':id')

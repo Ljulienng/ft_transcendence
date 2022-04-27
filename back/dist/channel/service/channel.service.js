@@ -18,9 +18,11 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const channel_entity_1 = require("../models/channel.entity");
 const message_service_1 = require("../../message/service/message.service");
+const user_service_1 = require("../../user/service/user.service");
 let ChannelService = class ChannelService {
-    constructor(channelRepository, messageService) {
+    constructor(channelRepository, userService, messageService) {
         this.channelRepository = channelRepository;
+        this.userService = userService;
         this.messageService = messageService;
     }
     async findAll() {
@@ -36,7 +38,8 @@ let ChannelService = class ChannelService {
             where: { name: channelName }
         });
     }
-    async createChannel(createChannel) {
+    async createChannel(createChannel, userId) {
+        const user = await this.userService.findByUserId(userId);
         const newChannel = this.channelRepository.create({
             name: createChannel.name,
             type: createChannel.type,
@@ -56,8 +59,10 @@ let ChannelService = class ChannelService {
 ChannelService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(channel_entity_1.Channel)),
-    __param(1, (0, common_1.Inject)(message_service_1.MessageService)),
+    __param(1, (0, common_1.Inject)(user_service_1.UserService)),
+    __param(2, (0, common_1.Inject)(message_service_1.MessageService)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        user_service_1.UserService,
         message_service_1.MessageService])
 ], ChannelService);
 exports.ChannelService = ChannelService;

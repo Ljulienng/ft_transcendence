@@ -28,7 +28,7 @@ let ChatGateway = class ChatGateway {
         console.log('client disconnected');
     }
     async createChannel(socket, createChannel) {
-        const newChannel = await this.channelService.createChannel(createChannel);
+        const newChannel = await this.channelService.createChannel(createChannel, socket.data.user);
         console.log(newChannel);
     }
     handlemessage(client, message) {
