@@ -12,5 +12,6 @@ export declare class ChannelService {
     findChannelById(channelId: string): Promise<Channel>;
     findChannelByName(channelName: string): Promise<Channel>;
     createChannel(createChannel: CreateChannelDto, userId: number): Promise<Channel>;
+    checkPasswordMatch(sentPassword: string, expectedPassword: string): Promise<boolean>;
     deleteChannel(channelId: string): Promise<Channel>;
 }

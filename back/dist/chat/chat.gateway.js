@@ -31,7 +31,7 @@ let ChatGateway = class ChatGateway {
         const newChannel = await this.channelService.createChannel(createChannel, socket.data.user);
         console.log(newChannel);
     }
-    handlemessage(client, message) {
+    sendMessage(client, message) {
         console.log('Send message');
         this.server.emit('messageSent', message);
     }
@@ -51,7 +51,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [socket_io_1.Socket, String]),
     __metadata("design:returntype", void 0)
-], ChatGateway.prototype, "handlemessage", null);
+], ChatGateway.prototype, "sendMessage", null);
 ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         namespace: '/chat',

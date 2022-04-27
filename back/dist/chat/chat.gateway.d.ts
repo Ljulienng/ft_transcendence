@@ -10,5 +10,5 @@ export declare class ChatGateway implements OnGatewayInit, OnGatewayConnection, 
     handleConnection(client: any, ...args: any[]): void;
     handleDisconnect(client: any): void;
     createChannel(socket: Socket, createChannel: CreateChannelDto): Promise<void>;
-    handlemessage(client: Socket, message: string): void;
+    sendMessage(client: Socket, message: string): void;
 }

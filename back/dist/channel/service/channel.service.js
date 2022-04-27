@@ -61,6 +61,9 @@ let ChannelService = class ChannelService {
         }
         return await this.channelRepository.save(newChannel);
     }
+    async checkPasswordMatch(sentPassword, expectedPassword) {
+        return await bcrypt.compare(sentPassword, expectedPassword);
+    }
     async deleteChannel(channelId) {
         const channel = await this.findChannelById(channelId);
         if (!channel) {

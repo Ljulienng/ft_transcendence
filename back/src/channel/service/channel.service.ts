@@ -39,7 +39,7 @@ export class ChannelService {
     }
 
     /* create one channel */
-   async createChannel(createChannel: CreateChannelDto, userId: number) {
+   async createChannel(createChannel: CreateChannelDto, userId: number): Promise<Channel> {
         const user = await this.userService.findByUserId(userId);
 
         if (!user) {

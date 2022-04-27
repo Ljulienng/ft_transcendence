@@ -41,6 +41,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     /*
+    ** listen to 'addChannel' event
     ** create a new channel and connect users to it
     */
     @SubscribeMessage('addChannel')
@@ -49,10 +50,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         console.log(newChannel);
     }
 
-    @SubscribeMessage('addMessage')    // listen to the 'msgToServer' event
-    handlemessage(client: Socket, message: string): void {
+     /*
+     ** listen to 'addMessage' event
+     ** add a new message
+     */
+    @SubscribeMessage('addMessage') 
+    /*async*/ sendMessage(client: Socket, message: string): void {
         console.log('Send message');
         this.server.emit('messageSent', message);   // send data to all connected clients
+        // await this.channelService.addMessage();
     }
 
 
