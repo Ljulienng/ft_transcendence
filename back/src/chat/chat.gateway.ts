@@ -6,8 +6,9 @@ import {
     WebSocketGateway,
     WebSocketServer
 } from "@nestjs/websockets";
-import { Logger } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
+import { CreateChannelDto } from "src/channel/models/createChannel.dto";
+import { ChannelService } from "src/channel/service/channel.service";
 
 /*
 ** OnGatewayInit        : need to implement afterInit()
@@ -22,23 +23,37 @@ import { Server, Socket } from 'socket.io'
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
     @WebSocketServer() server: Server;  // instance of socket server
-    private logger: Logger = new Logger('ChatGateway');
 
-    @SubscribeMessage('msgToServer')    // listen to the 'msgToServer' event
-    handlemessage(client: Socket, message: string): void {
-        this.server.emit('msgToClient', message);   // send data to all connected clients
-    }
+    constructor(
+        private channelService: ChannelService,
+    ){}
 
     afterInit(server: any) {
-        this.logger.log('Init');
+        console.log('init chat');
     }
 
     handleConnection(client: any, ...args: any[]) {
-        this.logger.log(`Client connected: ${client.id}`);
+        console.log('client connected');
     }
 
     handleDisconnect(client: any) {
-        this.logger.log(`Client disconnected: ${client.id}`);
+        console.log('client disconnected');
     }
+
+    /*
+    ** create a new channel and connect users to it
+    */
+    @SubscribeMessage('addChannel')
+    async createChannel(socket: Socket, createChannel: CreateChannelDto) {
+        const newChannel = await this.channelService.createChannel(createChannel);
+        console.log(newChannel);
+    }
+
+    @SubscribeMessage('addMessage')    // listen to the 'msgToServer' event
+    handlemessage(client: Socket, message: string): void {
+        console.log('Send message');
+        this.server.emit('messageSent', message);   // send data to all connected clients
+    }
+
 
 }

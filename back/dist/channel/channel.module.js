@@ -24,7 +24,8 @@ ChannelModule = __decorate([
             (0, common_1.forwardRef)(() => user_module_1.UserModule),
         ],
         controllers: [channel_controller_1.ChannelController],
-        providers: [channel_service_1.ChannelService]
+        providers: [channel_service_1.ChannelService],
+        exports: [channel_service_1.ChannelService],
     })
 ], ChannelModule);
 exports.ChannelModule = ChannelModule;

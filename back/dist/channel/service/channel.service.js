@@ -36,9 +36,14 @@ let ChannelService = class ChannelService {
             where: { name: channelName }
         });
     }
-    createChannel(createChannelDto) {
-        const channel = this.channelRepository.create(createChannelDto);
-        return this.channelRepository.save(channel);
+    async createChannel(createChannel) {
+        const newChannel = this.channelRepository.create({
+            name: createChannel.name,
+            type: createChannel.type,
+            password: createChannel.password,
+            messages: [],
+        });
+        return await this.channelRepository.save(newChannel);
     }
     async deleteChannel(channelId) {
         const channel = await this.findChannelById(channelId);

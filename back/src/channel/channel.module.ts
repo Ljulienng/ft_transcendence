@@ -13,6 +13,7 @@ import { UserModule } from 'src/user/user.module';
     forwardRef(() => UserModule),
   ],
   controllers: [ChannelController],
-  providers: [ChannelService]
+  providers: [ChannelService],
+  exports: [ChannelService],
 })
 export class ChannelModule {}

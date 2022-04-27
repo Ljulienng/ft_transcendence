@@ -9,10 +9,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatModule = void 0;
 const common_1 = require("@nestjs/common");
 const chat_gateway_1 = require("./chat.gateway");
+const channel_module_1 = require("../channel/channel.module");
 let ChatModule = class ChatModule {
 };
 ChatModule = __decorate([
     (0, common_1.Module)({
+        imports: [channel_module_1.ChannelModule],
         providers: [chat_gateway_1.ChatGateway],
     })
 ], ChatModule);

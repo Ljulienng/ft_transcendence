@@ -12,7 +12,7 @@ export enum ChannelType {
 @Entity('channels') 
 export class Channel {
 
-	@PrimaryGeneratedColumn()
+	@PrimaryGeneratedColumn() 
 	readonly id: number;
 
 	@Column()

@@ -50,9 +50,18 @@ export class ChannelService {
     /*
     ** create one channel
     */
-   createChannel(createChannelDto: CreateChannelDto) {
-       const channel = this.channelRepository.create(createChannelDto);
-       return this.channelRepository.save(channel);
+   async createChannel(createChannel: CreateChannelDto) {
+        // const user;// = await this.userservice.findUserById();
+
+        const newChannel = this.channelRepository.create({
+            name: createChannel.name,
+            type: createChannel.type,
+            password: createChannel.password,
+            messages: [],
+            // owner: user,
+       });
+
+       return await this.channelRepository.save(newChannel);
    }
 
     /*

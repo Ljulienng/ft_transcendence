@@ -9,6 +9,6 @@ export declare class ChannelService {
     findAll(): Promise<Channel[]>;
     findChannelById(channelId: string): Promise<Channel>;
     findChannelByName(channelName: string): Promise<Channel>;
-    createChannel(createChannelDto: CreateChannelDto): Promise<Channel>;
+    createChannel(createChannel: CreateChannelDto): Promise<Channel>;
     deleteChannel(channelId: string): Promise<Channel>;
 }
