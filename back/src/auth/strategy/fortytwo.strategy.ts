@@ -21,7 +21,7 @@ import { FortyTwoService } from "../fortytwo.service"
 		// console.log("userinfo: ",profile);
 
 		const userIdentity =  {
-			username: name['userName'],
+			username: profile['username'],
 			firstname: name['givenName'],
 			lastname: name['familyName'],
 			email: profile['emails'][0]['value'],

@@ -2,15 +2,16 @@
 	<h1>Welcome, {{getUserProfile.userName}}</h1>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "@vue/runtime-core";
 import { mapGetters } from "vuex";
 
-export default {
+export default defineComponent({
   name: "Home",
   computed: {
     ...mapGetters("auth", {
       getUserProfile: "getUserProfile",
     }),
   }
-};
+});
 </script>

@@ -1,10 +1,11 @@
-import { ConsoleLogger, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConsoleLogger, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { from, Observable, of, switchMap, map } from 'rxjs';
 import { getConnection, Repository } from 'typeorm';
 import { UserDto } from '../models/user.dto';
 import { Student } from "src/user/dto/student.dto"
-import { User } from '../models/user.entity';
+import { User, Friend } from '../models/user.entity';
+import { isNumber } from 'class-validator';
 
 @Injectable()
 export class UserService {
@@ -33,12 +34,23 @@ export class UserService {
 	}
 
 	async setUsername(userId: number, userName: string) {
-		await getConnection()
-		.createQueryBuilder()
-		.update(User)
-		.set({username: userName})
-		.where("id = :id", {id: userId})
-		.execute();
+		const currentUser = await this.userRepository.findOne({id: userId});
+		const tmp = await this.userRepository.findOne({username: userName})
+		const regex = /^[a-zA-Z0-9_]+$/
+
+		console.log("username: ", userName);
+		console.log("tmp: ", tmp);
+		console.log("currentUser: ", (await currentUser).username);
+		console.log("regexp = ", regex.test(userName));
+		if (tmp)
+			throw new HttpException('Username already taken', HttpStatus.FORBIDDEN);
+		else if ((await currentUser).username === userName)
+			throw new HttpException('You already took this username', HttpStatus.FORBIDDEN);
+		else if (regex.test(userName) === false)
+			throw new HttpException('Wrong format for username only underscore are allowed.', HttpStatus.FORBIDDEN);
+		currentUser.username = userName;
+		await this.userRepository.save(currentUser);
+		// await this.userRepository.save({})
 	}
 
 	findAll(): any {
@@ -79,6 +91,85 @@ export class UserService {
 		const newUser = await this.addStudent(user);
 		return newUser;
 
+	}
+
+	async addFriend(user: User, friendToAdd: any) {
+		const friend = await this.userRepository.findOne({username: friendToAdd.friendUsername});
+		if (user.friends === null)
+			user.friends = []
+		if (!friend) {
+			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
+		}
+
+		const tmp = user.friends.find(el => el === String(friend.id))
+
+		if (tmp) {
+			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user is already in your friendlist.')
+		}
+		else {
+			user.friends.push(String(friend.id))
+		}
+		await this.userRepository.save(user);
+	}
+
+	async deleteFriend(user: User, friendToDelete: any) {
+		const friend = await this.userRepository.findOne({username: friendToDelete.username});
+
+		if (!friend) {
+			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
+		}
+		const tmp = user.friends.find(el => el === String(friend.id))
+		if (tmp) {
+			// console.log("friend id deleted= ", String(friend.id))
+			const index = user.friends.indexOf(tmp, 0);
+			// console.log("friend index = ", index)
+			user.friends.splice(index, 1); 
+		}
+		else
+			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user isn\'t in your friendlist.')
+		await this.userRepository.save(user);
+	}
+
+	async retrieveFriendInfo(friendId: string): Promise<Friend> {
+		let friendInfo: User = undefined;
+		if (isNaN(+friendId))
+			return friendInfo;
+		friendInfo = await this.userRepository.findOne({id: +friendId});
+		console.log()
+		
+		if (friendInfo !== undefined) {
+
+			let friend: Friend = {
+				username: "",
+				firstname: "",
+				lastname: ""
+			};
+
+			friend.username = friendInfo.username;
+			friend.firstname = friendInfo.firstname;
+			friend.lastname = friendInfo.lastname;
+
+			return friend;
+		}
+		else {
+			console.log("User doesn't exist")
+			return friendInfo
+		}
+	}
+
+
+	async friendList(user: User): Promise<Friend[]> {
+		let friendList = [];
+		let friend;
+
+		// console.log("user.friends = ", user.friends)
+		for (let i = 0; user.friends[i]; i++) {
+			if ((friend = await this.retrieveFriendInfo(user.friends[i])) !== undefined){
+				friendList.push(friend);
+			}
+		}
+		console.log("Friendlist = ", friendList)
+		return (friendList);
 	}
 
 }

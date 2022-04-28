@@ -1,3 +1,3 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-//# sourceMappingURL=user.interface.js.map
+//# sourceMappingURL=jwt-payload.interface.js.map

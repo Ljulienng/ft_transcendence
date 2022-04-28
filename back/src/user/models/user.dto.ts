@@ -41,6 +41,6 @@ export class UserDto {
 	channels: Channel[];
 
 	@IsOptional()
-	friends: number[];
+	string: number[];
 
 }

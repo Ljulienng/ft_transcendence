@@ -1,12 +1,8 @@
 <template>
 <!-- universal modal -->
 <div>
-  <p>
-    <button @click="showModal">
-      Show modal
-    </button>
-  </p>
   <MyModal
+    v-if="getUserProfile.username === ''"
     v-model="isShow"
     :close="closeModal"
     :options="options"
@@ -29,6 +25,7 @@
           <input
             type="submit"
             value="Submit"
+            href="http://localhost:3001/home"
           >
         </p>
       </form>
@@ -41,11 +38,18 @@
 </template>
 
 <script>
-import { ref } from 'vue'
-// import axios from 'axios'
+import { defineComponent, ref } from 'vue'
+import { mapGetters } from "vuex";
+import http from "../http-common"
 
-export default {
-  inject:['http'],
+export default defineComponent({
+
+  computed: {
+    ...mapGetters("auth", {
+      getUserProfile: "getUserProfile",
+    }),
+  },
+
   data() {
     return {
       usernameToSet: {
@@ -57,7 +61,7 @@ export default {
   methods: {
     sendForm(){
       try {
-        this.http.post("/users/setusername", this.usernameToSet)
+        http.post("/users/setusername", this.usernameToSet)
         return ('http://localhost:3001')
 
       } catch(e) {
@@ -90,7 +94,7 @@ export default {
       closeModal
     }
   },
-}
+})
 
 </script>
 

@@ -2,6 +2,12 @@ import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, PrimaryGene
 import { Message } from "src/message/models/message.entity";
 import { Channel } from "src/channel/models/channel.entity";
 
+export type Friend = {
+	username: string;
+	firstname: string;
+	lastname: string;
+}
+
 @Entity()
 export class User {
 
@@ -42,7 +48,7 @@ export class User {
 	@OneToMany(() => Channel, channel => channel.owner)
 	channels: Channel[];
 
-	@Column("int", {array: true, nullable: true, default: null,})
-	friends: number[];
+	@Column("simple-array", {nullable: true})
+	friends: string[];
 
 }

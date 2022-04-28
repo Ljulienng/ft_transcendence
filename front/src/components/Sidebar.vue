@@ -21,10 +21,13 @@
 				<span class="text">Hello</span>
 			</router-link>
 			<router-link to="/showusers" class="button">
-				<span class="material-icons">people</span>
+				<span class="material-icons">group_add</span>
 				<span class="text">Show users</span>
 			</router-link>
-
+			<router-link to="/friendlist" class="button">
+				<span class="material-icons">group</span>
+				<span class="text">Show users</span>
+			</router-link>
 		</div>
 
 		<div class="flex"></div>

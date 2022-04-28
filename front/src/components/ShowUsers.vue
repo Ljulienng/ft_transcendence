@@ -29,7 +29,7 @@
   <p>
     <input
       type="submit"
-      value="Submit"
+      value="ADD"
     >
   </p>
   </form>
@@ -46,18 +46,20 @@
   <p>
     <input
       type="submit"
-      value="Submit"
+      value="Delete"
     >
   </p>
   </form>
 </div>
 </template>
 
-<script>
+<script lang='ts'>
 // import axios from 'axios'
 
-export default {
-  inject:['http'],
+import { defineComponent } from "@vue/runtime-core";
+import http from "../http-common"
+
+export default defineComponent({
   data() {
     return {
       users: [],
@@ -74,28 +76,35 @@ export default {
   methods: {
     async getData() {
       try {
-        const response  = await this.http.get('http://localhost:3000/users');
+        const response  = await http.get('/users');
 
         this.users = response.data;
+        console.log("user list = ", this.users)
       } catch (error) {
         console.log(error);
       }
     },
     sendForm() {
-      this.http.post("/users", this.createUser)
+      http.post("/users", this.createUser)
     },
     deleteForm() {
-      this.http.post("http://localhost:3000/users/delete", this.idToDelete);
+      console.log("to delete = ", this.idToDelete);
+      http.delete("/users/delete", {data: this.idToDelete});
+      this.getData();
     }
   },
-  mounted() {
-    this.getData();
-  },
-  updated: function () {
-    this.getData();
-  },
   
-}
+  created () {
+      this.getData();
+  },
+
+  watch: {
+		updateUserList() {
+			this.getData()
+		}
+	}
+  
+})
 </script>
 
 <style scoped>

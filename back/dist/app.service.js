@@ -9,15 +9,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
 let AppService = class AppService {
-    fortyTwoLogin(req) {
-        if (!req.user) {
-            return 'No user from 42';
-        }
-        return {
-            message: 'User info from 42',
-            user: req.user
-        };
-    }
     getHello() {
         return 'Hello World!';
     }

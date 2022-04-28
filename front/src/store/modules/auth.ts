@@ -15,7 +15,6 @@ const state = () => ({
 		id:0,
 		userName:"",
 		email:"",
-	//   phone:"",
 	}
 });
 
@@ -55,6 +54,7 @@ const actions = {
 		}
 	}
 };
+
 const mutations = {
 	// eslint-disable-next-line
 	setLoginApiStatus(state: State, data: any) {
