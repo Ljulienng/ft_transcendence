@@ -55,7 +55,10 @@ __decorate([
 ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         namespace: '/chat',
-        cors: { origin: true, credentials: true }
+        cors: {
+            origin: true,
+            credentials: true
+        },
     }),
     __metadata("design:paramtypes", [channel_service_1.ChannelService])
 ], ChatGateway);

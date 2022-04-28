@@ -1,43 +1,44 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MessageDto } from '../models/message.dto';
+import { CreateMessageDto } from '../models/createMessage.dto';
 import { Message } from '../models/message.entity';
+import { Channel } from 'src/channel/models/channel.entity';
+import { UserService } from 'src/user/service/user.service';
+import { ChannelService } from 'src/channel/service/channel.service';
 
 @Injectable()
 export class MessageService {
     constructor(
         @InjectRepository(Message)
         private messageRepository: Repository<Message>,
+        @Inject(UserService)
+        private userService: UserService,
     ) {}
 
-    /*
-    ** get all messages
-    */
+    /* get all messages */
    async findAll(): Promise<Message[]> {
        return await this.messageRepository.find();
    }
 
-   /*
-   ** get one message by its id
-   */
+   /* get a message by its id */
   async findMessageById(messageId: string): Promise<Message> {
       return await this.messageRepository.findOneOrFail({
           where: { id: Number(messageId) }
       });
   }
 
-  /*
-  ** create one message
-  */
-  create(messageDto: MessageDto) {
-      const message = this.messageRepository.create(messageDto);
-      return this.messageRepository.save(message);
+  /* save a message */
+  async saveMessage(createMessageDto: CreateMessageDto) {
+    const newMessage = this.messageRepository.create({
+        user: createMessageDto.user,
+        content: createMessageDto.content,
+   });
+
+   return this.messageRepository.save(newMessage);
   }
 
-  /*
-  ** remove one message
-  */
+  /* remove a message */
  async delete(messageId: string) {
      const message = await this.findMessageById(messageId);
      if (!message) {

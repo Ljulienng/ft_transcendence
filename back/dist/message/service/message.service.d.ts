@@ -1,11 +1,13 @@
 import { Repository } from 'typeorm';
-import { MessageDto } from '../models/message.dto';
+import { CreateMessageDto } from '../models/createMessage.dto';
 import { Message } from '../models/message.entity';
+import { UserService } from 'src/user/service/user.service';
 export declare class MessageService {
     private messageRepository;
-    constructor(messageRepository: Repository<Message>);
+    private userService;
+    constructor(messageRepository: Repository<Message>, userService: UserService);
     findAll(): Promise<Message[]>;
     findMessageById(messageId: string): Promise<Message>;
-    create(messageDto: MessageDto): Promise<Message>;
+    saveMessage(createMessageDto: CreateMessageDto): Promise<Message>;
     delete(messageId: string): Promise<Message>;
 }

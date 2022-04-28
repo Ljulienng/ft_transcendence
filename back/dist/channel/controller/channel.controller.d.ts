@@ -5,7 +5,7 @@ export declare class ChannelController {
     private readonly channelService;
     constructor(channelService: ChannelService);
     findAll(): Promise<import("../models/channel.entity").Channel[]>;
-    findChannelById(id: string): Promise<import("../models/channel.entity").Channel>;
+    findChannelById(id: number): Promise<import("../models/channel.entity").Channel>;
     createChannel(channelDto: CreateChannelDto, response: Response): Promise<import("../models/channel.entity").Channel>;
-    deleteChannel(id: string): Promise<import("../models/channel.entity").Channel>;
+    deleteChannel(id: number): Promise<import("../models/channel.entity").Channel>;
 }

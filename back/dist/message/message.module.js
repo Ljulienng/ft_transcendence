@@ -12,14 +12,14 @@ const typeorm_1 = require("@nestjs/typeorm");
 const message_controller_1 = require("./controller/message.controller");
 const message_entity_1 = require("./models/message.entity");
 const message_service_1 = require("./service/message.service");
-const channel_module_1 = require("../channel/channel.module");
+const user_module_1 = require("../user/user.module");
 let MessageModule = class MessageModule {
 };
 MessageModule = __decorate([
     (0, common_1.Module)({
         imports: [
             typeorm_1.TypeOrmModule.forFeature([message_entity_1.Message]),
-            (0, common_1.forwardRef)(() => channel_module_1.ChannelModule),
+            (0, common_1.forwardRef)(() => user_module_1.UserModule),
         ],
         controllers: [message_controller_1.MessageController],
         providers: [message_service_1.MessageService],

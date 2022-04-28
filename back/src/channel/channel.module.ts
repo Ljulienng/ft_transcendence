@@ -10,7 +10,7 @@ import { UserService } from 'src/user/service/user.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Channel]), 
-    forwardRef(() => MessageModule),
+    forwardRef(() => MessageModule), 
     forwardRef(() => UserModule),
   ],
   controllers: [ChannelController], 

@@ -14,7 +14,9 @@ let ChatModule = class ChatModule {
 };
 ChatModule = __decorate([
     (0, common_1.Module)({
-        imports: [channel_module_1.ChannelModule],
+        imports: [
+            (0, common_1.forwardRef)(() => channel_module_1.ChannelModule),
+        ],
         providers: [chat_gateway_1.ChatGateway],
     })
 ], ChatModule);

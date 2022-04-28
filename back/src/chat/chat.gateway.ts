@@ -18,7 +18,10 @@ import { ChannelService } from "src/channel/service/channel.service";
 
 @WebSocketGateway({     // decorator to access to the socket.io functionnality
     namespace: '/chat',
-    cors: { origin: true, credentials: true }
+    cors: {
+        origin: true,
+        credentials: true
+    },
 })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 

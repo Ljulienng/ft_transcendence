@@ -31,7 +31,7 @@ let ChannelService = class ChannelService {
     }
     async findChannelById(channelId) {
         return await this.channelRepository.findOneOrFail({
-            where: { id: Number(channelId) }
+            where: { id: channelId }
         });
     }
     async findChannelByName(channelName) {

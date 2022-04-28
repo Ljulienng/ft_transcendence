@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { MessageService } from '../service/message.service';
-import { MessageDto } from '../models/message.dto';
+import { CreateMessageDto } from '../models/createMessage.dto';
 
 @Controller('message') 
 export class MessageController {
@@ -17,7 +17,7 @@ export class MessageController {
     }
 
     @Post()
-    createMessage(@Body() messageDto: MessageDto) {
+    createMessage(@Body() createMessage: CreateMessageDto) {
         return ;
     }
 

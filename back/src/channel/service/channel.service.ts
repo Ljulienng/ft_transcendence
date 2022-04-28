@@ -25,9 +25,9 @@ export class ChannelService {
     }
 
     /* get one channel by its id */
-   async findChannelById(channelId: string): Promise<Channel> {
+   async findChannelById(channelId: number): Promise<Channel> {
         return await this.channelRepository.findOneOrFail({
-           where: { id: Number(channelId) }
+           where: { id: channelId }
        });
    }
 
@@ -73,7 +73,7 @@ export class ChannelService {
    }
 
     /* remove one channel */
-    async deleteChannel(channelId: string) {
+    async deleteChannel(channelId: number) {
         const channel = await this.findChannelById(channelId);
         if (!channel) {
             throw new NotFoundException();

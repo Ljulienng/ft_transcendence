@@ -9,9 +9,9 @@ export declare class ChannelService {
     private messageService;
     constructor(channelRepository: Repository<Channel>, userService: UserService, messageService: MessageService);
     findAll(): Promise<Channel[]>;
-    findChannelById(channelId: string): Promise<Channel>;
+    findChannelById(channelId: number): Promise<Channel>;
     findChannelByName(channelName: string): Promise<Channel>;
     createChannel(createChannel: CreateChannelDto, userId: number): Promise<Channel>;
     checkPasswordMatch(sentPassword: string, expectedPassword: string): Promise<boolean>;
-    deleteChannel(channelId: string): Promise<Channel>;
+    deleteChannel(channelId: number): Promise<Channel>;
 }

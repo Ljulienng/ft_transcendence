@@ -4,4 +4,4 @@ exports.CreateMessageDto = void 0;
 class CreateMessageDto {
 }
 exports.CreateMessageDto = CreateMessageDto;
-//# sourceMappingURL=message.dto.js.map
+//# sourceMappingURL=createMessage.dto.js.map
