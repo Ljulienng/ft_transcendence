@@ -83,6 +83,7 @@ aside {
 	}
 	.logo {
 		margin-bottom: 1rem;
+		align-self: center;
 		img {
 			width: 3rem;
 		}
@@ -163,7 +164,7 @@ aside {
 	&.is-expanded {
 		width: var(--sidebar-width);
 		.menu-toggle-wrap {
-			top: -3rem;
+			top: 0rem;
 			
 			.menu-toggle {
 				transform: rotate(-180deg);
