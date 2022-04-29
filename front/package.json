@@ -2,16 +2,21 @@
   "name": "front3",
   "version": "0.1.0",
   "private": true,
+  "main": "main.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "start": "node main.js"
   },
   "dependencies": {
     "axios": "^0.26.1",
     "core-js": "^3.8.3",
     "node-sass": "^7.0.1",
     "sass-loader": "^12.6.0",
+    "gallium": "^0.2.1",
+    "material-icons": "^1.10.8",
+    "npm": "^8.7.0",
     "vue": "^3.2.13",
     "vue-class-component": "^8.0.0-0",
     "vue-router": "^4.0.14",

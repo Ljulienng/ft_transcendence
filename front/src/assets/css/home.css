@@ -1,0 +1,45 @@
+.split {
+    width: 100%;
+    overflow: auto;
+    margin-top: 15%;
+    margin-bottom: 15%;
+}
+.lcol {
+    float: left;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.rcol {
+    float: right;
+    width: 50%;
+    height: 100%;
+    border-left: 6px solid #fff774;
+}
+.centered {
+    display: inline;
+    align-items: center;
+    text-align: center;
+}
+.left-aligned {
+    position: absolute;
+    top: 24%;
+    margin-left: 50px;
+}
+@import url('https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap');
+.point2win {
+    display: inline-block;
+    vertical-align: -30%;
+    font-family: 'Bungee Shade', cursive;
+    font-size: 64px;
+    color: #fff;
+}
+.theme {
+    display: inline-block;
+    vertical-align: -30%;
+    font-family: 'Impact', sans-serif;
+    font-size: 64px;
+    color: #fff;
+}
