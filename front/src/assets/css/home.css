@@ -1,44 +1,45 @@
 .split {
-    height: 100%;
+    width: 100%;
+    overflow: auto;
+    margin-top: 15%;
+    margin-bottom: 15%;
+}
+.lcol {
+    float: left;
     width: 50%;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    overflow-x: hidden;
-    padding-top: 20px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-.left {
-    left: 0;
-}
-.right {
-    right: 0;
+.rcol {
+    float: right;
+    width: 50%;
+    height: 100%;
+    border-left: 6px solid #fff774;
 }
 .centered {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    display: inline;
+    align-items: center;
     text-align: center;
 }
 .left-aligned {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: left;
+    top: 24%;
+    margin-left: 50px;
 }
-.vertl {
-    border-left: 6px solid #fff774;
-    height: 50%;
-    position: absolute;
-    left: 50%;
-    margin-top: 20%;
-    top: 0;
-}
+@import url('https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap');
 .point2win {
     display: inline-block;
     vertical-align: -30%;
-    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-family: 'Bungee Shade', cursive;
     font-size: 64px;
-    color: #fff774;
+    color: #fff;
+}
+.theme {
+    display: inline-block;
+    vertical-align: -30%;
+    font-family: 'Impact', sans-serif;
+    font-size: 64px;
+    color: #fff;
 }
