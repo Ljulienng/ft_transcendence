@@ -52,6 +52,7 @@ export default defineComponent({
 
   data() {
     return {
+      errorMsg: "",
       usernameToSet: {
         username: ''
       }
@@ -60,13 +61,17 @@ export default defineComponent({
 
   methods: {
     sendForm(){
-      try {
         http.post("/users/setusername", this.usernameToSet)
-        return ('http://localhost:3001')
-
-      } catch(e) {
-        return ('http://localhost:3001')
-      }
+        .then(
+        response => {
+          console.log(response)
+          this.errorMsg = ""
+          this.$router.push('/home')
+        }
+        )
+        .catch(
+          error => { console.log("msg = ", error.response.data.error, "full error = ", error), this.errorMsg = error.response.data.error, this.$router.push('/home')}
+        )
     },
   },
 

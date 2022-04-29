@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Req, UnauthorizedException, ConsoleLogger, UseGuards, Param} from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Req, UnauthorizedException, ConsoleLogger, UseGuards, Param, HttpException} from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { User, Friend } from '../models/user.entity';
 import { JwtService } from "@nestjs/jwt"
@@ -52,10 +52,11 @@ export class UserController {
 		let user: User;
 		try {
 			user = req.user;
+			await this.userService.addFriend(user, friendToAdd);
 		} catch (e) {
-			throw new UnauthorizedException("Error: user isn't recognized");
+			console.log('error = ', e)
+			throw e;
 		}
-		await this.userService.addFriend(user, friendToAdd);
 	}
 
 	@UseGuards(JwtAuthGuard)
@@ -68,7 +69,7 @@ export class UserController {
 			await this.userService.deleteFriend(user, friendToDelete);
 
 		} catch (e) {
-			throw new UnauthorizedException("Error: deleteFriend")
+			throw e
 		}
 	}
 
@@ -76,22 +77,12 @@ export class UserController {
 	@Post('/setusername')
 	async userInfo(@Req() req, @Body() userName) {
 	  try {
-		// const cookie = req.cookies['jwt'];
-  
-		// const data = await this.jwtService.verifyAsync(cookie);
-		// if (!data) {
-		//   throw new UnauthorizedException("User not found");
-		// }
-  
-		// const user = await this.userService.findOne(data['email']); //A changer
-		// console.log(userName);
-		// console.log("username name = ", userName.username)
 		const user = req.user;
   
 		this.userService.setUsername(user.id, userName.username);
 	  }
 	  catch (e) {
-		throw new UnauthorizedException("Username is already set.");
+		throw e;
 	  }
 	}
 

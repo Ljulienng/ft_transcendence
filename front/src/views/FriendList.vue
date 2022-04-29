@@ -11,6 +11,9 @@
 				name="id"
 				>
 			</p>
+			<p v-if="errorMsg !== ''" style="color: red">
+				{{errorMsg}}
+			</p>
 			<p>
 				<input
 				type="submit"
@@ -37,6 +40,7 @@ import http from "../http-common"
 export default defineComponent({
 	data() {
 		return {
+			errorMsg: "",
 			friendList: [],
 			friendToAdd: {
 				friendUsername: ""
@@ -57,17 +61,22 @@ export default defineComponent({
 		async addFriend() {
 			await http.post('/users/addfriend', this.friendToAdd)
 			.then(
-				response => { console.log("success"); this.getFriendList() }
+				response => { console.log("success"); this.getFriendList(); this.errorMsg = "" }
 			)
 			.catch(
-				error => { console.log("msg = ", error.response.data.message) }
+				error => { console.log("msg = ", error.response.data.error, "full error = ", error), this.errorMsg = error.response.data.error }
 			)
 		},
 
 		async deleteFriend(friendUsername: string) {
 			console.log("friend to delete =" ,friendUsername)
 			await http.delete('/users/deletefriend', {data:{username: friendUsername}})
-			this.getFriendList();
+			.then(
+				response => { console.log("success"); this.getFriendList(); this.errorMsg = "" }
+			)
+			.catch(
+				error => { this.errorMsg = error.response.data.error }
+			)
 		}
 	},
 
