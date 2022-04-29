@@ -6,6 +6,7 @@ import { UserDto } from '../models/user.dto';
 import { Student } from "src/user/dto/student.dto"
 import { User, Friend } from '../models/user.entity';
 import { isNumber } from 'class-validator';
+import { names, uniqueNamesGenerator } from 'unique-names-generator';
 
 @Injectable()
 export class UserService {
@@ -16,10 +17,13 @@ export class UserService {
 	) {}
 
 	add(user: User): any {
+		user.firstname = uniqueNamesGenerator({dictionaries: [names]})
+		user.lastname = uniqueNamesGenerator({dictionaries: [names]})
+
 		return from(this.userRepository.save(user));
 	}
 
-	addStudent(user: Student): any{
+	addStudent(user: Student): any {
 		const tmp: User = this.userRepository.create(user);
 
 		console.log('Student Added');
@@ -38,10 +42,10 @@ export class UserService {
 		const tmp = await this.userRepository.findOne({username: userName})
 		const regex = /^[a-zA-Z0-9_]+$/
 
-		console.log("username: ", userName);
-		console.log("tmp: ", tmp);
-		console.log("currentUser: ", (await currentUser).username);
-		console.log("regexp = ", regex.test(userName));
+		// console.log("username: ", userName);
+		// console.log("tmp: ", tmp);
+		// console.log("currentUser: ", (await currentUser).username);
+		// console.log("regexp = ", regex.test(userName));
 		if (tmp)
 			throw new HttpException('Username already taken', HttpStatus.FORBIDDEN);
 		else if ((await currentUser).username === userName)
@@ -168,7 +172,7 @@ export class UserService {
 				friendList.push(friend);
 			}
 		}
-		console.log("Friendlist = ", friendList)
+		// console.log("Friendlist = ", friendList)
 		return (friendList);
 	}
 

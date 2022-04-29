@@ -54,7 +54,6 @@ export class UserController {
 			user = req.user;
 			await this.userService.addFriend(user, friendToAdd);
 		} catch (e) {
-			console.log('error = ', e)
 			throw e;
 		}
 	}
