@@ -13,4 +13,5 @@ export declare class Channel {
     readonly createdTime: Date;
     messages: Message[];
     owner: User;
+    users: User[];
 }

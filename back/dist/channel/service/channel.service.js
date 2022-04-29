@@ -18,12 +18,12 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const channel_entity_1 = require("../models/channel.entity");
 const message_service_1 = require("../../message/service/message.service");
-const user_service_1 = require("../../user/service/user.service");
 const bcrypt = require("bcrypt");
+const user_entity_1 = require("../../user/models/user.entity");
 let ChannelService = class ChannelService {
-    constructor(channelRepository, userService, messageService) {
+    constructor(channelRepository, userRepository, messageService) {
         this.channelRepository = channelRepository;
-        this.userService = userService;
+        this.userRepository = userRepository;
         this.messageService = messageService;
     }
     async findAll() {
@@ -40,7 +40,7 @@ let ChannelService = class ChannelService {
         });
     }
     async createChannel(createChannel, userId) {
-        const user = await this.userService.findByUserId(userId);
+        const user = await this.userRepository.findOne({ id: userId });
         if (!user) {
             throw new common_1.UnauthorizedException('user does not exist');
         }
@@ -49,6 +49,7 @@ let ChannelService = class ChannelService {
             type: createChannel.type,
             password: createChannel.password,
             messages: [],
+            owner: user,
         });
         if (newChannel.type === channel_entity_1.ChannelType.protected || newChannel.type === channel_entity_1.ChannelType.private) {
             if (!newChannel.password) {
@@ -64,6 +65,21 @@ let ChannelService = class ChannelService {
     async checkPasswordMatch(sentPassword, expectedPassword) {
         return await bcrypt.compare(sentPassword, expectedPassword);
     }
+    async addUserToChannel(channel, userId) {
+        const user = await this.userRepository.findOne({ id: userId });
+        const welcomingChannel = await this.findChannelById(channel.id);
+        if (welcomingChannel.type !== channel_entity_1.ChannelType.public) {
+            if (welcomingChannel.password) {
+                const match = this.checkPasswordMatch(welcomingChannel.password, channel.password);
+                if (!match) {
+                    throw new common_1.UnauthorizedException('incorrect password');
+                }
+            }
+        }
+        if (welcomingChannel.users.find((u) => u.id === user.id)) {
+            throw new common_1.UnauthorizedException('user already in this channel');
+        }
+    }
     async deleteChannel(channelId) {
         const channel = await this.findChannelById(channelId);
         if (!channel) {
@@ -75,10 +91,10 @@ let ChannelService = class ChannelService {
 ChannelService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(channel_entity_1.Channel)),
-    __param(1, (0, common_1.Inject)(user_service_1.UserService)),
+    __param(1, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __param(2, (0, common_1.Inject)(message_service_1.MessageService)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        user_service_1.UserService,
+        typeorm_2.Repository,
         message_service_1.MessageService])
 ], ChannelService);
 exports.ChannelService = ChannelService;

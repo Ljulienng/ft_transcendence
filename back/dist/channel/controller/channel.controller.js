@@ -26,6 +26,9 @@ let ChannelController = class ChannelController {
     findChannelById(id) {
         return this.channelService.findChannelById(id);
     }
+    findChannelByName(name) {
+        return this.channelService.findChannelByName(name);
+    }
     createChannel(channelDto, response) {
         return this.channelService.createChannel(channelDto, response.locals.id);
     }
@@ -46,6 +49,13 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], ChannelController.prototype, "findChannelById", null);
+__decorate([
+    (0, common_1.Get)(':name'),
+    __param(0, (0, common_1.Param)('name')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], ChannelController.prototype, "findChannelByName", null);
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),

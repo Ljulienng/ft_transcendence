@@ -18,6 +18,11 @@ export class ChannelController {
         return this.channelService.findChannelById(id);
     }
 
+    @Get(':name')
+    findChannelByName(@Param('name') name: string) {
+        return this.channelService.findChannelByName(name);
+    }
+
     // @Get(':id/message')
     // findMessagesByChannelId(@Param('id') channelId: string): Promise<MessageDto[]> {
     //     return this.channelService.findMessagesByChannelId(channelId);

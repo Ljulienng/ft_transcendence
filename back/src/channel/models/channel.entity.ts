@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, OneToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, ManyToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable } from "typeorm";
 import { IsOptional } from 'class-validator';
 import { Message } from "src/message/models/message.entity";
 import { User } from "src/user/models/user.entity";
@@ -35,5 +35,9 @@ export class Channel {
         onDelete: 'CASCADE',
     })
     owner: User;
+
+	@ManyToMany(() => User, { onDelete: 'CASCADE'})
+	@JoinTable()
+	users: User[];
 
 }

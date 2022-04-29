@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const createChannel_dto_1 = require("../channel/models/createChannel.dto");
+const channel_entity_1 = require("../channel/models/channel.entity");
 const channel_service_1 = require("../channel/service/channel.service");
 let ChatGateway = class ChatGateway {
     constructor(channelService) {
@@ -27,9 +27,10 @@ let ChatGateway = class ChatGateway {
     handleDisconnect(client) {
         console.log('client disconnected');
     }
-    async createChannel(socket, createChannel) {
-        const newChannel = await this.channelService.createChannel(createChannel, socket.data.user);
-        console.log(newChannel);
+    async joinChannel(client, channel) {
+        await this.channelService.addUserToChannel(channel, client.data.user.id);
+    }
+    async leaveChannel(client) {
     }
     sendMessage(client, message) {
         console.log('Send message');
@@ -41,11 +42,17 @@ __decorate([
     __metadata("design:type", socket_io_1.Server)
 ], ChatGateway.prototype, "server", void 0);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('addChannel'),
+    (0, websockets_1.SubscribeMessage)('joinChannel'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket, createChannel_dto_1.CreateChannelDto]),
+    __metadata("design:paramtypes", [socket_io_1.Socket, channel_entity_1.Channel]),
     __metadata("design:returntype", Promise)
-], ChatGateway.prototype, "createChannel", null);
+], ChatGateway.prototype, "joinChannel", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('leaveChannel'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "leaveChannel", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('addMessage'),
     __metadata("design:type", Function),

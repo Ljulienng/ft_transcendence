@@ -7,6 +7,7 @@ import {
     WebSocketServer
 } from "@nestjs/websockets";
 import { Server, Socket } from 'socket.io'
+import { Channel } from "src/channel/models/channel.entity";
 import { CreateChannelDto } from "src/channel/models/createChannel.dto";
 import { ChannelService } from "src/channel/service/channel.service";
 
@@ -43,14 +44,22 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         console.log('client disconnected');
     }
 
-    /*
-    ** listen to 'addChannel' event
-    ** create a new channel and connect users to it
-    */
-    @SubscribeMessage('addChannel')
-    async createChannel(socket: Socket, createChannel: CreateChannelDto) {
-        const newChannel = await this.channelService.createChannel(createChannel, socket.data.user);
-        console.log(newChannel);
+    /* TO REMOVE - ACCESS BY CONTROLLER (endpoint /channel) */
+    // @SubscribeMessage('addChannel')
+    // async createChannel(client: Socket, createChannel: CreateChannelDto) {
+    //     const newChannel = await this.channelService.createChannel(createChannel, client.data.user);
+    //     console.log(newChannel);
+    // }
+
+    /* connect user to a channel */
+    @SubscribeMessage('joinChannel')
+    async joinChannel(client: Socket, channel: Channel) {
+        await this.channelService.addUserToChannel(channel, client.data.user.id);
+    }
+
+    @SubscribeMessage('leaveChannel')
+    async leaveChannel(client: Socket) {
+        // await this.channelService.removeUserToChannel(channel, client.data.user.id);
     }
 
      /*

@@ -7,14 +7,17 @@ import { Message } from 'src/message/models/message.entity';
 import { MessageService } from 'src/message/service/message.service';
 import { UserService } from 'src/user/service/user.service';
 import * as bcrypt from 'bcrypt';
+import { User } from 'src/user/models/user.entity';
 
 @Injectable()
 export class ChannelService {
     constructor(
         @InjectRepository(Channel)
         private channelRepository: Repository<Channel>,
-        @Inject(UserService)
-        private userService: UserService,
+        @InjectRepository(User)
+        private userRepository: Repository<User>,
+        // @Inject(UserService)
+        // private userService: UserService,
         @Inject(MessageService)
         private messageService: MessageService,
     ) {}
@@ -40,8 +43,9 @@ export class ChannelService {
 
     /* create one channel */
    async createChannel(createChannel: CreateChannelDto, userId: number): Promise<Channel> {
-        const user = await this.userService.findByUserId(userId);
-
+        // const user = await this.userService.findByUserId(userId);
+        const user = await this.userRepository.findOne({id: userId});
+        
         if (!user) {
             throw new UnauthorizedException('user does not exist');
         }
@@ -51,7 +55,7 @@ export class ChannelService {
             type: createChannel.type,
             password: createChannel.password,
             messages: [],
-            // owner: user,
+            owner: user,
        });
 
        if (newChannel.type === ChannelType.protected || newChannel.type === ChannelType.private) {
@@ -70,6 +74,33 @@ export class ChannelService {
     /* check if the password sent is the right one */
    async checkPasswordMatch(sentPassword: string, expectedPassword: string) {
         return await bcrypt.compare(sentPassword, expectedPassword);
+   }
+
+   /*
+   ** a user wants to integrate a channel
+   ** need to check if :
+   **       - the password is correct (private/protected only)
+   **       - the user is not already in the channel
+   **       - the user is banned of the channel
+   */
+   async addUserToChannel(channel: Channel, userId: number) {
+        // const user = await this.userService.findByUserId(userId);
+        const user = await this.userRepository.findOne({id: userId});
+        const welcomingChannel = await this.findChannelById(channel.id);
+        
+        if (welcomingChannel.type !== ChannelType.public) {
+            if (welcomingChannel.password) {
+                const match = this.checkPasswordMatch(welcomingChannel.password, channel.password);
+                if (!match) {
+                    throw new UnauthorizedException('incorrect password');
+                }
+            }
+        }
+
+        if (welcomingChannel.users.find((u) => u.id === user.id)) {
+            throw new UnauthorizedException('user already in this channel');
+        }
+
    }
 
     /* remove one channel */
