@@ -1,7 +1,8 @@
 .split {
+    position: absolute;
     width: 100%;
-    overflow: auto;
-    margin-top: 15%;
+    height: 50%;
+    margin-top: 10%;
     margin-bottom: 15%;
 }
 .lcol {
@@ -25,7 +26,6 @@
 }
 .left-aligned {
     position: absolute;
-    top: 24%;
     margin-left: 50px;
 }
 @import url('https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap');
@@ -42,4 +42,16 @@
     font-family: 'Impact', sans-serif;
     font-size: 64px;
     color: #fff;
+}
+@import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+.welcome {
+    height: 50px;
+    width: 100%;
+    margin-top: 5%;
+    margin-left: 5%;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 32px;
+    color: #fff;
+    text-shadow: 2px 2px #fff774;
 }

@@ -23,7 +23,7 @@ export default {
 }
 </script>
 
-<style scss lang="scss">
+<style scoped scss lang="scss">
 
 .modal {
   position: absolute;

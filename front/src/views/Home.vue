@@ -1,36 +1,43 @@
 <template>
-  <div class="split">
-    <div class="lcol">
-      <div class="centered">
-          <h4>points to victory</h4>
-          <div>
-            <button class="left_arrow"></button>
-            <p class="point2win">3</p>
-            <button class="right_arrow"></button>
-          </div>
-        <br>
-        <h4>theme</h4>
-          <div>
-            <button class="left_arrow"></button>
-            <p class="theme">classic</p>
-            <button class="right_arrow"></button>
-          </div>
-        <br>
-        <button class="btn">play</button>
-      </div>
+  <div class="body">
+    <div class="welcome">
+      Welcome, {{msg}}
     </div>
-    <div class="rcol">
-      <div class="left-aligned">
-        <h1>tran</h1>
-        <h1>scen</h1>
-        <h1>dence.</h1>
+    <div class="split">
+      <div class="lcol">
+        <div class="centered">
+            <h4>points to victory</h4>
+            <div>
+              <button class="left_arrow"></button>
+              <p class="point2win">3</p>
+              <button class="right_arrow"></button>
+            </div>
+          <br>
+          <h4>theme</h4>
+            <div>
+              <button class="left_arrow"></button>
+              <p class="theme">classic</p>
+              <button class="right_arrow"></button>
+            </div>
+          <br>
+          <button class="mybtn">play</button>
+        </div>
       </div>
+      <div class="rcol">
+        <div class="left-aligned">
+          <h1>tran</h1>
+          <h1>scen</h1>
+          <h1>dence.</h1>
+          <br>
+        </div>
+      </div>
+      <div style="clear:both"></div>
     </div>
-    <div style="clear:both"></div>
   </div>
 </template>
 
 <script>
+import '../assets/css/style.scss'
 import {onMounted, ref} from 'vue'
 import axios from 'axios'
 import {useStore, store} from 'vuex'
