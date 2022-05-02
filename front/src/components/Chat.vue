@@ -71,10 +71,11 @@ export default defineComponent({
                 status: this.privacy,
                 password: this.password,
              }
-            this.$emit('addChannel', channel);
+            this.socket.emit('addChannel', channel);
         },
     },
     created () {
+        this.socket = io('http://localhost:3000/chat', {  withCredentials: true });
         this.getChannelList();
     },
 })
