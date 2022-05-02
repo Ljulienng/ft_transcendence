@@ -99,11 +99,16 @@ export class ChannelService {
         if (welcomingChannel.users.find((u) => u.id === user.id)) {
             throw new UnauthorizedException('user already in this channel');
         }
+
+        // add the user to the channel
+        // await this.channelRepository.findAndCount(user);
    }
 
    async removeUserToChannel(channel: Channel, userId: number) {
         const user = await this.userRepository.findOne({id: userId});
         const channelToLeave = await this.findChannelById(channel.id);
+
+        // remove the user to the channel
    }
 
     /* remove one channel */
@@ -113,5 +118,12 @@ export class ChannelService {
             throw new NotFoundException();
         }
         return this.channelRepository.remove(channel);
+    }
+
+    /* get all the messages of a channel */
+    async getChannelMessagesByRoom(room: string) {
+        const channel = await this.findChannelByName(room);
+        const messages = await this.messageRepository.find(); // -> A MODIFIER -> where channelId = channel.id
+        return messages;
     }
 }

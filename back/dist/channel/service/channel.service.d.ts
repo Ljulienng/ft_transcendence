@@ -16,4 +16,5 @@ export declare class ChannelService {
     addUserToChannel(channel: Channel, userId: number): Promise<void>;
     removeUserToChannel(channel: Channel, userId: number): Promise<void>;
     deleteChannel(channelId: number): Promise<Channel>;
+    getChannelMessagesByRoom(room: string): Promise<Message[]>;
 }

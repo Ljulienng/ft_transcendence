@@ -24,7 +24,7 @@ AppModule = __decorate([
             config_1.ConfigModule.forRoot({ isGlobal: true }),
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'postgres',
-                url: process.env.DATABASE_URL,
+                url: 'postgres://user:password@localhost:5432/db',
                 autoLoadEntities: true,
                 synchronize: true
             }),

@@ -40,13 +40,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     /* https://lucaball.doesweb.dev/socket-io-rooms-and-nestjs-how-to
-    we listen to the 'room' event and join the client to the room
+        we listen to the 'room' event and join the client to the room
     */
-    handleConnection(client: Socket, room: string): any {
+    async handleConnection(client: Socket, room: string) {
         console.log('client connected to the chat');
-        client.on('room', function(room) {
-            client.join(room);
-        });
+        client.join(room);                          // add this client to the room
+        this.server.to(room).emit('client_join');   // send the info to other members of this channel
+        const messages = await this.channelService.getChannelMessagesByRoom(room);   // MODIFY dto
+        this.server.to(client.id).emit('channelMessages', messages);    // send messages of the channel to the new user
     }
 
     handleDisconnect(client: any) {

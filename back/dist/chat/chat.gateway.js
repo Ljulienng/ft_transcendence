@@ -24,11 +24,12 @@ let ChatGateway = class ChatGateway {
     afterInit(server) {
         console.log('init chat');
     }
-    handleConnection(client, room) {
+    async handleConnection(client, room) {
         console.log('client connected to the chat');
-        client.on('room', function (room) {
-            client.join(room);
-        });
+        client.join(room);
+        this.server.to(room).emit('client_join');
+        const messages = await this.channelService.getChannelMessagesByRoom(room);
+        this.server.to(client.id).emit('channelMessages', messages);
     }
     handleDisconnect(client) {
         console.log('client disconnected');

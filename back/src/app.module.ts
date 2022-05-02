@@ -15,9 +15,9 @@ import { ChatModule } from './chat/chat.module';
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal: true}),
-    TypeOrmModule.forRoot({ // for PostGres
+    TypeOrmModule.forRoot({ // for PostGres 
       type: 'postgres',
-      url: process.env.DATABASE_URL,
+      url: 'postgres://user:password@localhost:5432/db',
       autoLoadEntities: true,
       synchronize: true
     }),
