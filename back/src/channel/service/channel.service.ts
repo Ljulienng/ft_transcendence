@@ -16,10 +16,9 @@ export class ChannelService {
         private channelRepository: Repository<Channel>,
         @InjectRepository(User)
         private userRepository: Repository<User>,
-        // @Inject(UserService)
-        // private userService: UserService,
-        @Inject(MessageService)
-        private messageService: MessageService,
+        @InjectRepository(Message)
+        private messageRepository: Repository<Message>,
+        // private messageService: MessageService,
     ) {}
 
     /* get all channels */

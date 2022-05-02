@@ -10,12 +10,14 @@ exports.ChatModule = void 0;
 const common_1 = require("@nestjs/common");
 const chat_gateway_1 = require("./chat.gateway");
 const channel_module_1 = require("../channel/channel.module");
+const message_module_1 = require("../message/message.module");
 let ChatModule = class ChatModule {
 };
 ChatModule = __decorate([
     (0, common_1.Module)({
         imports: [
             (0, common_1.forwardRef)(() => channel_module_1.ChannelModule),
+            (0, common_1.forwardRef)(() => message_module_1.MessageModule),
         ],
         providers: [chat_gateway_1.ChatGateway],
     })

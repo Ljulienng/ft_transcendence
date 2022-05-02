@@ -12,7 +12,6 @@ export class MessageService {
     constructor(
         @InjectRepository(Message)
         private messageRepository: Repository<Message>,
-        @Inject(UserService)
         private userService: UserService,
     ) {}
 
@@ -46,5 +45,4 @@ export class MessageService {
      }
      return this.messageRepository.remove(message);
  }
-
 }

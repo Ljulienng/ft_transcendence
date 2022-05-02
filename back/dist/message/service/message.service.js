@@ -49,7 +49,6 @@ let MessageService = class MessageService {
 MessageService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(message_entity_1.Message)),
-    __param(1, (0, common_1.Inject)(user_service_1.UserService)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         user_service_1.UserService])
 ], MessageService);

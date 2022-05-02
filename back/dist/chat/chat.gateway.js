@@ -14,15 +14,21 @@ const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const channel_entity_1 = require("../channel/models/channel.entity");
 const channel_service_1 = require("../channel/service/channel.service");
+const createMessage_dto_1 = require("../message/models/createMessage.dto");
+const message_service_1 = require("../message/service/message.service");
 let ChatGateway = class ChatGateway {
-    constructor(channelService) {
+    constructor(channelService, messageService) {
         this.channelService = channelService;
+        this.messageService = messageService;
     }
     afterInit(server) {
         console.log('init chat');
     }
-    handleConnection(client, ...args) {
+    handleConnection(client, room) {
         console.log('client connected');
+        client.on('room', function (room) {
+            client.join(room);
+        });
     }
     handleDisconnect(client) {
         console.log('client disconnected');
@@ -32,9 +38,10 @@ let ChatGateway = class ChatGateway {
     }
     async leaveChannel(client) {
     }
-    sendMessage(client, message) {
+    async sendMessage(client, message) {
         console.log('Send message');
-        this.server.emit('messageSent', message);
+        this.server.emit('messageSent', message.content);
+        await this.messageService.saveMessage(message);
     }
 };
 __decorate([
@@ -56,8 +63,8 @@ __decorate([
 __decorate([
     (0, websockets_1.SubscribeMessage)('addMessage'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket, String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [socket_io_1.Socket, createMessage_dto_1.CreateMessageDto]),
+    __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "sendMessage", null);
 ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
@@ -67,7 +74,8 @@ ChatGateway = __decorate([
             credentials: true
         },
     }),
-    __metadata("design:paramtypes", [channel_service_1.ChannelService])
+    __metadata("design:paramtypes", [channel_service_1.ChannelService,
+        message_service_1.MessageService])
 ], ChatGateway);
 exports.ChatGateway = ChatGateway;
 //# sourceMappingURL=chat.gateway.js.map

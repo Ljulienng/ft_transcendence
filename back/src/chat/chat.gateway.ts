@@ -8,8 +8,9 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from 'socket.io'
 import { Channel } from "src/channel/models/channel.entity";
-import { CreateChannelDto } from "src/channel/models/createChannel.dto";
 import { ChannelService } from "src/channel/service/channel.service";
+import { CreateMessageDto } from "src/message/models/createMessage.dto";
+import { MessageService } from "src/message/service/message.service";
 
 /*
 ** OnGatewayInit        : need to implement afterInit()
@@ -30,14 +31,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     constructor(
         private channelService: ChannelService,
+        private messageService: MessageService,
     ){}
 
     afterInit(server: any) {
         console.log('init chat');
     }
 
-    handleConnection(client: any, ...args: any[]) {
+    handleConnection(client: Socket, room: string): any {
         console.log('client connected');
+        client.on('room', function(room) {
+            client.join(room);
+        });
     }
 
     handleDisconnect(client: any) {
@@ -67,10 +72,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
      ** add a new message
      */
     @SubscribeMessage('addMessage') 
-    /*async*/ sendMessage(client: Socket, message: string): void {
+    async sendMessage(client: Socket, message: CreateMessageDto /*string*/) {
         console.log('Send message');
-        this.server.emit('messageSent', message);   // send data to all connected clients
-        // await this.channelService.addMessage();
+        this.server.emit('messageSent', message.content);   // send data to all connected clients
+        await this.messageService.saveMessage(message); 
     }
 
 

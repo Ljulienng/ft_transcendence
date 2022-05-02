@@ -17,14 +17,14 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const channel_entity_1 = require("../models/channel.entity");
-const message_service_1 = require("../../message/service/message.service");
+const message_entity_1 = require("../../message/models/message.entity");
 const bcrypt = require("bcrypt");
 const user_entity_1 = require("../../user/models/user.entity");
 let ChannelService = class ChannelService {
-    constructor(channelRepository, userRepository, messageService) {
+    constructor(channelRepository, userRepository, messageRepository) {
         this.channelRepository = channelRepository;
         this.userRepository = userRepository;
-        this.messageService = messageService;
+        this.messageRepository = messageRepository;
     }
     async findAll() {
         return await this.channelRepository.find();
@@ -92,10 +92,10 @@ ChannelService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(channel_entity_1.Channel)),
     __param(1, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __param(2, (0, common_1.Inject)(message_service_1.MessageService)),
+    __param(2, (0, typeorm_1.InjectRepository)(message_entity_1.Message)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
-        message_service_1.MessageService])
+        typeorm_2.Repository])
 ], ChannelService);
 exports.ChannelService = ChannelService;
 //# sourceMappingURL=channel.service.js.map
