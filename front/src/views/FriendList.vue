@@ -61,7 +61,7 @@ export default defineComponent({
 		async addFriend() {
 			await http.post('/users/addfriend', this.friendToAdd)
 			.then(
-				response => { console.log("success"); this.getFriendList(); this.errorMsg = "" }
+				response => { console.log("success", response); this.getFriendList(); this.errorMsg = "" }
 			)
 			.catch(
 				error => { console.log("msg = ", error.response.data.error, "full error = ", error), this.errorMsg = error.response.data.error }
@@ -72,7 +72,7 @@ export default defineComponent({
 			console.log("friend to delete =" ,friendUsername)
 			await http.delete('/users/deletefriend', {data:{username: friendUsername}})
 			.then(
-				response => { console.log("success"); this.getFriendList(); this.errorMsg = "" }
+				response => { console.log("success", response); this.getFriendList(); this.errorMsg = "" }
 			)
 			.catch(
 				error => { this.errorMsg = error.response.data.error }

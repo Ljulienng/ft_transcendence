@@ -86,6 +86,7 @@ export default defineComponent({
     },
     sendForm() {
       http.post("/users", this.createUser)
+      this.getData();
     },
     deleteForm() {
       console.log("to delete = ", this.idToDelete);
@@ -98,11 +99,11 @@ export default defineComponent({
       this.getData();
   },
 
-  watch: {
-		updateUserList() {
-			this.getData()
-		}
-	}
+  // watch: {
+	// 	updateUserList() {
+	// 		this.getData()
+	// 	}
+	// }
   
 })
 </script>
