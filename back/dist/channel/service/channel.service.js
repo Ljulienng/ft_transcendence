@@ -80,6 +80,9 @@ let ChannelService = class ChannelService {
             throw new common_1.UnauthorizedException('user already in this channel');
         }
     }
+    async removeUserToChannel(channel, userId) {
+        const user = await this.userRepository.findOne({ id: userId });
+    }
     async deleteChannel(channelId) {
         const channel = await this.findChannelById(channelId);
         if (!channel) {

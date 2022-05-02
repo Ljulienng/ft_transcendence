@@ -11,6 +11,7 @@ import { Channel } from "src/channel/models/channel.entity";
 import { ChannelService } from "src/channel/service/channel.service";
 import { CreateMessageDto } from "src/message/models/createMessage.dto";
 import { MessageService } from "src/message/service/message.service";
+import { ChildEntity } from "typeorm";
 
 /*
 ** OnGatewayInit        : need to implement afterInit()
@@ -38,8 +39,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         console.log('init chat');
     }
 
+    /* https://lucaball.doesweb.dev/socket-io-rooms-and-nestjs-how-to
+    we listen to the 'room' event and join the client to the room
+    */
     handleConnection(client: Socket, room: string): any {
-        console.log('client connected');
+        console.log('client connected to the chat');
         client.on('room', function(room) {
             client.join(room);
         });
@@ -63,12 +67,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('leaveChannel')
-    async leaveChannel(client: Socket) {
-        // await this.channelService.removeUserToChannel(channel, client.data.user.id);
+    async leaveChannel(client: Socket, channel: Channel) {
+        await this.channelService.removeUserToChannel(channel, client.data.user.id);
     }
 
      /*
-     ** listen to 'addMessage' event
      ** add a new message
      */
     @SubscribeMessage('addMessage') 

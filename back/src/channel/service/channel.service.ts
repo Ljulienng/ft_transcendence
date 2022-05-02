@@ -99,7 +99,11 @@ export class ChannelService {
         if (welcomingChannel.users.find((u) => u.id === user.id)) {
             throw new UnauthorizedException('user already in this channel');
         }
+   }
 
+   async removeUserToChannel(channel: Channel, userId: number) {
+        const user = await this.userRepository.findOne({id: userId});
+        const channelToLeave = await this.findChannelById(channel.id);
    }
 
     /* remove one channel */

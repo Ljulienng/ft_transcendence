@@ -25,7 +25,7 @@ let ChatGateway = class ChatGateway {
         console.log('init chat');
     }
     handleConnection(client, room) {
-        console.log('client connected');
+        console.log('client connected to the chat');
         client.on('room', function (room) {
             client.join(room);
         });
@@ -36,7 +36,8 @@ let ChatGateway = class ChatGateway {
     async joinChannel(client, channel) {
         await this.channelService.addUserToChannel(channel, client.data.user.id);
     }
-    async leaveChannel(client) {
+    async leaveChannel(client, channel) {
+        await this.channelService.removeUserToChannel(channel, client.data.user.id);
     }
     async sendMessage(client, message) {
         console.log('Send message');
@@ -57,7 +58,7 @@ __decorate([
 __decorate([
     (0, websockets_1.SubscribeMessage)('leaveChannel'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket]),
+    __metadata("design:paramtypes", [socket_io_1.Socket, channel_entity_1.Channel]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "leaveChannel", null);
 __decorate([
