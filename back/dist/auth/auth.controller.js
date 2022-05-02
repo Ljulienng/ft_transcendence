@@ -33,8 +33,15 @@ let AuthController = class AuthController {
         res.cookie('jwt', accessToken, { httpOnly: true });
         res.redirect('http://localhost:3001/home');
     }
-    getHellow(req) {
-        return req.user;
+    async userinfo(req) {
+        try {
+            const user = req.user;
+            console.log("userinfo ", user);
+            return user;
+        }
+        catch (e) {
+            throw new common_1.UnauthorizedException("wtf");
+        }
     }
 };
 __decorate([
@@ -56,12 +63,12 @@ __decorate([
 ], AuthController.prototype, "FortyTwoAuthRedirect", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Get)('protected'),
+    (0, common_1.Get)('userinfo'),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", String)
-], AuthController.prototype, "getHellow", null);
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "userinfo", null);
 AuthController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [fortytwo_service_1.FortyTwoService, user_service_1.UserService, jwt_1.JwtService])

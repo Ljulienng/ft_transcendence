@@ -1,0 +1,57 @@
+.split {
+    position: absolute;
+    width: 100%;
+    height: 50%;
+    margin-top: 10%;
+    margin-bottom: 15%;
+}
+.lcol {
+    float: left;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.rcol {
+    float: right;
+    width: 50%;
+    height: 100%;
+    border-left: 6px solid #fff774;
+}
+.centered {
+    display: inline;
+    align-items: center;
+    text-align: center;
+}
+.left-aligned {
+    position: absolute;
+    margin-left: 50px;
+}
+@import url('https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap');
+.point2win {
+    display: inline-block;
+    vertical-align: -30%;
+    font-family: 'Bungee Shade', cursive;
+    font-size: 64px;
+    color: #fff;
+}
+.theme {
+    display: inline-block;
+    vertical-align: -30%;
+    font-family: 'Impact', sans-serif;
+    font-size: 64px;
+    color: #fff;
+}
+@import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+.welcome {
+    height: 50px;
+    width: 100%;
+    margin-top: 5%;
+    margin-left: 5%;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 32px;
+    color: #fff;
+    text-shadow: 2px 2px #fff774;
+}

@@ -8,5 +8,5 @@ export declare class AuthController {
     constructor(fortyTwoService: FortyTwoService, userService: UserService, jwtService: JwtService);
     FortyTwoAuth(req: any): Promise<void>;
     FortyTwoAuthRedirect(req: any, res: any): Promise<void>;
-    getHellow(req: any): string;
+    userinfo(req: any): Promise<any>;
 }

@@ -18,13 +18,14 @@ const typeorm_1 = require("@nestjs/typeorm");
 const rxjs_1 = require("rxjs");
 const typeorm_2 = require("typeorm");
 const user_entity_1 = require("../models/user.entity");
-const friend_request_entity_1 = require("../models/friend-request.entity");
+const unique_names_generator_1 = require("unique-names-generator");
 let UserService = class UserService {
-    constructor(userRepository, friendRequestRepository) {
+    constructor(userRepository) {
         this.userRepository = userRepository;
-        this.friendRequestRepository = friendRequestRepository;
     }
     add(user) {
+        user.firstname = (0, unique_names_generator_1.uniqueNamesGenerator)({ dictionaries: [unique_names_generator_1.names] });
+        user.lastname = (0, unique_names_generator_1.uniqueNamesGenerator)({ dictionaries: [unique_names_generator_1.names] });
         return (0, rxjs_1.from)(this.userRepository.save(user));
     }
     addStudent(user) {
@@ -35,8 +36,20 @@ let UserService = class UserService {
         return (0, rxjs_1.from)(this.userRepository.save(user));
     }
     async delete(id) {
-        console.log(id);
         await this.userRepository.delete(id);
+    }
+    async setUsername(userId, userName) {
+        const currentUser = await this.userRepository.findOne({ id: userId });
+        const tmp = await this.userRepository.findOne({ username: userName });
+        const regex = /^[a-zA-Z0-9_]+$/;
+        if (tmp)
+            throw new common_1.HttpException('Username already taken', common_1.HttpStatus.FORBIDDEN);
+        else if ((await currentUser).username === userName)
+            throw new common_1.HttpException('You already took this username', common_1.HttpStatus.FORBIDDEN);
+        else if (regex.test(userName) === false)
+            throw new common_1.HttpException('Wrong format for username only underscore are allowed.', common_1.HttpStatus.FORBIDDEN);
+        currentUser.username = userName;
+        await this.userRepository.save(currentUser);
     }
     findAll() {
         return (0, rxjs_1.from)(this.userRepository.find());
@@ -68,62 +81,73 @@ let UserService = class UserService {
         const newUser = await this.addStudent(user);
         return newUser;
     }
-    hasRequestBeenSentOrReceived(creator, receiver) {
-        return (0, rxjs_1.from)(this.friendRequestRepository.findOne({
-            where: [
-                { creator, receiver },
-                { creator: receiver, receiver: creator },
-            ]
-        })).pipe((0, rxjs_1.switchMap)((friendRequest) => {
-            if (!friendRequest)
-                return (0, rxjs_1.of)(false);
-            return (0, rxjs_1.of)(true);
-        }));
+    async addFriend(user, friendToAdd) {
+        const friend = await this.userRepository.findOne({ username: friendToAdd.friendUsername });
+        if (user.friends === null)
+            user.friends = [];
+        if (!friend) {
+            throw new common_1.UnauthorizedException(common_1.HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
+        }
+        const tmp = user.friends.find(el => el === String(friend.id));
+        if (tmp) {
+            throw new common_1.UnauthorizedException(common_1.HttpStatus.FORBIDDEN, 'The user is already in your friendlist.');
+        }
+        else {
+            user.friends.push(String(friend.id));
+        }
+        await this.userRepository.save(user);
     }
-    sendFriendRequest(creator, receiverId) {
-        if (receiverId === creator.id)
-            return (0, rxjs_1.of)({ error: 'Don\'t add yourself as a friend ?!' });
-        return this.findByUserId(receiverId).pipe((0, rxjs_1.switchMap)((receiver) => {
-            return this.hasRequestBeenSentOrReceived(creator, receiver).pipe((0, rxjs_1.switchMap)((hasBeenReceivedOrNot) => {
-                if (hasBeenReceivedOrNot)
-                    return (0, rxjs_1.of)({ error: 'A friend request has already been sent of received' });
-                let friendRequest = {
-                    creator,
-                    receiver,
-                    status: 'pending',
-                };
-                return (0, rxjs_1.from)(this.friendRequestRepository.save(friendRequest));
-            }));
-        }));
+    async deleteFriend(user, friendToDelete) {
+        const friend = await this.userRepository.findOne({ username: friendToDelete.username });
+        if (!friend) {
+            throw new common_1.UnauthorizedException(common_1.HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
+        }
+        const tmp = user.friends.find(el => el === String(friend.id));
+        if (tmp) {
+            const index = user.friends.indexOf(tmp, 0);
+            user.friends.splice(index, 1);
+        }
+        else
+            throw new common_1.UnauthorizedException(common_1.HttpStatus.FORBIDDEN, 'The user isn\'t in your friendlist.');
+        await this.userRepository.save(user);
     }
-    getFriendRequestStatus(currentUser, receiverId) {
-        return this.findByUserId(receiverId).pipe((0, rxjs_1.switchMap)((receiver) => {
-            return (0, rxjs_1.from)(this.friendRequestRepository.findOne({
-                where: [
-                    { creator: currentUser, receiver: receiver },
-                    { creator: receiver, receive: currentUser }
-                ],
-                relations: ['creator', 'receiver']
-            }));
-        }), (0, rxjs_1.switchMap)((FriendRequest) => {
-            if ((FriendRequest === null || FriendRequest === void 0 ? void 0 : FriendRequest.receiver.id) === currentUser.id) {
-                return (0, rxjs_1.of)({ status: 'waiting-response' });
+    async retrieveFriendInfo(friendId) {
+        let friendInfo = undefined;
+        if (isNaN(+friendId))
+            return friendInfo;
+        friendInfo = await this.userRepository.findOne({ id: +friendId });
+        console.log();
+        if (friendInfo !== undefined) {
+            let friend = {
+                username: "",
+                firstname: "",
+                lastname: ""
+            };
+            friend.username = friendInfo.username;
+            friend.firstname = friendInfo.firstname;
+            friend.lastname = friendInfo.lastname;
+            return friend;
+        }
+        else {
+            console.log("User doesn't exist");
+            return friendInfo;
+        }
+    }
+    async friendList(user) {
+        let friendList = [];
+        let friend;
+        for (let i = 0; user.friends[i]; i++) {
+            if ((friend = await this.retrieveFriendInfo(user.friends[i])) !== undefined) {
+                friendList.push(friend);
             }
-            return (0, rxjs_1.of)({ status: (FriendRequest === null || FriendRequest === void 0 ? void 0 : FriendRequest.status) || 'not-sent' });
-        }));
-    }
-    getFriendRequestUserById(friendRequestId) {
-        return (0, rxjs_1.from)(this.friendRequestRepository.findOne({
-            where: [{ id: friendRequestId }],
-        }));
+        }
+        return (friendList);
     }
 };
 UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __param(1, (0, typeorm_1.InjectRepository)(friend_request_entity_1.FriendRequest)),
-    __metadata("design:paramtypes", [typeorm_2.Repository,
-        typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

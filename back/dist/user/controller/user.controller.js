@@ -34,20 +34,44 @@ let UserController = class UserController {
         return this.userService.findAll();
     }
     findUserById(userId) {
+        console.log("went in userId");
         return this.userService.findByUserId(userId);
     }
-    async userInfo(req) {
+    async getFriendList(req) {
         try {
-            const cookie = req.cookies['jwt'];
-            const data = await this.jwtService.verifyAsync(cookie);
-            if (!data) {
-                throw new common_1.UnauthorizedException("User not found");
-            }
-            const user = await this.userService.findOne(data['email']);
-            return data;
+            const user = req.user;
+            return await this.userService.friendList(user);
         }
         catch (e) {
-            throw new common_1.UnauthorizedException();
+            throw new common_1.UnauthorizedException("Error: getFriendList");
+        }
+    }
+    async addFriend(req, friendToAdd) {
+        let user;
+        try {
+            user = req.user;
+            await this.userService.addFriend(user, friendToAdd);
+        }
+        catch (e) {
+            throw e;
+        }
+    }
+    async deleteFriend(req, friendToDelete) {
+        try {
+            const user = req.user;
+            await this.userService.deleteFriend(user, friendToDelete);
+        }
+        catch (e) {
+            throw e;
+        }
+    }
+    async userInfo(req, userName) {
+        try {
+            const user = req.user;
+            this.userService.setUsername(user.id, userName.username);
+        }
+        catch (e) {
+            throw e;
         }
     }
 };
@@ -59,7 +83,7 @@ __decorate([
     __metadata("design:returntype", Object)
 ], UserController.prototype, "add", null);
 __decorate([
-    (0, common_1.Post)('/delete'),
+    (0, common_1.Delete)('/delete'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -72,7 +96,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(':userId'),
+    (0, common_1.Get)('/info/:userId'),
     __param(0, (0, common_1.Param)('userId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -80,10 +104,37 @@ __decorate([
 ], UserController.prototype, "findUserById", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Get)('/userinfo'),
+    (0, common_1.Get)('/friendlist'),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getFriendList", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('/addfriend'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "addFriend", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Delete)('/deletefriend'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "deleteFriend", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('/setusername'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "userInfo", null);
 UserController = __decorate([

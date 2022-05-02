@@ -13,7 +13,6 @@ exports.User = void 0;
 const typeorm_1 = require("typeorm");
 const message_entity_1 = require("../../message/models/message.entity");
 const channel_entity_1 = require("../../channel/models/channel.entity");
-const friend_request_entity_1 = require("./friend-request.entity");
 let User = class User {
 };
 __decorate([
@@ -23,7 +22,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ nullable: true, default: null, }),
     __metadata("design:type", String)
-], User.prototype, "firsname", void 0);
+], User.prototype, "firstname", void 0);
 __decorate([
     (0, typeorm_1.Column)({ nullable: true, default: null, }),
     __metadata("design:type", String)
@@ -65,17 +64,9 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "channels", void 0);
 __decorate([
-    (0, typeorm_1.Column)("int", { array: true, nullable: true, default: null, }),
+    (0, typeorm_1.Column)("simple-array", { nullable: true }),
     __metadata("design:type", Array)
 ], User.prototype, "friends", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => friend_request_entity_1.FriendRequest, (FriendRequest) => FriendRequest.creator),
-    __metadata("design:type", Array)
-], User.prototype, "sentFriendRequests", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => friend_request_entity_1.FriendRequest, (FriendRequest) => FriendRequest.receiver),
-    __metadata("design:type", Array)
-], User.prototype, "receivedFriendRequests", void 0);
 User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);

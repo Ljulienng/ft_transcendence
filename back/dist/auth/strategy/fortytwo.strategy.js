@@ -27,10 +27,11 @@ let FortyTwoStrategy = class FortyTwoStrategy extends (0, passport_1.PassportStr
     async validate(accessToken, refreshToken, profile, cb) {
         const { name } = profile;
         const userIdentity = {
-            username: name['givenName'],
+            username: profile['username'],
+            firstname: name['givenName'],
+            lastname: name['familyName'],
             email: profile['emails'][0]['value'],
         };
-        console.log("VALIDATE: ", userIdentity);
         return this.fortyTwoService.validateUser(userIdentity);
     }
 };

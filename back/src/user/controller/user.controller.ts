@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Req, UnauthorizedException, ConsoleLogger, UseGuards, Param} from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Req, UnauthorizedException, ConsoleLogger, UseGuards, Param, HttpException} from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { User } from '../models/user.entity';
+import { User, Friend } from '../models/user.entity';
 import { JwtService } from "@nestjs/jwt"
 import { UserService } from '../service/user.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -17,7 +17,7 @@ export class UserController {
 		return this.userService.add(user);
 	}
 
-	@Post('/delete')
+	@Delete('/delete')
 	delete(@Body() idToDelete: string): any {
 		return this.userService.delete(idToDelete);
 	}
@@ -27,30 +27,61 @@ export class UserController {
 		return this.userService.findAll();
 	}
 
-	@Get(':userId')
+	@Get('/info/:userId')
 	findUserById(@Param('userId') userId: number): Observable<User> {
+		console.log("went in userId");
 		return this.userService.findByUserId(userId);
 	}
 
-	
+	@UseGuards(JwtAuthGuard)
+	@Get('/friendlist')
+	async getFriendList(@Req() req) {
+		try {
+			const user = req.user;
+
+			return await this.userService.friendList(user);
+		} catch(e) {
+			throw new UnauthorizedException("Error: getFriendList");
+
+		}
+	}
 
 	@UseGuards(JwtAuthGuard)
-	@Get('/userinfo')
-	async userInfo(@Req() req) {
-	  try {
-		const cookie = req.cookies['jwt'];
-  
-		const data = await this.jwtService.verifyAsync(cookie);
-		if (!data) {
-		  throw new UnauthorizedException("User not found");
+	@Post('/addfriend')
+	async addFriend(@Req() req, @Body() friendToAdd) {
+		let user: User;
+		try {
+			user = req.user;
+			await this.userService.addFriend(user, friendToAdd);
+		} catch (e) {
+			throw e;
 		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Delete('/deletefriend')
+	async deleteFriend(@Req() req, @Body() friendToDelete) {
+		try {
+			// console.log("friend to delete= " ,friendToDelete)
+			const user = req.user;
+			
+			await this.userService.deleteFriend(user, friendToDelete);
+
+		} catch (e) {
+			throw e
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Post('/setusername')
+	async userInfo(@Req() req, @Body() userName) {
+	  try {
+		const user = req.user;
   
-		const user = await this.userService.findOne(data['email']); //A changer 
-  
-		return data;
+		this.userService.setUsername(user.id, userName.username);
 	  }
 	  catch (e) {
-		throw new UnauthorizedException();
+		throw e;
 	  }
 	}
 

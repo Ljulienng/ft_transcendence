@@ -4,12 +4,16 @@
     <Sidebar/>
 
 	<router-view />
+	<MyModal/>
+	<div id="my-modals"/>
   </div>
 </template>
 
 <script setup>
   /* tslint:disable:no-unused-variable */
 import Sidebar from './components/Sidebar.vue'
+  /* tslint:disable:no-unused-variable */
+import MyModal from './components/UsernameModal.vue'
 </script>
 
 <script>

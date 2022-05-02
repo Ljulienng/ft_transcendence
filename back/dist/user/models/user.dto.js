@@ -16,7 +16,7 @@ class UserDto {
 __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], UserDto.prototype, "firsname", void 0);
+], UserDto.prototype, "firstname", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -60,14 +60,6 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Array)
-], UserDto.prototype, "friends", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Array)
-], UserDto.prototype, "sentFriendRequests", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Array)
-], UserDto.prototype, "receivedFriendRequests", void 0);
+], UserDto.prototype, "string", void 0);
 exports.UserDto = UserDto;
 //# sourceMappingURL=user.dto.js.map

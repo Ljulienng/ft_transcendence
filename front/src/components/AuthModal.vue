@@ -11,19 +11,21 @@
 	
 </template>
 
-<script>
+<script lang='ts'>
 // import axios from 'axios'
 
-export default {
+import { defineComponent } from "@vue/runtime-core";
+
+export default defineComponent({
   methods:{
     ftAuth() {
       return ('http://localhost:3000/auth/42');
     }
   }
-}
+})
 </script>
 
-<style scss lang="scss">
+<style scoped scss lang="scss">
 
 .modal {
   position: absolute;
