@@ -8,6 +8,7 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from 'socket.io'
 import { Channel } from "src/channel/models/channel.entity";
+import { CreateChannelDto } from "src/channel/models/createChannel.dto";
 import { ChannelService } from "src/channel/service/channel.service";
 import { CreateMessageDto } from "src/message/models/createMessage.dto";
 import { MessageService } from "src/message/service/message.service";
@@ -55,11 +56,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     /* TO REMOVE - ACCESS BY CONTROLLER (endpoint /channel) */
-    // @SubscribeMessage('addChannel')
-    // async createChannel(client: Socket, createChannel: CreateChannelDto) {
-    //     const newChannel = await this.channelService.createChannel(createChannel, client.data.user);
-    //     console.log(newChannel);
-    // }
+    @SubscribeMessage('addChannel')
+    async createChannel(client: Socket, createChannel: CreateChannelDto) {
+        const newChannel = await this.channelService.createChannel(createChannel, client.data.user);
+        console.log(newChannel);
+    }
 
     /* connect user to a channel */
     @SubscribeMessage('joinChannel')
@@ -81,6 +82,5 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.emit('messageSent', message.content);   // send data to all connected clients
         await this.messageService.saveMessage(message); 
     }
-
 
 }

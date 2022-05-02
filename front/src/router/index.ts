@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld.vue'
 import ShowUsers from '@/components/ShowUsers.vue'
 import AuthModal from '@/components/AuthModal.vue'
 import FriendList from '@/views/FriendList.vue'
+import Chat from '@/components/Chat.vue'
 import Home from '@/views/Home.vue'
 
 
@@ -34,7 +35,13 @@ const routes = [
 		path: '/friendlist',
 		component: FriendList,
 		meta: {requiredAuth: true}
-	}
+	},
+	{
+		name: 'chat',
+		path: '/chat',
+		component: Chat
+	},
+
 ];
 
 const router = createRouter({

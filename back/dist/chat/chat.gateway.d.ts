@@ -1,6 +1,7 @@
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from "@nestjs/websockets";
 import { Server, Socket } from 'socket.io';
 import { Channel } from "src/channel/models/channel.entity";
+import { CreateChannelDto } from "src/channel/models/createChannel.dto";
 import { ChannelService } from "src/channel/service/channel.service";
 import { CreateMessageDto } from "src/message/models/createMessage.dto";
 import { MessageService } from "src/message/service/message.service";
@@ -12,6 +13,7 @@ export declare class ChatGateway implements OnGatewayInit, OnGatewayConnection, 
     afterInit(server: any): void;
     handleConnection(client: Socket, room: string): Promise<void>;
     handleDisconnect(client: any): void;
+    createChannel(client: Socket, createChannel: CreateChannelDto): Promise<void>;
     joinChannel(client: Socket, channel: Channel): Promise<void>;
     leaveChannel(client: Socket, channel: Channel): Promise<void>;
     sendMessage(client: Socket, message: CreateMessageDto): Promise<void>;

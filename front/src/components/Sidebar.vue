@@ -28,6 +28,10 @@
 				<span class="material-icons">group</span>
 				<span class="text">Show users</span>
 			</router-link>
+			<router-link to="/chat" class="button">
+				<span class="material-icons">chat</span>
+				<span class="text">Chat</span>
+			</router-link>
 		</div>
 
 		<div class="flex"></div>
