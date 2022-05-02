@@ -1,7 +1,7 @@
 <template>
   <div class="body">
     <div class="welcome">
-      Welcome, {{msg}}
+      Welcome, {{getUserProfile.userName}}
     </div>
     <div class="split">
       <div class="lcol">
@@ -36,37 +36,21 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import '../assets/css/style.scss'
-import {onMounted, ref} from 'vue'
-import axios from 'axios'
-import {useStore, store} from 'vuex'
+import { defineComponent } from "@vue/runtime-core";
+import { mapGetters } from "vuex";
 
-export default {
-	setup() {
-		const msg = ref('you are not logged in');
-		try {
-			const store = useStore();
-
-			onMounted( async() => {
-			const response = await axios.get('http://localhost:3000/users/userinfo');
-			
-			console.log(response.data);
-			const content = await response.data;
-	
-			msg.value = content.username;
-			await store.dispatch('setAuth', true)
-			})
-
-		} catch(e) {
-			store.dispatch('setAuth', false);
-		}
-		return {
-			msg
-		}
-	}
-}
+export default defineComponent({
+  name: "Home",
+  computed: {
+    ...mapGetters("auth", {
+      getUserProfile: "getUserProfile",
+    }),
+  }
+});
 </script>
+
 
 <style src="../assets/css/home.css" scoped>
 </style>

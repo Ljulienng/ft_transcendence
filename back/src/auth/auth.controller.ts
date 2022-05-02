@@ -26,8 +26,24 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('protected')
-  getHellow(@Req() req): string {
-    return req.user;
+  @Get('userinfo')
+  async userinfo(@Req() req) {
+    // return req.user;
+    try {
+		// const cookie = req.cookies['jwt'];
+  
+		// const data = await this.jwtService.verifyAsync(cookie);
+		// if (!data) {
+		//   throw new UnauthorizedException("User not found");
+		// }
+  
+		// const user = await this.userService.findOne(data['email']); //A changer 
+    const user = req.user;
+    console.log("userinfo ", user);
+
+		return user;
+	  } catch (e) {
+		throw new UnauthorizedException("wtf");
+	  }
   }
 }

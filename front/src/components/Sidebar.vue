@@ -21,15 +21,18 @@
 				<span class="text">Hello</span>
 			</router-link>
 			<router-link to="/showusers" class="button">
-				<span class="material-icons">people</span>
+				<span class="material-icons">group_add</span>
 				<span class="text">Show users</span>
 			</router-link>
-
+			<router-link to="/friendlist" class="button">
+				<span class="material-icons">group</span>
+				<span class="text">Show users</span>
+			</router-link>
 		</div>
 
 		<div class="flex"></div>
 		
-		<div class="menu">
+		<div class="menu" v-if="getUserProfile.id === 0">
 			<router-link to="/settings" class="button">
 				<span class="material-icons">settings</span>
 				<span class="text">Settings</span>
@@ -37,6 +40,19 @@
 		</div>
 	</aside>
 </template>
+
+<script>
+import { mapGetters } from "vuex";
+
+export default {
+  name: "App",
+  computed: {
+    ...mapGetters("auth", {
+      getUserProfile: "getUserProfile",
+    }),
+  },
+}
+</script>
 
 <script setup>
 import { ref } from 'vue'

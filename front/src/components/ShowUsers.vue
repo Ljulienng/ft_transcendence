@@ -7,7 +7,7 @@
 		</li>
 	</ul>
   <br/>
-  <form v-on:submit.prevent="checkForm">
+  <form v-on:submit.prevent="sendForm">
   <p>
     <label for="username">Username</label>
     <input
@@ -29,7 +29,7 @@
   <p>
     <input
       type="submit"
-      value="Submit"
+      value="ADD"
     >
   </p>
   </form>
@@ -46,17 +46,20 @@
   <p>
     <input
       type="submit"
-      value="Submit"
+      value="Delete"
     >
   </p>
   </form>
 </div>
 </template>
 
-<script>
-import axios from 'axios'
+<script lang='ts'>
+// import axios from 'axios'
 
-export default {
+import { defineComponent } from "@vue/runtime-core";
+import http from "../http-common"
+
+export default defineComponent({
   data() {
     return {
       users: [],
@@ -71,31 +74,38 @@ export default {
     };
   },
   methods: {
-
     async getData() {
       try {
-        const response  = await axios.get('http://localhost:3000/users');
+        const response  = await http.get('/users');
 
         this.users = response.data;
+        console.log("user list = ", this.users)
       } catch (error) {
         console.log(error);
       }
     },
-    checkForm() {
-      axios.post("http://localhost:3000/users", this.createUser)
+    sendForm() {
+      http.post("/users", this.createUser)
+      this.getData();
     },
     deleteForm() {
-      axios.post("http://localhost:3000/users/delete", this.idToDelete);
+      console.log("to delete = ", this.idToDelete);
+      http.delete("/users/delete", {data: this.idToDelete});
+      this.getData();
     }
   },
-  mounted() {
-    this.getData();
-  },
-  updated: function () {
-    this.getData();
-  },
   
-}
+  created () {
+      this.getData();
+  },
+
+  // watch: {
+	// 	updateUserList() {
+	// 		this.getData()
+	// 	}
+	// }
+  
+})
 </script>
 
 <style scoped>

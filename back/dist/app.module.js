@@ -12,8 +12,9 @@ const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
-const fortytwo_strategy_1 = require("./auth/fortytwo.strategy");
+const auth_module_1 = require("./auth/auth.module");
 const user_module_1 = require("./user/user.module");
+const message_module_1 = require("./message/message.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -26,10 +27,12 @@ AppModule = __decorate([
                 autoLoadEntities: true,
                 synchronize: true
             }),
-            user_module_1.UserModule
+            user_module_1.UserModule,
+            auth_module_1.AuthModule,
+            message_module_1.MessageModule
         ],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService, fortytwo_strategy_1.FortyTwoStrategy],
+        providers: [app_service_1.AppService]
     })
 ], AppModule);
 exports.AppModule = AppModule;
