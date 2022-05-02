@@ -39,10 +39,12 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core"
 import axios from 'axios'
+import io from 'socket.io-client'
 
 export default defineComponent({
     data() {
         return {
+            socket: io(),
             channelList: [],
             name: '',
             password: '',
