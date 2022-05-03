@@ -47,9 +47,12 @@ export class ChannelController {
 
     @Post()
     createChannel(
+        //@Req() request: Request,
         @Body() channelDto: CreateChannelDto,
-        @Res() response: Response) {
-        return this.channelService.createChannel(channelDto, response.locals.id);
+        /*@Res() response: Response*/) {
+        console.log('POST REQUEST : ', channelDto);
+        //console.log('id:', request.user.id);
+        //return this.channelService.createChannel(channelDto, response.locals.id);
     }
 
     @Delete(':channelId')

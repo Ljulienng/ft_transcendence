@@ -25,7 +25,7 @@
             <button @click="createChat">create channel</button>
         </div>
 
-        <div>
+        <div> 
             Message <input type="text" maxlength="100" v-model="message" class="inputMessage" />
             <button @click="sendMessage">send test message</button>
         </div>
@@ -45,6 +45,7 @@
 import { defineComponent } from "@vue/runtime-core"
 import axios from 'axios'
 import io from 'socket.io-client'
+import http from "../http-common"
 
 export default defineComponent({
     data() {
@@ -75,14 +76,18 @@ export default defineComponent({
             console.log("chat created : name=", this.name, " privacy=", this.privacy, " password=", this.password);
             let channel = {
                 name: this.name,
-                status: this.privacy,
+                privacy: this.privacy,
                 password: this.password,
              }
-            this.socket.emit('addChannel', channel);
+            //this.socket.emit('addChannel', channel);
+            http.post('/channel', channel);
+            this.name = '';
+            this.privacy = '';
+            this.password = '';
         },
 
         sendMessage() {
-            this.socket.emit('sendMessage', this.message);
+            // this.socket.emit('sendMessage', this.message);
             this.message = '';
         },
     },
@@ -91,11 +96,11 @@ export default defineComponent({
         this.getChannelList();
     },
 
-    mounted() {
-        this.socket.on('messageSent', (data) => {
-            console.log('Message sent to the front : ', data);
-        });
-    },
+    // mounted() {
+    //     this.socket.on('messageSent', (data) => {
+    //         console.log('Message sent to the front : ', data);
+    //     });
+    // },
 })
 </script>
 
