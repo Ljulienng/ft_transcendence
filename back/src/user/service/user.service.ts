@@ -37,6 +37,17 @@ export class UserService {
 		await this.userRepository.delete(id);
 	}
 
+	updateOne(id: number, user: Partial<User>): Observable<any> {
+		delete user.email;
+		delete user.username;
+		delete user.firstname;
+		delete user.lastname;
+
+		return from(this.userRepository.update(id, user)).pipe(
+			switchMap(() => this.userRepository.findOne({id: id}))
+		)
+	}
+
 	async setUsername(userId: number, userName: string) {
 		const currentUser = await this.userRepository.findOne({id: userId});
 		const tmp = await this.userRepository.findOne({username: userName})

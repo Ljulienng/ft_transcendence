@@ -28,11 +28,15 @@
 				<span class="material-icons">group</span>
 				<span class="text">Show users</span>
 			</router-link>
+			<router-link to="/userprofile" class="button">
+				<span class="material-icons">account_circle</span>
+				<span class="text">User Profile</span>
+			</router-link>
 		</div>
 
 		<div class="flex"></div>
 		
-		<div class="menu" v-if="getUserProfile.id === 0">
+		<div class="menu" v-if="getUserProfile.id !== 0">
 			<router-link to="/settings" class="button">
 				<span class="material-icons">settings</span>
 				<span class="text">Settings</span>

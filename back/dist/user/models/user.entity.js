@@ -9,13 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = exports.Friend = void 0;
+exports.User = void 0;
 const typeorm_1 = require("typeorm");
 const message_entity_1 = require("../../message/models/message.entity");
 const channel_entity_1 = require("../../channel/models/channel.entity");
-class Friend {
-}
-exports.Friend = Friend;
 let User = class User {
 };
 __decorate([
@@ -67,9 +64,13 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "channels", void 0);
 __decorate([
-    (0, typeorm_1.Column)("simple-array", { default: [], }),
+    (0, typeorm_1.Column)("simple-array", { nullable: true }),
     __metadata("design:type", Array)
 ], User.prototype, "friends", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "profileImage", void 0);
 User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);

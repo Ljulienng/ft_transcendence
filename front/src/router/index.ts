@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld.vue'
 import ShowUsers from '@/components/ShowUsers.vue'
 import AuthModal from '@/components/AuthModal.vue'
 import FriendList from '@/views/FriendList.vue'
+import UserProfile from '@/views/UserProfile.vue'
 import Home from '@/views/Home.vue'
 
 
@@ -33,6 +34,12 @@ const routes = [
 		name: 'FriendList',
 		path: '/friendlist',
 		component: FriendList,
+		meta: {requiredAuth: true}
+	},
+	{
+		name: 'UserProfile',
+		path: '/userprofile',
+		component: UserProfile,
 		meta: {requiredAuth: true}
 	}
 ];
