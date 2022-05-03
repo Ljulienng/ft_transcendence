@@ -36,7 +36,8 @@ let ChatGateway = class ChatGateway {
         console.log('client disconnected');
     }
     async createChannel(client, createChannel) {
-        const newChannel = await this.channelService.createChannel(createChannel, client.data.user);
+        console.log('Create chat:', createChannel.name, ' in back by user:', client.id);
+        const newChannel = await this.channelService.createChannel(createChannel, client.data.userId);
         console.log(newChannel);
     }
     async joinChannel(client, channel) {
@@ -46,9 +47,13 @@ let ChatGateway = class ChatGateway {
         await this.channelService.removeUserToChannel(channel, client.data.user.id);
     }
     async sendMessage(client, message) {
-        console.log('Send message');
+        console.log('Message sent to the back : ', message.content);
         this.server.emit('messageSent', message.content);
         await this.messageService.saveMessage(message);
+    }
+    testMessage(client, message) {
+        console.log('Message sent to the back : ', message);
+        client.emit('messageSent', message);
     }
 };
 __decorate([
@@ -79,6 +84,12 @@ __decorate([
     __metadata("design:paramtypes", [socket_io_1.Socket, createMessage_dto_1.CreateMessageDto]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "sendMessage", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('sendMessage'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket, String]),
+    __metadata("design:returntype", void 0)
+], ChatGateway.prototype, "testMessage", null);
 ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         namespace: '/chat',

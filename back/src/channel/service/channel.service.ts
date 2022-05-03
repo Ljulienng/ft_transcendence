@@ -38,6 +38,9 @@ export class ChannelService {
 
     /* create one channel */
    async createChannel(createChannel: CreateChannelDto, userId: number): Promise<Channel> {
+        // const users = await this.userRepository.find();
+        // console.log(users);
+
         // const user = await this.userService.findByUserId(userId);
         const user = await this.userRepository.findOne({id: userId});
         

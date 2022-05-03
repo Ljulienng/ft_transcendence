@@ -16,27 +16,40 @@ exports.ChannelController = void 0;
 const common_1 = require("@nestjs/common");
 const channel_service_1 = require("../service/channel.service");
 const createChannel_dto_1 = require("../models/createChannel.dto");
+const message_service_1 = require("../../message/service/message.service");
 let ChannelController = class ChannelController {
-    constructor(channelService) {
+    constructor(channelService, messageService) {
         this.channelService = channelService;
+        this.messageService = messageService;
     }
     findAll() {
         console.log("return all channels");
         return this.channelService.findAll();
     }
-    findChannelById(id) {
-        console.log("return channel with id=", id);
-        return this.channelService.findChannelById(id);
+    findChannelById(channelId) {
+        console.log("return channel with id=", channelId);
+        return this.channelService.findChannelById(channelId);
     }
     findChannelByName(name) {
         console.log("return channel with name=", name);
         return this.channelService.findChannelByName(name);
     }
+    testPostMessage() {
+        const message = {
+            content: "Hello I'm a message",
+        };
+        this.messageService.saveMessage(message);
+    }
+    async findMessagesByChannelId(channelId) {
+        console.log("find messages of one channel");
+        const channel = await this.channelService.findChannelById(channelId);
+        return this.channelService.getChannelMessagesByRoom(channel.name);
+    }
     createChannel(channelDto, response) {
         return this.channelService.createChannel(channelDto, response.locals.id);
     }
-    deleteChannel(id) {
-        return this.channelService.deleteChannel(id);
+    deleteChannel(channelId) {
+        return this.channelService.deleteChannel(channelId);
     }
 };
 __decorate([
@@ -46,8 +59,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ChannelController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Get)(':channelId'),
+    __param(0, (0, common_1.Param)('channelId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
@@ -60,6 +73,19 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ChannelController.prototype, "findChannelByName", null);
 __decorate([
+    (0, common_1.Get)(':channelId/postMessage'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], ChannelController.prototype, "testPostMessage", null);
+__decorate([
+    (0, common_1.Get)(':channelId/messages'),
+    __param(0, (0, common_1.Param)('channelId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ChannelController.prototype, "findMessagesByChannelId", null);
+__decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
@@ -68,15 +94,16 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ChannelController.prototype, "createChannel", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Delete)(':channelId'),
+    __param(0, (0, common_1.Param)('channelId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], ChannelController.prototype, "deleteChannel", null);
 ChannelController = __decorate([
     (0, common_1.Controller)('channel'),
-    __metadata("design:paramtypes", [channel_service_1.ChannelService])
+    __metadata("design:paramtypes", [channel_service_1.ChannelService,
+        message_service_1.MessageService])
 ], ChannelController);
 exports.ChannelController = ChannelController;
 //# sourceMappingURL=channel.controller.js.map

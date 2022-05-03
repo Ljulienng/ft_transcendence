@@ -3,10 +3,13 @@ import { ChannelService } from '../service/channel.service';
 import { CreateChannelDto } from '../models/createChannel.dto';
 import { CreateMessageDto } from 'src/message/models/createMessage.dto';
 import { Response } from 'express'
+import { MessageService } from 'src/message/service/message.service';
 
 @Controller('channel')
 export class ChannelController {
-    constructor(private readonly channelService: ChannelService) {}
+    constructor(
+        private readonly channelService: ChannelService,
+        private messageService: MessageService) {}
 
     @Get()
     findAll() {
@@ -14,10 +17,11 @@ export class ChannelController {
         return this.channelService.findAll();
     }
 
-    @Get(':id')
-    findChannelById(@Param('id') id: number) {
-        console.log("return channel with id=", id);
-        return this.channelService.findChannelById(id);
+
+    @Get(':channelId')
+    findChannelById(@Param('channelId') channelId: number) {
+        console.log("return channel with id=", channelId);
+        return this.channelService.findChannelById(channelId);
     }
 
     @Get(':name')
@@ -26,10 +30,20 @@ export class ChannelController {
         return this.channelService.findChannelByName(name);
     }
 
-    // @Get(':id/message')
-    // findMessagesByChannelId(@Param('id') channelId: string): Promise<MessageDto[]> {
-    //     return this.channelService.findMessagesByChannelId(channelId);
-    // }
+    @Get(':channelId/postMessage')
+    testPostMessage() {
+        const message: CreateMessageDto = {
+            content: "Hello I'm a message",
+        }
+        this.messageService.saveMessage(message);
+    }
+
+    @Get(':channelId/messages')
+    async findMessagesByChannelId(@Param('channelId') channelId: number): Promise<CreateMessageDto[]> {
+        console.log("find messages of one channel");
+        const channel = await this.channelService.findChannelById(channelId);
+        return this.channelService.getChannelMessagesByRoom(channel.name);
+    }
 
     @Post()
     createChannel(
@@ -38,8 +52,8 @@ export class ChannelController {
         return this.channelService.createChannel(channelDto, response.locals.id);
     }
 
-    @Delete(':id')
-    deleteChannel(@Param('id') id: number) {
-        return this.channelService.deleteChannel(id);
+    @Delete(':channelId')
+    deleteChannel(@Param('channelId') channelId: number) {
+        return this.channelService.deleteChannel(channelId);
     }
 }

@@ -25,6 +25,11 @@
             <button @click="createChat">create channel</button>
         </div>
 
+        <div>
+            Message <input type="text" maxlength="100" v-model="message" class="inputMessage" />
+            <button @click="sendMessage">send test message</button>
+        </div>
+
         <div class="channelList">
             <h3>Channel list</h3>
             <ul>
@@ -49,6 +54,8 @@ export default defineComponent({
             name: '',
             password: '',
             privacy: '',
+            user: '',
+            message: '',
         }
     },
     computed: {
@@ -73,16 +80,30 @@ export default defineComponent({
              }
             this.socket.emit('addChannel', channel);
         },
+
+        sendMessage() {
+            this.socket.emit('sendMessage', this.message);
+            this.message = '';
+        },
     },
-    created () {
-        this.socket = io('http://localhost:3000/chat', {  withCredentials: true });
+    created() {
+        this.socket = io('localhost:3000/chat', {  withCredentials: true });
         this.getChannelList();
+    },
+
+    mounted() {
+        this.socket.on('messageSent', (data) => {
+            console.log('Message sent to the front : ', data);
+        });
     },
 })
 </script>
 
 <style scoped>
     div {
+        color: white;
+    }
+    button {
         color: white;
     }
 </style>

@@ -42,7 +42,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     /* https://lucaball.doesweb.dev/socket-io-rooms-and-nestjs-how-to
         we listen to the 'room' event and join the client to the room
-    */
+    */ 
     async handleConnection(client: Socket, room: string) {
         console.log('client connected to the chat');
         client.join(room);                          // add this client to the room
@@ -58,7 +58,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     /* TO REMOVE - ACCESS BY CONTROLLER (endpoint /channel) */
     @SubscribeMessage('addChannel')
     async createChannel(client: Socket, createChannel: CreateChannelDto) {
-        const newChannel = await this.channelService.createChannel(createChannel, client.data.user);
+        console.log('Create chat:', createChannel.name, ' in back by user:', client.id);
+        const newChannel = await this.channelService.createChannel(createChannel, client.data.userId);
         console.log(newChannel);
     }
 
@@ -68,7 +69,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this.channelService.addUserToChannel(channel, client.data.user.id);
     }
 
-    @SubscribeMessage('leaveChannel')
+    @SubscribeMessage('leaveChannel') 
     async leaveChannel(client: Socket, channel: Channel) {
         await this.channelService.removeUserToChannel(channel, client.data.user.id);
     }
@@ -78,9 +79,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
      */
     @SubscribeMessage('addMessage') 
     async sendMessage(client: Socket, message: CreateMessageDto /*string*/) {
-        console.log('Send message');
+        console.log('Message sent to the back : ', message.content);
         this.server.emit('messageSent', message.content);   // send data to all connected clients
         await this.messageService.saveMessage(message); 
     }
+
+    /*** test sockets ****/
+    @SubscribeMessage('sendMessage')
+    testMessage(client: Socket, message: string) {
+        console.log('Message sent to the back : ', message);
+        client.emit('messageSent', message);
+    }
+
 
 }

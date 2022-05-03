@@ -17,4 +17,5 @@ export declare class ChatGateway implements OnGatewayInit, OnGatewayConnection, 
     joinChannel(client: Socket, channel: Channel): Promise<void>;
     leaveChannel(client: Socket, channel: Channel): Promise<void>;
     sendMessage(client: Socket, message: CreateMessageDto): Promise<void>;
+    testMessage(client: Socket, message: string): void;
 }
