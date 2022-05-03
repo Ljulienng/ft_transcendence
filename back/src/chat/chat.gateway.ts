@@ -51,7 +51,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.to(client.id).emit('channelMessages', messages);    // send messages of the channel to the new user
     }
 
-    handleDisconnect(client: any) {
+    handleDisconnect(client: Socket) {
         console.log('client disconnected');
     }
 

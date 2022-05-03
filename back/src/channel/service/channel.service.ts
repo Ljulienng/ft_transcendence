@@ -82,14 +82,20 @@ export class ChannelService {
    **       - the user is not already in the channel
    **       - the user is banned of the channel
    */
-   async addUserToChannel(channel: Channel, userId: number) {
+   async addUserToChannel(channelSent: Channel, userId: number) {
         // const user = await this.userService.findByUserId(userId);
         const user = await this.userRepository.findOne({id: userId});
-        const welcomingChannel = await this.findChannelById(channel.id);
+        
+        // select * from channel where channel.id=channelSent.id
+        // const welcomingChannel = await this.findChannelById(channelSent.id);
+        const welcomingChannel = await this.channelRepository
+            .createQueryBuilder('channel')
+            .where('channel.id = :channelId', {channelId: channelSent.id})
+            .getOne();
         
         if (welcomingChannel.type !== ChannelType.public) {
             if (welcomingChannel.password) {
-                const match = this.checkPasswordMatch(welcomingChannel.password, channel.password);
+                const match = this.checkPasswordMatch(welcomingChannel.password, channelSent.password);
                 if (!match) {
                     throw new UnauthorizedException('incorrect password');
                 }
@@ -100,15 +106,23 @@ export class ChannelService {
             throw new UnauthorizedException('user already in this channel');
         }
 
-        // add the user to the channel
-        // await this.channelRepository.findAndCount(user);
+        welcomingChannel.users.push(user);                      // add the user to the channel
+        await this.channelRepository.save(welcomingChannel);    // update the channel
    }
 
-   async removeUserToChannel(channel: Channel, userId: number) {
+   async removeUserToChannel(channelSent: Channel, userId: number) {
         const user = await this.userRepository.findOne({id: userId});
-        const channelToLeave = await this.findChannelById(channel.id);
-
-        // remove the user to the channel
+        
+        // const channelToLeave = await this.findChannelById(channelSent.id);
+        const channelToLeave = await this.channelRepository
+            .createQueryBuilder('channel')
+            .where('channel.id = :channelId', {channelId: channelSent.id})
+            .getOne();
+        
+        
+            // remove the user to the channel
+            
+        await this.channelRepository.save(channelToLeave);   // update the channel
    }
 
     /* remove one channel */
