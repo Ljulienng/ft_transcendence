@@ -12,5 +12,6 @@ export declare class UserController {
     findUserById(userId: number): Observable<User>;
     getFriendList(req: any): Promise<Friend[]>;
     addFriend(req: any, friendToAdd: any): Promise<void>;
+    deleteFriend(req: any, friendToDelete: any): Promise<void>;
     userInfo(req: any, userName: any): Promise<void>;
 }

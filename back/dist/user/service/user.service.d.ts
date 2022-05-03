@@ -15,6 +15,7 @@ export declare class UserService {
     findOne(id: any): Promise<User>;
     validateStudent(user: Student): Promise<User>;
     addFriend(user: User, friendToAdd: any): Promise<void>;
+    deleteFriend(user: User, friendToDelete: any): Promise<void>;
     retrieveFriendInfo(friendId: string): Promise<Friend>;
     friendList(user: User): Promise<Friend[]>;
 }

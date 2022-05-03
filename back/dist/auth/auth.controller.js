@@ -35,12 +35,8 @@ let AuthController = class AuthController {
     }
     async userinfo(req) {
         try {
-            const cookie = req.cookies['jwt'];
-            const data = await this.jwtService.verifyAsync(cookie);
-            if (!data) {
-                throw new common_1.UnauthorizedException("User not found");
-            }
-            const user = await this.userService.findOne(data['email']);
+            const user = req.user;
+            console.log("userinfo ", user);
             return user;
         }
         catch (e) {

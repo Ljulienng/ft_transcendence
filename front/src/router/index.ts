@@ -48,9 +48,6 @@ const router = createRouter({
 	routes,
 })
 
-<<<<<<< HEAD
-export default router;
-=======
 router.beforeEach(async (to, from, next) => {
 	if (to.meta.requiredAuth) {
 	let userProfile = store.getters["auth/getUserProfile"];
@@ -84,4 +81,3 @@ router.beforeEach(async (to, from, next) => {
 // });
 
 export default router;
->>>>>>> master

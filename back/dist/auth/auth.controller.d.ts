@@ -8,5 +8,5 @@ export declare class AuthController {
     constructor(fortyTwoService: FortyTwoService, userService: UserService, jwtService: JwtService);
     FortyTwoAuth(req: any): Promise<void>;
     FortyTwoAuthRedirect(req: any, res: any): Promise<void>;
-    userinfo(req: any): Promise<import("../user/models/user.entity").User>;
+    userinfo(req: any): Promise<any>;
 }

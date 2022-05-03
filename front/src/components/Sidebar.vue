@@ -28,13 +28,10 @@
 				<span class="material-icons">group</span>
 				<span class="text">Show users</span>
 			</router-link>
-<<<<<<< HEAD
 			<router-link to="/play" class="button">
 				<span class="material-icons">videogame_asset</span>
 				<span class="text">Play</span>
 			</router-link>
-=======
->>>>>>> master
 		</div>
 
 		<div class="flex"></div>
