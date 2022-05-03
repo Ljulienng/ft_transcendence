@@ -30,14 +30,10 @@ let ChannelService = class ChannelService {
         return await this.channelRepository.find();
     }
     async findChannelById(channelId) {
-        return await this.channelRepository.findOneOrFail({
-            where: { id: channelId }
-        });
+        return await this.channelRepository.findOne({ id: channelId });
     }
     async findChannelByName(channelName) {
-        return await this.channelRepository.findOneOrFail({
-            where: { name: channelName }
-        });
+        return await this.channelRepository.findOne({ name: channelName });
     }
     async createChannel(createChannel, userId) {
         const user = await this.userRepository.findOne({ id: userId });
@@ -65,12 +61,15 @@ let ChannelService = class ChannelService {
     async checkPasswordMatch(sentPassword, expectedPassword) {
         return await bcrypt.compare(sentPassword, expectedPassword);
     }
-    async addUserToChannel(channel, userId) {
+    async addUserToChannel(channelSent, userId) {
         const user = await this.userRepository.findOne({ id: userId });
-        const welcomingChannel = await this.findChannelById(channel.id);
+        const welcomingChannel = await this.channelRepository
+            .createQueryBuilder('channel')
+            .where('channel.id = :channelId', { channelId: channelSent.id })
+            .getOne();
         if (welcomingChannel.type !== channel_entity_1.ChannelType.public) {
             if (welcomingChannel.password) {
-                const match = this.checkPasswordMatch(welcomingChannel.password, channel.password);
+                const match = this.checkPasswordMatch(welcomingChannel.password, channelSent.password);
                 if (!match) {
                     throw new common_1.UnauthorizedException('incorrect password');
                 }
@@ -79,10 +78,16 @@ let ChannelService = class ChannelService {
         if (welcomingChannel.users.find((u) => u.id === user.id)) {
             throw new common_1.UnauthorizedException('user already in this channel');
         }
+        welcomingChannel.users.push(user);
+        await this.channelRepository.save(welcomingChannel);
     }
-    async removeUserToChannel(channel, userId) {
+    async removeUserToChannel(channelSent, userId) {
         const user = await this.userRepository.findOne({ id: userId });
-        const channelToLeave = await this.findChannelById(channel.id);
+        const channelToLeave = await this.channelRepository
+            .createQueryBuilder('channel')
+            .where('channel.id = :channelId', { channelId: channelSent.id })
+            .getOne();
+        await this.channelRepository.save(channelToLeave);
     }
     async deleteChannel(channelId) {
         const channel = await this.findChannelById(channelId);

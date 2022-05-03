@@ -32,18 +32,15 @@ let MessageService = class MessageService {
         });
     }
     async saveMessage(createMessageDto) {
-        const newMessage = this.messageRepository.create({
-            user: createMessageDto.user,
-            content: createMessageDto.content,
-        });
-        return this.messageRepository.save(newMessage);
+        const newMessage = this.messageRepository.create(createMessageDto);
+        return await this.messageRepository.save(newMessage);
     }
     async delete(messageId) {
         const message = await this.findMessageById(messageId);
         if (!message) {
             throw new common_1.NotFoundException();
         }
-        return this.messageRepository.remove(message);
+        return await this.messageRepository.remove(message);
     }
 };
 MessageService = __decorate([

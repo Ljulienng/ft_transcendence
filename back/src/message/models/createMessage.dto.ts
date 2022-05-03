@@ -4,8 +4,8 @@ import { Message } from './message.entity';
 
 export class CreateMessageDto {
 
-    user: User;
+    // user: User;
     content: string;
-    channelId: number;
+    // channelId: number;
 
 }

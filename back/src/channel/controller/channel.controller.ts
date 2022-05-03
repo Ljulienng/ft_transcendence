@@ -10,16 +10,19 @@ export class ChannelController {
 
     @Get()
     findAll() {
+        console.log("return all channels");
         return this.channelService.findAll();
     }
 
     @Get(':id')
     findChannelById(@Param('id') id: number) {
+        console.log("return channel with id=", id);
         return this.channelService.findChannelById(id);
     }
 
     @Get(':name')
     findChannelByName(@Param('name') name: string) {
+        console.log("return channel with name=", name);
         return this.channelService.findChannelByName(name);
     }
 

@@ -21,13 +21,14 @@ let MessageController = class MessageController {
         this.messageService = messageService;
     }
     findAll() {
-        return;
+        console.log("return all messages");
+        return this.messageService.findAll();
     }
     findMessageById(id) {
         return;
     }
     createMessage(createMessage) {
-        return;
+        return this.messageService.saveMessage(createMessage);
     }
     deleteMessage(id) {
         return;

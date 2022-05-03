@@ -8,7 +8,8 @@ export class MessageController {
 
     @Get()
     findAll() {
-        return ;
+        console.log("return all messages");
+        return this.messageService.findAll();
     }
 
     @Get(':id')
@@ -18,7 +19,7 @@ export class MessageController {
 
     @Post()
     createMessage(@Body() createMessage: CreateMessageDto) {
-        return ;
+        return this.messageService.saveMessage(createMessage);
     }
 
     @Delete(':id')

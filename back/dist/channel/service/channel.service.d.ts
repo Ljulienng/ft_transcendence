@@ -13,8 +13,8 @@ export declare class ChannelService {
     findChannelByName(channelName: string): Promise<Channel>;
     createChannel(createChannel: CreateChannelDto, userId: number): Promise<Channel>;
     checkPasswordMatch(sentPassword: string, expectedPassword: string): Promise<boolean>;
-    addUserToChannel(channel: Channel, userId: number): Promise<void>;
-    removeUserToChannel(channel: Channel, userId: number): Promise<void>;
+    addUserToChannel(channelSent: Channel, userId: number): Promise<void>;
+    removeUserToChannel(channelSent: Channel, userId: number): Promise<void>;
     deleteChannel(channelId: number): Promise<Channel>;
     getChannelMessagesByRoom(room: string): Promise<Message[]>;
 }

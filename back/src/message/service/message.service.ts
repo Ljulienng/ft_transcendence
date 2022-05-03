@@ -15,34 +15,26 @@ export class MessageService {
         private userService: UserService,
     ) {}
 
-    /* get all messages */
    async findAll(): Promise<Message[]> {
        return await this.messageRepository.find();
    }
 
-   /* get a message by its id */
   async findMessageById(messageId: string): Promise<Message> {
       return await this.messageRepository.findOneOrFail({
           where: { id: Number(messageId) }
       });
   }
 
-  /* save a message */
   async saveMessage(createMessageDto: CreateMessageDto) {
-    const newMessage = this.messageRepository.create({
-        user: createMessageDto.user,
-        content: createMessageDto.content,
-   });
-
-   return this.messageRepository.save(newMessage);
+    const newMessage = this.messageRepository.create(createMessageDto);
+    return await this.messageRepository.save(newMessage);
   }
 
-  /* remove a message */
  async delete(messageId: string) {
      const message = await this.findMessageById(messageId);
      if (!message) {
          throw new NotFoundException();
      }
-     return this.messageRepository.remove(message);
+     return await this.messageRepository.remove(message);
  }
 }

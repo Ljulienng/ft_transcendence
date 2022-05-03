@@ -28,16 +28,12 @@ export class ChannelService {
 
     /* get one channel by its id */
    async findChannelById(channelId: number): Promise<Channel> {
-        return await this.channelRepository.findOneOrFail({
-           where: { id: channelId }
-       });
+        return await this.channelRepository.findOne({id: channelId});
    }
 
     /* get one channel by its name */
    async findChannelByName(channelName: string): Promise<Channel> {
-        return await this.channelRepository.findOneOrFail({
-        where: { name: channelName }
-        });
+        return await this.channelRepository.findOne({name: channelName});
     }
 
     /* create one channel */
@@ -121,7 +117,7 @@ export class ChannelService {
         
         
             // remove the user to the channel
-            
+
         await this.channelRepository.save(channelToLeave);   // update the channel
    }
 

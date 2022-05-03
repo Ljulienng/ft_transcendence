@@ -21,12 +21,15 @@ let ChannelController = class ChannelController {
         this.channelService = channelService;
     }
     findAll() {
+        console.log("return all channels");
         return this.channelService.findAll();
     }
     findChannelById(id) {
+        console.log("return channel with id=", id);
         return this.channelService.findChannelById(id);
     }
     findChannelByName(name) {
+        console.log("return channel with name=", name);
         return this.channelService.findChannelByName(name);
     }
     createChannel(channelDto, response) {
