@@ -1,7 +1,12 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { Message } from "src/message/models/message.entity";
 import { Channel } from "src/channel/models/channel.entity";
-import { FriendRequest } from "./friend-request.entity"
+
+export type Friend = {
+	username: string;
+	firstname: string;
+	lastname: string;
+}
 
 @Entity()
 export class User {
@@ -11,7 +16,7 @@ export class User {
 
 	// nullable/default for tests
 	@Column({ nullable: true, default: null,})
-	firsname: string;
+	firstname: string;
 
 	@Column({ nullable: true, default: null,})
 	lastname: string;
@@ -43,13 +48,7 @@ export class User {
 	@OneToMany(() => Channel, channel => channel.owner)
 	channels: Channel[];
 
-	@Column("int", {array: true, nullable: true, default: null,})
-	friends: number[];
-
-	@OneToMany(() => FriendRequest, (FriendRequest) => FriendRequest.creator)
-	sentFriendRequests: FriendRequest[];
-
-	@OneToMany(() => FriendRequest, (FriendRequest) => FriendRequest.receiver)
-	receivedFriendRequests: FriendRequest[];
+	@Column("simple-array", {nullable: true})
+	friends: string[];
 
 }

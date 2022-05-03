@@ -77,3 +77,4 @@ Nest is [MIT licensed](LICENSE).
 - [Docker-compose with Postgres using TypeORM from NestJS](https://www.youtube.com/watch?v=jYFyLLqvHy8)
 - [Get data from api for vue JS](https://www.section.io/engineering-education/how-to-interact-with-an-api-from-a-vuejs-application/) && [A video using NuxtJs but still works with Vue](https://www.youtube.com/watch?v=TbUpYeLn6SI)
 
+- [Typescript with vueJS](https://blog.logrocket.com/vue-typescript-tutorial-examples/#data)

@@ -1,0 +1,114 @@
+.page {
+    height: 100%;
+    width: 100%;
+    text-align: left;
+    padding: 20px;
+}
+h1 {
+    color: #fff774;
+    font-size: 128px;
+}
+h2 {
+    color: #fff774;
+    font-size: 4rem;
+}
+h3 {
+    color: #fff;
+    font-size: 2rem;
+}
+h4 {
+    color: #fff774;
+    font-size: 24px;
+}
+.mybtn {
+    height: 50px;
+    width: 200px;
+    color: #fff774;
+    font-size: 1.5rem;
+    outline: none;
+    border-radius: 20px;
+    border: 2px solid #fff774;
+    margin: 5px;
+}
+.mybtn:hover {
+    height: 50px;
+    width: 200px;
+    color: #fff774;
+    background-color: #fff77480;
+    font-size: 1.5rem;
+    outline: none;
+    border-radius: 20px;
+    border: 2px solid #fff774;
+    margin: 5px;
+}
+.box {
+    height: 900px;
+    width: 800px;
+    background-color: #c4c4c480;
+    border-radius: 20px;
+    margin-top: 10px;
+    overflow:scroll;
+}
+.boxhead {
+    height: 150px;
+    width: 800px;
+    background-color: #c4c4c4;
+    border-radius: 20px 20px 0px 0px;
+    padding: 50px;
+}
+.right_arrow {
+    border: solid #fff774;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 10px;
+    transform: rotate(-45deg);
+}
+.left_arrow {
+    border: solid #fff774;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 10px;
+    transform: rotate(135deg);
+}
+.up_arrow {
+    border: solid #fff774;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(-135deg);
+}
+.down_arrow {
+    border: solid #fff774;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg);
+}
+.right_arrow:hover {
+    border: solid #fff774;
+    border-width: 0 4px 4px 0;
+    display: inline-block;
+    padding: 10px;
+    transform: rotate(-45deg);
+}
+.left_arrow:hover {
+    border: solid #fff774;
+    border-width: 0 4px 4px 0;
+    display: inline-block;
+    padding: 10px;
+    transform: rotate(135deg);
+}
+.up_arrow:hover {
+    border: solid #fff774;
+    border-width: 0 4px 4px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(-135deg);
+}
+.down_arrow:hover {
+    border: solid #fff774;
+    border-width: 0 4px 4px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg);
+}

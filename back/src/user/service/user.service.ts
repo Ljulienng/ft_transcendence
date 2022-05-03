@@ -1,12 +1,12 @@
-import { ConsoleLogger, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConsoleLogger, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { from, Observable, of, switchMap, map } from 'rxjs';
-import { Repository } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 import { UserDto } from '../models/user.dto';
 import { Student } from "src/user/dto/student.dto"
-import { User } from '../models/user.entity';
-import { FriendRequest } from '../models/friend-request.entity';
-import { FriendRequestDto, FriendRequestStatus, FriendRequest_Status } from '../models/friend-request.dto';
+import { User, Friend } from '../models/user.entity';
+import { isNumber } from 'class-validator';
+import { names, uniqueNamesGenerator } from 'unique-names-generator';
 
 @Injectable()
 export class UserService {
@@ -14,15 +14,16 @@ export class UserService {
 	constructor(
 		@InjectRepository(User)
 		private userRepository: Repository<User>,
-		@InjectRepository(FriendRequest)
-		private friendRequestRepository: Repository<FriendRequest>
 	) {}
 
 	add(user: User): any {
+		user.firstname = uniqueNamesGenerator({dictionaries: [names]})
+		user.lastname = uniqueNamesGenerator({dictionaries: [names]})
+
 		return from(this.userRepository.save(user));
 	}
 
-	addStudent(user: Student): any{
+	addStudent(user: Student): any {
 		const tmp: User = this.userRepository.create(user);
 
 		console.log('Student Added');
@@ -33,8 +34,27 @@ export class UserService {
 	}
 
 	async delete(id: string) {
-		console.log(id)
 		await this.userRepository.delete(id);
+	}
+
+	async setUsername(userId: number, userName: string) {
+		const currentUser = await this.userRepository.findOne({id: userId});
+		const tmp = await this.userRepository.findOne({username: userName})
+		const regex = /^[a-zA-Z0-9_]+$/
+
+		// console.log("username: ", userName);
+		// console.log("tmp: ", tmp);
+		// console.log("currentUser: ", (await currentUser).username);
+		// console.log("regexp = ", regex.test(userName));
+		if (tmp)
+			throw new HttpException('Username already taken', HttpStatus.FORBIDDEN);
+		else if ((await currentUser).username === userName)
+			throw new HttpException('You already took this username', HttpStatus.FORBIDDEN);
+		else if (regex.test(userName) === false)
+			throw new HttpException('Wrong format for username only underscore are allowed.', HttpStatus.FORBIDDEN);
+		currentUser.username = userName;
+		await this.userRepository.save(currentUser);
+		// await this.userRepository.save({})
 	}
 
 	findAll(): any {
@@ -77,67 +97,83 @@ export class UserService {
 
 	}
 
-	// Friends
+	async addFriend(user: User, friendToAdd: any) {
+		const friend = await this.userRepository.findOne({username: friendToAdd.friendUsername});
+		if (user.friends === null)
+			user.friends = []
+		if (!friend) {
+			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
+		}
 
-	hasRequestBeenSentOrReceived( creator: User, receiver: User): Observable<boolean> {
-		return from(this.friendRequestRepository.findOne({
-			where: [
-				{ creator, receiver },
-				{ creator: receiver, receiver: creator },
-			]
-		})).pipe(
-			switchMap((friendRequest: FriendRequest) => {
-				if (!friendRequest) return of(false);
-				return of(true);
-			})
-		)
+		const tmp = user.friends.find(el => el === String(friend.id))
+
+		if (tmp) {
+			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user is already in your friendlist.')
+		}
+		else {
+			user.friends.push(String(friend.id))
+		}
+		await this.userRepository.save(user);
 	}
 
-	sendFriendRequest(creator: User, receiverId: number): Observable<FriendRequest | {error: string}> {
-		if (receiverId === creator.id)
-			return of({error: 'Don\'t add yourself as a friend ?!'});
+	async deleteFriend(user: User, friendToDelete: any) {
+		const friend = await this.userRepository.findOne({username: friendToDelete.username});
 
-		return this.findByUserId(receiverId).pipe(
-			switchMap((receiver: User) => {
-				return this.hasRequestBeenSentOrReceived(creator, receiver).pipe(
-					switchMap((hasBeenReceivedOrNot: boolean) => {
-						if (hasBeenReceivedOrNot)
-							return of({error: 'A friend request has already been sent of received'});
-						let friendRequest: FriendRequestDto = {
-							creator,
-							receiver,
-							status: 'pending',
-						};
-						return from(this.friendRequestRepository.save(friendRequest));
-					})
-				)
-			}) // end switchMap
-		)
+		if (!friend) {
+			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
+		}
+		const tmp = user.friends.find(el => el === String(friend.id))
+		if (tmp) {
+			// console.log("friend id deleted= ", String(friend.id))
+			const index = user.friends.indexOf(tmp, 0);
+			// console.log("friend index = ", index)
+			user.friends.splice(index, 1); 
+		}
+		else
+			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user isn\'t in your friendlist.')
+		await this.userRepository.save(user);
 	}
 
-	getFriendRequestStatus(currentUser: User, receiverId: number): Observable<FriendRequestStatus> {
-		return this.findByUserId(receiverId).pipe(
-			switchMap((receiver: User) => {
-				return from(this.friendRequestRepository.findOne({
-					where: [
-						{ creator: currentUser, receiver: receiver },
-						{ creator: receiver, receive: currentUser }
-					],
-					relations: ['creator', 'receiver']
-				}))
-			}),
-			switchMap((FriendRequest: FriendRequest) => {
-				if (FriendRequest?.receiver.id === currentUser.id) {
-					return of({status: 'waiting-response' as FriendRequest_Status})
-				}
-				return of({ status: FriendRequest?.status || 'not-sent' })
-			})
-		)
+	async retrieveFriendInfo(friendId: string): Promise<Friend> {
+		let friendInfo: User = undefined;
+		if (isNaN(+friendId))
+			return friendInfo;
+		friendInfo = await this.userRepository.findOne({id: +friendId});
+		console.log()
+		
+		if (friendInfo !== undefined) {
+
+			let friend: Friend = {
+				username: "",
+				firstname: "",
+				lastname: ""
+			};
+
+			friend.username = friendInfo.username;
+			friend.firstname = friendInfo.firstname;
+			friend.lastname = friendInfo.lastname;
+
+			return friend;
+		}
+		else {
+			console.log("User doesn't exist")
+			return friendInfo
+		}
 	}
 
-	getFriendRequestUserById(friendRequestId: number): Observable<FriendRequest> {
-		return from(this.friendRequestRepository.findOne({
-			where: [{id: friendRequestId}],
-		}));
+
+	async friendList(user: User): Promise<Friend[]> {
+		let friendList = [];
+		let friend;
+
+		// console.log("user.friends = ", user.friends)
+		for (let i = 0; user.friends[i]; i++) {
+			if ((friend = await this.retrieveFriendInfo(user.friends[i])) !== undefined){
+				friendList.push(friend);
+			}
+		}
+		// console.log("Friendlist = ", friendList)
+		return (friendList);
 	}
+
 }
