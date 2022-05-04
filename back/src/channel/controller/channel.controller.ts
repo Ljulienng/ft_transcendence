@@ -1,9 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ChannelService } from '../service/channel.service';
 import { CreateChannelDto } from '../models/createChannel.dto';
 import { CreateMessageDto } from 'src/message/models/createMessage.dto';
 import { Response } from 'express'
 import { MessageService } from 'src/message/service/message.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { User } from 'src/user/models/user.entity';
 
 @Controller('channel')
 export class ChannelController {
@@ -45,13 +47,14 @@ export class ChannelController {
         return this.channelService.getChannelMessagesByRoom(channel.name);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Post()
     createChannel(
-        //@Req() request: Request,
+        @Req() request,
         @Body() channelDto: CreateChannelDto) {
+        const user = request.user;
         console.log('POST a new channel : ', channelDto);
-        //console.log('id:', request.user.id);
-        return this.channelService.createChannel(channelDto, 1); // 1 is temporary : need to match with the user id !
+        return this.channelService.createChannel(channelDto, request.user.id);
     }
 
     @Delete(':channelId')

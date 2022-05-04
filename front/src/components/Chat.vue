@@ -39,7 +39,7 @@
             <h3>Channel list</h3>
             <ul>
                 <li v-for="channel in channelList" :key="channel">
-                    [{{channel.id}}]  channel -> {{channel.name}}
+                    [{{channel.id}}]  channel -> {{channel.name}} created by {{channel.owner.username}}
                 </li>
             </ul>
         </div>
@@ -86,7 +86,7 @@ export default defineComponent({
                 password: this.password,
              }
             //this.socket.emit('addChannel', channel);
-            http.post('/channel', channel);
+            http.post('/channel', channel, { withCredentials: true });
             this.getChannelList();
             this.name = '';
             this.privacy = '';
@@ -96,6 +96,7 @@ export default defineComponent({
         deleteChat() {
             console.log("delete channel");
             http.delete('/channel/' + this.channelId);
+            this.getChannelList();
             this.channelId = 0;
         },
 
@@ -108,10 +109,6 @@ export default defineComponent({
         this.socket = io('localhost:3000/chat', {  withCredentials: true });
         this.getChannelList();
     },
-
-    mounted() {
-        this.getChannelList();
-    }
 
     // mounted() {
     //     this.socket.on('messageSent', (data) => {

@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const channel_service_1 = require("../service/channel.service");
 const createChannel_dto_1 = require("../models/createChannel.dto");
 const message_service_1 = require("../../message/service/message.service");
+const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
 let ChannelController = class ChannelController {
     constructor(channelService, messageService) {
         this.channelService = channelService;
@@ -45,9 +46,10 @@ let ChannelController = class ChannelController {
         const channel = await this.channelService.findChannelById(channelId);
         return this.channelService.getChannelMessagesByRoom(channel.name);
     }
-    createChannel(channelDto) {
+    createChannel(request, channelDto) {
+        const user = request.user;
         console.log('POST a new channel : ', channelDto);
-        return this.channelService.createChannel(channelDto, 1);
+        return this.channelService.createChannel(channelDto, request.user.id);
     }
     deleteChannel(channelId) {
         return this.channelService.deleteChannel(channelId);
@@ -87,10 +89,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "findMessagesByChannelId", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [createChannel_dto_1.CreateChannelDto]),
+    __metadata("design:paramtypes", [Object, createChannel_dto_1.CreateChannelDto]),
     __metadata("design:returntype", void 0)
 ], ChannelController.prototype, "createChannel", null);
 __decorate([
