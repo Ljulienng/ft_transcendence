@@ -1,8 +1,9 @@
 <template>
 	<div class="uploadAvatar">
-		<h1>Upload Avatar</h1>
+		<img :src="this.image">
+		<h2>Upload Avatar</h2>
 		<p v-if="success === true">Successfully uploaded</p>
-		<input type="file" id="file" ref="file" @change="onFileSelected">
+		<input type="File" id="file" ref="file" @change="onFileSelected">
 		<button type="submit" @click="onUpload">Upload</button>
 	</div>
 </template>
@@ -20,15 +21,18 @@ import http from "../http-common"
 export default defineComponent({
 	data () {
 		return {
-			selectedFile: null,
-			success: false
+			// eslint-disable-next-line
+			selectedFile: null as any,
+			success: false,
+			image: null as any,
 		}
 	},
 
 	methods: {
 		onFileSelected(): void {
 			try {
-				this.selectedFile = this.$refs.file.files[0];
+				// eslint-disable-next-line
+				this.selectedFile = (this.$refs.file as any).files[0];
 				console.log("selectedFIle = ", this.selectedFile)
 			} catch(e) {
 				console.log('error: ', e)
@@ -50,7 +54,38 @@ export default defineComponent({
 			// .catch(err => {
 			// 	console.log(err),
 			// })
+		},
+
+		atou(b64) {
+			return decodeURIComponent(escape(atob(b64)));
+		},
+
+		getAvatar() {
+			try {
+				http.get('users/avatar')
+				.then(response => {
+				btoa(unescape(encodeURIComponent(response.data)));
+				console.log(this.image)
+				console.log(atob(response.data))
+					// this.image = window.webkitURL(response.data);
+				})
+				.catch(error => {
+					console.log(error)
+				})
+			} catch(e) {
+				console.log(e)
+			}
 		}
+	},
+
+	created () {
+		this.getAvatar();
 	}
 })
 </script>
+
+<style lang='scss'>
+
+
+
+</style>
