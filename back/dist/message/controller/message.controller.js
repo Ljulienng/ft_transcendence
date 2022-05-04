@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageController = void 0;
 const common_1 = require("@nestjs/common");
 const message_service_1 = require("../service/message.service");
-const createMessage_dto_1 = require("../models/createMessage.dto");
 let MessageController = class MessageController {
     constructor(messageService) {
         this.messageService = messageService;
@@ -26,9 +25,6 @@ let MessageController = class MessageController {
     }
     findMessageById(id) {
         return;
-    }
-    createMessage(createMessage) {
-        return this.messageService.saveMessage(createMessage);
     }
     deleteMessage(id) {
         return;
@@ -47,13 +43,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], MessageController.prototype, "findMessageById", null);
-__decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [createMessage_dto_1.CreateMessageDto]),
-    __metadata("design:returntype", void 0)
-], MessageController.prototype, "createMessage", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),

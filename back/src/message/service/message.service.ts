@@ -25,8 +25,10 @@ export class MessageService {
       });
   }
 
-  async saveMessage(createMessageDto: CreateMessageDto) {
-    const newMessage = this.messageRepository.create(createMessageDto);
+  async saveMessage(/*createMessageDto: CreateMessageDto*/message: string, channelId: number) {
+    const newMessage = this.messageRepository.create(/*createMessageDto*/{
+        content: message,
+    });
     return await this.messageRepository.save(newMessage);
   }
 

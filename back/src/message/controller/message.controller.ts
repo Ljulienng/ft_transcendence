@@ -17,10 +17,10 @@ export class MessageController {
         return ;
     }
 
-    @Post()
-    createMessage(@Body() createMessage: CreateMessageDto) {
-        return this.messageService.saveMessage(createMessage);
-    }
+    // @Post()
+    // createMessage(@Body() createMessage: CreateMessageDto) {
+    //     return this.messageService.saveMessage(createMessage);
+    // }
 
     @Delete(':id')
     deleteMessage(@Param('id') id: string) {

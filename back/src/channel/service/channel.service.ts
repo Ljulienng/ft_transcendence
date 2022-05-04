@@ -139,4 +139,12 @@ export class ChannelService {
         const messages = await this.messageRepository.find(); // -> A MODIFIER -> where channelId = channel.id
         return messages;
     }
+
+    /* get all the messages of a channel */
+    async getChannelMessagesByRoomId(roomId: number) {
+        const channel = await this.findChannelById(roomId);
+        const messages = await this.messageRepository.find(); // -> A MODIFIER -> where channelId = channel.id
+        console.log('messages found for channelId ', roomId, ' : ', messages);
+        return messages;
+    }
 }

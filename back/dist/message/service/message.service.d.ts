@@ -1,5 +1,4 @@
 import { Repository } from 'typeorm';
-import { CreateMessageDto } from '../models/createMessage.dto';
 import { Message } from '../models/message.entity';
 import { UserService } from 'src/user/service/user.service';
 export declare class MessageService {
@@ -8,6 +7,6 @@ export declare class MessageService {
     constructor(messageRepository: Repository<Message>, userService: UserService);
     findAll(): Promise<Message[]>;
     findMessageById(messageId: string): Promise<Message>;
-    saveMessage(createMessageDto: CreateMessageDto): Promise<Message>;
+    saveMessage(message: string, channelId: number): Promise<Message>;
     delete(messageId: string): Promise<Message>;
 }

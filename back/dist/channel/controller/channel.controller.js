@@ -35,20 +35,12 @@ let ChannelController = class ChannelController {
         console.log("return channel with name=", name);
         return this.channelService.findChannelByName(name);
     }
-    testPostMessage() {
-        const message = {
-            content: "Hello I'm a message",
-        };
-        this.messageService.saveMessage(message);
-    }
     async findMessagesByChannelId(channelId) {
         console.log("find messages of one channel");
         const channel = await this.channelService.findChannelById(channelId);
-        return this.channelService.getChannelMessagesByRoom(channel.name);
+        return this.channelService.getChannelMessagesByRoomId(channel.id);
     }
     createChannel(request, channelDto) {
-        const user = request.user;
-        console.log('POST a new channel : ', channelDto);
         return this.channelService.createChannel(channelDto, request.user.id);
     }
     deleteChannel(channelId) {
@@ -75,12 +67,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ChannelController.prototype, "findChannelByName", null);
-__decorate([
-    (0, common_1.Get)(':channelId/postMessage'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], ChannelController.prototype, "testPostMessage", null);
 __decorate([
     (0, common_1.Get)(':channelId/messages'),
     __param(0, (0, common_1.Param)('channelId')),

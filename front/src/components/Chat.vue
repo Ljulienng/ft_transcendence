@@ -30,16 +30,23 @@
             <input type="number" v-model="channelId" class="inputChannelId" />
         </div><br>
 
-        <!-- <div> 
-            Message <input type="text" maxlength="100" v-model="message" class="inputMessage" />
-            <button @click="sendMessage">send test message</button>
-        </div> -->
+        <div> 
+            <button @click="sendMessage">Send message</button>
+            <input type="text" maxlength="100" v-model="message.content" class="inputMessage" />
+            in channel <input type="text" maxlength="100" v-model="message.roomId" class="inputChannelId" />  
+        </div>
 
         <div class="channelList">
             <h3>Channel list</h3>
             <ul>
                 <li v-for="channel in channelList" :key="channel">
                     [{{channel.id}}]  channel -> {{channel.name}} created by {{channel.owner.username}}
+                        <div v-for="message in messageList" :key="message">
+                            <!-- channel.id = {{channel.id}}   message.roomId = {{message.roomId}} -->
+                            <div v-if="channel.id == message.roomId">
+                                message : {{message.content}}
+                            </div>
+                        </div>
                 </li>
             </ul>
         </div>
@@ -51,17 +58,23 @@ import { defineComponent } from "@vue/runtime-core"
 import axios from 'axios'
 import io from 'socket.io-client'
 import http from "../http-common"
+import MessageI from '../types/interfaces/message.interface'
 
 export default defineComponent({
     data() {
         return {
             socket: io(),
             channelList: [],
+            message: {
+                content: '',
+                roomId: 0,
+            },
+            messageList: [] as MessageI[],
             name: '',
             password: '',
             privacy: '',
             user: '',
-            message: '',
+            
             channelId: 0,
         }
     },
@@ -73,6 +86,16 @@ export default defineComponent({
                 const response = await axios.get('http://localhost:3000/channel');
                 this.channelList = response.data;
                 console.log('get channelList : ', response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        },
+
+        async getMessageList() {
+            try {
+                const response = await axios.get('http://localhost:3000/channel/' + this.channelId + '/messages');
+                this.messageList = response.data;
+                console.log('get messageList of channel ', this.channelId, ' : ', response.data);
             } catch (error) {
                 console.log(error);
             }
@@ -101,8 +124,9 @@ export default defineComponent({
         },
 
         sendMessage() {
-            // this.socket.emit('sendMessage', this.message);
-            this.message = '';
+            console.log('sendMessage - on roomId : ', this.message.roomId);
+            this.socket.emit('sendMessage', this.message.content, this.message.roomId);
+            // this.message.content = '';
         },
     },
     created() {
@@ -110,11 +134,13 @@ export default defineComponent({
         this.getChannelList();
     },
 
-    // mounted() {
-    //     this.socket.on('messageSent', (data) => {
-    //         console.log('Message sent to the front : ', data);
-    //     });
-    // },
+    mounted() {
+        // this.socket.on('messageSent', (data) => {
+        //     this.message = data;
+        //     this.messageList.push(data);
+        //     console.log('Message sent to the front : ', data);
+        // });
+    },
 })
 </script>
 

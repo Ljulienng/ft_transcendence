@@ -31,8 +31,10 @@ let MessageService = class MessageService {
             where: { id: Number(messageId) }
         });
     }
-    async saveMessage(createMessageDto) {
-        const newMessage = this.messageRepository.create(createMessageDto);
+    async saveMessage(message, channelId) {
+        const newMessage = this.messageRepository.create({
+            content: message,
+        });
         return await this.messageRepository.save(newMessage);
     }
     async delete(messageId) {

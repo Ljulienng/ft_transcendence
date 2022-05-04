@@ -32,19 +32,11 @@ export class ChannelController {
         return this.channelService.findChannelByName(name);
     }
 
-    @Get(':channelId/postMessage')
-    testPostMessage() {
-        const message: CreateMessageDto = {
-            content: "Hello I'm a message",
-        }
-        this.messageService.saveMessage(message);
-    }
-
     @Get(':channelId/messages')
     async findMessagesByChannelId(@Param('channelId') channelId: number): Promise<CreateMessageDto[]> {
         console.log("find messages of one channel");
         const channel = await this.channelService.findChannelById(channelId);
-        return this.channelService.getChannelMessagesByRoom(channel.name);
+        return this.channelService.getChannelMessagesByRoomId(channel.id);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -52,8 +44,7 @@ export class ChannelController {
     createChannel(
         @Req() request,
         @Body() channelDto: CreateChannelDto) {
-        const user = request.user;
-        console.log('POST a new channel : ', channelDto);
+        // console.log('POST a new channel : ', channelDto);
         return this.channelService.createChannel(channelDto, request.user.id);
     }
 

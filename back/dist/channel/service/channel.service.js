@@ -102,6 +102,12 @@ let ChannelService = class ChannelService {
         const messages = await this.messageRepository.find();
         return messages;
     }
+    async getChannelMessagesByRoomId(roomId) {
+        const channel = await this.findChannelById(roomId);
+        const messages = await this.messageRepository.find();
+        console.log('messages found for channelId ', roomId, ' : ', messages);
+        return messages;
+    }
 };
 ChannelService = __decorate([
     (0, common_1.Injectable)(),
