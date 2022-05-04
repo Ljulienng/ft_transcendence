@@ -39,7 +39,7 @@ export class MessageService {
   }
 
  async delete(messageId: string) {
-     const message = await this.findMessageById(messageId);
+     const message = await this.findMessageById(messageId);  
      if (!message) {
          throw new NotFoundException();
      }
