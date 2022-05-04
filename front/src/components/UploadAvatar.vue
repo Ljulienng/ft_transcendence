@@ -1,6 +1,8 @@
 <template>
 	<div class="uploadAvatar">
-		<img :src="this.image">
+		<div class="avatar">
+			<img :src="this.image" class="Image">
+		</div>
 		<h2>Upload Avatar</h2>
 		<p v-if="success === true">Successfully uploaded</p>
 		<input type="File" id="file" ref="file" @change="onFileSelected">
@@ -47,35 +49,27 @@ export default defineComponent({
 			.then(res => {
 				console.log(res),
 				this.success = true;
+				window.location.reload()
 			})
 			.catch(error => {
 				console.log("error on upload = ", error)
 			})
-			// .catch(err => {
-			// 	console.log(err),
-			// })
 		},
 
-		atou(b64) {
-			return decodeURIComponent(escape(atob(b64)));
-		},
+		async getAvatar() {
+			http.get("/users/avatar", {responseType: "blob"})
+			.then(response => {
+				const blob = response.data
+				console.log("res = ", response.data)
+				console.log('blob - ', blob )
+				this.image = URL.createObjectURL(blob);
+				console.log('img = ', this.image)
+			})
+			.catch(error => {
+				console.log(error)
+			})
 
-		getAvatar() {
-			try {
-				http.get('users/avatar')
-				.then(response => {
-				btoa(unescape(encodeURIComponent(response.data)));
-				console.log(this.image)
-				console.log(atob(response.data))
-					// this.image = window.webkitURL(response.data);
-				})
-				.catch(error => {
-					console.log(error)
-				})
-			} catch(e) {
-				console.log(e)
-			}
-		}
+		},
 	},
 
 	created () {
@@ -86,6 +80,15 @@ export default defineComponent({
 
 <style lang='scss'>
 
+img.Image {
+	max-width: 100%;
+	max-height: 100%;
 
+}
+
+.avatar {
+	width: 200px;
+	height: 200px;
+}
 
 </style>

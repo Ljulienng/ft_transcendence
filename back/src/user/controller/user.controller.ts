@@ -18,7 +18,7 @@ export const storage = {
 	storage: diskStorage({
 		destination: './uploads/profileimages',
 		filename: (req, file, cb) => {
-			const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+			const filename: string = req.user.username;
 			const extension: string = path.parse(file.originalname).ext;
 
 			cb(null, filename + extension);
@@ -110,7 +110,6 @@ export class UserController {
 	@UseInterceptors(FileInterceptor('image', storage))
 	uploadFile(@UploadedFile() file, @Req() req): Observable<Object> {
 		console.log("filename = ", file.filename)
-		console.log("req = ", req)
 		const user: User = req.user;
 
 		return this.userService.updateOne(user.id, {profileImage: file.filename}).pipe(
@@ -121,9 +120,9 @@ export class UserController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Get('/avatar/:imagename')
-	findProfileImage(@Param('imagename') imagename, @Res() res) {
-		return (res.sendFile(join(process.cwd(), '/uploads/profileimages' + imagename)))
+	@Get('/avatar')
+	findProfileImage(@Req() req, @Res() res) {
+		return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + req.user.profileImage)))
 	}
 
 }
