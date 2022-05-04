@@ -16,6 +16,16 @@ export class AuthController {
   async FortyTwoAuth(@Req() req)  {
   }
 
+  // @UseGuards(FortyTwoAuthGuard)
+  @Get('/norminet')
+  async Norminet(@Req() req, @Res({passthrough: true}) res) {
+    const payload = { username: 'norminet', auth: false };
+		const accessToken = await this.jwtService.signAsync(payload);
+		res.cookie('jwt', accessToken, {httpOnly: true})
+		// res.redirect('http://localhost:3001/home');
+  }
+
+
   @UseGuards(FortyTwoAuthGuard)
   @Get('/auth/42/callback')
   async FortyTwoAuthRedirect(@Req() req, @Res({passthrough: true}) res) {

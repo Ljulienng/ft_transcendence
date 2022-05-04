@@ -1,16 +1,36 @@
-import { Controller, Get, Post, Delete, Body, Req, UnauthorizedException, ConsoleLogger, UseGuards, Param, HttpException} from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Controller, Get, Post, Delete, Body, Req, Res, UnauthorizedException, ConsoleLogger, UseGuards, Param, UseInterceptors, UploadedFile, } from '@nestjs/common';
+import { Observable, of, tap } from 'rxjs';
 import { User, Friend } from '../models/user.entity';
 import { JwtService } from "@nestjs/jwt"
 import { UserService } from '../service/user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { diskStorage } from 'multer'
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { v4 as uuidv4 } from 'uuid'
+import path = require('path');
+import { map } from 'rxjs';
+import { join } from 'path';
+import { fileURLToPath } from 'url';
 // import { UserI } from '../models/user.interface';
+
+export const storage = {
+	storage: diskStorage({
+		destination: './uploads/profileimages',
+		filename: (req, file, cb) => {
+			const filename: string = req.user.username;
+			const extension: string = path.parse(file.originalname).ext;
+
+			cb(null, filename + extension);
+		}
+	})
+}
 
 @Controller('users')
 export class UserController {
-
 	constructor(private userService: UserService, private jwtService: JwtService) {}
+
+
 
 	@Post()
 	add(@Body() user: User): any {
@@ -83,6 +103,26 @@ export class UserController {
 	  catch (e) {
 		throw e;
 	  }
+	}
+
+	@Post('/uploadavatar')
+	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(FileInterceptor('image', storage))
+	uploadFile(@UploadedFile() file, @Req() req): Observable<Object> {
+		console.log("filename = ", file.filename)
+		const user: User = req.user;
+
+		return this.userService.updateOne(user.id, {profileImage: file.filename}).pipe(
+			tap((user: User) => console.log(user)),
+			map((user: User) => ({profileImage: user.profileImage}))
+		)
+		// return of({imagePath: file.path});
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Get('/avatar')
+	findProfileImage(@Req() req, @Res() res) {
+		return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + req.user.profileImage)))
 	}
 
 }

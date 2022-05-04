@@ -1,10 +1,10 @@
 import { Message } from "src/message/models/message.entity";
 import { Channel } from "src/channel/models/channel.entity";
-export declare class Friend {
+export declare type Friend = {
     username: string;
     firstname: string;
     lastname: string;
-}
+};
 export declare class User {
     id: number;
     firstname: string;
@@ -19,4 +19,5 @@ export declare class User {
     messages: Message[];
     channels: Channel[];
     friends: string[];
+    profileImage: string;
 }

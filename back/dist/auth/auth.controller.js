@@ -27,6 +27,11 @@ let AuthController = class AuthController {
     }
     async FortyTwoAuth(req) {
     }
+    async Norminet(req, res) {
+        const payload = { username: 'norminet', auth: false };
+        const accessToken = await this.jwtService.signAsync(payload);
+        res.cookie('jwt', accessToken, { httpOnly: true });
+    }
     async FortyTwoAuthRedirect(req, res) {
         const payload = { username: req.user['username'], auth: false };
         const accessToken = await this.jwtService.signAsync(payload);
@@ -35,12 +40,8 @@ let AuthController = class AuthController {
     }
     async userinfo(req) {
         try {
-            const cookie = req.cookies['jwt'];
-            const data = await this.jwtService.verifyAsync(cookie);
-            if (!data) {
-                throw new common_1.UnauthorizedException("User not found");
-            }
-            const user = await this.userService.findOne(data['email']);
+            const user = req.user;
+            console.log("userinfo ", user);
             return user;
         }
         catch (e) {
@@ -56,6 +57,14 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "FortyTwoAuth", null);
+__decorate([
+    (0, common_1.Get)('/norminet'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "Norminet", null);
 __decorate([
     (0, common_1.UseGuards)(fortytwo_guard_1.FortyTwoAuthGuard),
     (0, common_1.Get)('/auth/42/callback'),

@@ -4,7 +4,7 @@ import { JwtService } from "@nestjs/jwt";
 import { Student } from "src/user/dto/student.dto";
 import { Observable } from "rxjs";
 export declare class FortyTwoService {
-    private userService;
+    protected userService: UserService;
     private jwtService;
     constructor(userService: UserService, jwtService: JwtService);
     createUser(user: Student): Observable<User>;

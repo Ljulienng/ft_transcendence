@@ -18,11 +18,28 @@ const typeorm_1 = require("@nestjs/typeorm");
 const rxjs_1 = require("rxjs");
 const typeorm_2 = require("typeorm");
 const user_entity_1 = require("../models/user.entity");
+const unique_names_generator_1 = require("unique-names-generator");
 let UserService = class UserService {
     constructor(userRepository) {
         this.userRepository = userRepository;
     }
+    async onModuleInit() {
+        let user = {
+            username: 'norminet',
+            email: "norminet@cat.42.fr",
+        };
+        const userTmp = await this.userRepository.findOne({ email: user.email });
+        if (userTmp)
+            return;
+        const tmp = this.userRepository.create(user);
+        console.log('Norminet Added');
+        tmp.username = user.username;
+        tmp.email = user.email;
+        this.userRepository.save(user);
+    }
     add(user) {
+        user.firstname = (0, unique_names_generator_1.uniqueNamesGenerator)({ dictionaries: [unique_names_generator_1.names] });
+        user.lastname = (0, unique_names_generator_1.uniqueNamesGenerator)({ dictionaries: [unique_names_generator_1.names] });
         return (0, rxjs_1.from)(this.userRepository.save(user));
     }
     addStudent(user) {
@@ -35,26 +52,25 @@ let UserService = class UserService {
     async delete(id) {
         await this.userRepository.delete(id);
     }
+    updateOne(id, user) {
+        delete user.email;
+        delete user.username;
+        delete user.firstname;
+        delete user.lastname;
+        return (0, rxjs_1.from)(this.userRepository.update(id, user)).pipe((0, rxjs_1.switchMap)(() => this.userRepository.findOne({ id: id })));
+    }
     async setUsername(userId, userName) {
         const currentUser = await this.userRepository.findOne({ id: userId });
         const tmp = await this.userRepository.findOne({ username: userName });
         const regex = /^[a-zA-Z0-9_]+$/;
-        console.log("username: ", userName);
-        console.log("tmp: ", tmp);
-        console.log("currentUser: ", (await currentUser).username);
-        console.log("regexp = ", regex.test(userName));
         if (tmp)
             throw new common_1.HttpException('Username already taken', common_1.HttpStatus.FORBIDDEN);
         else if ((await currentUser).username === userName)
             throw new common_1.HttpException('You already took this username', common_1.HttpStatus.FORBIDDEN);
         else if (regex.test(userName) === false)
             throw new common_1.HttpException('Wrong format for username only underscore are allowed.', common_1.HttpStatus.FORBIDDEN);
-        await (0, typeorm_2.getConnection)()
-            .createQueryBuilder()
-            .update(user_entity_1.User)
-            .set({ username: userName })
-            .where("id = :id", { id: userId })
-            .execute();
+        currentUser.username = userName;
+        await this.userRepository.save(currentUser);
     }
     findAll() {
         return (0, rxjs_1.from)(this.userRepository.find());
@@ -87,29 +103,47 @@ let UserService = class UserService {
         return newUser;
     }
     async addFriend(user, friendToAdd) {
-        console.log("add friend", friendToAdd, "user = ", user);
         const friend = await this.userRepository.findOne({ username: friendToAdd.friendUsername });
-        console.log("friend", friend);
+        if (user.friends === null)
+            user.friends = [];
         if (!friend) {
             throw new common_1.UnauthorizedException(common_1.HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
         }
         const tmp = user.friends.find(el => el === String(friend.id));
-        console.log("tmpy", tmp);
         if (tmp) {
             throw new common_1.UnauthorizedException(common_1.HttpStatus.FORBIDDEN, 'The user is already in your friendlist.');
         }
         else {
-            console.log("friend id = ", String(friend.id));
             user.friends.push(String(friend.id));
         }
         await this.userRepository.save(user);
     }
+    async deleteFriend(user, friendToDelete) {
+        const friend = await this.userRepository.findOne({ username: friendToDelete.username });
+        if (!friend) {
+            throw new common_1.UnauthorizedException(common_1.HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
+        }
+        const tmp = user.friends.find(el => el === String(friend.id));
+        if (tmp) {
+            const index = user.friends.indexOf(tmp, 0);
+            user.friends.splice(index, 1);
+        }
+        else
+            throw new common_1.UnauthorizedException(common_1.HttpStatus.FORBIDDEN, 'The user isn\'t in your friendlist.');
+        await this.userRepository.save(user);
+    }
     async retrieveFriendInfo(friendId) {
-        console.log("friendID  ", friendId);
-        let friendInfo = await this.userRepository.findOne(friendId);
-        console.log("FriendInfo", friendInfo);
-        let friend;
-        if (friendInfo) {
+        let friendInfo = undefined;
+        if (isNaN(+friendId))
+            return friendInfo;
+        friendInfo = await this.userRepository.findOne({ id: +friendId });
+        console.log();
+        if (friendInfo !== undefined) {
+            let friend = {
+                username: "",
+                firstname: "",
+                lastname: ""
+            };
             friend.username = friendInfo.username;
             friend.firstname = friendInfo.firstname;
             friend.lastname = friendInfo.lastname;
@@ -117,15 +151,17 @@ let UserService = class UserService {
         }
         else {
             console.log("User doesn't exist");
+            return friendInfo;
         }
     }
     async friendList(user) {
-        let friendList;
-        for (const friendId of user.friends) {
-            console.log("loop id = ", friendId);
-            friendList.push(await this.retrieveFriendInfo(friendId));
+        let friendList = [];
+        let friend;
+        for (let i = 0; user.friends[i]; i++) {
+            if ((friend = await this.retrieveFriendInfo(user.friends[i])) !== undefined) {
+                friendList.push(friend);
+            }
         }
-        console.log("friendlist", friendList);
         return (friendList);
     }
 };
