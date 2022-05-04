@@ -108,7 +108,6 @@ export default defineComponent({
                 privacy: this.privacy,
                 password: this.password,
              }
-            //this.socket.emit('addChannel', channel);
             http.post('/channel', channel, { withCredentials: true });
             this.getChannelList();
             this.name = '';
@@ -119,7 +118,7 @@ export default defineComponent({
         deleteChat() {
             console.log("delete channel");
             http.delete('/channel/' + this.channelId);
-            this.getChannelList();
+            this.getChannelList(); 
             this.channelId = 0;
         },
 

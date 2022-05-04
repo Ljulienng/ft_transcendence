@@ -15,31 +15,27 @@ export class ChannelController {
 
     @Get()
     findAll() {
-        console.log("return all channels");
         return this.channelService.findAll();
     }
 
 
     @Get(':channelId')
     findChannelById(@Param('channelId') channelId: number) {
-        console.log("return channel with id=", channelId);
         return this.channelService.findChannelById(channelId);
     }
 
     @Get(':name')
     findChannelByName(@Param('name') name: string) {
-        console.log("return channel with name=", name);
         return this.channelService.findChannelByName(name);
     }
 
     @Get(':channelId/messages')
     async findMessagesByChannelId(@Param('channelId') channelId: number): Promise<CreateMessageDto[]> {
-        console.log("find messages of one channel");
         const channel = await this.channelService.findChannelById(channelId);
         return this.channelService.getChannelMessagesByRoomId(channel.id);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard) // the user need to be connected to add a channel
     @Post()
     createChannel(
         @Req() request,
