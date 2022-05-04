@@ -21,7 +21,6 @@ const user_service_1 = require("../service/user.service");
 const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
 const multer_1 = require("multer");
 const platform_express_1 = require("@nestjs/platform-express");
-const uuid_1 = require("uuid");
 const path = require("path");
 const rxjs_2 = require("rxjs");
 const path_1 = require("path");
@@ -29,7 +28,7 @@ exports.storage = {
     storage: (0, multer_1.diskStorage)({
         destination: './uploads/profileimages',
         filename: (req, file, cb) => {
-            const filename = path.parse(file.originalname).name.replace(/\s/g, '') + (0, uuid_1.v4)();
+            const filename = req.user.username;
             const extension = path.parse(file.originalname).ext;
             cb(null, filename + extension);
         }
@@ -92,12 +91,11 @@ let UserController = class UserController {
     }
     uploadFile(file, req) {
         console.log("filename = ", file.filename);
-        console.log("req = ", req);
         const user = req.user;
         return this.userService.updateOne(user.id, { profileImage: file.filename }).pipe((0, rxjs_1.tap)((user) => console.log(user)), (0, rxjs_2.map)((user) => ({ profileImage: user.profileImage })));
     }
-    findProfileImage(imagename, res) {
-        return (res.sendFile((0, path_1.join)(process.cwd(), '/uploads/profileimages' + imagename)));
+    findProfileImage(req, res) {
+        return (res.sendFile((0, path_1.join)(process.cwd(), '/uploads/profileimages/' + req.user.profileImage)));
     }
 };
 __decorate([
@@ -174,8 +172,8 @@ __decorate([
 ], UserController.prototype, "uploadFile", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Get)('/avatar/:imagename'),
-    __param(0, (0, common_1.Param)('imagename')),
+    (0, common_1.Get)('/avatar'),
+    __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),

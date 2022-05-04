@@ -3,8 +3,9 @@ import { Repository } from 'typeorm';
 import { Student } from "src/user/dto/student.dto";
 import { User, Friend } from '../models/user.entity';
 export declare class UserService {
-    private userRepository;
+    protected userRepository: Repository<User>;
     constructor(userRepository: Repository<User>);
+    onModuleInit(): Promise<void>;
     add(user: User): any;
     addStudent(user: Student): any;
     delete(id: string): Promise<void>;

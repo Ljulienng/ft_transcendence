@@ -1,5 +1,6 @@
 # compiled output
 */dist
+back/dist/
 */node_modules
 /back/uploads
 

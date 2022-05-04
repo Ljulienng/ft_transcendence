@@ -18,5 +18,5 @@ export declare class UserController {
     deleteFriend(req: any, friendToDelete: any): Promise<void>;
     userInfo(req: any, userName: any): Promise<void>;
     uploadFile(file: any, req: any): Observable<Object>;
-    findProfileImage(imagename: any, res: any): any;
+    findProfileImage(req: any, res: any): any;
 }

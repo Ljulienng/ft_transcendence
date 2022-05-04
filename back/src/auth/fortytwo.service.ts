@@ -8,7 +8,7 @@ import { Observable } from "rxjs";
 
 @Injectable()
 export class FortyTwoService {
-	constructor(private userService: UserService, private jwtService: JwtService) {}
+	constructor(protected userService: UserService, private jwtService: JwtService) {}
 
 	createUser(user: Student): Observable<User> {
 		return this.userService.addStudent(user);

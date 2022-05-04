@@ -23,6 +23,20 @@ let UserService = class UserService {
     constructor(userRepository) {
         this.userRepository = userRepository;
     }
+    async onModuleInit() {
+        let user = {
+            username: 'norminet',
+            email: "norminet@cat.42.fr",
+        };
+        const userTmp = await this.userRepository.findOne({ email: user.email });
+        if (userTmp)
+            return;
+        const tmp = this.userRepository.create(user);
+        console.log('Norminet Added');
+        tmp.username = user.username;
+        tmp.email = user.email;
+        this.userRepository.save(user);
+    }
     add(user) {
         user.firstname = (0, unique_names_generator_1.uniqueNamesGenerator)({ dictionaries: [unique_names_generator_1.names] });
         user.lastname = (0, unique_names_generator_1.uniqueNamesGenerator)({ dictionaries: [unique_names_generator_1.names] });

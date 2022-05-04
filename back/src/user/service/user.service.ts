@@ -13,8 +13,27 @@ export class UserService {
 
 	constructor(
 		@InjectRepository(User)
-		private userRepository: Repository<User>,
+		protected userRepository: Repository<User>,
 	) {}
+
+	async onModuleInit(): Promise<void> {
+		let user: Student = {
+			username: 'norminet',
+			email: "norminet@cat.42.fr",
+		}
+
+		const userTmp = await this.userRepository.findOne({email: user.email});
+		if (userTmp)
+			return ;
+		const tmp: User = this.userRepository.create(user);
+
+		console.log('Norminet Added');
+		tmp.username = user.username;
+		tmp.email = user.email;
+
+		this.userRepository.save(user);
+
+	}
 
 	add(user: User): any {
 		user.firstname = uniqueNamesGenerator({dictionaries: [names]})
@@ -96,6 +115,9 @@ export class UserService {
 		let userTmp: User = undefined;
 		
 		const { username } = user;
+		// if (user.email === "norminet") { // create second user for testing purposes
+
+		// }
 		userTmp = await this.userRepository.findOne({username: username});
 		if (userTmp)
 			return userTmp;
