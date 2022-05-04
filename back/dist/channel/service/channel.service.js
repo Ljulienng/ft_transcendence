@@ -56,6 +56,7 @@ let ChannelService = class ChannelService {
                 newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);
             }
         }
+        console.log('new channel created : ', newChannel);
         return await this.channelRepository.save(newChannel);
     }
     async checkPasswordMatch(sentPassword, expectedPassword) {

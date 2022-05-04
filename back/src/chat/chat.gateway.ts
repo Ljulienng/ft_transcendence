@@ -33,7 +33,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     constructor(
         private channelService: ChannelService,
-        private messageService: MessageService,
+        private messageService: MessageService, 
     ){}
 
     afterInit(server: any) {
@@ -56,12 +56,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     /* TO REMOVE - ACCESS BY CONTROLLER (endpoint /channel) */
-    @SubscribeMessage('addChannel')
-    async createChannel(client: Socket, createChannel: CreateChannelDto) {
-        console.log('Create chat:', createChannel.name, ' in back by user:', client.id);
-        const newChannel = await this.channelService.createChannel(createChannel, client.data.userId);
-        console.log(newChannel);
-    }
+    // @SubscribeMessage('addChannel')
+    // async createChannel(client: Socket, createChannel: CreateChannelDto) {
+    //     console.log('Create chat:', createChannel.name, ' in back by user:', client.id);
+    //     const newChannel = await this.channelService.createChannel(createChannel, client.data.userId);
+    //     console.log(newChannel);
+    // }
 
     /* connect user to a channel */
     @SubscribeMessage('joinChannel')
@@ -78,7 +78,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
      ** add a new message
      */
     @SubscribeMessage('addMessage') 
-    async sendMessage(client: Socket, message: CreateMessageDto /*string*/) {
+    async sendMessage(client: Socket, message: CreateMessageDto /*string*/) { 
         console.log('Message sent to the back : ', message.content);
         this.server.emit('messageSent', message.content);   // send data to all connected clients
         await this.messageService.saveMessage(message); 

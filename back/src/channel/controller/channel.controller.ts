@@ -48,11 +48,10 @@ export class ChannelController {
     @Post()
     createChannel(
         //@Req() request: Request,
-        @Body() channelDto: CreateChannelDto,
-        /*@Res() response: Response*/) {
-        console.log('POST REQUEST : ', channelDto);
+        @Body() channelDto: CreateChannelDto) {
+        console.log('POST a new channel : ', channelDto);
         //console.log('id:', request.user.id);
-        //return this.channelService.createChannel(channelDto, response.locals.id);
+        return this.channelService.createChannel(channelDto, 1); // 1 is temporary : need to match with the user id !
     }
 
     @Delete(':channelId')

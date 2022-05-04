@@ -3,7 +3,7 @@
 
         <div class="createChat">
             <h3>Create new channel</h3>
-            Name <input type="text" maxlength="12" v-model="name" class="inputName" />
+            Name <input type="text" maxlength="20" v-model="name" class="inputName" />
             <div>
                 <div class="one_elem">
                     <input type="radio" value="public" v-model="privacy"/>
@@ -23,18 +23,23 @@
                 <p>*Minimun 8 characters</p>
             </div> 
             <button @click="createChat">create channel</button>
-        </div>
+        </div><br>
 
         <div> 
+            <button @click="deleteChat">delete channel with id </button>
+            <input type="number" v-model="channelId" class="inputChannelId" />
+        </div><br>
+
+        <!-- <div> 
             Message <input type="text" maxlength="100" v-model="message" class="inputMessage" />
             <button @click="sendMessage">send test message</button>
-        </div>
+        </div> -->
 
         <div class="channelList">
             <h3>Channel list</h3>
             <ul>
                 <li v-for="channel in channelList" :key="channel">
-                    {{channel.id}} {{channel.name}}
+                    [{{channel.id}}]  channel -> {{channel.name}}
                 </li>
             </ul>
         </div>
@@ -57,6 +62,7 @@ export default defineComponent({
             privacy: '',
             user: '',
             message: '',
+            channelId: 0,
         }
     },
     computed: {
@@ -66,7 +72,7 @@ export default defineComponent({
             try {
                 const response = await axios.get('http://localhost:3000/channel');
                 this.channelList = response.data;
-                console.log(response.data);
+                console.log('get channelList : ', response.data);
             } catch (error) {
                 console.log(error);
             }
@@ -81,9 +87,16 @@ export default defineComponent({
              }
             //this.socket.emit('addChannel', channel);
             http.post('/channel', channel);
+            this.getChannelList();
             this.name = '';
             this.privacy = '';
             this.password = '';
+        },
+
+        deleteChat() {
+            console.log("delete channel");
+            http.delete('/channel/' + this.channelId);
+            this.channelId = 0;
         },
 
         sendMessage() {
@@ -95,6 +108,10 @@ export default defineComponent({
         this.socket = io('localhost:3000/chat', {  withCredentials: true });
         this.getChannelList();
     },
+
+    mounted() {
+        this.getChannelList();
+    }
 
     // mounted() {
     //     this.socket.on('messageSent', (data) => {
@@ -110,5 +127,6 @@ export default defineComponent({
     }
     button {
         color: white;
+        border: thin solid #CCCCCC
     }
 </style>
