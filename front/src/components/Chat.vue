@@ -33,7 +33,7 @@
         <div> 
             <button @click="sendMessage">Send message</button>
             <input type="text" maxlength="100" v-model="message.content" class="inputMessage" />
-            in channel <input type="text" maxlength="100" v-model="message.roomId" class="inputChannelId" />  
+            in channel <input type="text" maxlength="100" v-model="message.channelId" class="inputChannelId" />  
         </div>
 
         <div class="channelList">
@@ -42,8 +42,8 @@
                 <li v-for="channel in channelList" :key="channel">
                     [{{channel.id}}]  channel -> {{channel.name}} created by {{channel.owner.username}}
                         <div v-for="message in messageList" :key="message">
-                            <!-- channel.id = {{channel.id}}   message.roomId = {{message.roomId}} -->
-                            <div v-if="channel.id == message.roomId">
+                            <!-- channel.id = {{channel.id}}   message.channelId = {{message.channelId}} -->
+                            <div v-if="channel.id == message.channelId">
                                 message : {{message.content}}
                             </div>
                         </div>
@@ -67,7 +67,7 @@ export default defineComponent({
             channelList: [],
             message: {
                 content: '',
-                roomId: 0,
+                channelId: 0,
             },
             messageList: [] as MessageI[],
             name: '',
@@ -124,8 +124,9 @@ export default defineComponent({
         },
 
         sendMessage() {
-            console.log('sendMessage - on roomId : ', this.message.roomId);
-            this.socket.emit('sendMessage', this.message.content, this.message.roomId);
+            console.log('sendMessage - on channelId ', this.message.channelId, this.message.content);
+            // this.socket.emit('sendMessage', this.message.content, this.message.channelId);
+            this.socket.emit('sendMessage', this.message);
             // this.message.content = '';
         },
     },
@@ -134,13 +135,6 @@ export default defineComponent({
         this.getChannelList();
     },
 
-    mounted() {
-        // this.socket.on('messageSent', (data) => {
-        //     this.message = data;
-        //     this.messageList.push(data);
-        //     console.log('Message sent to the front : ', data);
-        // });
-    },
 })
 </script>
 

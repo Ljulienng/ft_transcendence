@@ -17,7 +17,7 @@ export class ChannelService {
         @InjectRepository(User)
         private userRepository: Repository<User>,
         @InjectRepository(Message)
-        private messageRepository: Repository<Message>,
+        private messageRepository: Repository<Message>, 
         // private messageService: MessageService,
     ) {}
 
@@ -144,7 +144,20 @@ export class ChannelService {
     async getChannelMessagesByRoomId(roomId: number) {
         const channel = await this.findChannelById(roomId);
         const messages = await this.messageRepository.find(); // -> A MODIFIER -> where channelId = channel.id
-        console.log('messages found for channelId ', roomId, ' : ', messages);
+        // console.log('messages found for channelId ', roomId, ' : ', messages);
         return messages;
     }
+
+    async saveMessage(/*createMessageDto: CreateMessageDto*/message: string, channelId: number) {
+        // const newMessage = this.messageRepository.create(/*createMessageDto*/{
+        //     content: message,
+        // });
+        const currentChannel = await this.findChannelById(channelId);
+        console.log('[saveMessage] channel ', channelId, ' : ', currentChannel);
+        return await this.messageRepository.save({
+            content: message,
+            channel: currentChannel,
+        });
+      }
+    
 }

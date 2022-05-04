@@ -13,6 +13,7 @@ export class MessageService {
         @InjectRepository(Message)
         private messageRepository: Repository<Message>,
         private userService: UserService,
+        private channelService: ChannelService,
     ) {}
 
    async findAll(): Promise<Message[]> {
@@ -26,10 +27,15 @@ export class MessageService {
   }
 
   async saveMessage(/*createMessageDto: CreateMessageDto*/message: string, channelId: number) {
-    const newMessage = this.messageRepository.create(/*createMessageDto*/{
+    // const newMessage = this.messageRepository.create(/*createMessageDto*/{
+    //     content: message,
+    // });
+    const currentChannel = await this.channelService.findChannelById(channelId);
+    console.log('[saveMessage] channel ', channelId, ' : ', currentChannel);
+    return await this.messageRepository.save({
         content: message,
+        channel: currentChannel,
     });
-    return await this.messageRepository.save(newMessage);
   }
 
  async delete(messageId: string) {

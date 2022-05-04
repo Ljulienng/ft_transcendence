@@ -86,10 +86,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     /*** test sockets ****/
     @SubscribeMessage('sendMessage')
-    async testMessage(client: Socket, message: string, channelId: number) {
-        console.log('Message sent to the back in channel ', channelId, ' : ', message);
-        client.emit('messageSent', message, channelId);
-        await this.messageService.saveMessage(message, channelId); 
+    async sendMessage(client: Socket, createMessageDto: CreateMessageDto /*message: string, channelId: number*/) {
+        // console.log('Message sent to the back in channel ', channelId, ' : ', message);
+        console.log('Message sent to the back in channel ', createMessageDto);
+        // client.emit('messageSent', message, channelId);
+        await this.channelService.saveMessage(createMessageDto.content, createMessageDto.channelId);
     }
 
 

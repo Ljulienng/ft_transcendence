@@ -105,8 +105,15 @@ let ChannelService = class ChannelService {
     async getChannelMessagesByRoomId(roomId) {
         const channel = await this.findChannelById(roomId);
         const messages = await this.messageRepository.find();
-        console.log('messages found for channelId ', roomId, ' : ', messages);
         return messages;
+    }
+    async saveMessage(message, channelId) {
+        const currentChannel = await this.findChannelById(channelId);
+        console.log('[saveMessage] channel ', channelId, ' : ', currentChannel);
+        return await this.messageRepository.save({
+            content: message,
+            channel: currentChannel,
+        });
     }
 };
 ChannelService = __decorate([

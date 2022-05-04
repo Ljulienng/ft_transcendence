@@ -18,10 +18,12 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const message_entity_1 = require("../models/message.entity");
 const user_service_1 = require("../../user/service/user.service");
+const channel_service_1 = require("../../channel/service/channel.service");
 let MessageService = class MessageService {
-    constructor(messageRepository, userService) {
+    constructor(messageRepository, userService, channelService) {
         this.messageRepository = messageRepository;
         this.userService = userService;
+        this.channelService = channelService;
     }
     async findAll() {
         return await this.messageRepository.find();
@@ -32,10 +34,12 @@ let MessageService = class MessageService {
         });
     }
     async saveMessage(message, channelId) {
-        const newMessage = this.messageRepository.create({
+        const currentChannel = await this.channelService.findChannelById(channelId);
+        console.log('[saveMessage] channel ', channelId, ' : ', currentChannel);
+        return await this.messageRepository.save({
             content: message,
+            channel: currentChannel,
         });
-        return await this.messageRepository.save(newMessage);
     }
     async delete(messageId) {
         const message = await this.findMessageById(messageId);
@@ -49,7 +53,8 @@ MessageService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(message_entity_1.Message)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        user_service_1.UserService])
+        user_service_1.UserService,
+        channel_service_1.ChannelService])
 ], MessageService);
 exports.MessageService = MessageService;
 //# sourceMappingURL=message.service.js.map

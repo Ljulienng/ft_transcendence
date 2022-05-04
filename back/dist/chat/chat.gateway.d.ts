@@ -2,6 +2,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from "@nestjs
 import { Server, Socket } from 'socket.io';
 import { Channel } from "src/channel/models/channel.entity";
 import { ChannelService } from "src/channel/service/channel.service";
+import { CreateMessageDto } from "src/message/models/createMessage.dto";
 import { MessageService } from "src/message/service/message.service";
 export declare class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     private channelService;
@@ -13,5 +14,5 @@ export declare class ChatGateway implements OnGatewayInit, OnGatewayConnection, 
     handleDisconnect(client: Socket): void;
     joinChannel(client: Socket, channel: Channel): Promise<void>;
     leaveChannel(client: Socket, channel: Channel): Promise<void>;
-    testMessage(client: Socket, message: string, channelId: number): Promise<void>;
+    sendMessage(client: Socket, createMessageDto: CreateMessageDto): Promise<void>;
 }

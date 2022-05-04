@@ -14,6 +14,7 @@ const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const channel_entity_1 = require("../channel/models/channel.entity");
 const channel_service_1 = require("../channel/service/channel.service");
+const createMessage_dto_1 = require("../message/models/createMessage.dto");
 const message_service_1 = require("../message/service/message.service");
 let ChatGateway = class ChatGateway {
     constructor(channelService, messageService) {
@@ -39,10 +40,9 @@ let ChatGateway = class ChatGateway {
     async leaveChannel(client, channel) {
         await this.channelService.removeUserToChannel(channel, client.data.user.id);
     }
-    async testMessage(client, message, channelId) {
-        console.log('Message sent to the back in channel ', channelId, ' : ', message);
-        client.emit('messageSent', message, channelId);
-        await this.messageService.saveMessage(message, channelId);
+    async sendMessage(client, createMessageDto) {
+        console.log('Message sent to the back in channel ', createMessageDto);
+        await this.channelService.saveMessage(createMessageDto.content, createMessageDto.channelId);
     }
 };
 __decorate([
@@ -64,9 +64,9 @@ __decorate([
 __decorate([
     (0, websockets_1.SubscribeMessage)('sendMessage'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket, String, Number]),
+    __metadata("design:paramtypes", [socket_io_1.Socket, createMessage_dto_1.CreateMessageDto]),
     __metadata("design:returntype", Promise)
-], ChatGateway.prototype, "testMessage", null);
+], ChatGateway.prototype, "sendMessage", null);
 ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         namespace: '/chat',

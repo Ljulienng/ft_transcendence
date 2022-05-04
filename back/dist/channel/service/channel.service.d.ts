@@ -18,4 +18,8 @@ export declare class ChannelService {
     deleteChannel(channelId: number): Promise<Channel>;
     getChannelMessagesByRoom(room: string): Promise<Message[]>;
     getChannelMessagesByRoomId(roomId: number): Promise<Message[]>;
+    saveMessage(message: string, channelId: number): Promise<{
+        content: string;
+        channel: Channel;
+    } & Message>;
 }
