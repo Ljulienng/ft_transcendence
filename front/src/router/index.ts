@@ -4,9 +4,9 @@ import HelloWorld from '@/components/HelloWorld.vue'
 import ShowUsers from '@/components/ShowUsers.vue'
 import AuthModal from '@/components/AuthModal.vue'
 import FriendList from '@/views/FriendList.vue'
-import Chat from '@/components/Chat.vue'
 import UserProfile from '@/views/UserProfile.vue'
 import Home from '@/views/Home.vue'
+import Chat from '@/views/Chat.vue'
 
 
 const routes = [

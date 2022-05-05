@@ -3,7 +3,7 @@
 
         <div class="createChat">
             <h3>Create new channel</h3>
-            Name <input type="text" maxlength="20" v-model="name" class="inputName" />
+            Name <input type="text" maxlength="20" v-model="name"/>
             <div>
                 <div class="one_elem">
                     <input type="radio" value="public" v-model="privacy"/>
@@ -19,28 +19,28 @@
                 </div>        
             </div>
             <div  v-if="privacy == 'protected'">
-                <input  class="input_password" type="password"  v-model="password" required>
-                <p>*Minimun 8 characters</p>
+                <input type="password"  v-model="password" required>
+                <p>Minimun 8 characters</p>
             </div> 
             <button @click="createChat">create channel</button>
         </div><br>
 
         <div> 
             <button @click="deleteChat">delete channel with id </button>
-            <input type="number" v-model="channelId" class="inputChannelId" />
+            <input type="number" v-model="channelId"/>
         </div><br>
 
         <div> 
             <button @click="sendMessage">Send message</button>
             <input type="text" maxlength="100" v-model="message.content" class="inputMessage" />
-            in channel <input type="text" maxlength="100" v-model="message.channelId" class="inputChannelId" />  
-        </div>
+            in channel <input type="text" maxlength="100" v-model="message.channelId"/>  
+        </div><br>
 
         <div class="channelList">
             <h3>Channel list</h3>
             <ul>
                 <li v-for="channel in channelList" :key="channel">
-                    [{{channel.id}}]  channel -> {{channel.name}} created by {{channel.owner.username}}
+                    {{channel.id}} - "{{channel.name}}" : created by {{channel.owner.username}}
                         <div v-for="message in messageList" :key="message">
                             <!-- channel.id = {{channel.id}}   message.channelId = {{message.channelId}} -->
                             <div v-if="channel.id == message.channelId">
@@ -140,6 +140,9 @@ export default defineComponent({
 <style scoped>
     div {
         color: white;
+    }
+    ul {
+	padding-left: 10%;
     }
     button {
         color: white;
