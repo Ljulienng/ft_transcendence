@@ -7,6 +7,7 @@ export declare class AuthController {
     private jwtService;
     constructor(fortyTwoService: FortyTwoService, userService: UserService, jwtService: JwtService);
     FortyTwoAuth(req: any): Promise<void>;
+    Norminet(req: any, res: any): Promise<void>;
     FortyTwoAuthRedirect(req: any, res: any): Promise<void>;
     userinfo(req: any): Promise<any>;
 }

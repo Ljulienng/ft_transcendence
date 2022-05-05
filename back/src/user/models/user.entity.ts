@@ -51,4 +51,6 @@ export class User {
 	@Column("simple-array", {nullable: true})
 	friends: string[];
 
+	@Column({nullable: true})
+	profileImage: string;
 }

@@ -19,4 +19,5 @@ export declare class User {
     messages: Message[];
     channels: Channel[];
     friends: string[];
+    profileImage: string;
 }

@@ -23,6 +23,20 @@ let UserService = class UserService {
     constructor(userRepository) {
         this.userRepository = userRepository;
     }
+    async onModuleInit() {
+        let user = {
+            username: 'norminet',
+            email: "norminet@cat.42.fr",
+        };
+        const userTmp = await this.userRepository.findOne({ email: user.email });
+        if (userTmp)
+            return;
+        const tmp = this.userRepository.create(user);
+        console.log('Norminet Added');
+        tmp.username = user.username;
+        tmp.email = user.email;
+        this.userRepository.save(user);
+    }
     add(user) {
         user.firstname = (0, unique_names_generator_1.uniqueNamesGenerator)({ dictionaries: [unique_names_generator_1.names] });
         user.lastname = (0, unique_names_generator_1.uniqueNamesGenerator)({ dictionaries: [unique_names_generator_1.names] });
@@ -37,6 +51,13 @@ let UserService = class UserService {
     }
     async delete(id) {
         await this.userRepository.delete(id);
+    }
+    updateOne(id, user) {
+        delete user.email;
+        delete user.username;
+        delete user.firstname;
+        delete user.lastname;
+        return (0, rxjs_1.from)(this.userRepository.update(id, user)).pipe((0, rxjs_1.switchMap)(() => this.userRepository.findOne({ id: id })));
     }
     async setUsername(userId, userName) {
         const currentUser = await this.userRepository.findOne({ id: userId });

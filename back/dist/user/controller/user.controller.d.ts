@@ -2,6 +2,9 @@ import { Observable } from 'rxjs';
 import { User, Friend } from '../models/user.entity';
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from '../service/user.service';
+export declare const storage: {
+    storage: any;
+};
 export declare class UserController {
     private userService;
     private jwtService;
@@ -14,4 +17,6 @@ export declare class UserController {
     addFriend(req: any, friendToAdd: any): Promise<void>;
     deleteFriend(req: any, friendToDelete: any): Promise<void>;
     userInfo(req: any, userName: any): Promise<void>;
+    uploadFile(file: any, req: any): Observable<Object>;
+    findProfileImage(req: any, res: any): any;
 }

@@ -43,4 +43,7 @@ export class UserDto {
 	@IsOptional()
 	string: number[];
 
+	@IsOptional()
+	profileImage? : string;
+
 }

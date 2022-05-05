@@ -28,16 +28,23 @@
 				<span class="material-icons">group</span>
 				<span class="text">Show users</span>
 			</router-link>
+<<<<<<< HEAD
 			<router-link to="/chat" class="button">
 				<span class="material-icons">chat</span>
 				<span class="text">Chat</span>
 			</router-link>
+=======
+			<!-- <router-link to="/userprofile" class="button">
+				<span class="material-icons">account_circle</span>
+				<span class="text">User Profile</span>
+			</router-link> -->
+>>>>>>> master
 		</div>
 
 		<div class="flex"></div>
 		
-		<div class="menu" v-if="getUserProfile.id === 0">
-			<router-link to="/settings" class="button">
+		<div class="menu" v-if="getUserProfile.id !== 0">
+			<router-link to="/userprofile" class="button">
 				<span class="material-icons">settings</span>
 				<span class="text">Settings</span>
 			</router-link>

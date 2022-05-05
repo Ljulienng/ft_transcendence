@@ -14,4 +14,5 @@ export declare class UserDto {
     messages: Message[];
     channels: Channel[];
     string: number[];
+    profileImage?: string;
 }

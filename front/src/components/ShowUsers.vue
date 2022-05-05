@@ -99,11 +99,11 @@ export default defineComponent({
       this.getData();
   },
 
-  // watch: {
-	// 	updateUserList() {
-	// 		this.getData()
-	// 	}
-	// }
+  watch: {
+		updateUserList() {
+			this.getData()
+		}
+	}
   
 })
 </script>
