@@ -125,4 +125,34 @@ export class UserController {
 		return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + req.user.profileImage)))
 	}
 
+	@UseGuards(JwtAuthGuard)
+	@Get('/status/:username')
+	async getUserStatus(@Param('username') username: number): Promise<string> {
+	  // let user: User;
+		const user = await this.userService.findOne({username: username});
+		console.log("status user = ", user);
+
+		return user.status
+	}
+  
+  
+	@UseGuards(JwtAuthGuard)
+	@Post('/setstatus')
+	async setUserStatus(@Req() req, @Body() newStatus) {
+	  try {
+		const user = req.user;
+		const userStatus = newStatus.newStatus
+
+		console.log("userstatus = ", userStatus)
+		console.log("current userstatus = ", user.status)
+
+	
+		await this.userService.setStatus(user, userStatus);
+		console.log("new user status = ", user.status)
+
+	  } catch (e) {
+		throw e;
+	  }
+	}
+
 }

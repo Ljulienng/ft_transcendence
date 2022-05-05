@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { Message } from "src/message/models/message.entity";
 import { Channel } from "src/channel/models/channel.entity";
+import { colors } from "unique-names-generator";
 
 export type Friend = {
 	username: string;
@@ -50,6 +51,9 @@ export class User {
 
 	@Column("simple-array", {nullable: true})
 	friends: string[];
+
+	@Column({default: 'Offline'})
+	status: string;
 
 	@Column({nullable: true})
 	profileImage: string;

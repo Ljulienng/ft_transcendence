@@ -1,6 +1,6 @@
 import { ConsoleLogger, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { from, Observable, of, switchMap, map } from 'rxjs';
+import { from, Observable, of, switchMap, map, tap} from 'rxjs';
 import { getConnection, Repository } from 'typeorm';
 import { UserDto } from '../models/user.dto';
 import { Student } from "src/user/dto/student.dto"
@@ -48,6 +48,7 @@ export class UserService {
 		console.log('Student Added');
 		tmp.username = user.username;
 		tmp.email = user.email;
+		tmp.status = 'Offline';
 
 		return from(this.userRepository.save(user));
 	}
@@ -61,6 +62,7 @@ export class UserService {
 		delete user.username;
 		delete user.firstname;
 		delete user.lastname;
+		delete user.status;
 
 		return from(this.userRepository.update(id, user)).pipe(
 			switchMap(() => this.userRepository.findOne({id: id}))
@@ -119,12 +121,18 @@ export class UserService {
 
 		// }
 		userTmp = await this.userRepository.findOne({username: username});
-		if (userTmp)
+		if (userTmp) {
+			if (userTmp.status === 'Offline')
+				userTmp.status = 'Online';
 			return userTmp;
+		}
 		const { email } = user;
 		userTmp = await this.userRepository.findOne({email: email});
-		if (userTmp)
+		if (userTmp) {
+			if (userTmp.status === 'Offline')
+				userTmp.status = 'Online';
 			return userTmp;
+		}
 		const newUser = await this.addStudent(user);
 		return newUser;
 
@@ -207,6 +215,15 @@ export class UserService {
 		}
 		// console.log("Friendlist = ", friendList)
 		return (friendList);
+	}
+
+	async setStatus(user: User, newStatus: string) {
+		// if (newStatus !== 'Online'  'Offline'  'In game'  'Away'  'Occupied')
+		// 	throw new HttpException("Incorrect user status", HttpStatus.FORBIDDEN)
+		if (newStatus !== 'Online' || 'Offline')
+			console.log("user is", newStatus)
+		user.status = newStatus;
+		this.userRepository.save(user)
 	}
 
 }

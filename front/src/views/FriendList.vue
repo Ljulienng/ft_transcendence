@@ -25,7 +25,7 @@
 		<div class="friendList">
 			<ul>
 				<li v-for="friend in friendList" :key="friend" >
-					{{friend.username}} ({{friend.firstname}}, {{friend.lastname}})
+					{{friend.username}} ({{friend.firstname}}, {{friend.lastname}}) is {{getFriendStatus(friend.username)}} {{this.userStatus}}
 					<button v-on:click="deleteFriend(friend.username)"> DELETE </button>
 				</li>
 			</ul>
@@ -40,6 +40,7 @@ import http from "../http-common"
 export default defineComponent({
 	data() {
 		return {
+			userStatus: "",
 			errorMsg: "",
 			friendList: [],
 			friendToAdd: {
@@ -56,6 +57,19 @@ export default defineComponent({
 			} catch (e) {
 				console.log(e);
 			}
+		},
+
+		getFriendStatus(friendUsername: string) {
+			let data: string;
+			http.get('/users/status/' + friendUsername)
+			.then(res => {
+				console.log(res.data);
+				this.userStatus = res.data
+			})
+			.catch(err => {
+				console.log(err);
+			})
+
 		},
 
 		async addFriend() {
@@ -93,6 +107,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+	body {
+		color: white;
+	}
+
 	#friend {
 		width: 100%;
 		height: 100%;

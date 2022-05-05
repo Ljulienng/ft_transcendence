@@ -11,7 +11,7 @@ import VueUniversalModal from 'vue-universal-modal'
 
 const app = createApp(App);
 app.use(router);
-app.use(store);
+app.config.globalProperties.$store = store;app.use(store);
 app.component("Sidebar", Sidebar);
 app.component("UploadAvatar", UploadAvatar);
 app.component("HelloWorld", HelloWorld);

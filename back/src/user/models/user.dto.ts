@@ -41,6 +41,9 @@ export class UserDto {
 	channels: Channel[];
 
 	@IsOptional()
+	status: string;
+
+	@IsOptional()
 	string: number[];
 
 	@IsOptional()

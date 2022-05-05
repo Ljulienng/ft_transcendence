@@ -9,11 +9,27 @@
   </div>
 </template>
 
-<script setup>
-  /* tslint:disable:no-unused-variable */
-import Sidebar from './components/Sidebar.vue'
-  /* tslint:disable:no-unused-variable */
-import MyModal from './components/UsernameModal.vue'
+<script lamg='ts'>
+import { defineComponent } from "@vue/runtime-core";
+import http from './http-common'
+
+export default defineComponent({
+	created(){
+		window.addEventListener('beforeunload', this.setOffline) 
+	},
+
+	methods: {
+		setOffline() {
+			http.post('/users/setstatus', {newStatus: 'Offline'})
+			.then(res => {
+				console.log(res);
+			})
+			.catch(err => {
+				console.log(err);
+			})
+		}
+	}
+})
 </script>
 
 <script>

@@ -1,7 +1,7 @@
 <template>
   <div class="body">
     <div class="welcome">
-      Welcome, {{getUserProfile.userName}}
+      Welcome, {{getUserProfile.userName}} you are {{getUserProfile.status}}
     </div>
     <div class="split">
       <div class="lcol">
@@ -39,14 +39,45 @@
 <script lang="ts">
 import '../assets/css/style.scss'
 import { defineComponent } from "@vue/runtime-core";
-import { mapGetters } from "vuex";
+import { mapGetters} from "vuex";
+import store from '../store'
+import http from '../http-common'
 
 export default defineComponent({
   name: "Home",
+  data() {
+    return {
+    }
+  },
+
   computed: {
     ...mapGetters("auth", {
       getUserProfile: "getUserProfile",
     }),
+  },
+
+  methods: { 
+    getId() {
+      const userId = store.getters['auth/getUserProfile'].id
+      if (userId)
+        console.log('userId = ', userId)
+      return userId;
+    },
+
+    setStatus() {
+      http.post('/users/setstatus', {newStatus: 'Online'})
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    }
+  },
+
+  created() {
+    this.getId();
+    this.setStatus()
   }
 });
 </script>

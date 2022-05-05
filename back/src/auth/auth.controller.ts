@@ -1,9 +1,11 @@
-import { Controller, Get, UseGuards, Req, Res, UnauthorizedException, ConsoleLogger } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, UnauthorizedException, ConsoleLogger, Param } from '@nestjs/common';
 import { FortyTwoService } from './fortytwo.service';
 import { AuthGuard } from '@nestjs/passport'
 import { get } from 'http';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { FortyTwoAuthGuard } from './guards/fortytwo.guard';
+import { User } from 'src/user/models/user.entity';
+import { from, Observable, of, switchMap, map } from 'rxjs';
 import { JwtService } from "@nestjs/jwt"
 import { UserService } from 'src/user/service/user.service';
 
@@ -31,6 +33,8 @@ export class AuthController {
   async FortyTwoAuthRedirect(@Req() req, @Res({passthrough: true}) res) {
     const payload = { username: req.user['username'], auth: false };
 		const accessToken = await this.jwtService.signAsync(payload);
+    if (req.user.status === 'Offline')
+      req.user.status = 'Online';
 		res.cookie('jwt', accessToken, {httpOnly: true})
 		res.redirect('http://localhost:3001/home');
   }

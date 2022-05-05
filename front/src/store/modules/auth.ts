@@ -6,6 +6,7 @@ export interface State {
 		id: number,
 		userName: string,
 		email: string,
+		status: string,
 	}
 }
 
@@ -15,6 +16,7 @@ const state = () => ({
 		id:0,
 		userName:"",
 		email:"",
+		status:"Offline"
 	}
 });
 
@@ -65,9 +67,8 @@ const mutations = {
 		const userProfile = {
 			id:data.id,
 			userName: data.username,
-		//   firstName: data.firstName,
 			email: data.email,
-		//   phone: data.phone,
+			status: data.status
 		};
 		state.userProfile = userProfile
 	}
