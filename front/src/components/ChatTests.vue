@@ -61,9 +61,10 @@ import http from "../http-common"
 import MessageI from '../types/interfaces/message.interface'
 
 export default defineComponent({
+    
     data() {
         return {
-            socket: io(),
+            socket: io('http://localhost:3000/chat', {  withCredentials: true }),
             channelList: [],
             message: {
                 content: '',
@@ -78,8 +79,7 @@ export default defineComponent({
             channelId: 0,
         }
     },
-    computed: {
-    },
+
     methods: {
         async getChannelList() {
             try {
