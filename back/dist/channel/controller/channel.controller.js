@@ -24,19 +24,15 @@ let ChannelController = class ChannelController {
         this.messageService = messageService;
     }
     findAll() {
-        console.log("return all channels");
         return this.channelService.findAll();
     }
     findChannelById(channelId) {
-        console.log("return channel with id=", channelId);
         return this.channelService.findChannelById(channelId);
     }
     findChannelByName(name) {
-        console.log("return channel with name=", name);
         return this.channelService.findChannelByName(name);
     }
     async findMessagesByChannelId(channelId) {
-        console.log("find messages of one channel");
         const channel = await this.channelService.findChannelById(channelId);
         return this.channelService.getChannelMessagesByRoomId(channel.id);
     }

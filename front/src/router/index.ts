@@ -4,11 +4,8 @@ import HelloWorld from '@/components/HelloWorld.vue'
 import ShowUsers from '@/components/ShowUsers.vue'
 import AuthModal from '@/components/AuthModal.vue'
 import FriendList from '@/views/FriendList.vue'
-<<<<<<< HEAD
 import Chat from '@/components/Chat.vue'
-=======
 import UserProfile from '@/views/UserProfile.vue'
->>>>>>> master
 import Home from '@/views/Home.vue'
 
 
@@ -41,19 +38,16 @@ const routes = [
 		meta: {requiredAuth: true}
 	},
 	{
-<<<<<<< HEAD
 		name: 'chat',
 		path: '/chat',
 		component: Chat
 	},
-
-=======
+	{
 		name: 'UserProfile',
 		path: '/userprofile',
 		component: UserProfile,
 		meta: {requiredAuth: true}
 	}
->>>>>>> master
 ];
 
 const router = createRouter({
