@@ -7,7 +7,7 @@ import FriendList from '@/views/FriendList.vue'
 import UserProfile from '@/views/UserProfile.vue'
 import Home from '@/views/Home.vue'
 import Chat from '@/views/Chat.vue'
-import Chat from '@/views/myChat.vue'
+import myChat from '@/views/myChat.vue'
 
 
 const routes = [
