@@ -1,4 +1,5 @@
 import { 
+    ConnectedSocket,
     OnGatewayConnection,
     OnGatewayDisconnect,
     OnGatewayInit,
@@ -9,6 +10,7 @@ import {
 import { Server, Socket } from 'socket.io'
 import { Channel } from "src/channel/models/channel.entity";
 import { CreateChannelDto } from "src/channel/models/createChannel.dto";
+import { JoinChannelDto } from "src/channel/models/joinChannel.dto";
 import { ChannelService } from "src/channel/service/channel.service";
 import { CreateMessageDto } from "src/message/models/createMessage.dto";
 import { MessageService } from "src/message/service/message.service";
@@ -65,8 +67,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     /* connect user to a channel */
     @SubscribeMessage('joinChannel')
-    async joinChannel(client: Socket, channel: Channel) {
-        await this.channelService.addUserToChannel(channel, client.data.user.id);
+    async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
+        console.log('user data : ', client.data.user.userId);
+        await this.channelService.addUserToChannel(joinChannel, client.data.user.id);
     }
 
     @SubscribeMessage('leaveChannel') 
@@ -87,7 +90,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     /*** test sockets ****/
     @SubscribeMessage('sendMessage')
     async sendMessage(client: Socket, createMessageDto: CreateMessageDto /*message: string, channelId: number*/) {
-        // console.log('Message sent to the back in channel ', channelId, ' : ', message);
         console.log('Message sent to the back in channel ', createMessageDto);
         // client.emit('messageSent', message, channelId);
         await this.channelService.saveMessage(createMessageDto.content, createMessageDto.channelId);

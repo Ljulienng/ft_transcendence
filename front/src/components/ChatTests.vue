@@ -31,6 +31,11 @@
         </div><br>
 
         <div> 
+            <button @click="joinChannel">Join channel with id</button>
+            <input type="number" v-model="channelToJoin.id"/>
+        </div><br>
+
+        <div> 
             <button @click="sendMessage">Send message</button>
             <input type="text" maxlength="100" v-model="message.content" class="inputMessage" />
             in channel <input type="text" maxlength="100" v-model="message.channelId"/>  
@@ -59,8 +64,9 @@ import axios from 'axios'
 import io from 'socket.io-client'
 import http from "../http-common"
 import MessageI from '../types/interfaces/message.interface'
+import { mapGetters } from "vuex";
 
-export default defineComponent({
+export default defineComponent({ 
     
     data() {
         return {
@@ -70,15 +76,20 @@ export default defineComponent({
                 content: '',
                 channelId: 0,
             },
+            channelToJoin: {
+                id: 0,
+                type: '',
+                password: '',
+                // userId: 0,
+            },
             messageList: [] as MessageI[],
             name: '',
             password: '',
-            privacy: '',
-            user: '',
-            
+            privacy: '',           
             channelId: 0,
         }
     },
+
 
     methods: {
         async getChannelList() {
@@ -124,15 +135,24 @@ export default defineComponent({
 
         sendMessage() {
             console.log('sendMessage - on channelId ', this.message.channelId, this.message.content);
-            // this.socket.emit('sendMessage', this.message.content, this.message.channelId);
             this.socket.emit('sendMessage', this.message);
-            // this.message.content = '';
         },
+
+        joinChannel() {
+            console.log('join channel : ', this.channelToJoin.id);
+            this.socket.emit('joinChannel', this.channelToJoin);
+        }
     },
+
     created() {
         this.socket = io('localhost:3000/chat', {  withCredentials: true });
         this.getChannelList();
+        // this.channelToJoin.userId = this.getUserProfile.id;
     },
+
+    computed: {
+    ...mapGetters("auth", { getUserProfile: "getUserProfile",})
+    }
 
 })
 </script>

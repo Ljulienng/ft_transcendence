@@ -33,14 +33,6 @@ let MessageService = class MessageService {
             where: { id: Number(messageId) }
         });
     }
-    async saveMessage(message, channelId) {
-        const currentChannel = await this.channelService.findChannelById(channelId);
-        console.log('[saveMessage] channel ', channelId, ' : ', currentChannel);
-        return await this.messageRepository.save({
-            content: message,
-            channel: currentChannel,
-        });
-    }
     async delete(messageId) {
         const message = await this.findMessageById(messageId);
         if (!message) {

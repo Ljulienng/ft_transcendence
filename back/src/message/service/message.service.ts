@@ -26,18 +26,6 @@ export class MessageService {
       });
   }
 
-  async saveMessage(/*createMessageDto: CreateMessageDto*/message: string, channelId: number) {
-    // const newMessage = this.messageRepository.create(/*createMessageDto*/{
-    //     content: message,
-    // });
-    const currentChannel = await this.channelService.findChannelById(channelId);
-    console.log('[saveMessage] channel ', channelId, ' : ', currentChannel);
-    return await this.messageRepository.save({
-        content: message,
-        channel: currentChannel,
-    });
-  }
-
  async delete(messageId: string) {
      const message = await this.findMessageById(messageId);  
      if (!message) {

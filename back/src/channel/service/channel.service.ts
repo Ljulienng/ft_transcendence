@@ -8,6 +8,7 @@ import { MessageService } from 'src/message/service/message.service';
 import { UserService } from 'src/user/service/user.service';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/models/user.entity';
+import { JoinChannelDto } from '../models/joinChannel.dto';
 
 @Injectable()
 export class ChannelService {
@@ -18,7 +19,6 @@ export class ChannelService {
         private userRepository: Repository<User>,
         @InjectRepository(Message)
         private messageRepository: Repository<Message>, 
-        // private messageService: MessageService,
     ) {}
 
     /* get all channels */
@@ -50,6 +50,7 @@ export class ChannelService {
             password: createChannel.password,
             messages: [],
             owner: user,
+            membersId: [userId],
        });
 
        if (newChannel.type === ChannelType.protected || newChannel.type === ChannelType.private) {
@@ -77,7 +78,7 @@ export class ChannelService {
    **       - the user is not already in the channel
    **       - the user is banned of the channel
    */
-   async addUserToChannel(channelSent: Channel, userId: number) {
+   async addUserToChannel(joinChannel: JoinChannelDto, userId: number) {
         // const user = await this.userService.findByUserId(userId);
         const user = await this.userRepository.findOne({id: userId});
         
@@ -85,23 +86,25 @@ export class ChannelService {
         // const welcomingChannel = await this.findChannelById(channelSent.id);
         const welcomingChannel = await this.channelRepository
             .createQueryBuilder('channel')
-            .where('channel.id = :channelId', {channelId: channelSent.id})
+            .where('channel.id = :channelId', {channelId: joinChannel.id})
             .getOne();
         
         if (welcomingChannel.type !== ChannelType.public) {
             if (welcomingChannel.password) {
-                const match = this.checkPasswordMatch(welcomingChannel.password, channelSent.password);
+                const match = this.checkPasswordMatch(welcomingChannel.password, joinChannel.password);
                 if (!match) {
                     throw new UnauthorizedException('incorrect password');
                 }
             }
         }
 
-        if (welcomingChannel.users.find((u) => u.id === user.id)) {
+        if (welcomingChannel.membersId.find(userId => userId === user.id)) {
+        // if (welcomingChannel.users.find((u) => u.id === user.id)) {
             throw new UnauthorizedException('user already in this channel');
         }
 
-        welcomingChannel.users.push(user);                      // add the user to the channel
+        welcomingChannel.membersId.push(user.id);               // add the user to the channel
+        // welcomingChannel.users.push(user);                   // add the user to the channel
         await this.channelRepository.save(welcomingChannel);    // update the channel
    }
 
@@ -132,16 +135,23 @@ export class ChannelService {
     /* get all the messages of a channel */
     async getChannelMessagesByRoom(room: string) {
         const channel = await this.findChannelByName(room);
-        const messages = await this.messageRepository.find(); // -> A MODIFIER -> where channelId = channel.id
-        return messages;
+        const messages = await this.messageRepository.find({
+            where: {
+                channel: channel,
+            }
+        });
+        return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
 
     /* get all the messages of a channel */
     async getChannelMessagesByRoomId(roomId: number) {
         const channel = await this.findChannelById(roomId);
-        const messages = await this.messageRepository.find(); // -> A MODIFIER -> where channelId = channel.id
-        // console.log('messages found for channelId ', roomId, ' : ', messages);
-        return messages;
+        const messages = await this.messageRepository.find({
+            where: {
+                channel: channel,
+            }
+        });
+        return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
 
     async saveMessage(/*createMessageDto: CreateMessageDto*/message: string, channelId: number) {

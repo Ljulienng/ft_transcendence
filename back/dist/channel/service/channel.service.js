@@ -46,6 +46,7 @@ let ChannelService = class ChannelService {
             password: createChannel.password,
             messages: [],
             owner: user,
+            membersId: [userId],
         });
         if (newChannel.type === channel_entity_1.ChannelType.protected || newChannel.type === channel_entity_1.ChannelType.private) {
             if (!newChannel.password) {
@@ -62,24 +63,24 @@ let ChannelService = class ChannelService {
     async checkPasswordMatch(sentPassword, expectedPassword) {
         return await bcrypt.compare(sentPassword, expectedPassword);
     }
-    async addUserToChannel(channelSent, userId) {
+    async addUserToChannel(joinChannel, userId) {
         const user = await this.userRepository.findOne({ id: userId });
         const welcomingChannel = await this.channelRepository
             .createQueryBuilder('channel')
-            .where('channel.id = :channelId', { channelId: channelSent.id })
+            .where('channel.id = :channelId', { channelId: joinChannel.id })
             .getOne();
         if (welcomingChannel.type !== channel_entity_1.ChannelType.public) {
             if (welcomingChannel.password) {
-                const match = this.checkPasswordMatch(welcomingChannel.password, channelSent.password);
+                const match = this.checkPasswordMatch(welcomingChannel.password, joinChannel.password);
                 if (!match) {
                     throw new common_1.UnauthorizedException('incorrect password');
                 }
             }
         }
-        if (welcomingChannel.users.find((u) => u.id === user.id)) {
+        if (welcomingChannel.membersId.find(userId => userId === user.id)) {
             throw new common_1.UnauthorizedException('user already in this channel');
         }
-        welcomingChannel.users.push(user);
+        welcomingChannel.membersId.push(user.id);
         await this.channelRepository.save(welcomingChannel);
     }
     async removeUserToChannel(channelSent, userId) {
@@ -99,13 +100,21 @@ let ChannelService = class ChannelService {
     }
     async getChannelMessagesByRoom(room) {
         const channel = await this.findChannelByName(room);
-        const messages = await this.messageRepository.find();
-        return messages;
+        const messages = await this.messageRepository.find({
+            where: {
+                channel: channel,
+            }
+        });
+        return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
     async getChannelMessagesByRoomId(roomId) {
         const channel = await this.findChannelById(roomId);
-        const messages = await this.messageRepository.find();
-        return messages;
+        const messages = await this.messageRepository.find({
+            where: {
+                channel: channel,
+            }
+        });
+        return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
     async saveMessage(message, channelId) {
         const currentChannel = await this.findChannelById(channelId);

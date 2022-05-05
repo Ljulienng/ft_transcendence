@@ -53,10 +53,9 @@ __decorate([
     __metadata("design:type", user_entity_1.User)
 ], Channel.prototype, "owner", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => user_entity_1.User, { onDelete: 'CASCADE' }),
-    (0, typeorm_1.JoinTable)(),
+    (0, typeorm_1.Column)("simple-array", { nullable: true }),
     __metadata("design:type", Array)
-], Channel.prototype, "users", void 0);
+], Channel.prototype, "membersId", void 0);
 Channel = __decorate([
     (0, typeorm_1.Entity)('channels')
 ], Channel);

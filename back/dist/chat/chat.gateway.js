@@ -13,6 +13,7 @@ exports.ChatGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const channel_entity_1 = require("../channel/models/channel.entity");
+const joinChannel_dto_1 = require("../channel/models/joinChannel.dto");
 const channel_service_1 = require("../channel/service/channel.service");
 const createMessage_dto_1 = require("../message/models/createMessage.dto");
 const message_service_1 = require("../message/service/message.service");
@@ -34,8 +35,9 @@ let ChatGateway = class ChatGateway {
     handleDisconnect(client) {
         console.log('client disconnected');
     }
-    async joinChannel(client, channel) {
-        await this.channelService.addUserToChannel(channel, client.data.user.id);
+    async joinChannel(client, joinChannel) {
+        console.log('user data : ', client.data.user.userId);
+        await this.channelService.addUserToChannel(joinChannel, client.data.user.id);
     }
     async leaveChannel(client, channel) {
         await this.channelService.removeUserToChannel(channel, client.data.user.id);
@@ -52,7 +54,7 @@ __decorate([
 __decorate([
     (0, websockets_1.SubscribeMessage)('joinChannel'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket, channel_entity_1.Channel]),
+    __metadata("design:paramtypes", [socket_io_1.Socket, joinChannel_dto_1.JoinChannelDto]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "joinChannel", null);
 __decorate([
