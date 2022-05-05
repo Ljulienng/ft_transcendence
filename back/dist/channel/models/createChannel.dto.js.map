@@ -1,1 +1,0 @@
-{"version":3,"file":"createChannel.dto.js","sourceRoot":"","sources":["../../../src/channel/models/createChannel.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,qDAAmE;AACnE,qDAA+C;AAE/C,MAAa,gBAAgB;CAa5B;AATG;IAFC,IAAA,4BAAU,GAAE;IACZ,IAAA,0BAAQ,GAAE;;8CACE;AAIb;IAFC,IAAA,4BAAU,GAAE;IACZ,IAAA,0BAAQ,GAAE;;8CACO;AAIlB;IAFC,IAAA,4BAAU,GAAE;IACZ,IAAA,0BAAQ,GAAE;;kDACM;AAZrB,4CAaC"}
