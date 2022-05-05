@@ -10,7 +10,7 @@ import Home from '@/views/Home.vue'
 import Test from '@/views/Test.vue'
 // import http from '../http-common'
 import Chat from '@/views/Chat.vue'
-import Chat from '@/views/myChat.vue'
+// import Chat from '@/views/myChat.vue'
 
 
 const routes = [
