@@ -40,6 +40,7 @@ import http from "../http-common"
 export default defineComponent({
 	data() {
 		return {
+			interval: 0,
 			userStatus: "",
 			errorMsg: "",
 			friendList: [],
@@ -90,11 +91,24 @@ export default defineComponent({
 			.catch(
 				error => { this.errorMsg = error.response.data.error }
 			)
+		},
+
+		friendListloop(sec: number) {
+			setInterval( () => {this.getFriendList}, sec * 1000);
 		}
 	},
 
 	created () {
 		this.getFriendList();
+		// this.friendListloop(5);
+	},
+
+	mounted(){
+		setInterval( async () => {
+			const response =  await http.get('/users/friendlist');
+			this.friendList = response.data;
+		}, 5 * 1000); // 5 sec
+
 	},
 
 	watch: {

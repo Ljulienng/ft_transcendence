@@ -12,14 +12,47 @@
 <script lamg='ts'>
 import { defineComponent } from "@vue/runtime-core";
 import http from './http-common'
+import store from './store'
+import router from './router'
+
+import { mapGetters} from "vuex";
 
 export default defineComponent({
-	created(){
-		window.addEventListener('beforeunload', this.setOffline) 
+	computed: {
+		...mapGetters("auth", {
+		getUserProfile: "getUserProfile",
+		}),
 	},
 
+
 	methods: {
+		async checkUserstatus() {
+			let userProfile = store.getters["auth/getUserProfile"];
+
+			if (userProfile.id === 0) {
+				await store.dispatch("auth/userProfile");
+				userProfile = store.getters["auth/getUserProfile"];
+			}
+
+			if (userProfile.id === 0)
+				router.push('http://localhost:3001/authmodal')
+			const userId = store.getters['auth/getUserProfile'].id
+
+			console.log('userId = ', userId);
+			// const userSocket = store.getters['auth/getUserSocket'].id
+	
+			// if (!userSocket)
+			// 	store.dispatch('auth/setUserSocket')
+			if (userId)
+				store.dispatch('auth/setUserStatus', 'Online');
+		},
+		
 		setOffline() {
+			const userSocket = store.getters['auth/getUserSocket'].id
+	
+			if (!userSocket)
+				store.dispatch('auth/setUserSocket')
+			store.dispatch('auth/setUserStatus', 'Offline');
 			http.post('/users/setstatus', {newStatus: 'Offline'})
 			.then(res => {
 				console.log(res);
@@ -28,7 +61,12 @@ export default defineComponent({
 				console.log(err);
 			})
 		}
-	}
+	},
+
+	created(){
+		window.addEventListener('beforeunload', this.setOffline) 
+		this.checkUserstatus();
+	},
 })
 </script>
 
