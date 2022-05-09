@@ -16,6 +16,7 @@ export declare class ChannelService {
     checkPasswordMatch(sentPassword: string, expectedPassword: string): Promise<boolean>;
     addUserToChannel(joinChannel: JoinChannelDto, userId: number): Promise<void>;
     removeUserToChannel(channelSent: Channel, userId: number): Promise<void>;
+    changePassword(channelId: number, userId: number, newPassword: string): Promise<void>;
     deleteChannel(channelId: number): Promise<Channel>;
     getChannelMessagesByRoom(room: string): Promise<Message[]>;
     getChannelMessagesByRoomId(roomId: number): Promise<Message[]>;

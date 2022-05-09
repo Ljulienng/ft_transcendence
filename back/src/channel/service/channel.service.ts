@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Channel, ChannelType} from '../models/channel.entity'
@@ -57,6 +57,12 @@ export class ChannelService {
            if (!newChannel.password) {
                throw new BadRequestException('need a password for private or protected channel');
            }
+           else if (newChannel.password.length < 8) {
+               throw new HttpException('password too short', HttpStatus.FORBIDDEN);
+           }
+           else if (newChannel.password.length > 20) {
+            throw new HttpException('password too long', HttpStatus.FORBIDDEN);
+            }
            else {
                const saltOrRounds = await bcrypt.genSalt();
                newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);
@@ -121,6 +127,18 @@ export class ChannelService {
             // remove the user to the channel
 
         await this.channelRepository.save(channelToLeave);   // update the channel
+   }
+
+   /* only owner/can change the password */
+   async changePassword(channelId: number, userId: number, newPassword: string)
+   {
+        console.log('user:', userId, ' changes password of channel:', channelId, ' [new pass:', newPassword,']');
+        if (newPassword.length < 8) {
+            throw new HttpException('password too short', HttpStatus.FORBIDDEN);
+        }
+        else if (newPassword.length > 20) {
+         throw new HttpException('password too long', HttpStatus.FORBIDDEN);
+         }
    }
 
     /* remove one channel */

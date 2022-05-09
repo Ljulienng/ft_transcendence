@@ -40,8 +40,7 @@ let ChannelController = class ChannelController {
         return this.channelService.createChannel(channelDto, request.user.id);
     }
     changePassword(channelId, request, newPassword) {
-        console.log('user:', request.user.id, ' changes password of channel:', channelId, ' [new pass:', newPassword, ']');
-        return this.channelService.changePassword(channelId, request.user.id, newPassword);
+        return this.channelService.changePassword(channelId, 2, newPassword);
     }
     deleteChannel(channelId) {
         return this.channelService.deleteChannel(channelId);
