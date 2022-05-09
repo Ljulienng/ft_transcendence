@@ -44,9 +44,11 @@ export class ChannelController {
         return this.channelService.createChannel(channelDto, request.user.id);
     }
 
-    @Post()
+    @Post(':channelId/changePass')
     changePassword(
-
+        @Param('channelId') channelId: number,
+        userId: number,
+        @Body() newPassword: string        
     ) {
         return ;
     }
