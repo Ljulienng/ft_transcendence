@@ -130,29 +130,29 @@ export class UserController {
 	async getUserStatus(@Param('username') username: number): Promise<string> {
 	  // let user: User;
 		const user = await this.userService.findOne({username: username});
-		console.log("status user = ", user);
+		// console.log("status user = ", user);
 
 		return user.status
 	}
   
   
-	@UseGuards(JwtAuthGuard)
-	@Post('/setstatus')
-	async setUserStatus(@Req() req, @Body() newStatus) {
-	  try {
-		const user = req.user;
-		const userStatus = newStatus.newStatus
+	// @UseGuards(JwtAuthGuard)
+	// @Post('/setstatus')
+	// async setUserStatus(@Req() req, @Body() newStatus) {
+	//   try {
+	// 	const user = req.user;
+	// 	const userStatus = newStatus.newStatus
 
-		console.log("userstatus = ", userStatus)
-		console.log("current userstatus = ", user.status)
+	// 	console.log("userstatus = ", userStatus)
+	// 	console.log("current userstatus = ", user.status)
 
 	
-		await this.userService.setStatus(user, userStatus);
-		console.log("new user status = ", user.status)
+	// 	await this.userService.setStatus(user, userStatus);
+	// 	console.log("new user status = ", user.status)
 
-	  } catch (e) {
-		throw e;
-	  }
-	}
+	//   } catch (e) {
+	// 	throw e;
+	//   }
+	// }
 
 }

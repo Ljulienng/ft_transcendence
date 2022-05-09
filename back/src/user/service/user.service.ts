@@ -8,6 +8,7 @@ import { User, Friend } from '../models/user.entity';
 import { isNumber } from 'class-validator';
 import { names, uniqueNamesGenerator } from 'unique-names-generator';
 
+
 @Injectable()
 export class UserService {
 
@@ -220,8 +221,8 @@ export class UserService {
 	async setStatus(user: User, newStatus: string) {
 		// if (newStatus !== 'Online'  'Offline'  'In game'  'Away'  'Occupied')
 		// 	throw new HttpException("Incorrect user status", HttpStatus.FORBIDDEN)
-		if (newStatus !== 'Online' || 'Offline')
-			console.log("user is", newStatus)
+		if (newStatus === 'Online' || 'Offline')
+			console.log("user", user.username , "is", newStatus)
 		user.status = newStatus;
 		this.userRepository.save(user)
 	}

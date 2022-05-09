@@ -39,7 +39,6 @@
 <script lang="ts">
 import '../assets/css/style.scss'
 import { defineComponent } from "@vue/runtime-core";
-import { mapGetters} from "vuex";
 import store from '../store'
 import http from '../http-common'
 
@@ -47,20 +46,30 @@ export default defineComponent({
   name: "Home",
   data() {
     return {
+      getUserProfile: '',
     }
   },
 
-  computed: {
-    ...mapGetters("auth", {
-      getUserProfile: "getUserProfile",
-    }),
-  },
+  methods: {
+    setUser() {
+      this.getUserProfile = store.getters['auth/getUserProfile']
+    },
 
-  methods: { 
+    connectUser() {
+      const userSocket = store.getters['auth/getUserSocket'].id
+  
+      if (!userSocket)
+        store.dispatch('auth/setUserSocket')
+      store.dispatch('auth/setUserStatus', 'Online');
+    },
+
     getId() {
       const userId = store.getters['auth/getUserProfile'].id
+      const userSocket = store.getters['auth/getUserSocket'].id
       if (userId)
         console.log('userId = ', userId)
+      // if (userSocket)
+        console.log('userSocket = ', userSocket)
       return userId;
     },
 
@@ -76,8 +85,11 @@ export default defineComponent({
   },
 
   created() {
-    this.getId();
-    this.setStatus()
+    this.setUser();
+    this.connectUser();
+    // this.getId();
+
+    // this.setStatus()
   }
 });
 </script>

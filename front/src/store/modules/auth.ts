@@ -1,11 +1,11 @@
-import axios from "axios";
+import http from '../../http-common'
 import { Commit } from "vuex"
-import io from 'socket.io-client'
+import { io, Socket } from 'socket.io-client'
 
 
 export interface State {
 	loginApiStatus: string,
-	socket: unknown,
+	socket: Socket,
 	userProfile: {
 		id: number,
 		userName: string,
@@ -28,9 +28,12 @@ const getters = {
 	getLoginApiStatus(state: State) {
 		return state.loginApiStatus;
 	},
-	getUserProfile(state: State){
+	getUserProfile(state: State) {
 		return state.userProfile;
-	}
+	},
+	getUserSocket(state: State) {
+		return state.socket;
+	},
 };
 
 const actions = {
@@ -38,14 +41,24 @@ const actions = {
 		commit("setUserSocket")
 	},
 
-	setUserStatus({commit}: {commit: Commit}, userStatus: string) {
+	async setUserStatus({commit}: {commit: Commit}, userStatus: string) {
+		console.log('set user status info = ', userStatus)
+
+		if (userStatus === 'Online') {
+			commit('connectUser');
+		}
+		else if (userStatus === 'Offline')
+			commit('disconnectUser');
+		else {
+			console.log('status unknown');
+			return ;
+		}
 
 	},
 
 	// eslint-disable-next-line
 	async userProfile({commit}: any){
-		const response = await axios
-		.get("http://localhost:3000/userinfo", {withCredentials: true})
+		const response = await http.get("userinfo", {withCredentials: true})
 		.catch((err) => {
 			console.log(err);
 		});
@@ -61,17 +74,25 @@ const mutations = {
 	// eslint-disable-next-line
 	setUserSocket(state: State) {
 		if (!state.socket)
-			state.socket = io('http://localhost:3000');
+			state.socket = io('http://localhost:3000/user', {  withCredentials: true });
+		console.log('socket = ', state.socket);
 	},
 
 	connectUser(state: State) {
-		state.userProfile.status = "Online";
+		console.log('connect user with socket n ', state.socket)
+		state.userProfile.status = "Online"
+		state.socket.emit('connectUser', state.userProfile.userName,)
 	},
 
 	disconnectUser(state: State) {
+		console.log('disconnect user with socket')
+
 		state.userProfile.status = "Offline";
+		
+		state.socket.emit('disconnectUser', state.userProfile.userName)
 	},
 
+	// eslint-disable-next-line
 	setLoginApiStatus(state: State, data: any) {
 		state.loginApiStatus = data;
 	},
@@ -84,6 +105,8 @@ const mutations = {
 			status: data.status
 		};
 		state.userProfile = userProfile
+		if (!state.socket)
+			state.socket = io('http://localhost:3000/user', {  withCredentials: true });
 	}
 };
 

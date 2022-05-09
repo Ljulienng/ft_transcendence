@@ -9,6 +9,11 @@ import Home from '@/views/Home.vue'
 
 
 const routes = [
+	// {
+	// 	name: 'Base',
+	// 	path: '/',
+	// 	meta: {requiredAuth: true}
+	// },
 	{
 		name: 'Home',
 		path: '/home',

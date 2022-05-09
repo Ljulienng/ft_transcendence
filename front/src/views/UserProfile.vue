@@ -7,9 +7,8 @@
 
 <script lang='ts'>
 import { defineComponent } from "@vue/runtime-core";
-// import { useCookies } from "vue3-cookies"
 import http from '../http-common'
-// import router from '../router'
+import store from '../store'
 
 export default defineComponent({
 	// setup() {
@@ -32,7 +31,11 @@ export default defineComponent({
 		},
 
 		logout() {
-			this.setStatus();
+			const userSocket = store.getters['auth/getUserSocket'].id
+  
+			if (!userSocket)
+				store.dispatch('auth/setUserSocket')
+			store.dispatch('auth/setUserStatus', 'Offline');
 			http.delete('/logout')
 			.then(res => {
 				console.log(res);
