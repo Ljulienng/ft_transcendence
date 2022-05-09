@@ -11,6 +11,7 @@ import { UserModule } from './user/user.module';
 import { ChannelModule } from './channel/channel.module';
 import { MessageModule } from './message/message.module';
 import { ChatModule } from './chat/chat.module';
+import { ChannelMemberModule } from './channelMember/channelMember.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { ChatModule } from './chat/chat.module';
     UserModule,
     AuthModule,
     MessageModule,
-    ChatModule
+    ChatModule,
+    ChannelMemberModule
   ],
   controllers: [AppController],
   providers: [AppService]

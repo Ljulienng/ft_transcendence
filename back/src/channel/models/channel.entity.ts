@@ -42,6 +42,4 @@ export class Channel {
 	// @ManyToMany(() => User, { onDelete: 'CASCADE'})
 	// // @JoinTable()
 	// users: User[];	// a supprimer si participants ok pour remplacer
-
-
 }
