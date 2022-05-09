@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Commit } from "vuex"
-import { ActionContext } from "vuex";
+import io from 'socket.io-client'
 
 
 export interface State {
@@ -39,7 +39,7 @@ const actions = {
 	},
 
 	setUserStatus({commit}: {commit: Commit}, userStatus: string) {
-		
+
 	},
 
 	// eslint-disable-next-line
@@ -61,7 +61,7 @@ const mutations = {
 	// eslint-disable-next-line
 	setUserSocket(state: State) {
 		if (!state.socket)
-			state.socket = io('http://localhost:3000', {withCredential: true});
+			state.socket = io('http://localhost:3000');
 	},
 
 	connectUser(state: State) {
