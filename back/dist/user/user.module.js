@@ -15,6 +15,7 @@ const user_entity_1 = require("./models/user.entity");
 const auth_module_1 = require("../auth/auth.module");
 const channel_module_1 = require("../channel/channel.module");
 const message_module_1 = require("../message/message.module");
+const user_gateway_1 = require("./user.gateway");
 let UserModule = class UserModule {
 };
 UserModule = __decorate([
@@ -26,7 +27,7 @@ UserModule = __decorate([
             (0, common_1.forwardRef)(() => message_module_1.MessageModule),
         ],
         controllers: [user_controller_1.UserController],
-        providers: [user_service_1.UserService],
+        providers: [user_service_1.UserService, user_gateway_1.UserGateway],
         exports: [user_service_1.UserService]
     })
 ], UserModule);

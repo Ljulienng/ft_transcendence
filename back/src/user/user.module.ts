@@ -8,6 +8,7 @@ import { ChannelModule } from 'src/channel/channel.module';
 import { PassportModule } from "@nestjs/passport";
 import { MessageModule } from 'src/message/message.module';
 import { JwtModule } from "@nestjs/jwt"
+import { UserGateway } from './user.gateway';
 
 
 @Module({
@@ -19,7 +20,7 @@ import { JwtModule } from "@nestjs/jwt"
     // TypeOrmModule.forFeature([UserRepository]),
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, UserGateway],
   exports: [UserService]
 
 })

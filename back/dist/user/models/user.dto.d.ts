@@ -13,6 +13,7 @@ export declare class UserDto {
     createdTime: Date;
     messages: Message[];
     channels: Channel[];
+    status: string;
     string: number[];
     profileImage?: string;
 }

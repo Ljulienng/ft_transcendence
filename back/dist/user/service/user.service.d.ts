@@ -20,4 +20,5 @@ export declare class UserService {
     deleteFriend(user: User, friendToDelete: any): Promise<void>;
     retrieveFriendInfo(friendId: string): Promise<Friend>;
     friendList(user: User): Promise<Friend[]>;
+    setStatus(user: User, newStatus: string): Promise<void>;
 }

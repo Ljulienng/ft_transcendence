@@ -19,4 +19,6 @@ export declare class UserController {
     userInfo(req: any, userName: any): Promise<void>;
     uploadFile(file: any, req: any): Observable<Object>;
     findProfileImage(req: any, res: any): any;
+    getUserStatus(username: number): Promise<string>;
+    setUserStatus(req: any, newStatus: any): Promise<void>;
 }

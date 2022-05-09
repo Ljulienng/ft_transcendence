@@ -59,6 +59,10 @@ __decorate([
 ], UserDto.prototype, "channels", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UserDto.prototype, "status", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Array)
 ], UserDto.prototype, "string", void 0);
 __decorate([

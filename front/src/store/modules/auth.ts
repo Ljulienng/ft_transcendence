@@ -2,6 +2,7 @@ import axios from "axios";
 
 export interface State {
 	loginApiStatus: string,
+	socket: unknown,
 	userProfile: {
 		id: number,
 		userName: string,

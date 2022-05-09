@@ -35,6 +35,8 @@ let AuthController = class AuthController {
     async FortyTwoAuthRedirect(req, res) {
         const payload = { username: req.user['username'], auth: false };
         const accessToken = await this.jwtService.signAsync(payload);
+        if (req.user.status === 'Offline')
+            req.user.status = 'Online';
         res.cookie('jwt', accessToken, { httpOnly: true });
         res.redirect('http://localhost:3001/home');
     }
@@ -47,6 +49,9 @@ let AuthController = class AuthController {
         catch (e) {
             throw new common_1.UnauthorizedException("wtf");
         }
+    }
+    logout(res) {
+        res.clearCookie('jwt');
     }
 };
 __decorate([
@@ -82,6 +87,14 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "userinfo", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Delete)('/logout'),
+    __param(0, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "logout", null);
 AuthController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [fortytwo_service_1.FortyTwoService, user_service_1.UserService, jwt_1.JwtService])

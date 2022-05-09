@@ -97,6 +97,24 @@ let UserController = class UserController {
     findProfileImage(req, res) {
         return (res.sendFile((0, path_1.join)(process.cwd(), '/uploads/profileimages/' + req.user.profileImage)));
     }
+    async getUserStatus(username) {
+        const user = await this.userService.findOne({ username: username });
+        console.log("status user = ", user);
+        return user.status;
+    }
+    async setUserStatus(req, newStatus) {
+        try {
+            const user = req.user;
+            const userStatus = newStatus.newStatus;
+            console.log("userstatus = ", userStatus);
+            console.log("current userstatus = ", user.status);
+            await this.userService.setStatus(user, userStatus);
+            console.log("new user status = ", user.status);
+        }
+        catch (e) {
+            throw e;
+        }
+    }
 };
 __decorate([
     (0, common_1.Post)(),
@@ -179,6 +197,23 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "findProfileImage", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('/status/:username'),
+    __param(0, (0, common_1.Param)('username')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getUserStatus", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('/setstatus'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "setUserStatus", null);
 UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService, jwt_1.JwtService])

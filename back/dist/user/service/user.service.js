@@ -47,6 +47,7 @@ let UserService = class UserService {
         console.log('Student Added');
         tmp.username = user.username;
         tmp.email = user.email;
+        tmp.status = 'Offline';
         return (0, rxjs_1.from)(this.userRepository.save(user));
     }
     async delete(id) {
@@ -57,6 +58,7 @@ let UserService = class UserService {
         delete user.username;
         delete user.firstname;
         delete user.lastname;
+        delete user.status;
         return (0, rxjs_1.from)(this.userRepository.update(id, user)).pipe((0, rxjs_1.switchMap)(() => this.userRepository.findOne({ id: id })));
     }
     async setUsername(userId, userName) {
@@ -93,12 +95,18 @@ let UserService = class UserService {
         let userTmp = undefined;
         const { username } = user;
         userTmp = await this.userRepository.findOne({ username: username });
-        if (userTmp)
+        if (userTmp) {
+            if (userTmp.status === 'Offline')
+                userTmp.status = 'Online';
             return userTmp;
+        }
         const { email } = user;
         userTmp = await this.userRepository.findOne({ email: email });
-        if (userTmp)
+        if (userTmp) {
+            if (userTmp.status === 'Offline')
+                userTmp.status = 'Online';
             return userTmp;
+        }
         const newUser = await this.addStudent(user);
         return newUser;
     }
@@ -163,6 +171,12 @@ let UserService = class UserService {
             }
         }
         return (friendList);
+    }
+    async setStatus(user, newStatus) {
+        if (newStatus !== 'Online' || 'Offline')
+            console.log("user is", newStatus);
+        user.status = newStatus;
+        this.userRepository.save(user);
     }
 };
 UserService = __decorate([

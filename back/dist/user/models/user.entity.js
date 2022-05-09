@@ -68,6 +68,10 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "friends", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ default: 'Offline' }),
+    __metadata("design:type", String)
+], User.prototype, "status", void 0);
+__decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "profileImage", void 0);

@@ -60,7 +60,6 @@ export default defineComponent({
 		},
 
 		getFriendStatus(friendUsername: string) {
-			let data: string;
 			http.get('/users/status/' + friendUsername)
 			.then(res => {
 				console.log(res.data);

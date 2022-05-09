@@ -10,4 +10,5 @@ export declare class AuthController {
     Norminet(req: any, res: any): Promise<void>;
     FortyTwoAuthRedirect(req: any, res: any): Promise<void>;
     userinfo(req: any): Promise<any>;
+    logout(res: any): void;
 }

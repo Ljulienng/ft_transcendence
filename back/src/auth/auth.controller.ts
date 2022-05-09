@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Req, Res, UnauthorizedException, ConsoleLogger, Param } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, UnauthorizedException, Delete ,ConsoleLogger, Param } from '@nestjs/common';
 import { FortyTwoService } from './fortytwo.service';
 import { AuthGuard } from '@nestjs/passport'
 import { get } from 'http';
@@ -60,4 +60,11 @@ export class AuthController {
 		throw new UnauthorizedException("wtf");
 	  }
   }
+
+
+	@UseGuards(JwtAuthGuard)
+	@Delete('/logout')
+	logout(@Res({passthrough: true}) res) {
+		res.clearCookie('jwt');
+	}
 }
