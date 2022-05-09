@@ -47,9 +47,10 @@ export class ChannelController {
     @Post(':channelId/changePass')
     changePassword(
         @Param('channelId') channelId: number,
-        userId: number,
+        @Req() request,
         @Body() newPassword: string        
     ) {
+        console.log('user:', request.user.id, ' changes password of channel:', channelId, ' [new pass:', newPassword,']');
         return ;
     }
 

@@ -39,7 +39,8 @@ let ChannelController = class ChannelController {
     createChannel(request, channelDto) {
         return this.channelService.createChannel(channelDto, request.user.id);
     }
-    changePassword(channelId, userId, newPassword) {
+    changePassword(channelId, request, newPassword) {
+        console.log('user:', request.user.id, ' changes password of channel:', channelId, ' [new pass:', newPassword, ']');
         return;
     }
     deleteChannel(channelId) {
@@ -85,9 +86,10 @@ __decorate([
 __decorate([
     (0, common_1.Post)(':channelId/changePass'),
     __param(0, (0, common_1.Param)('channelId')),
+    __param(1, (0, common_1.Req)()),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number, String]),
+    __metadata("design:paramtypes", [Number, Object, String]),
     __metadata("design:returntype", void 0)
 ], ChannelController.prototype, "changePassword", null);
 __decorate([
