@@ -36,24 +36,24 @@ export class ChannelController {
         return this.channelService.getChannelMessagesByRoomId(channel.id);
     }
 
-    @UseGuards(JwtAuthGuard) // the user need to be connected to add a channel
+    // test : curl -v  -X POST -d '{"name":"room42", "type": 1,  "password":"supersecuremdp"}' -H "Content-Type: application/json" http://localhost:3000/channel/
+    // @UseGuards(JwtAuthGuard) // user has to be connected   // line is commented for tests
     @Post()
     createChannel(
         @Req() request,
         @Body() channelDto: CreateChannelDto) {
         // console.log('POST a new channel : ', channelDto);
-        return this.channelService.createChannel(channelDto, request.user.id);
+        return this.channelService.createChannel(channelDto, 1/*request.user.id*/);
     }
 
     // test : curl -X POST -d '{"oldPassword":"oldpass", "newPassword":"newpass"}' -H "Content-Type: application/json" http://localhost:3000/channel/{id}/changePass
-    // @UseGuards(JwtAuthGuard) // line is commented for tests
+    // @UseGuards(JwtAuthGuard) // user has to be connected  // line is commented for tests
     @Post(':channelId/changePass')
     changePassword(
         @Param('channelId') channelId: number,
         @Req() request,
         @Body() passwords: PasswordI        
     ) {
-        console.log('changes password of channel:', channelId, ' [old pass:', passwords.oldPassword,']  ', ' [new pass:', passwords.newPassword,']');
         return this.channelService.changePassword(channelId, 1/*request.user.id*/, passwords);
     }
 

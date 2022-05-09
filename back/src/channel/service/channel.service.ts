@@ -146,6 +146,7 @@ export class ChannelService {
         if (!( await this.checkPasswordMatch(passwords.oldPassword, channel.password))) {
             throw new HttpException('current password does not match', HttpStatus.FORBIDDEN);
         }
+        console.log('password changed');
         const saltOrRounds = await bcrypt.genSalt();
         const password = await bcrypt.hash(passwords.newPassword, saltOrRounds);
         this.channelRepository.update(channel.id, { password });
