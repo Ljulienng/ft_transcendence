@@ -39,6 +39,9 @@ let ChannelController = class ChannelController {
     createChannel(request, channelDto) {
         return this.channelService.createChannel(channelDto, request.user.id);
     }
+    changePassword() {
+        return;
+    }
     deleteChannel(channelId) {
         return this.channelService.deleteChannel(channelId);
     }
@@ -79,6 +82,12 @@ __decorate([
     __metadata("design:paramtypes", [Object, createChannel_dto_1.CreateChannelDto]),
     __metadata("design:returntype", void 0)
 ], ChannelController.prototype, "createChannel", null);
+__decorate([
+    (0, common_1.Post)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], ChannelController.prototype, "changePassword", null);
 __decorate([
     (0, common_1.Delete)(':channelId'),
     __param(0, (0, common_1.Param)('channelId')),

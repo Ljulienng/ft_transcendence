@@ -44,6 +44,13 @@ export class ChannelController {
         return this.channelService.createChannel(channelDto, request.user.id);
     }
 
+    @Post()
+    changePassword(
+
+    ) {
+        return ;
+    }
+
     @Delete(':channelId')
     deleteChannel(@Param('channelId') channelId: number) {
         return this.channelService.deleteChannel(channelId);
