@@ -39,14 +39,21 @@
 <script lang="ts">
 import '../assets/css/style.scss'
 import { defineComponent } from "@vue/runtime-core";
-import store from '../store'
+import store from '../store';
 import http from '../http-common'
+
+export interface UserProfile {
+		id: number,
+		userName: string,
+		email: string,
+		status: string,
+}
 
 export default defineComponent({
   name: "Home",
   data() {
     return {
-      getUserProfile: '',
+      getUserProfile: {} as UserProfile
     }
   },
 
@@ -86,7 +93,8 @@ export default defineComponent({
 
   created() {
     this.setUser();
-    this.connectUser();
+    if (this.getUserProfile.status === 'Offline')
+      this.connectUser();
     // this.getId();
 
     // this.setStatus()

@@ -104,11 +104,15 @@ export default defineComponent({
 	},
 
 	mounted(){
-		setInterval( async () => {
+		this.interval = setInterval( async () => {
 			const response =  await http.get('/users/friendlist');
 			this.friendList = response.data;
 		}, 5 * 1000); // 5 sec
 
+	},
+
+	beforeUnmount() {
+		clearInterval(this.interval);
 	},
 
 	watch: {
