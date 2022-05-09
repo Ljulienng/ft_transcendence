@@ -1,4 +1,7 @@
 import axios from "axios";
+import { Commit } from "vuex"
+import { ActionContext } from "vuex";
+
 
 export interface State {
 	loginApiStatus: string,
@@ -31,18 +34,14 @@ const getters = {
 };
 
 const actions = {
-	// async loginApi({ commit }, payload) {
-	//   const response = await axios("http://localhost:3000/auth/42")
-	// 	.catch((err) => {
-	// 	  console.log(err);
-	// 	});
-   
-	//   if (response && response.data) {
-	// 	commit("setLoginApiStatus", "success");
-	//   } else {
-	// 	commit("setLoginApiStatus", "failed");
-	//   }
-	// },
+	setUserSocket({commit}: {commit: Commit}) {
+		commit("setUserSocket")
+	},
+
+	setUserStatus({commit}: {commit: Commit}, userStatus: string) {
+		
+	},
+
 	// eslint-disable-next-line
 	async userProfile({commit}: any){
 		const response = await axios
@@ -60,6 +59,19 @@ const actions = {
 
 const mutations = {
 	// eslint-disable-next-line
+	setUserSocket(state: State) {
+		if (!state.socket)
+			state.socket = io('http://localhost:3000', {withCredential: true});
+	},
+
+	connectUser(state: State) {
+		state.userProfile.status = "Online";
+	},
+
+	disconnectUser(state: State) {
+		state.userProfile.status = "Offline";
+	},
+
 	setLoginApiStatus(state: State, data: any) {
 		state.loginApiStatus = data;
 	},
