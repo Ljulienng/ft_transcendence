@@ -4,6 +4,7 @@ import { CreateChannelDto } from '../models/createChannel.dto';
 import { Message } from 'src/message/models/message.entity';
 import { User } from 'src/user/models/user.entity';
 import { JoinChannelDto } from '../models/joinChannel.dto';
+import { PasswordI } from '../models/password.interface';
 export declare class ChannelService {
     private channelRepository;
     private userRepository;
@@ -16,7 +17,7 @@ export declare class ChannelService {
     checkPasswordMatch(sentPassword: string, expectedPassword: string): Promise<boolean>;
     addUserToChannel(joinChannel: JoinChannelDto, userId: number): Promise<void>;
     removeUserToChannel(channelSent: Channel, userId: number): Promise<void>;
-    changePassword(channelId: number, userId: number, newPassword: string): Promise<void>;
+    changePassword(channelId: number, userId: number, passwords: PasswordI): Promise<void>;
     deleteChannel(channelId: number): Promise<Channel>;
     getChannelMessagesByRoom(room: string): Promise<Message[]>;
     getChannelMessagesByRoomId(roomId: number): Promise<Message[]>;

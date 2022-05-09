@@ -52,16 +52,14 @@ let ChannelService = class ChannelService {
             if (!newChannel.password) {
                 throw new common_1.BadRequestException('need a password for private or protected channel');
             }
-            else if (newChannel.password.length < 8) {
+            if (newChannel.password.length < 8) {
                 throw new common_1.HttpException('password too short', common_1.HttpStatus.FORBIDDEN);
             }
-            else if (newChannel.password.length > 20) {
+            if (newChannel.password.length > 20) {
                 throw new common_1.HttpException('password too long', common_1.HttpStatus.FORBIDDEN);
             }
-            else {
-                const saltOrRounds = await bcrypt.genSalt();
-                newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);
-            }
+            const saltOrRounds = await bcrypt.genSalt();
+            newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);
         }
         console.log('new channel created : ', newChannel);
         return await this.channelRepository.save(newChannel);
@@ -97,14 +95,24 @@ let ChannelService = class ChannelService {
             .getOne();
         await this.channelRepository.save(channelToLeave);
     }
-    async changePassword(channelId, userId, newPassword) {
-        console.log('user:', userId, ' changes password of channel:', channelId, ' [new pass:', newPassword, ']');
-        if (newPassword.length < 8) {
+    async changePassword(channelId, userId, passwords) {
+        console.log('user:', userId, ' changes password of channel:', channelId, ' [new pass:', passwords.newPassword, ']');
+        const user = await this.userRepository.findOne({ id: userId });
+        const channel = await this.findChannelById(channelId);
+        if (userId !== channel.owner.id) {
+            throw new common_1.HttpException('you are not authorized to change the password', common_1.HttpStatus.FORBIDDEN);
+        }
+        if (passwords.newPassword.length < 8) {
             throw new common_1.HttpException('password too short', common_1.HttpStatus.FORBIDDEN);
         }
-        else if (newPassword.length > 20) {
+        if (passwords.newPassword.length > 20) {
             throw new common_1.HttpException('password too long', common_1.HttpStatus.FORBIDDEN);
         }
+        if (!this.checkPasswordMatch(passwords.oldPassword, channel.password)) {
+            throw new common_1.HttpException('current password does not match', common_1.HttpStatus.FORBIDDEN);
+        }
+        const saltOrRounds = await bcrypt.genSalt();
+        channel.password = await bcrypt.hash(passwords.newPassword, saltOrRounds);
     }
     async deleteChannel(channelId) {
         const channel = await this.findChannelById(channelId);

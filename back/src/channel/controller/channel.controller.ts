@@ -6,6 +6,7 @@ import { Response } from 'express'
 import { MessageService } from 'src/message/service/message.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/user/models/user.entity';
+import { PasswordI } from '../models/password.interface';
 
 @Controller('channel')
 export class ChannelController {
@@ -49,9 +50,10 @@ export class ChannelController {
     changePassword(
         @Param('channelId') channelId: number,
         @Req() request,
-        @Body() newPassword: string        
+        @Body() passwords: PasswordI        
     ) {
-        return this.channelService.changePassword(channelId, 2/*request.user.id*/, newPassword);
+        console.log('changes password of channel:', channelId, ' [old pass:', passwords.oldPassword,']  ', ' [new pass:', passwords.newPassword,']');
+        return this.channelService.changePassword(channelId, 1/*request.user.id*/, passwords);
     }
 
     @Delete(':channelId')

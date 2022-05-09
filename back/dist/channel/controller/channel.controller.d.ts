@@ -2,6 +2,7 @@ import { ChannelService } from '../service/channel.service';
 import { CreateChannelDto } from '../models/createChannel.dto';
 import { CreateMessageDto } from 'src/message/models/createMessage.dto';
 import { MessageService } from 'src/message/service/message.service';
+import { PasswordI } from '../models/password.interface';
 export declare class ChannelController {
     private readonly channelService;
     private messageService;
@@ -11,6 +12,6 @@ export declare class ChannelController {
     findChannelByName(name: string): Promise<import("../models/channel.entity").Channel>;
     findMessagesByChannelId(channelId: number): Promise<CreateMessageDto[]>;
     createChannel(request: any, channelDto: CreateChannelDto): Promise<import("../models/channel.entity").Channel>;
-    changePassword(channelId: number, request: any, newPassword: string): Promise<void>;
+    changePassword(channelId: number, request: any, passwords: PasswordI): Promise<void>;
     deleteChannel(channelId: number): Promise<import("../models/channel.entity").Channel>;
 }
