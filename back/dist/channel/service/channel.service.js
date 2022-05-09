@@ -64,8 +64,8 @@ let ChannelService = class ChannelService {
         console.log('new channel created : ', newChannel);
         return await this.channelRepository.save(newChannel);
     }
-    async checkPasswordMatch(sentPassword, expectedPassword) {
-        return await bcrypt.compare(sentPassword, expectedPassword);
+    async checkPasswordMatch(sentPassword, hashExpectedPassword) {
+        return await bcrypt.compare(sentPassword, hashExpectedPassword);
     }
     async addUserToChannel(joinChannel, userId) {
         const user = await this.userRepository.findOne({ id: userId });
@@ -97,7 +97,6 @@ let ChannelService = class ChannelService {
     }
     async changePassword(channelId, userId, passwords) {
         console.log('user:', userId, ' changes password of channel:', channelId, ' [new pass:', passwords.newPassword, ']');
-        const user = await this.userRepository.findOne({ id: userId });
         const channel = await this.findChannelById(channelId);
         if (userId !== channel.owner.id) {
             throw new common_1.HttpException('you are not authorized to change the password', common_1.HttpStatus.FORBIDDEN);
@@ -108,10 +107,9 @@ let ChannelService = class ChannelService {
         if (passwords.newPassword.length > 20) {
             throw new common_1.HttpException('password too long', common_1.HttpStatus.FORBIDDEN);
         }
-        if (!this.checkPasswordMatch(passwords.oldPassword, channel.password)) {
+        if (!(await this.checkPasswordMatch(passwords.oldPassword, channel.password))) {
             throw new common_1.HttpException('current password does not match', common_1.HttpStatus.FORBIDDEN);
         }
-        console.log('password changed');
         const saltOrRounds = await bcrypt.genSalt();
         const password = await bcrypt.hash(passwords.newPassword, saltOrRounds);
         this.channelRepository.update(channel.id, { password });

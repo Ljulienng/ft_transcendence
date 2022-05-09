@@ -45,7 +45,7 @@ export class ChannelController {
         return this.channelService.createChannel(channelDto, request.user.id);
     }
 
-    // test : curl -X POST -d '{"oldPassword":"old", "newPassword":"new"}' -H "Content-Type: application/json" http://localhost:3000/channel/{id}/changePass
+    // test : curl -X POST -d '{"oldPassword":"oldpass", "newPassword":"newpass"}' -H "Content-Type: application/json" http://localhost:3000/channel/{id}/changePass
     // @UseGuards(JwtAuthGuard) // line is commented for tests
     @Post(':channelId/changePass')
     changePassword(

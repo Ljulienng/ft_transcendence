@@ -72,8 +72,8 @@ export class ChannelService {
    }
 
     /* check if the password sent is the right one */
-   async checkPasswordMatch(sentPassword: string, expectedPassword: string) {
-        return await bcrypt.compare(sentPassword, expectedPassword);
+   async checkPasswordMatch(sentPassword: string, hashExpectedPassword: string): Promise<boolean> {
+    return await bcrypt.compare(sentPassword, hashExpectedPassword);
    }
 
    /*
@@ -132,7 +132,6 @@ export class ChannelService {
    async changePassword(channelId: number, userId: number, passwords: PasswordI)
    {
         console.log('user:', userId, ' changes password of channel:', channelId, ' [new pass:', passwords.newPassword,']');
-        const user = await this.userRepository.findOne({id: userId});
         const channel = await this.findChannelById(channelId);
 
         if (userId !== channel.owner.id) {
@@ -144,10 +143,9 @@ export class ChannelService {
         if (passwords.newPassword.length > 20) {
             throw new HttpException('password too long', HttpStatus.FORBIDDEN);
         }
-        if (!this.checkPasswordMatch(passwords.oldPassword, channel.password)) {
+        if (!( await this.checkPasswordMatch(passwords.oldPassword, channel.password))) {
             throw new HttpException('current password does not match', HttpStatus.FORBIDDEN);
         }
-        console.log('password changed');
         const saltOrRounds = await bcrypt.genSalt();
         const password = await bcrypt.hash(passwords.newPassword, saltOrRounds);
         this.channelRepository.update(channel.id, { password });
