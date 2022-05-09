@@ -51,7 +51,7 @@ export class ChannelController {
         @Body() newPassword: string        
     ) {
         console.log('user:', request.user.id, ' changes password of channel:', channelId, ' [new pass:', newPassword,']');
-        return ;
+        return this.channelService.changePassword(channelId, request.user.id, newPassword);
     }
 
     @Delete(':channelId')
