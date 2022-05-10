@@ -1,24 +1,23 @@
 <template>
 	<div class="userProfile">
+		<button class='logout' @click="logout">Logout</button>
 		<UploadAvatar/>
-		<button @click="logout">Logout</button>
+		<TwoFactorModal/>
 	</div>
 </template>
 
 <script lang='ts'>
 import { defineComponent } from "@vue/runtime-core";
 import http from '../http-common'
+import TwoFactorModal from '../components/TwoFactorModal.vue'
 import store from '../store'
 
 export default defineComponent({
-	// setup() {
-
-
-		
-	// },
+	components: {
+		TwoFactorModal
+	},
 
 	methods: {
-
 		setStatus() {
 
 			http.post('/users/setstatus', {newStatus: 'Offline'})
@@ -45,6 +44,30 @@ export default defineComponent({
 				console.log(err);
 			})
 		}
+
 	}
 })
 </script>
+
+<style lang='scss'>
+
+.userProfile {
+	width: 100%;
+}
+
+.logout
+{
+    float: right;
+    border: none;
+    background: #EDEDED;
+    font-size: 24px;
+    color: arial;
+    padding: 5px 10px;
+}
+.logout:hover
+{
+    background: red;
+    cursor: pointer;
+}
+
+</style>

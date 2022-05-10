@@ -227,4 +227,21 @@ export class UserService {
 		this.userRepository.save(user)
 	}
 
+	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+		return this.userRepository.update(userId, {
+			twoFASecret: secret
+		});
+	}
+
+	async turnOnTwoFactorAuthentication(userId: number) {
+		return this.userRepository.update(userId, {
+			twoFAEnabled: true
+		});
+	}
+	async turnOffTwoFactorAuthentication(userId: number) {
+		return this.userRepository.update(userId, {
+			twoFAEnabled: false
+		});
+	}
+		
 }

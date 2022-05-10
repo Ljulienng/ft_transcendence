@@ -35,9 +35,9 @@ export class User {
 	banned: boolean;
 
 	@Column({ nullable: true, default: null,})
-	twoFASecret: string
+	twoFASecret?: string
 
-	@Column({ nullable: true, default: null,})
+	@Column({ nullable: true, default: false,})
 	twoFAEnabled: boolean
 
 	@CreateDateColumn({ type: 'timestamp', default: () => 'now()' })

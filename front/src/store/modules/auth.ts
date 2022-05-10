@@ -11,6 +11,7 @@ export interface State {
 		userName: string,
 		email: string,
 		status: string,
+		twoFAEnabled: boolean
 	}
 }
 
@@ -20,7 +21,8 @@ const state = () => ({
 		id:0,
 		userName:"",
 		email:"",
-		status:"Offline"
+		status:"Offline",
+		twoFAEnabled: false
 	}
 });
 
@@ -102,7 +104,8 @@ const mutations = {
 			id:data.id,
 			userName: data.username,
 			email: data.email,
-			status: data.status
+			status: data.status,
+			twoFAEnabled: data.twoFAEnabled
 		};
 		state.userProfile = userProfile
 		if (!state.socket)

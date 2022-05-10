@@ -12,6 +12,7 @@ import path = require('path');
 import { map } from 'rxjs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
+import { TwoFAAuthGuard } from 'src/auth/guards/twoFA.guard';
 // import { UserI } from '../models/user.interface';
 
 export const storage = {
@@ -42,6 +43,7 @@ export class UserController {
 		return this.userService.delete(idToDelete);
 	}
 
+	@UseGuards(TwoFAAuthGuard)
 	@Get()
 	findAll() {
 		return this.userService.findAll();
@@ -130,7 +132,7 @@ export class UserController {
 
 	@UseGuards(JwtAuthGuard)
 	@Get('/status/:username')
-	async getUserStatus(@Param('username') username: number): Promise<string> {
+	async getUserStatus(@Param('username') username: string): Promise<string> {
 	  // let user: User;
 		const user = await this.userService.findOne({username: username});
 		// console.log("status user = ", user);
