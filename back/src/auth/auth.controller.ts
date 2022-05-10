@@ -53,7 +53,7 @@ export class AuthController {
   
 		// const user = await this.userService.findOne(data['email']); //A changer 
     const user = req.user;
-    console.log("userinfo ", user);
+    // console.log("userinfo ", user);
 
 		return user;
 	  } catch (e) {

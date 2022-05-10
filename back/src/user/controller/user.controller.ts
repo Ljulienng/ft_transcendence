@@ -122,7 +122,10 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@Get('/avatar')
 	findProfileImage(@Req() req, @Res() res) {
-		return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + req.user.profileImage)))
+		if (req.user.profileImage)
+			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + req.user.profileImage)))
+		else
+			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + 'default/default.jpg')))
 	}
 
 	@UseGuards(JwtAuthGuard)

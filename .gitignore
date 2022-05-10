@@ -1,8 +1,8 @@
 # compiled output
-*/dist
-back/dist/
-*/node_modules
-/back/uploads
+dist
+node_modules
+/back/dist
+# /back/uploads
 
 # Logs
 logs
