@@ -8,6 +8,7 @@ import { UserModule } from 'src/user/user.module';
 import { UserService } from 'src/user/service/user.service';
 import { User } from 'src/user/models/user.entity';
 import { Message } from 'src/message/models/message.entity';
+import { ChannelMemberModule } from 'src/channelMember/channelMember.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { Message } from 'src/message/models/message.entity';
     TypeOrmModule.forFeature([User]), 
     forwardRef(() => MessageModule), 
     forwardRef(() => UserModule),
+    forwardRef(() => ChannelMemberModule),
   ],
   controllers: [ChannelController], 
   providers: [ChannelService],

@@ -10,6 +10,8 @@ import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/models/user.entity';
 import { JoinChannelDto } from '../models/joinChannel.dto';
 import { PasswordI } from '../models/password.interface';
+import { ChannelMember } from 'src/channelMember/models/channelMember.entity';
+import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 
 @Injectable()
 export class ChannelService {
@@ -19,7 +21,11 @@ export class ChannelService {
         @InjectRepository(User)
         private userRepository: Repository<User>,
         @InjectRepository(Message)
-        private messageRepository: Repository<Message>, 
+        private messageRepository: Repository<Message>,
+        // @InjectRepository(ChannelMember)
+        // private channelMemberRepository: Repository<ChannelMember>,
+        @Inject(ChannelMemberService)
+        private channelMemberService: ChannelMemberService,
     ) {}
 
     /* get all channels */
@@ -50,8 +56,9 @@ export class ChannelService {
             type: createChannel.type,
             password: createChannel.password,
             messages: [],
+            channelMembers: [user],
+            // membersId: [userId],
             owner: user,
-            membersId: [userId],
        });
 
        if (newChannel.type === ChannelType.protected || newChannel.type === ChannelType.private) {
@@ -103,12 +110,13 @@ export class ChannelService {
             }
         }
 
-        if (welcomingChannel.membersId.find(userId => userId === user.id)) {
-        // if (welcomingChannel.users.find((u) => u.id === user.id)) {
+        if (this.channelMemberService.findOne(user, welcomingChannel)) {
+        // // if (welcomingChannel.membersId.find(userId => userId === user.id)) {
             throw new UnauthorizedException('user already in this channel');
         }
 
-        welcomingChannel.membersId.push(user.id);               // add the user to the channel
+        // // welcomingChannel.membersId.push(user.id);               // add the user to the channel
+        // this.channelMemberRepository.create
         // welcomingChannel.users.push(user);                   // add the user to the channel
         await this.channelRepository.save(welcomingChannel);    // update the channel
    }

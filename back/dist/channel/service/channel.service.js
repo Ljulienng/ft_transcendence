@@ -20,11 +20,13 @@ const channel_entity_1 = require("../models/channel.entity");
 const message_entity_1 = require("../../message/models/message.entity");
 const bcrypt = require("bcrypt");
 const user_entity_1 = require("../../user/models/user.entity");
+const channelMember_service_1 = require("../../channelMember/service/channelMember.service");
 let ChannelService = class ChannelService {
-    constructor(channelRepository, userRepository, messageRepository) {
+    constructor(channelRepository, userRepository, messageRepository, channelMemberService) {
         this.channelRepository = channelRepository;
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
+        this.channelMemberService = channelMemberService;
     }
     async findAll() {
         return await this.channelRepository.find();
@@ -45,8 +47,8 @@ let ChannelService = class ChannelService {
             type: createChannel.type,
             password: createChannel.password,
             messages: [],
+            channelMembers: [user],
             owner: user,
-            membersId: [userId],
         });
         if (newChannel.type === channel_entity_1.ChannelType.protected || newChannel.type === channel_entity_1.ChannelType.private) {
             if (!newChannel.password) {
@@ -81,10 +83,9 @@ let ChannelService = class ChannelService {
                 }
             }
         }
-        if (welcomingChannel.membersId.find(userId => userId === user.id)) {
+        if (this.channelMemberService.findOne(user, welcomingChannel)) {
             throw new common_1.UnauthorizedException('user already in this channel');
         }
-        welcomingChannel.membersId.push(user.id);
         await this.channelRepository.save(welcomingChannel);
     }
     async removeUserToChannel(channelSent, userId) {
@@ -154,9 +155,11 @@ ChannelService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(channel_entity_1.Channel)),
     __param(1, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __param(2, (0, typeorm_1.InjectRepository)(message_entity_1.Message)),
+    __param(3, (0, common_1.Inject)(channelMember_service_1.ChannelMemberService)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
-        typeorm_2.Repository])
+        typeorm_2.Repository,
+        channelMember_service_1.ChannelMemberService])
 ], ChannelService);
 exports.ChannelService = ChannelService;
 //# sourceMappingURL=channel.service.js.map

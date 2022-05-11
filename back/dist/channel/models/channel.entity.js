@@ -61,10 +61,6 @@ __decorate([
     }),
     __metadata("design:type", user_entity_1.User)
 ], Channel.prototype, "owner", void 0);
-__decorate([
-    (0, typeorm_1.Column)("simple-array", { nullable: true }),
-    __metadata("design:type", Array)
-], Channel.prototype, "membersId", void 0);
 Channel = __decorate([
     (0, typeorm_1.Entity)('channels')
 ], Channel);

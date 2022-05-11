@@ -16,6 +16,7 @@ const message_module_1 = require("../message/message.module");
 const user_module_1 = require("../user/user.module");
 const user_entity_1 = require("../user/models/user.entity");
 const message_entity_1 = require("../message/models/message.entity");
+const channelMember_module_1 = require("../channelMember/channelMember.module");
 let ChannelModule = class ChannelModule {
 };
 ChannelModule = __decorate([
@@ -26,6 +27,7 @@ ChannelModule = __decorate([
             typeorm_1.TypeOrmModule.forFeature([user_entity_1.User]),
             (0, common_1.forwardRef)(() => message_module_1.MessageModule),
             (0, common_1.forwardRef)(() => user_module_1.UserModule),
+            (0, common_1.forwardRef)(() => channelMember_module_1.ChannelMemberModule),
         ],
         controllers: [channel_controller_1.ChannelController],
         providers: [channel_service_1.ChannelService],

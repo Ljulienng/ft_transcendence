@@ -15,5 +15,4 @@ export declare class Channel {
     messages: Message[];
     channelMembers: ChannelMember[];
     owner: User;
-    membersId: number[];
 }
