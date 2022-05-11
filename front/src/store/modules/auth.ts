@@ -6,6 +6,7 @@ import { io, Socket } from 'socket.io-client'
 export interface State {
 	loginApiStatus: string,
 	socket: Socket,
+	twoFAauth: boolean,
 	userProfile: {
 		id: number,
 		userName: string,
@@ -17,6 +18,7 @@ export interface State {
 
 const state = () => ({
 	loginApiStatus: "",
+	// twoFAauth: false,
 	userProfile:{
 		id:0,
 		userName:"",
@@ -35,6 +37,10 @@ const getters = {
 	},
 	getUserSocket(state: State) {
 		return state.socket;
+	},
+	getTwoFAauth(state: State) {
+		console.log("SETTWOAUTH = ", state.twoFAauth)
+		return state.twoFAauth;
 	},
 };
 
@@ -58,8 +64,25 @@ const actions = {
 
 	},
 
-	// eslint-disable-next-line
-	async userProfile({commit}: any){
+	async setTwoFAauth({commit}: {commit: Commit}) {
+		const data: boolean = await http.get('/twofa/check')
+		.then ( res => {
+			console.log("res.data from setTwoFAauth = ", res.data)
+			return res.data
+		})
+		.catch( err => {
+			console.log("SetTwoFAauth = ", err)
+		})
+
+		console.log("data from setTwoFAauth = ", data)
+	
+		if (data === true)
+			commit("setTwoFAauth", data)
+		else
+			commit("setTwoFAauth", data)
+	},
+
+	async userProfile({commit}: {commit: Commit}){
 		const response = await http.get("userinfo", {withCredentials: true})
 		.catch((err) => {
 			console.log(err);
@@ -78,6 +101,9 @@ const mutations = {
 		if (!state.socket)
 			state.socket = io('http://localhost:3000/user', {  withCredentials: true });
 		console.log('socket = ', state.socket);
+	},
+	setTwoFAauth(state: State, data: boolean) {
+		state.twoFAauth = data;
 	},
 
 	connectUser(state: State) {

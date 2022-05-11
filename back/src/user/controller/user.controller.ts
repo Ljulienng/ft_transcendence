@@ -12,7 +12,7 @@ import path = require('path');
 import { map } from 'rxjs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
-import { TwoFAAuthGuard } from 'src/auth/guards/twoFA.guard';
+import { TwoFAAuth } from 'src/auth/guards/twoFA.guard';
 // import { UserI } from '../models/user.interface';
 
 export const storage = {
@@ -43,7 +43,7 @@ export class UserController {
 		return this.userService.delete(idToDelete);
 	}
 
-	@UseGuards(TwoFAAuthGuard)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get()
 	findAll() {
 		return this.userService.findAll();
@@ -55,7 +55,7 @@ export class UserController {
 		return this.userService.findByUserId(userId);
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get('/friendlist')
 	async getFriendList(@Req() req) {
 		try {
@@ -68,7 +68,7 @@ export class UserController {
 		}
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Post('/addfriend')
 	async addFriend(@Req() req, @Body() friendToAdd) {
 		let user: User;
@@ -80,7 +80,7 @@ export class UserController {
 		}
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Delete('/deletefriend')
 	async deleteFriend(@Req() req, @Body() friendToDelete) {
 		try {
@@ -94,7 +94,7 @@ export class UserController {
 		}
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Post('/setusername')
 	async userInfo(@Req() req, @Body() userName) {
 	  try {
@@ -108,7 +108,7 @@ export class UserController {
 	}
 
 	@Post('/uploadavatar')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@UseInterceptors(FileInterceptor('image', storage))
 	uploadFile(@UploadedFile() file, @Req() req): Observable<Object> {
 		console.log("filename = ", file.filename)
@@ -121,7 +121,7 @@ export class UserController {
 		// return of({imagePath: file.path});
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get('/avatar')
 	findProfileImage(@Req() req, @Res() res) {
 		if (req.user.profileImage)
@@ -130,7 +130,7 @@ export class UserController {
 			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + 'default/default.jpg')))
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get('/status/:username')
 	async getUserStatus(@Param('username') username: string): Promise<string> {
 	  // let user: User;
@@ -140,24 +140,4 @@ export class UserController {
 		return user.status
 	}
   
-  
-	// @UseGuards(JwtAuthGuard)
-	// @Post('/setstatus')
-	// async setUserStatus(@Req() req, @Body() newStatus) {
-	//   try {
-	// 	const user = req.user;
-	// 	const userStatus = newStatus.newStatus
-
-	// 	console.log("userstatus = ", userStatus)
-	// 	console.log("current userstatus = ", user.status)
-
-	
-	// 	await this.userService.setStatus(user, userStatus);
-	// 	console.log("new user status = ", user.status)
-
-	//   } catch (e) {
-	// 	throw e;
-	//   }
-	// }
-
 }

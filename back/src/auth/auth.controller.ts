@@ -60,20 +60,20 @@ export class AuthController {
     return this.twoFAService.pipeQrCodeStream(response, otpauthUrl);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('/twofa/turn-on')
   @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
   async turnOnTwoFactorAuthentication(
     @Req() req,
     @Body() twoFactorAuthenticationCode) {
-      console.log('twoFactorAuthenticationCode = ', twoFactorAuthenticationCode.twoFactorAuthenticationCode);
+      // console.log('twoFactorAuthenticationCode = ', twoFactorAuthenticationCode.twoFactorAuthenticationCode);
     const isCodeValid = this.twoFAService.isTwoFactorAuthenticationCodeValid(
       twoFactorAuthenticationCode.twoFactorAuthenticationCode, req.user
     );
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
-    console.log('double FA ACTIVATED FOR ', req.user.username)
+    // console.log('double FA ACTIVATED FOR ', req.user.username)
     await this.userService.turnOnTwoFactorAuthentication(req.user.id);
   }
 
@@ -82,35 +82,62 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async turnOffTwoFactorAuthentication(
     @Req() req,
+    @Res() res,
     @Body() twoFactorAuthenticationCode) {
-      console.log('twoFactorAuthenticationCode = ', twoFactorAuthenticationCode.twoFactorAuthenticationCodeTwo);
+      // console.log('twoFactorAuthenticationCode = ', twoFactorAuthenticationCode.twoFactorAuthenticationCodeTwo);
+    const user: User = req.user;
     const isCodeValid = this.twoFAService.isTwoFactorAuthenticationCodeValid(
       twoFactorAuthenticationCode.twoFactorAuthenticationCodeTwo, req.user
     );
+
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
-    console.log('double FA DEACTIVATED FOR ', req.user.username)
+    // console.log('double FA DEACTIVATED FOR ', req.user.username)
     await this.userService.turnOffTwoFactorAuthentication(req.user.id);
+  
+    const payload = { username: req.user['username'], auth: false };
+		const accessToken = await this.jwtService.signAsync(payload);
+		res.clearCookie('jwt');
+    res.cookie('jwt', accessToken, {httpOnly: true})
+		res.redirect('http://localhost:3001/home');
   }
-
+  
+  @UseGuards(JwtAuthGuard)
   @Post('/twofa/authenticate')
   @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
   async twoFAAuthenticate(
     @Req() req,
+    @Res() res,
     @Body() twoFactorAuthenticationCode) {
-      console.log('twoFactorAuthenticationCode = ', twoFactorAuthenticationCode.twoFactorAuthenticationCode);
+    const user: User = req.user;
+
+      // console.log('twoFactorAuthenticationCode = ', twoFactorAuthenticationCode.twoFactorAuthenticationCode);
     const isCodeValid = this.twoFAService.isTwoFactorAuthenticationCodeValid(
       twoFactorAuthenticationCode.twoFactorAuthenticationCode, req.user
     );
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
-    console.log('TWOFA AUTHENTICATE =', req.user.username)
+    // console.log('TWOFA AUTHENTICATE =', req.user.username, user.twoFASecret)
 
     const payload = { username: req.user['username'], auth: true };
 		const accessToken = await this.jwtService.signAsync(payload);
+		res.clearCookie('jwt');
+    res.cookie('jwt', accessToken, {httpOnly: true})
+		res.redirect('http://localhost:3001/home');
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/twofa/check')
+  async checkAuthentication(@Req()req) {
+    const user: User = req.user;
+    const decode = this.jwtService.decode(req.cookies.jwt);
+
+    if (user.twoFAEnabled === true && decode['auth'] === true)
+      return (true)
+    else
+      return (false)
   }
 
 	@UseGuards(JwtAuthGuard)

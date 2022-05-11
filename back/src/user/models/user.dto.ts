@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { Message } from "src/message/models/message.entity";
 import { Channel } from "src/channel/models/channel.entity";
 
@@ -28,7 +28,7 @@ export class UserDto {
 	@IsOptional()
 	twoFASecret: string
 
-	@IsOptional()
+	@IsBoolean()
 	twoFAEnabled: boolean
 
 	@IsOptional()

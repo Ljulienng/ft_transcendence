@@ -3,9 +3,11 @@ import store from '../store'
 import HelloWorld from '@/components/HelloWorld.vue'
 import ShowUsers from '@/components/ShowUsers.vue'
 import AuthModal from '@/components/AuthModal.vue'
+import TwoFaAuth from '@/components/TwoFaAuth.vue'
 import FriendList from '@/views/FriendList.vue'
 import UserProfile from '@/views/UserProfile.vue'
 import Home from '@/views/Home.vue'
+import http from '../http-common'
 
 
 const routes = [
@@ -36,6 +38,11 @@ const routes = [
 		component: AuthModal
 	},
 	{
+		name: 'TwoFA',
+		path: '/twofaauth',
+		component: TwoFaAuth
+	},
+	{
 		name: 'FriendList',
 		path: '/friendlist',
 		component: FriendList,
@@ -62,8 +69,38 @@ router.beforeEach(async (to, from, next) => {
 			userProfile = store.getters["auth/getUserProfile"];
 			if (userProfile.id === 0) {
 				return next({ path: "/authmodal" });
-			} else {
-				return next();
+			} 
+			else {
+				if (userProfile.twoFAEnabled === true) {
+					let TwoFAauth = store.getters["auth/getTwoFAauth"];
+					console.log("WENT THEREEEEEE", TwoFAauth)
+
+					if (TwoFAauth === false || undefined) {
+						store.dispatch('auth/setTwoFAauth')
+						TwoFAauth = store.getters["auth/getTwoFAauth"];
+						if (TwoFAauth === true)
+							return next();
+						else
+							return next({ path: "/twofaauth" });
+					}
+					else
+						return next();
+					// const data = await http.get('/twofa/check')
+					// .then ( res => {
+					// 	console.log("res.data = ", res.data)
+					// 	return res.data
+					// })
+					// if (data === true)
+					// 	return next();
+					// else {
+					// 	console.log('res data = ', data)
+					// 	return next({ path: "/twofaauth" });
+							
+					// }
+				}
+				else {
+					return next();
+				}
 			}
 		}
 	}

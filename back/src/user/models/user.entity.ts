@@ -37,7 +37,7 @@ export class User {
 	@Column({ nullable: true, default: null,})
 	twoFASecret?: string
 
-	@Column({ nullable: true, default: false,})
+	@Column({default: false,})
 	twoFAEnabled: boolean
 
 	@CreateDateColumn({ type: 'timestamp', default: () => 'now()' })

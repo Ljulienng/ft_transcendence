@@ -88,24 +88,26 @@ export default defineComponent({
             .then(
             response => {
                 console.log(response)
-                this.$router.push('/home')
+				window.location.reload()
             })
             .catch(
-            error => { console.log("msg = ", error.response.data.error, "full error = ", error), this.errorMsg = error.response.data.error}
+            error => { console.log("msg = ", error.response.data.error, "full error = ", error), error.response.data.error}
             )
         },
 
         async deactivateTwoFA() {
             console.log('twoFactorAuthenticationCode = ', this.twoFA)
             await http.post("/twofa/turn-off", this.twoFA)
-            .then(
-            response => {
-                console.log(response)
-                this.$router.push('/home')
-            })
-            .catch(
-            error => { console.log("msg = ", error.response.data.error, "full error = ", error), this.errorMsg = error.response.data.error}
-            )
+            // .then(
+            // response => {
+            //     console.log(response.data)
+            // })
+            // .catch(
+            //     error => { console.log("msg = ", error.response.data.error, "full error = ", error), error.response.data.error}
+            // )
+            store.dispatch('auth/setTwoFAauth')
+            window.location.reload()
+
         },
     },
 
