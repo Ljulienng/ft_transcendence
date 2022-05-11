@@ -90,7 +90,7 @@ let ChannelService = class ChannelService {
         if (this.channelMemberService.findOne(user, welcomingChannel)) {
             throw new common_1.UnauthorizedException('user already in this channel');
         }
-        this.channelMemberService.addOne(user, welcomingChannel, false);
+        this.channelMemberService.createMember(user, welcomingChannel, false);
         await this.channelRepository.save(welcomingChannel);
     }
     async removeUserToChannel(channelSent, userId) {

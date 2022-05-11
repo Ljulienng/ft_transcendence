@@ -59,7 +59,6 @@ export class ChannelService {
             password: createChannel.password,
             messages: [],
             channelMembers: [user],
-            // membersId: [userId],
             owner: user,
        });
 
@@ -117,10 +116,8 @@ export class ChannelService {
             throw new UnauthorizedException('user already in this channel');
         }
 
-        this.channelMemberService.addOne(user, welcomingChannel, false);
+        this.channelMemberService.createMember(user, welcomingChannel, false);
         // // welcomingChannel.membersId.push(user.id);               // add the user to the channel
-        // this.channelMemberRepository.create
-        // welcomingChannel.users.push(user);                   // add the user to the channel
         await this.channelRepository.save(welcomingChannel);    // update the channel
    }
 
