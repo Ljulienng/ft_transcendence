@@ -14,6 +14,17 @@ export class ChannelMemberService {
     ) {}
    
     async findOne(user: User, channel: Channel) {
-        
+        return await this.channelMemberRepository.findOne({
+            member: user,
+            channel: channel,
+        })
+    }
+
+    async addOne(user: User, channel: Channel, admin: boolean) {
+        const newMember = new ChannelMember();
+        newMember.admin = admin;
+        newMember.member = user;
+        newMember.channel = channel;
+        await this.channelMemberRepository.save(newMember);
     }
 }

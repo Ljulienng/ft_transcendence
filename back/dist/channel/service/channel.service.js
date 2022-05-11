@@ -32,10 +32,14 @@ let ChannelService = class ChannelService {
         return await this.channelRepository.find();
     }
     async findChannelById(channelId) {
-        return await this.channelRepository.findOne({ id: channelId });
+        return await this.channelRepository.findOne({
+            id: channelId
+        });
     }
     async findChannelByName(channelName) {
-        return await this.channelRepository.findOne({ name: channelName });
+        return await this.channelRepository.findOne({
+            name: channelName
+        });
     }
     async createChannel(createChannel, userId) {
         const user = await this.userRepository.findOne({ id: userId });
@@ -86,6 +90,7 @@ let ChannelService = class ChannelService {
         if (this.channelMemberService.findOne(user, welcomingChannel)) {
             throw new common_1.UnauthorizedException('user already in this channel');
         }
+        this.channelMemberService.addOne(user, welcomingChannel, false);
         await this.channelRepository.save(welcomingChannel);
     }
     async removeUserToChannel(channelSent, userId) {

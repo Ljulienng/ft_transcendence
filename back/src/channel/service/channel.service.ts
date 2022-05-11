@@ -22,8 +22,6 @@ export class ChannelService {
         private userRepository: Repository<User>,
         @InjectRepository(Message)
         private messageRepository: Repository<Message>,
-        // @InjectRepository(ChannelMember)
-        // private channelMemberRepository: Repository<ChannelMember>,
         @Inject(ChannelMemberService)
         private channelMemberService: ChannelMemberService,
     ) {}
@@ -35,12 +33,16 @@ export class ChannelService {
 
     /* get one channel by its id */
    async findChannelById(channelId: number): Promise<Channel> {
-        return await this.channelRepository.findOne({id: channelId});
+        return await this.channelRepository.findOne({
+            id: channelId
+        });
    }
 
     /* get one channel by its name */
    async findChannelByName(channelName: string): Promise<Channel> {
-        return await this.channelRepository.findOne({name: channelName});
+        return await this.channelRepository.findOne({
+            name: channelName
+        });
     }
 
     /* create one channel */
@@ -115,6 +117,7 @@ export class ChannelService {
             throw new UnauthorizedException('user already in this channel');
         }
 
+        this.channelMemberService.addOne(user, welcomingChannel, false);
         // // welcomingChannel.membersId.push(user.id);               // add the user to the channel
         // this.channelMemberRepository.create
         // welcomingChannel.users.push(user);                   // add the user to the channel
