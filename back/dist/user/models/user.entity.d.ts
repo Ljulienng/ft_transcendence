@@ -1,5 +1,6 @@
 import { Message } from "src/message/models/message.entity";
 import { Channel } from "src/channel/models/channel.entity";
+import { ChannelMember } from "src/channelMember/models/channelMember.entity";
 export declare type Friend = {
     username: string;
     firstname: string;
@@ -18,6 +19,7 @@ export declare class User {
     readonly createdTime: Date;
     messages: Message[];
     channels: Channel[];
+    channelMembers: ChannelMember[];
     friends: string[];
     profileImage: string;
 }

@@ -13,6 +13,7 @@ exports.User = void 0;
 const typeorm_1 = require("typeorm");
 const message_entity_1 = require("../../message/models/message.entity");
 const channel_entity_1 = require("../../channel/models/channel.entity");
+const channelMember_entity_1 = require("../../channelMember/models/channelMember.entity");
 let User = class User {
 };
 __decorate([
@@ -63,6 +64,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => channel_entity_1.Channel, channel => channel.owner),
     __metadata("design:type", Array)
 ], User.prototype, "channels", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => channelMember_entity_1.ChannelMember, channelMember => channelMember.member),
+    __metadata("design:type", Array)
+], User.prototype, "channelMembers", void 0);
 __decorate([
     (0, typeorm_1.Column)("simple-array", { nullable: true }),
     __metadata("design:type", Array)

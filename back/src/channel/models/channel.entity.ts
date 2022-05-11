@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, OneToMany, ManyToOne, PrimaryGenerate
 import { IsOptional } from 'class-validator';
 import { Message } from "src/message/models/message.entity";
 import { User } from "src/user/models/user.entity";
+import { ChannelMember } from "src/channelMember/models/channelMember.entity";
 
 export enum ChannelType {
 	private,
@@ -29,6 +30,13 @@ export class Channel {
 
 	@OneToMany(() => Message, message => message.channel)
 	messages: Message[];
+	
+	@OneToMany(() => ChannelMember, channelMember => channelMember.channel, {
+		cascade: true,
+		eager: true,
+		nullable: true,
+	})
+	channelMembers: ChannelMember[];
 
     @ManyToOne(() => User, owner => owner.id, {
         eager: true,

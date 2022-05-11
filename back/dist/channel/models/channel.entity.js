@@ -13,6 +13,7 @@ exports.Channel = exports.ChannelType = void 0;
 const typeorm_1 = require("typeorm");
 const message_entity_1 = require("../../message/models/message.entity");
 const user_entity_1 = require("../../user/models/user.entity");
+const channelMember_entity_1 = require("../../channelMember/models/channelMember.entity");
 var ChannelType;
 (function (ChannelType) {
     ChannelType[ChannelType["private"] = 0] = "private";
@@ -45,6 +46,14 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => message_entity_1.Message, message => message.channel),
     __metadata("design:type", Array)
 ], Channel.prototype, "messages", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => channelMember_entity_1.ChannelMember, channelMember => channelMember.channel, {
+        cascade: true,
+        eager: true,
+        nullable: true,
+    }),
+    __metadata("design:type", Array)
+], Channel.prototype, "channelMembers", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => user_entity_1.User, owner => owner.id, {
         eager: true,

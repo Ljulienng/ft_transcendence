@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { Message } from "src/message/models/message.entity";
 import { Channel } from "src/channel/models/channel.entity";
+import { ChannelMember } from "src/channelMember/models/channelMember.entity";
 
 export type Friend = {
 	username: string;
@@ -47,6 +48,9 @@ export class User {
 
 	@OneToMany(() => Channel, channel => channel.owner)
 	channels: Channel[];
+
+	@OneToMany(() => ChannelMember, channelMember => channelMember.member)
+	channelMembers: ChannelMember[];
 
 	@Column("simple-array", {nullable: true})
 	friends: string[];

@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToMany, ManyToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable } from "typeorm";
-
+import { User } from "src/user/models/user.entity";
+import { Channel } from "src/channel/models/channel.entity";
 
 @Entity('channelMembers') 
 export class ChannelMember {
@@ -22,4 +23,14 @@ export class ChannelMember {
 	@CreateDateColumn({ nullable: true, default: null })
 	bannedEnd: Date;
 
+	@ManyToOne(() => User, member => member.id, {
+        eager: true,
+        onDelete: 'CASCADE',
+    })
+    member: User;
+
+	@ManyToOne(() => Channel, channel => channel.id, {
+        onDelete: 'CASCADE',
+    })
+    channel: Channel;
 }
