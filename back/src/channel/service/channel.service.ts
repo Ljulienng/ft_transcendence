@@ -64,13 +64,13 @@ export class ChannelService {
 
        if (newChannel.type === ChannelType.protected || newChannel.type === ChannelType.private) {
            if (!newChannel.password) {
-               throw new BadRequestException('need a password for private or protected channel');
+                throw new BadRequestException('need a password for private or protected channel');
            }
            if (newChannel.password.length < 8) {
-               throw new HttpException('password too short', HttpStatus.FORBIDDEN);
+                throw new HttpException('password too short', HttpStatus.FORBIDDEN);
            }
            if (newChannel.password.length > 20) {
-            throw new HttpException('password too long', HttpStatus.FORBIDDEN);
+                throw new HttpException('password too long', HttpStatus.FORBIDDEN);
             }
             const saltOrRounds = await bcrypt.genSalt();
             newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);
@@ -166,7 +166,13 @@ export class ChannelService {
         if (!channel) {
             throw new NotFoundException();
         }
-        return this.channelRepository.remove(channel);
+        return await this.channelRepository.remove(channel);
+    }
+
+    async deleteChannelMember(userId: number, channelId: number) {
+        const user = await this.userRepository.findOne({id: userId});
+        const channel = await this.findChannelById(channelId);
+        return await this.channelMemberService.deleteMember(user, channel);
     }
 
     /* get all the messages of a channel */

@@ -29,22 +29,38 @@ export class ChannelMemberService {
     }
 
     async muteMember(user: User, channel: Channel) {
+        const member = await this.findOne(user, channel);
+        const muteTime = 1000 * 60;  // arbitrary time [1000 = 1 second]
 
+        member.muted = true;
+        member.mutedEnd = new Date(Date.now() + muteTime);
+        await this.channelMemberRepository.save(member); 
     }
 
     async unmuteMember(user: User, channel: Channel) {
-
+        const member = await this.findOne(user, channel);
+        member.muted = false;
+        member.mutedEnd = null;
+        await this.channelMemberRepository.save(member); 
     }
 
     async banMember(user: User, channel: Channel) {
+        const member = await this.findOne(user, channel);
+        const banTime = 1000 * 60;  // arbitrary time [1000 = 1 second]
 
+        member.banned = true;
+        member.bannedEnd = new Date(Date.now() + banTime);
+        await this.channelMemberRepository.save(member); 
     }
 
     async unbanMember(user: User, channel: Channel) {
-
+        const member = await this.findOne(user, channel);
+        member.banned = false;
+        member.bannedEnd = null;
+        await this.channelMemberRepository.save(member); 
     }
 
-    async removeMember(user: User, channel: Channel) {
+    async deleteMember(user: User, channel: Channel) {
         const memberToRemove = await this.findOne(user, channel);
         await this.channelMemberRepository.delete(memberToRemove);
     }

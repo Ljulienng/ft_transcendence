@@ -126,7 +126,12 @@ let ChannelService = class ChannelService {
         if (!channel) {
             throw new common_1.NotFoundException();
         }
-        return this.channelRepository.remove(channel);
+        return await this.channelRepository.remove(channel);
+    }
+    async deleteChannelMember(userId, channelId) {
+        const user = await this.userRepository.findOne({ id: userId });
+        const channel = await this.findChannelById(channelId);
+        return await this.channelMemberService.deleteMember(user, channel);
     }
     async getChannelMessagesByRoom(room) {
         const channel = await this.findChannelByName(room);

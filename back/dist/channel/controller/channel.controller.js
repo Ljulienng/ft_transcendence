@@ -41,8 +41,11 @@ let ChannelController = class ChannelController {
     changePassword(channelId, request, passwords) {
         return this.channelService.changePassword(channelId, 1, passwords);
     }
-    deleteChannel(channelId) {
-        return this.channelService.deleteChannel(channelId);
+    async deleteChannel(channelId) {
+        return await this.channelService.deleteChannel(channelId);
+    }
+    async deleteChannelMember(userId, channelId) {
+        return await this.channelService.deleteChannelMember(userId, channelId);
     }
 };
 __decorate([
@@ -94,8 +97,16 @@ __decorate([
     __param(0, (0, common_1.Param)('channelId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "deleteChannel", null);
+__decorate([
+    (0, common_1.Delete)(':channelId/:userId'),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Param)('channelId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number]),
+    __metadata("design:returntype", Promise)
+], ChannelController.prototype, "deleteChannelMember", null);
 ChannelController = __decorate([
     (0, common_1.Controller)('channel'),
     __metadata("design:paramtypes", [channel_service_1.ChannelService,

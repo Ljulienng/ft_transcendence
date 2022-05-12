@@ -14,4 +14,5 @@ export declare class ChannelController {
     createChannel(request: any, channelDto: CreateChannelDto): Promise<import("../models/channel.entity").Channel>;
     changePassword(channelId: number, request: any, passwords: PasswordI): Promise<void>;
     deleteChannel(channelId: number): Promise<import("../models/channel.entity").Channel>;
+    deleteChannelMember(userId: number, channelId: number): Promise<void>;
 }

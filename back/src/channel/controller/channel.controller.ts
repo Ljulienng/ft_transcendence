@@ -52,13 +52,20 @@ export class ChannelController {
     changePassword(
         @Param('channelId') channelId: number,
         @Req() request,
-        @Body() passwords: PasswordI        
-    ) {
+        @Body() passwords: PasswordI) {
         return this.channelService.changePassword(channelId, 1/*request.user.id*/, passwords);
     }
 
     @Delete(':channelId')
-    deleteChannel(@Param('channelId') channelId: number) {
-        return this.channelService.deleteChannel(channelId);
+    async deleteChannel(
+        @Param('channelId') channelId: number) {
+        return await this.channelService.deleteChannel(channelId);
+    }
+
+    @Delete(':channelId/:userId')
+    async deleteChannelMember(
+        @Param('userId') userId: number,
+        @Param('channelId') channelId: number) {
+        return await this.channelService.deleteChannelMember(userId, channelId);
     }
 }
