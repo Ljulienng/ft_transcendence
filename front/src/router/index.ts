@@ -7,7 +7,7 @@ import TwoFaAuth from '@/components/TwoFaAuth.vue'
 import FriendList from '@/views/FriendList.vue'
 import UserProfile from '@/views/UserProfile.vue'
 import Home from '@/views/Home.vue'
-import http from '../http-common'
+// import http from '../http-common'
 
 
 const routes = [

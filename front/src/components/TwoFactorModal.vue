@@ -98,13 +98,14 @@ export default defineComponent({
         async deactivateTwoFA() {
             console.log('twoFactorAuthenticationCode = ', this.twoFA)
             await http.post("/twofa/turn-off", this.twoFA)
-            // .then(
-            // response => {
-            //     console.log(response.data)
-            // })
-            // .catch(
-            //     error => { console.log("msg = ", error.response.data.error, "full error = ", error), error.response.data.error}
-            // )
+            .then(
+            response => {
+                console.log(response.data)
+				window.location.reload()
+            })
+            .catch(
+                error => { console.log("msg = ", error.response.data.error, "full error = ", error), error.response.data.error}
+            )
             store.dispatch('auth/setTwoFAauth')
             window.location.reload()
 

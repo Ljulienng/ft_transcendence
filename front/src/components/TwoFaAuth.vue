@@ -62,11 +62,12 @@ export default defineComponent({
         .then(
         response => {
             console.log(response)
+            this.$store.dispatch('auth/setTwoFAauth')
             this.$router.push("http://localhost:3001/home")
 
         })
         .catch(
-        error => { console.log("msg = ", error.response.data.error, "full error = ", error), error.response.data.error}
+        error => { console.log("full error = ", error)}
         )
     },
   },
