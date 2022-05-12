@@ -1,9 +1,9 @@
 import { Repository } from 'typeorm';
 import { Channel } from '../models/channel.entity';
-import { CreateChannelDto } from '../models/createChannel.dto';
+import { CreateChannelDto, UpdateChannelDto } from '../models/channel.dto';
 import { Message } from 'src/message/models/message.entity';
 import { User } from 'src/user/models/user.entity';
-import { JoinChannelDto } from '../models/joinChannel.dto';
+import { JoinChannelDto } from '../models/channel.dto';
 import { PasswordI } from '../models/password.interface';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 export declare class ChannelService {
@@ -21,6 +21,7 @@ export declare class ChannelService {
     removeUserToChannel(channelSent: Channel, userId: number): Promise<void>;
     changePassword(channelId: number, userId: number, passwords: PasswordI): Promise<void>;
     deleteChannel(channelId: number): Promise<Channel>;
+    updateChannelMember(userId: number, channelId: number, updates: UpdateChannelDto): Promise<void>;
     deleteChannelMember(userId: number, channelId: number): Promise<void>;
     getChannelMessagesByRoom(room: string): Promise<Message[]>;
     getChannelMessagesByRoomId(roomId: number): Promise<Message[]>;

@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChannelController = void 0;
 const common_1 = require("@nestjs/common");
 const channel_service_1 = require("../service/channel.service");
-const createChannel_dto_1 = require("../models/createChannel.dto");
+const channel_dto_1 = require("../models/channel.dto");
 const message_service_1 = require("../../message/service/message.service");
 let ChannelController = class ChannelController {
     constructor(channelService, messageService) {
@@ -40,6 +40,9 @@ let ChannelController = class ChannelController {
     }
     changePassword(channelId, request, passwords) {
         return this.channelService.changePassword(channelId, 1, passwords);
+    }
+    async updateMemberChannel(userId, channelId, updates) {
+        return await this.channelService.updateChannelMember(userId, channelId, updates);
     }
     async deleteChannel(channelId) {
         return await this.channelService.deleteChannel(channelId);
@@ -80,7 +83,7 @@ __decorate([
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, createChannel_dto_1.CreateChannelDto]),
+    __metadata("design:paramtypes", [Object, channel_dto_1.CreateChannelDto]),
     __metadata("design:returntype", void 0)
 ], ChannelController.prototype, "createChannel", null);
 __decorate([
@@ -92,6 +95,15 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object, Object]),
     __metadata("design:returntype", void 0)
 ], ChannelController.prototype, "changePassword", null);
+__decorate([
+    (0, common_1.Patch)(':channelId/:userId'),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Param)('channelId')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number, channel_dto_1.UpdateChannelDto]),
+    __metadata("design:returntype", Promise)
+], ChannelController.prototype, "updateMemberChannel", null);
 __decorate([
     (0, common_1.Delete)(':channelId'),
     __param(0, (0, common_1.Param)('channelId')),

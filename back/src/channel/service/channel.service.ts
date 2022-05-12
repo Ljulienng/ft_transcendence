@@ -2,13 +2,13 @@ import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, Not
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Channel, ChannelType} from '../models/channel.entity'
-import { CreateChannelDto } from '../models/createChannel.dto';
+import { CreateChannelDto, UpdateChannelDto } from '../models/channel.dto';
 import { Message } from 'src/message/models/message.entity';
 import { MessageService } from 'src/message/service/message.service';
 import { UserService } from 'src/user/service/user.service';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/models/user.entity';
-import { JoinChannelDto } from '../models/joinChannel.dto';
+import { JoinChannelDto } from '../models/channel.dto';
 import { PasswordI } from '../models/password.interface';
 import { ChannelMember } from 'src/channelMember/models/channelMember.entity';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
@@ -167,6 +167,12 @@ export class ChannelService {
             throw new NotFoundException();
         }
         return await this.channelRepository.remove(channel);
+    }
+
+    async updateChannelMember(userId: number, channelId: number, updates: UpdateChannelDto) {
+        const user = await this.userRepository.findOne({id: userId});
+        const channel = await this.findChannelById(channelId);
+        // return await thi
     }
 
     async deleteChannelMember(userId: number, channelId: number) {

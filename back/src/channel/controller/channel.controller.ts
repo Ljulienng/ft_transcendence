@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ChannelService } from '../service/channel.service';
-import { CreateChannelDto } from '../models/createChannel.dto';
-import { CreateMessageDto } from 'src/message/models/createMessage.dto';
+import { CreateChannelDto, UpdateChannelDto } from '../models/channel.dto';
+import { CreateMessageDto } from 'src/message/models/message.dto';
 import { Response } from 'express'
 import { MessageService } from 'src/message/service/message.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -54,6 +54,14 @@ export class ChannelController {
         @Req() request,
         @Body() passwords: PasswordI) {
         return this.channelService.changePassword(channelId, 1/*request.user.id*/, passwords);
+    }
+
+    @Patch(':channelId/:userId')
+    async updateMemberChannel(
+        @Param('userId') userId: number,
+        @Param('channelId') channelId: number,
+        @Body() updates: UpdateChannelDto) {
+        return await this.channelService.updateChannelMember(userId, channelId, updates);
     }
 
     @Delete(':channelId')

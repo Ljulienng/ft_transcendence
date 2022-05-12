@@ -128,6 +128,10 @@ let ChannelService = class ChannelService {
         }
         return await this.channelRepository.remove(channel);
     }
+    async updateChannelMember(userId, channelId, updates) {
+        const user = await this.userRepository.findOne({ id: userId });
+        const channel = await this.findChannelById(channelId);
+    }
     async deleteChannelMember(userId, channelId) {
         const user = await this.userRepository.findOne({ id: userId });
         const channel = await this.findChannelById(channelId);

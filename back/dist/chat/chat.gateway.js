@@ -13,9 +13,9 @@ exports.ChatGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const channel_entity_1 = require("../channel/models/channel.entity");
-const joinChannel_dto_1 = require("../channel/models/joinChannel.dto");
+const channel_dto_1 = require("../channel/models/channel.dto");
 const channel_service_1 = require("../channel/service/channel.service");
-const createMessage_dto_1 = require("../message/models/createMessage.dto");
+const message_dto_1 = require("../message/models/message.dto");
 const message_service_1 = require("../message/service/message.service");
 let ChatGateway = class ChatGateway {
     constructor(channelService, messageService) {
@@ -54,7 +54,7 @@ __decorate([
 __decorate([
     (0, websockets_1.SubscribeMessage)('joinChannel'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket, joinChannel_dto_1.JoinChannelDto]),
+    __metadata("design:paramtypes", [socket_io_1.Socket, channel_dto_1.JoinChannelDto]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "joinChannel", null);
 __decorate([
@@ -66,7 +66,7 @@ __decorate([
 __decorate([
     (0, websockets_1.SubscribeMessage)('sendMessage'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket, createMessage_dto_1.CreateMessageDto]),
+    __metadata("design:paramtypes", [socket_io_1.Socket, message_dto_1.CreateMessageDto]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "sendMessage", null);
 ChatGateway = __decorate([
