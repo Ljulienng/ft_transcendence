@@ -4,6 +4,9 @@
             <img :src="this.image" class="Image">
         </div>
         <div class="twoFAModal">
+            <p v-if="errorMsg !== ''" style="color: red; font-size: 12px">
+				{{errorMsg}}
+			</p>
             <div v-if="getUserProfile.twoFAEnabled === false">
                 <form v-on:submit.prevent="activateTwoFA">
                     <p>
@@ -23,7 +26,7 @@
                     </p>
                 </form>
             </div>
-            <form v-on:submit.prevent="deactivateTwoFA">
+            <form v-on:submit.prevent="deactivateTwoFA" v-if="getUserProfile.twoFAEnabled === true">>
                 <p>
                 <label for="twoFAcodeDeactivate">twoFAcodeDeactivate</label>
                 <input
@@ -59,6 +62,7 @@ export default defineComponent({
     },
     data () {
         return {
+            errorMsg: '',
             twoFA: {
                 twoFactorAuthenticationCode: '',
                 twoFactorAuthenticationCodeTwo: '',
@@ -91,7 +95,7 @@ export default defineComponent({
 				window.location.reload()
             })
             .catch(
-            error => { console.log("msg = ", error.response.data.error, "full error = ", error), error.response.data.error}
+            error => { console.log("full error = ", error), this.errorMsg = error.response.data.message}
             )
         },
 
@@ -101,13 +105,12 @@ export default defineComponent({
             .then(
             response => {
                 console.log(response.data)
+                store.dispatch('auth/setTwoFAauth')
 				window.location.reload()
             })
             .catch(
-                error => { console.log("msg = ", error.response.data.error, "full error = ", error), error.response.data.error}
+                error => { console.log("full error = ", this.errorMsg = error.response.data.message)}
             )
-            store.dispatch('auth/setTwoFAauth')
-            window.location.reload()
 
         },
     },

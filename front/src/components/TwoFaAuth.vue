@@ -8,7 +8,9 @@
   >
     <div class="modal">
       <p>Enter authentification code</p>
-
+      <p v-if="errorMsg !== ''" style="color: red; font-size: 12px">
+				{{errorMsg}}
+			</p>
       <form v-on:submit.prevent="authenticateTwoFA">
         <p>
           <label for="twoFA"></label>
@@ -49,6 +51,7 @@ export default defineComponent({
 
   data() {
     return {
+        errorMsg: '',
         twoFA: {
           twoFactorAuthenticationCode: '',
         }
@@ -58,17 +61,17 @@ export default defineComponent({
   methods: {
     async authenticateTwoFA() {
         console.log('twoFactorAuthenticationCode = ', this.twoFA)
-        await http.post("/twofa/authenticate", this.twoFA)
+        await http.post("/twofa/authenticate", this.twoFA, {withCredentials: true})
         .then(
         response => {
-            console.log(response)
+            console.log("went in then", response)
             this.$store.dispatch('auth/setTwoFAauth')
-            this.$router.push("http://localhost:3001/home")
-
+            this.$router.push("http://localhost:3001/home") 
         })
         .catch(
-        error => { console.log("full error = ", error)}
+          error => { console.log("full error = ", error.response.data.message); this.errorMsg = error.response.data.message}
         )
+
     },
   },
 

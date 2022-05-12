@@ -39,7 +39,6 @@ const getters = {
 		return state.socket;
 	},
 	getTwoFAauth(state: State) {
-		console.log("SETTWOAUTH = ", state.twoFAauth)
 		return state.twoFAauth;
 	},
 };
@@ -65,21 +64,20 @@ const actions = {
 	},
 
 	async setTwoFAauth({commit}: {commit: Commit}) {
-		const data: boolean = await http.get('/twofa/check')
+		const data: boolean = await http.get('/twofa/check', {withCredentials: true})
 		.then ( res => {
-			console.log("res.data from setTwoFAauth = ", res.data)
 			return res.data
 		})
 		.catch( err => {
 			console.log("SetTwoFAauth = ", err)
 		})
 
-		console.log("data from setTwoFAauth = ", data)
 	
 		if (data === true)
 			commit("setTwoFAauth", data)
 		else
 			commit("setTwoFAauth", data)
+		return data;
 	},
 
 	async userProfile({commit}: {commit: Commit}){

@@ -73,11 +73,11 @@ router.beforeEach(async (to, from, next) => {
 			else {
 				if (userProfile.twoFAEnabled === true) {
 					let TwoFAauth = store.getters["auth/getTwoFAauth"];
-					console.log("WENT THEREEEEEE", TwoFAauth)
 
 					if (TwoFAauth === false || undefined) {
-						store.dispatch('auth/setTwoFAauth')
+						await store.dispatch('auth/setTwoFAauth')
 						TwoFAauth = store.getters["auth/getTwoFAauth"];
+
 						if (TwoFAauth === true)
 							return next();
 						else
@@ -91,7 +91,7 @@ router.beforeEach(async (to, from, next) => {
 					// 	return res.data
 					// })
 					// if (data === true)
-					// 	return next();
+					// 	return next()jew je test jie alksjid ;
 					// else {
 					// 	console.log('res data = ', data)
 					// 	return next({ path: "/twofaauth" });
