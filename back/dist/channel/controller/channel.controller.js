@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const channel_service_1 = require("../service/channel.service");
 const channel_dto_1 = require("../models/channel.dto");
 const message_service_1 = require("../../message/service/message.service");
+const channelMember_dto_1 = require("../../channelMember/models/channelMember.dto");
 let ChannelController = class ChannelController {
     constructor(channelService, messageService) {
         this.channelService = channelService;
@@ -35,8 +36,8 @@ let ChannelController = class ChannelController {
         const channel = await this.channelService.findChannelById(channelId);
         return this.channelService.getChannelMessagesByRoomId(channel.id);
     }
-    createChannel(request, channelDto) {
-        return this.channelService.createChannel(channelDto, 1);
+    async createChannel(request, channelDto) {
+        await this.channelService.createChannel(channelDto, 1);
     }
     changePassword(channelId, request, passwords) {
         return this.channelService.changePassword(channelId, 1, passwords);
@@ -84,7 +85,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, channel_dto_1.CreateChannelDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "createChannel", null);
 __decorate([
     (0, common_1.Post)(':channelId/changePass'),
@@ -101,7 +102,7 @@ __decorate([
     __param(1, (0, common_1.Param)('channelId')),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number, channel_dto_1.UpdateChannelDto]),
+    __metadata("design:paramtypes", [Number, Number, channelMember_dto_1.UpdateMemberChannelDto]),
     __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "updateMemberChannel", null);
 __decorate([

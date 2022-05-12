@@ -7,6 +7,7 @@ import { MessageService } from 'src/message/service/message.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/user/models/user.entity';
 import { PasswordI } from '../models/password.interface';
+import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
 
 @Controller('channel')
 export class ChannelController {
@@ -39,11 +40,11 @@ export class ChannelController {
     // test : curl -v  -X POST -d '{"name":"room42", "type": 1,  "password":"supersecuremdp"}' -H "Content-Type: application/json" http://localhost:3000/channel/
     // @UseGuards(JwtAuthGuard) // user has to be connected   // line is commented for tests
     @Post()
-    createChannel(
+    async createChannel(
         @Req() request,
         @Body() channelDto: CreateChannelDto) {
         // console.log('POST a new channel : ', channelDto);
-        return this.channelService.createChannel(channelDto, 1/*request.user.id*/);
+        await this.channelService.createChannel(channelDto, 1/*request.user.id*/);
     }
 
     // test : curl -X POST -d '{"oldPassword":"oldpass", "newPassword":"newpass"}' -H "Content-Type: application/json" http://localhost:3000/channel/{id}/changePass
@@ -60,7 +61,7 @@ export class ChannelController {
     async updateMemberChannel(
         @Param('userId') userId: number,
         @Param('channelId') channelId: number,
-        @Body() updates: UpdateChannelDto) {
+        @Body() updates: UpdateMemberChannelDto) {
         return await this.channelService.updateChannelMember(userId, channelId, updates);
     }
 

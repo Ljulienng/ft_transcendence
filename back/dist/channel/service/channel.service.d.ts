@@ -1,11 +1,12 @@
 import { Repository } from 'typeorm';
 import { Channel } from '../models/channel.entity';
-import { CreateChannelDto, UpdateChannelDto } from '../models/channel.dto';
+import { CreateChannelDto } from '../models/channel.dto';
 import { Message } from 'src/message/models/message.entity';
 import { User } from 'src/user/models/user.entity';
 import { JoinChannelDto } from '../models/channel.dto';
 import { PasswordI } from '../models/password.interface';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
+import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
 export declare class ChannelService {
     private channelRepository;
     private userRepository;
@@ -15,13 +16,13 @@ export declare class ChannelService {
     findAll(): Promise<Channel[]>;
     findChannelById(channelId: number): Promise<Channel>;
     findChannelByName(channelName: string): Promise<Channel>;
-    createChannel(createChannel: CreateChannelDto, userId: number): Promise<Channel>;
+    createChannel(createChannel: CreateChannelDto, userId: number): Promise<void>;
     checkPasswordMatch(sentPassword: string, hashExpectedPassword: string): Promise<boolean>;
     addUserToChannel(joinChannel: JoinChannelDto, userId: number): Promise<void>;
     removeUserToChannel(channelSent: Channel, userId: number): Promise<void>;
     changePassword(channelId: number, userId: number, passwords: PasswordI): Promise<void>;
     deleteChannel(channelId: number): Promise<Channel>;
-    updateChannelMember(userId: number, channelId: number, updates: UpdateChannelDto): Promise<void>;
+    updateChannelMember(userId: number, channelId: number, updates: UpdateMemberChannelDto): Promise<void>;
     deleteChannelMember(userId: number, channelId: number): Promise<void>;
     getChannelMessagesByRoom(room: string): Promise<Message[]>;
     getChannelMessagesByRoomId(roomId: number): Promise<Message[]>;

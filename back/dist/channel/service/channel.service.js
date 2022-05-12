@@ -51,7 +51,7 @@ let ChannelService = class ChannelService {
             type: createChannel.type,
             password: createChannel.password,
             messages: [],
-            channelMembers: [user],
+            channelMembers: [],
             owner: user,
         });
         if (newChannel.type === channel_entity_1.ChannelType.protected || newChannel.type === channel_entity_1.ChannelType.private) {
@@ -68,7 +68,8 @@ let ChannelService = class ChannelService {
             newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);
         }
         console.log('new channel created : ', newChannel);
-        return await this.channelRepository.save(newChannel);
+        await this.channelRepository.save(newChannel);
+        await this.channelMemberService.createMember(user, newChannel, true);
     }
     async checkPasswordMatch(sentPassword, hashExpectedPassword) {
         return await bcrypt.compare(sentPassword, hashExpectedPassword);
@@ -131,6 +132,7 @@ let ChannelService = class ChannelService {
     async updateChannelMember(userId, channelId, updates) {
         const user = await this.userRepository.findOne({ id: userId });
         const channel = await this.findChannelById(channelId);
+        return await this.channelMemberService.updateMember(user, channel, updates);
     }
     async deleteChannelMember(userId, channelId) {
         const user = await this.userRepository.findOne({ id: userId });

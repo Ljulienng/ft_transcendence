@@ -12,6 +12,7 @@ import { JoinChannelDto } from '../models/channel.dto';
 import { PasswordI } from '../models/password.interface';
 import { ChannelMember } from 'src/channelMember/models/channelMember.entity';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
+import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
 
 @Injectable()
 export class ChannelService {
@@ -46,7 +47,7 @@ export class ChannelService {
     }
 
     /* create one channel */
-   async createChannel(createChannel: CreateChannelDto, userId: number): Promise<Channel> {
+   async createChannel(createChannel: CreateChannelDto, userId: number)/*: Promise<Channel>*/ {
         const user = await this.userRepository.findOne({id: userId});
         
         if (!user) {
@@ -58,7 +59,7 @@ export class ChannelService {
             type: createChannel.type,
             password: createChannel.password,
             messages: [],
-            channelMembers: [user],
+            channelMembers: [],
             owner: user,
        });
 
@@ -76,8 +77,9 @@ export class ChannelService {
             newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);
        }
        console.log('new channel created : ', newChannel);
-       return await this.channelRepository.save(newChannel);
-   }
+       await this.channelRepository.save(newChannel);
+       await this.channelMemberService.createMember(user, newChannel, true);
+    }
 
     /* check if the password sent is the right one */
    async checkPasswordMatch(sentPassword: string, hashExpectedPassword: string): Promise<boolean> {
@@ -169,10 +171,10 @@ export class ChannelService {
         return await this.channelRepository.remove(channel);
     }
 
-    async updateChannelMember(userId: number, channelId: number, updates: UpdateChannelDto) {
+    async updateChannelMember(userId: number, channelId: number, updates: UpdateMemberChannelDto) {
         const user = await this.userRepository.findOne({id: userId});
         const channel = await this.findChannelById(channelId);
-        // return await thi
+        return await this.channelMemberService.updateMember(user, channel, updates);
     }
 
     async deleteChannelMember(userId: number, channelId: number) {
