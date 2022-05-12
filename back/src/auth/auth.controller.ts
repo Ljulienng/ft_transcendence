@@ -8,6 +8,7 @@ import { User } from 'src/user/models/user.entity';
 import { from, Observable, of, switchMap, map } from 'rxjs';
 import { TwoFactorAuthenticationService } from './twofactorauth.service'
 import { JwtService } from "@nestjs/jwt"
+import { TwoFAAuth } from './guards/twoFA.guard';
 import { UserService } from 'src/user/service/user.service';
 
 @Controller()
@@ -40,7 +41,7 @@ export class AuthController {
 		res.redirect('http://localhost:3001/home');
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, TwoFAAuth)
   @Get('userinfo')
   async userinfo(@Req() req) {
     try {
@@ -79,10 +80,10 @@ export class AuthController {
 
   @Post('/twofa/turn-off')
   @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, TwoFAAuth)
   async turnOffTwoFactorAuthentication(
     @Req() req,
-    @Res() res,
+    @Res({passthrough: true}) res,
     @Body() twoFactorAuthenticationCode) {
       // console.log('twoFactorAuthenticationCode = ', twoFactorAuthenticationCode.twoFactorAuthenticationCodeTwo);
     const user: User = req.user;
@@ -100,7 +101,7 @@ export class AuthController {
 		const accessToken = await this.jwtService.signAsync(payload);
 		res.clearCookie('jwt');
     res.cookie('jwt', accessToken, {httpOnly: true})
-		res.redirect('http://localhost:3001/home');
+		// res.redirect('http://localhost:3001/home');
   }
   
   @UseGuards(JwtAuthGuard)
@@ -108,7 +109,7 @@ export class AuthController {
   @HttpCode(200)
   async twoFAAuthenticate(
     @Req() req,
-    @Res() res,
+    @Res({passthrough: true}) res,
     @Body() twoFactorAuthenticationCode) {
     const user: User = req.user;
 
@@ -123,9 +124,12 @@ export class AuthController {
 
     const payload = { username: req.user['username'], auth: true };
 		const accessToken = await this.jwtService.signAsync(payload);
-		res.clearCookie('jwt');
+		// res.clearCookie('jwt');
+    
     res.cookie('jwt', accessToken, {httpOnly: true})
-		res.redirect('http://localhost:3001/home');
+    // console.log('check payload ', payload)
+    // console.log('check accessToken ', accessToken)
+		// res.redirect('http://localhost:3001/home');
   }
 
   @UseGuards(JwtAuthGuard)
@@ -133,6 +137,8 @@ export class AuthController {
   async checkAuthentication(@Req()req) {
     const user: User = req.user;
     const decode = this.jwtService.decode(req.cookies.jwt);
+
+    // console.log('check auth ', decode['auth'])
 
     if (user.twoFAEnabled === true && decode['auth'] === true)
       return (true)
