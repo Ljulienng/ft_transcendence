@@ -49,7 +49,7 @@ export class User {
 	@OneToMany(() => Channel, channel => channel.owner)
 	channels: Channel[];
 
-	@OneToMany(() => ChannelMember, channelMember => channelMember.member)
+	@OneToMany(() => ChannelMember, channelMember => channelMember.user)
 	channelMembers: ChannelMember[];
 
 	@Column("simple-array", {nullable: true})

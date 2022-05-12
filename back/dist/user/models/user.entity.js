@@ -65,7 +65,7 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "channels", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => channelMember_entity_1.ChannelMember, channelMember => channelMember.member),
+    (0, typeorm_1.OneToMany)(() => channelMember_entity_1.ChannelMember, channelMember => channelMember.user),
     __metadata("design:type", Array)
 ], User.prototype, "channelMembers", void 0);
 __decorate([

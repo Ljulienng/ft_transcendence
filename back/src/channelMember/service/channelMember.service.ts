@@ -15,7 +15,7 @@ export class ChannelMemberService {
    
     async findOne(user: User, channel: Channel) {
         return await this.channelMemberRepository.findOne({
-            member: user,
+            user: user,
             channel: channel,
         })
     }
@@ -23,46 +23,36 @@ export class ChannelMemberService {
     async createMember(user: User, channel: Channel, admin: boolean) {
         const newMember = this.channelMemberRepository.create({
             admin: admin,
-            member: user,
+            user: user,
             channel: channel,
         });
         await this.channelMemberRepository.save(newMember);
     }
 
+    /*
+    ** updade admin, muted or banned options of a member
+    ** if the member is muted or banned, we set a period from which it will no longer be 
+    */
     async updateMember(user: User, channel: Channel, updates: UpdateMemberChannelDto) {
+        const member = await this.findOne(user, channel);
+        const muteOrBanTime = 1000 * 60;  // arbitrary time [1000 = 1 second]
         console.log(updates);
-    }
+        
+        for (const update in updates) {
+            member[update] = updates[update];
+        }
 
-    async muteMember(user: User, channel: Channel) {
-        const member = await this.findOne(user, channel);
-        const muteTime = 1000 * 60;  // arbitrary time [1000 = 1 second]
-
-        member.muted = true;
-        member.mutedEnd = new Date(Date.now() + muteTime);
-        await this.channelMemberRepository.save(member); 
-    }
-
-    async unmuteMember(user: User, channel: Channel) {
-        const member = await this.findOne(user, channel);
-        member.muted = false;
-        member.mutedEnd = null;
-        await this.channelMemberRepository.save(member); 
-    }
-
-    async banMember(user: User, channel: Channel) {
-        const member = await this.findOne(user, channel);
-        const banTime = 1000 * 60;  // arbitrary time [1000 = 1 second]
-
-        member.banned = true;
-        member.bannedEnd = new Date(Date.now() + banTime);
-        await this.channelMemberRepository.save(member); 
-    }
-
-    async unbanMember(user: User, channel: Channel) {
-        const member = await this.findOne(user, channel);
-        member.banned = false;
-        member.bannedEnd = null;
-        await this.channelMemberRepository.save(member); 
+        if (member.muted == false)
+            member.mutedEnd = null;
+        if (member.banned == false)
+            member.bannedEnd = null;
+        
+        if (updates.muted == true)
+            member.mutedEnd = new Date(Date.now() + muteOrBanTime);
+        if (updates.banned == true)
+            member.bannedEnd = new Date(Date.now() + muteOrBanTime);
+        
+        await this.channelMemberRepository.save(member);
     }
 
     async deleteMember(user: User, channel: Channel) {

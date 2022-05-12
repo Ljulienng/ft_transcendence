@@ -43,11 +43,10 @@ export class ChannelController {
     async createChannel(
         @Req() request,
         @Body() channelDto: CreateChannelDto) {
-        // console.log('POST a new channel : ', channelDto);
         await this.channelService.createChannel(channelDto, 1/*request.user.id*/);
     }
 
-    // test : curl -X POST -d '{"oldPassword":"oldpass", "newPassword":"newpass"}' -H "Content-Type: application/json" http://localhost:3000/channel/{id}/changePass
+    // test : curl -v -X POST -d '{"oldPassword":"oldpass", "newPassword":"newpass"}' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/changePass
     // @UseGuards(JwtAuthGuard) // user has to be connected  // line is commented for tests
     @Post(':channelId/changePass')
     changePassword(
@@ -57,6 +56,8 @@ export class ChannelController {
         return this.channelService.changePassword(channelId, 1/*request.user.id*/, passwords);
     }
 
+    // test : curl -v  -X PATCH -d '{"muted": true }' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/{userId}
+    // @UseGuards(JwtAuthGuard) // user has to be connected  // line is commented for tests
     @Patch(':channelId/:userId')
     async updateMemberChannel(
         @Param('userId') userId: number,

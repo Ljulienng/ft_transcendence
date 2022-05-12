@@ -29,7 +29,7 @@ let ChannelService = class ChannelService {
         this.channelMemberService = channelMemberService;
     }
     async findAll() {
-        return await this.channelRepository.find();
+        return (await this.channelRepository.find()).sort((a, b) => b.createdTime.getTime() - a.createdTime.getTime());
     }
     async findChannelById(channelId) {
         return await this.channelRepository.findOne({

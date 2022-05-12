@@ -27,7 +27,7 @@ export class ChannelMember {
         eager: true,
         onDelete: 'CASCADE',
     })
-    member: User;
+    user: User;
 
 	@ManyToOne(() => Channel, channel => channel.id, {
         onDelete: 'CASCADE',

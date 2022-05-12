@@ -27,9 +27,12 @@ export class ChannelService {
         private channelMemberService: ChannelMemberService,
     ) {}
 
-    /* get all channels */
+    /* 
+    ** get all channels
+    ** returns most recent first
+    */
     async findAll(): Promise<Channel[]> {
-        return await this.channelRepository.find();
+        return (await this.channelRepository.find()).sort((a, b)=> b.createdTime.getTime() - a.createdTime.getTime());
     }
 
     /* get one channel by its id */
@@ -94,11 +97,9 @@ export class ChannelService {
    **       - the user is banned of the channel
    */
    async addUserToChannel(joinChannel: JoinChannelDto, userId: number) {
-        // const user = await this.userService.findByUserId(userId);
         const user = await this.userRepository.findOne({id: userId});
         
         // select * from channel where channel.id=channelSent.id
-        // const welcomingChannel = await this.findChannelById(channelSent.id);
         const welcomingChannel = await this.channelRepository
             .createQueryBuilder('channel')
             .where('channel.id = :channelId', {channelId: joinChannel.id})
@@ -114,12 +115,10 @@ export class ChannelService {
         }
 
         if (this.channelMemberService.findOne(user, welcomingChannel)) {
-        // // if (welcomingChannel.membersId.find(userId => userId === user.id)) {
             throw new UnauthorizedException('user already in this channel');
         }
 
-        this.channelMemberService.createMember(user, welcomingChannel, false);
-        // // welcomingChannel.membersId.push(user.id);               // add the user to the channel
+        this.channelMemberService.createMember(user, welcomingChannel, false); // add the user to the channel
         await this.channelRepository.save(welcomingChannel);    // update the channel
    }
 
@@ -183,7 +182,10 @@ export class ChannelService {
         return await this.channelMemberService.deleteMember(user, channel);
     }
 
-    /* get all the messages of a channel */
+    /*
+    ** get all the messages of a channel
+    ** returns most recent last
+    */
     async getChannelMessagesByRoom(room: string) {
         const channel = await this.findChannelByName(room);
         const messages = await this.messageRepository.find({
@@ -194,7 +196,10 @@ export class ChannelService {
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
 
-    /* get all the messages of a channel */
+    /*
+    ** get all the messages of a channel
+    ** returns most recent last
+    */
     async getChannelMessagesByRoomId(roomId: number) {
         const channel = await this.findChannelById(roomId);
         const messages = await this.messageRepository.find({
