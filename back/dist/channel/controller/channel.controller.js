@@ -42,8 +42,8 @@ let ChannelController = class ChannelController {
     changePassword(channelId, request, passwords) {
         return this.channelService.changePassword(channelId, 1, passwords);
     }
-    async updateMemberChannel(userId, channelId, updates) {
-        return await this.channelService.updateChannelMember(userId, channelId, updates);
+    async updateMemberChannel(request, userId, channelId, updates) {
+        return await this.channelService.updateChannelMember(1, userId, channelId, updates);
     }
     async deleteChannel(channelId) {
         return await this.channelService.deleteChannel(channelId);
@@ -98,11 +98,12 @@ __decorate([
 ], ChannelController.prototype, "changePassword", null);
 __decorate([
     (0, common_1.Patch)(':channelId/:userId'),
-    __param(0, (0, common_1.Param)('userId')),
-    __param(1, (0, common_1.Param)('channelId')),
-    __param(2, (0, common_1.Body)()),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('userId')),
+    __param(2, (0, common_1.Param)('channelId')),
+    __param(3, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number, channelMember_dto_1.UpdateMemberChannelDto]),
+    __metadata("design:paramtypes", [Object, Number, Number, channelMember_dto_1.UpdateMemberChannelDto]),
     __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "updateMemberChannel", null);
 __decorate([

@@ -36,7 +36,6 @@ let ChatGateway = class ChatGateway {
         console.log('client disconnected');
     }
     async joinChannel(client, joinChannel) {
-        console.log('user data : ', client.data.user.userId);
         await this.channelService.addUserToChannel(joinChannel, client.data.user.id);
     }
     async leaveChannel(client, channel) {

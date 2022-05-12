@@ -44,10 +44,4 @@ export class Channel {
     })
     owner: User;
 
-	// @Column("simple-array", {nullable: true})
-	// membersId: number[];	// just store the userId of the members of the channel
-
-	// @ManyToMany(() => User, { onDelete: 'CASCADE'})
-	// // @JoinTable()
-	// users: User[];	// a supprimer si participants ok pour remplacer
 }

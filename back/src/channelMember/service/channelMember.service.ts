@@ -29,7 +29,19 @@ export class ChannelMemberService {
         await this.channelMemberRepository.save(newMember);
     }
 
-    updateAllowed(): boolean {
+    /*
+    ** to update a member :
+    **      - need to be an admin
+    **      - need to be the owner if you want to set a member as admin
+    */
+    updateAllowed(memberWhoUpdate: ChannelMember, memberToUpdate: ChannelMember, channel: Channel, updates: UpdateMemberChannelDto): boolean {
+        if (memberWhoUpdate.admin == false) {
+            return false;
+        }
+        if (updates.admin && channel.owner.id != memberWhoUpdate.user.id) {
+            return false;
+        }
+
         return true;
     }
 
@@ -43,7 +55,7 @@ export class ChannelMemberService {
         const muteOrBanTime = 1000 * 60;  // arbitrary time [1000 = 1 second]
         console.log(updates);
         
-        if (!this.updateAllowed()) {
+        if (!this.updateAllowed(memberWhoUpdate, memberToUpdate, channel, updates)) {
             throw new HttpException('you can\'t update this channel member', HttpStatus.FORBIDDEN);
         }
         else {

@@ -22,7 +22,7 @@ export declare class ChannelService {
     removeUserToChannel(channelSent: Channel, userId: number): Promise<void>;
     changePassword(channelId: number, userId: number, passwords: PasswordI): Promise<void>;
     deleteChannel(channelId: number): Promise<Channel>;
-    updateChannelMember(userId: number, channelId: number, updates: UpdateMemberChannelDto): Promise<void>;
+    updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto): Promise<void>;
     deleteChannelMember(userId: number, channelId: number): Promise<void>;
     getChannelMessagesByRoom(room: string): Promise<Message[]>;
     getChannelMessagesByRoomId(roomId: number): Promise<Message[]>;

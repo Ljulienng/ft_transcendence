@@ -56,18 +56,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         console.log('client disconnected');
     }
 
-    /* TO REMOVE - ACCESS BY CONTROLLER (endpoint /channel) */
-    // @SubscribeMessage('addChannel')
-    // async createChannel(client: Socket, createChannel: CreateChannelDto) {
-    //     console.log('Create chat:', createChannel.name, ' in back by user:', client.id);
-    //     const newChannel = await this.channelService.createChannel(createChannel, client.data.userId);
-    //     console.log(newChannel);
-    // }
-
     /* connect user to a channel */
     @SubscribeMessage('joinChannel')
     async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
-        console.log('user data : ', client.data.user.userId);
         await this.channelService.addUserToChannel(joinChannel, client.data.user.id);
     }
 
