@@ -60,10 +60,11 @@ export class ChannelController {
     // @UseGuards(JwtAuthGuard) // user has to be connected  // line is commented for tests
     @Patch(':channelId/:userId')
     async updateMemberChannel(
+        @Req() request,
         @Param('userId') userId: number,
         @Param('channelId') channelId: number,
         @Body() updates: UpdateMemberChannelDto) {
-        return await this.channelService.updateChannelMember(userId, channelId, updates);
+        return await this.channelService.updateChannelMember(1/*request.user.id*/, userId, channelId, updates);
     }
 
     @Delete(':channelId')

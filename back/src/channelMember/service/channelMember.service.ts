@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Channel } from "src/channel/models/channel.entity";
 import { User } from "src/user/models/user.entity";
@@ -29,30 +29,40 @@ export class ChannelMemberService {
         await this.channelMemberRepository.save(newMember);
     }
 
+    updateAllowed(): boolean {
+        return true;
+    }
+
     /*
     ** updade admin, muted or banned options of a member
     ** if the member is muted or banned, we set a period from which it will no longer be 
     */
-    async updateMember(user: User, channel: Channel, updates: UpdateMemberChannelDto) {
-        const member = await this.findOne(user, channel);
+    async updateMember(userWhoUpdate: User, userToUpdate: User, channel: Channel, updates: UpdateMemberChannelDto) {
+        const memberWhoUpdate = await this.findOne(userWhoUpdate, channel);
+        const memberToUpdate = await this.findOne(userToUpdate, channel);
         const muteOrBanTime = 1000 * 60;  // arbitrary time [1000 = 1 second]
         console.log(updates);
         
-        for (const update in updates) {
-            member[update] = updates[update];
+        if (!this.updateAllowed()) {
+            throw new HttpException('you can\'t update this channel member', HttpStatus.FORBIDDEN);
         }
+        else {
+            for (const update in updates) {
+                memberToUpdate[update] = updates[update];
+            }
 
-        if (member.muted == false)
-            member.mutedEnd = null;
-        if (member.banned == false)
-            member.bannedEnd = null;
-        
-        if (updates.muted == true)
-            member.mutedEnd = new Date(Date.now() + muteOrBanTime);
-        if (updates.banned == true)
-            member.bannedEnd = new Date(Date.now() + muteOrBanTime);
-        
-        await this.channelMemberRepository.save(member);
+            if (memberToUpdate.muted == false)
+                memberToUpdate.mutedEnd = null;
+            if (memberToUpdate.banned == false)
+                memberToUpdate.bannedEnd = null;
+            
+            if (updates.muted == true)
+                memberToUpdate.mutedEnd = new Date(Date.now() + muteOrBanTime);
+            if (updates.banned == true)
+                memberToUpdate.bannedEnd = new Date(Date.now() + muteOrBanTime);
+            
+            await this.channelMemberRepository.save(memberToUpdate);
+        }
     }
 
     async deleteMember(user: User, channel: Channel) {

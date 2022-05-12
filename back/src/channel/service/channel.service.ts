@@ -170,10 +170,12 @@ export class ChannelService {
         return await this.channelRepository.remove(channel);
     }
 
-    async updateChannelMember(userId: number, channelId: number, updates: UpdateMemberChannelDto) {
-        const user = await this.userRepository.findOne({id: userId});
+    async updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto) {
+        const userWhoUpdate = await this.userRepository.findOne({id: userId});
+        const userToUpdate = await this.userRepository.findOne({id: memberId});
         const channel = await this.findChannelById(channelId);
-        return await this.channelMemberService.updateMember(user, channel, updates);
+        
+        return await this.channelMemberService.updateMember(userWhoUpdate, userToUpdate, channel, updates);
     }
 
     async deleteChannelMember(userId: number, channelId: number) {
