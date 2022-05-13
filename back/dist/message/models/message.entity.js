@@ -29,7 +29,6 @@ __decorate([
 ], Message.prototype, "createdTime", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => channel_entity_1.Channel, channel => channel.messages, {
-        eager: true,
         onDelete: 'CASCADE',
     }),
     __metadata("design:type", channel_entity_1.Channel)

@@ -43,7 +43,11 @@ __decorate([
     __metadata("design:type", Date)
 ], Channel.prototype, "createdTime", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => message_entity_1.Message, message => message.channel),
+    (0, typeorm_1.OneToMany)(() => message_entity_1.Message, message => message.channel, {
+        cascade: true,
+        eager: true,
+        nullable: true,
+    }),
     __metadata("design:type", Array)
 ], Channel.prototype, "messages", void 0);
 __decorate([

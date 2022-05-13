@@ -17,7 +17,6 @@ export class Message {
 	readonly createdTime: Date;
 
     @ManyToOne(() => Channel, channel => channel.messages, {
-        eager: true,            // Source entity object loads the target entity objects as well
         onDelete: 'CASCADE',    // delete all messages if the channel is deleted
     })
     channel: Channel;

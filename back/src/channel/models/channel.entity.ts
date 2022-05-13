@@ -28,7 +28,11 @@ export class Channel {
 	@CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
 	readonly createdTime: Date
 
-	@OneToMany(() => Message, message => message.channel)
+	@OneToMany(() => Message, message => message.channel, {
+		cascade: true, 
+		eager: true, // Source entity object loads the target entity objects as well
+		nullable: true,
+	})
 	messages: Message[];
 	
 	@OneToMany(() => ChannelMember, channelMember => channelMember.channel, {
