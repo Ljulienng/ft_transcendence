@@ -13,6 +13,7 @@ import { PasswordI } from '../models/password.interface';
 import { ChannelMember } from 'src/channelMember/models/channelMember.entity';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
+import { CreateMessageDto } from 'src/message/models/message.dto';
 
 @Injectable()
 export class ChannelService {
@@ -21,10 +22,10 @@ export class ChannelService {
         private channelRepository: Repository<Channel>,
         @InjectRepository(User)
         private userRepository: Repository<User>,
-        @InjectRepository(Message)
-        private messageRepository: Repository<Message>,
         @Inject(ChannelMemberService)
         private channelMemberService: ChannelMemberService,
+        @Inject(MessageService)
+        private messageService: MessageService,
     ) {}
 
     /* 
@@ -188,13 +189,9 @@ export class ChannelService {
     ** get all the messages of a channel
     ** returns most recent last
     */
-    async getChannelMessagesByRoom(room: string) {
+    async getChannelMessagesByRoomName(room: string) {
         const channel = await this.findChannelByName(room);
-        const messages = await this.messageRepository.find({
-            where: {
-                channel: channel,
-            }
-        });
+        const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
 
@@ -204,24 +201,20 @@ export class ChannelService {
     */
     async getChannelMessagesByRoomId(roomId: number) {
         const channel = await this.findChannelById(roomId);
-        const messages = await this.messageRepository.find({
-            where: {
-                channel: channel,
-            }
-        });
+        const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
 
-    async saveMessage(/*createMessageDto: CreateMessageDto*/message: string, channelId: number) {
-        // const newMessage = this.messageRepository.create(/*createMessageDto*/{
-        //     content: message,
+    async saveMessage(userId: number, createMessageDto: CreateMessageDto/*message: string, channelId: number*/) {
+        const user = await this.userRepository.findOne({id: userId});
+        const currentChannel = await this.findChannelById(createMessageDto.channelId);
+        // console.log('[saveMessage] channel ', channelId, ' : ', currentChannel);
+        // const newMessage = this.messageRepository.create({
+        //     user: user,
+        //     content: createMessageDto.content,
+        //     channel: currentChannel,
         // });
-        const currentChannel = await this.findChannelById(channelId);
-        console.log('[saveMessage] channel ', channelId, ' : ', currentChannel);
-        return await this.messageRepository.save({
-            content: message,
-            channel: currentChannel,
-        });
+        return await this.messageService.save(user, currentChannel, createMessageDto);
       }
     
 }

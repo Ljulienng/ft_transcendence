@@ -46,12 +46,7 @@
             <ul>
                 <li v-for="channel in channelList" :key="channel">
                     {{channel.id}} - "{{channel.name}}" : created by {{channel.owner.username}}
-                        <div v-for="message in messageList" :key="message">
-                            <!-- channel.id = {{channel.id}}   message.channelId = {{message.channelId}} -->
-                            <div v-if="channel.id == message.channelId">
-                                message : {{message.content}}
-                            </div>
-                        </div>
+                    {{channel.messages}}
                 </li>
             </ul>
         </div>
@@ -126,7 +121,7 @@ export default defineComponent({
             this.password = '';
         },
 
-        deleteChat() {
+        deleteChat() { 
             console.log("delete channel");
             http.delete('/channel/' + this.channelId);
             this.getChannelList(); 
@@ -135,7 +130,7 @@ export default defineComponent({
 
         sendMessage() {
             console.log('sendMessage - on channelId ', this.message.channelId, this.message.content);
-            this.socket.emit('sendMessage', this.message);
+            this.socket.emit('sendMessageToServer', this.message);
         },
 
         joinChannel() {
@@ -147,12 +142,15 @@ export default defineComponent({
     created() {
         this.socket = io('localhost:3000/chat', {  withCredentials: true });
         this.getChannelList();
-        // this.channelToJoin.userId = this.getUserProfile.id;
+        this.socket.on('sendMessageToClient', (data) => {
+            console.log(data);
+        })
     },
 
     computed: {
     ...mapGetters("auth", { getUserProfile: "getUserProfile",})
-    }
+    },
+
 
 })
 </script>

@@ -48,7 +48,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         console.log('client connected to the chat');
         client.join(room);                          // add this client to the room
         this.server.to(room).emit('client_join');   // send the info to other members of this channel
-        const messages = await this.channelService.getChannelMessagesByRoom(room);   // MODIFY dto
+        const messages = await this.channelService.getChannelMessagesByRoomName(room);   // MODIFY dto
         this.server.to(client.id).emit('channelMessages', messages);    // send messages of the channel to the new user
     }
 
@@ -78,11 +78,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // }
 
     /*** test sockets ****/
-    @SubscribeMessage('sendMessage')
+    @SubscribeMessage('sendMessageToServer') 
     async sendMessage(client: Socket, createMessageDto: CreateMessageDto /*message: string, channelId: number*/) {
         console.log('Message sent to the back in channel ', createMessageDto);
         // client.emit('messageSent', message, channelId);
-        await this.channelService.saveMessage(createMessageDto.content, createMessageDto.channelId);
+        this.server.emit('sendMessageToClient', createMessageDto.content);
+        await this.channelService.saveMessage(/*client.id*/1, createMessageDto/*.content, createMessageDto.channelId*/);
     }
 
 

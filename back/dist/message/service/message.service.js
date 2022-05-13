@@ -17,13 +17,9 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const message_entity_1 = require("../models/message.entity");
-const user_service_1 = require("../../user/service/user.service");
-const channel_service_1 = require("../../channel/service/channel.service");
 let MessageService = class MessageService {
-    constructor(messageRepository, userService, channelService) {
+    constructor(messageRepository) {
         this.messageRepository = messageRepository;
-        this.userService = userService;
-        this.channelService = channelService;
     }
     async findAll() {
         return await this.messageRepository.find();
@@ -32,6 +28,21 @@ let MessageService = class MessageService {
         return await this.messageRepository.findOneOrFail({
             where: { id: Number(messageId) }
         });
+    }
+    async findMessagesByChannel(channel) {
+        return await this.messageRepository.find({
+            where: {
+                channel: channel
+            }
+        });
+    }
+    async save(user, channel, message) {
+        const newMessage = this.messageRepository.create({
+            user: user,
+            content: message.content,
+            channel: channel,
+        });
+        return await this.messageRepository.save(newMessage);
     }
     async delete(messageId) {
         const message = await this.findMessageById(messageId);
@@ -44,9 +55,7 @@ let MessageService = class MessageService {
 MessageService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(message_entity_1.Message)),
-    __metadata("design:paramtypes", [typeorm_2.Repository,
-        user_service_1.UserService,
-        channel_service_1.ChannelService])
+    __metadata("design:paramtypes", [typeorm_2.Repository])
 ], MessageService);
 exports.MessageService = MessageService;
 //# sourceMappingURL=message.service.js.map

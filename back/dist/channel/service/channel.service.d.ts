@@ -2,17 +2,19 @@ import { Repository } from 'typeorm';
 import { Channel } from '../models/channel.entity';
 import { CreateChannelDto } from '../models/channel.dto';
 import { Message } from 'src/message/models/message.entity';
+import { MessageService } from 'src/message/service/message.service';
 import { User } from 'src/user/models/user.entity';
 import { JoinChannelDto } from '../models/channel.dto';
 import { PasswordI } from '../models/password.interface';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
+import { CreateMessageDto } from 'src/message/models/message.dto';
 export declare class ChannelService {
     private channelRepository;
     private userRepository;
-    private messageRepository;
     private channelMemberService;
-    constructor(channelRepository: Repository<Channel>, userRepository: Repository<User>, messageRepository: Repository<Message>, channelMemberService: ChannelMemberService);
+    private messageService;
+    constructor(channelRepository: Repository<Channel>, userRepository: Repository<User>, channelMemberService: ChannelMemberService, messageService: MessageService);
     findAll(): Promise<Channel[]>;
     findChannelById(channelId: number): Promise<Channel>;
     findChannelByName(channelName: string): Promise<Channel>;
@@ -24,10 +26,7 @@ export declare class ChannelService {
     deleteChannel(channelId: number): Promise<Channel>;
     updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto): Promise<void>;
     deleteChannelMember(userId: number, channelId: number): Promise<void>;
-    getChannelMessagesByRoom(room: string): Promise<Message[]>;
+    getChannelMessagesByRoomName(room: string): Promise<Message[]>;
     getChannelMessagesByRoomId(roomId: number): Promise<Message[]>;
-    saveMessage(message: string, channelId: number): Promise<{
-        content: string;
-        channel: Channel;
-    } & Message>;
+    saveMessage(userId: number, createMessageDto: CreateMessageDto): Promise<Message>;
 }

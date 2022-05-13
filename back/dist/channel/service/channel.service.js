@@ -17,16 +17,16 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const channel_entity_1 = require("../models/channel.entity");
-const message_entity_1 = require("../../message/models/message.entity");
+const message_service_1 = require("../../message/service/message.service");
 const bcrypt = require("bcrypt");
 const user_entity_1 = require("../../user/models/user.entity");
 const channelMember_service_1 = require("../../channelMember/service/channelMember.service");
 let ChannelService = class ChannelService {
-    constructor(channelRepository, userRepository, messageRepository, channelMemberService) {
+    constructor(channelRepository, userRepository, channelMemberService, messageService) {
         this.channelRepository = channelRepository;
         this.userRepository = userRepository;
-        this.messageRepository = messageRepository;
         this.channelMemberService = channelMemberService;
+        this.messageService = messageService;
     }
     async findAll() {
         return (await this.channelRepository.find()).sort((a, b) => b.createdTime.getTime() - a.createdTime.getTime());
@@ -140,43 +140,32 @@ let ChannelService = class ChannelService {
         const channel = await this.findChannelById(channelId);
         return await this.channelMemberService.deleteMember(user, channel);
     }
-    async getChannelMessagesByRoom(room) {
+    async getChannelMessagesByRoomName(room) {
         const channel = await this.findChannelByName(room);
-        const messages = await this.messageRepository.find({
-            where: {
-                channel: channel,
-            }
-        });
+        const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
     async getChannelMessagesByRoomId(roomId) {
         const channel = await this.findChannelById(roomId);
-        const messages = await this.messageRepository.find({
-            where: {
-                channel: channel,
-            }
-        });
+        const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
-    async saveMessage(message, channelId) {
-        const currentChannel = await this.findChannelById(channelId);
-        console.log('[saveMessage] channel ', channelId, ' : ', currentChannel);
-        return await this.messageRepository.save({
-            content: message,
-            channel: currentChannel,
-        });
+    async saveMessage(userId, createMessageDto) {
+        const user = await this.userRepository.findOne({ id: userId });
+        const currentChannel = await this.findChannelById(createMessageDto.channelId);
+        return await this.messageService.save(user, currentChannel, createMessageDto);
     }
 };
 ChannelService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(channel_entity_1.Channel)),
     __param(1, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __param(2, (0, typeorm_1.InjectRepository)(message_entity_1.Message)),
-    __param(3, (0, common_1.Inject)(channelMember_service_1.ChannelMemberService)),
+    __param(2, (0, common_1.Inject)(channelMember_service_1.ChannelMemberService)),
+    __param(3, (0, common_1.Inject)(message_service_1.MessageService)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
-        typeorm_2.Repository,
-        channelMember_service_1.ChannelMemberService])
+        channelMember_service_1.ChannelMemberService,
+        message_service_1.MessageService])
 ], ChannelService);
 exports.ChannelService = ChannelService;
 //# sourceMappingURL=channel.service.js.map

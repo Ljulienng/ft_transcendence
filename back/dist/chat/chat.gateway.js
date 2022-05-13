@@ -29,7 +29,7 @@ let ChatGateway = class ChatGateway {
         console.log('client connected to the chat');
         client.join(room);
         this.server.to(room).emit('client_join');
-        const messages = await this.channelService.getChannelMessagesByRoom(room);
+        const messages = await this.channelService.getChannelMessagesByRoomName(room);
         this.server.to(client.id).emit('channelMessages', messages);
     }
     handleDisconnect(client) {
@@ -43,7 +43,8 @@ let ChatGateway = class ChatGateway {
     }
     async sendMessage(client, createMessageDto) {
         console.log('Message sent to the back in channel ', createMessageDto);
-        await this.channelService.saveMessage(createMessageDto.content, createMessageDto.channelId);
+        this.server.emit('sendMessageToClient', createMessageDto.content);
+        await this.channelService.saveMessage(1, createMessageDto);
     }
 };
 __decorate([
@@ -63,7 +64,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "leaveChannel", null);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('sendMessage'),
+    (0, websockets_1.SubscribeMessage)('sendMessageToServer'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [socket_io_1.Socket, message_dto_1.CreateMessageDto]),
     __metadata("design:returntype", Promise)
