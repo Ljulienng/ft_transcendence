@@ -208,12 +208,6 @@ export class ChannelService {
     async saveMessage(userId: number, createMessageDto: CreateMessageDto/*message: string, channelId: number*/) {
         const user = await this.userRepository.findOne({id: userId});
         const currentChannel = await this.findChannelById(createMessageDto.channelId);
-        // console.log('[saveMessage] channel ', channelId, ' : ', currentChannel);
-        // const newMessage = this.messageRepository.create({
-        //     user: user,
-        //     content: createMessageDto.content,
-        //     channel: currentChannel,
-        // });
         return await this.messageService.save(user, currentChannel, createMessageDto);
       }
     

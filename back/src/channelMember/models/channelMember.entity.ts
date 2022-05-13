@@ -14,7 +14,7 @@ export class ChannelMember {
     @Column({ default: false })
 	muted: boolean;
 
-    @CreateDateColumn({ nullable: true, default: null })
+    @CreateDateColumn({ nullable: true, default: null }) 
 	mutedEnd: Date;
 
     @Column({ default: false })
