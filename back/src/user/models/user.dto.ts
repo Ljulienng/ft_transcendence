@@ -2,6 +2,8 @@ import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { Message } from "src/message/models/message.entity";
 import { Channel } from "src/channel/models/channel.entity";
 
+
+// class transformer
 export class UserDto {
 	
 	id: number;

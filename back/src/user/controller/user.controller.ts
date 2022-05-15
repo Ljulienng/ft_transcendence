@@ -51,7 +51,7 @@ export class UserController {
 
 	@Get('/info/:userId')
 	findUserById(@Param('userId') userId: number): Observable<User> {
-		console.log("went in userId");
+		// console.log("went in userId");
 		return this.userService.findByUserId(userId);
 	}
 
@@ -111,7 +111,7 @@ export class UserController {
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@UseInterceptors(FileInterceptor('image', storage))
 	uploadFile(@UploadedFile() file, @Req() req): Observable<Object> {
-		console.log("filename = ", file.filename)
+		// console.log("filename = ", file.filename)
 		const user: User = req.user;
 
 		return this.userService.updateOne(user.id, {profileImage: file.filename}).pipe(
@@ -130,14 +130,14 @@ export class UserController {
 			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + 'default/default.jpg')))
 	}
 
-	@UseGuards(JwtAuthGuard, TwoFAAuth)
-	@Get('/status/:username')
-	async getUserStatus(@Param('username') username: string): Promise<string> {
-	  // let user: User;
-		const user = await this.userService.findOne({username: username});
-		// console.log("status user = ", user);
+	// @UseGuards(JwtAuthGuard, TwoFAAuth)
+	// @Get('/status/:username')
+	// async getUserStatus(@Param('username') username: string): Promise<string> {
+	//   // let user: User;
+	// 	const user = await this.userService.findOne({username: username});
+	// 	// console.log("status user = ", user);
 
-		return user.status
-	}
+	// 	return user.status
+	// }
   
 }

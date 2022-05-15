@@ -41,7 +41,7 @@ export class AuthController {
 		res.redirect('http://localhost:3001/home');
   }
 
-  @UseGuards(JwtAuthGuard, TwoFAAuth)
+  @UseGuards(JwtAuthGuard)
   @Get('userinfo')
   async userinfo(@Req() req) {
     try {

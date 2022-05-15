@@ -17,6 +17,12 @@ const routes = [
 	// 	meta: {requiredAuth: true}
 	// },
 	{
+		name: 'Root',
+		path: '/',
+		component: Home,
+		meta: {requiredAuth: true}
+	},
+	{
 		name: 'Home',
 		path: '/home',
 		component: Home,
@@ -85,18 +91,6 @@ router.beforeEach(async (to, from, next) => {
 					}
 					else
 						return next();
-					// const data = await http.get('/twofa/check')
-					// .then ( res => {
-					// 	console.log("res.data = ", res.data)
-					// 	return res.data
-					// })
-					// if (data === true)
-					// 	return next()jew je test jie alksjid ;
-					// else {
-					// 	console.log('res data = ', data)
-					// 	return next({ path: "/twofaauth" });
-							
-					// }
 				}
 				else {
 					return next();

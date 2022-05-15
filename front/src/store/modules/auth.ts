@@ -60,7 +60,6 @@ const actions = {
 			console.log('status unknown');
 			return ;
 		}
-
 	},
 
 	async setTwoFAauth({commit}: {commit: Commit}) {

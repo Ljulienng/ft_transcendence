@@ -25,7 +25,7 @@
 		<div class="friendList">
 			<ul>
 				<li v-for="friend in friendList" :key="friend" >
-					{{friend.username}} ({{friend.firstname}}, {{friend.lastname}}) is {{getFriendStatus(friend.username)}} {{this.userStatus}}
+					{{friend.username}} ({{friend.firstname}}, {{friend.lastname}}) is {{friend.status}} {{this.userStatus}}
 					<button v-on:click="deleteFriend(friend.username)"> DELETE </button>
 				</li>
 			</ul>
@@ -60,25 +60,13 @@ export default defineComponent({
 			}
 		},
 
-		getFriendStatus(friendUsername: string) {
-			http.get('/users/status/' + friendUsername)
-			.then(res => {
-				console.log(res.data);
-				this.userStatus = res.data
-			})
-			.catch(err => {
-				console.log(err);
-			})
-
-		},
-
 		async addFriend() {
 			await http.post('/users/addfriend', this.friendToAdd)
 			.then(
-				response => { console.log("success", response); this.getFriendList(); this.errorMsg = "" }
+				response => { console.log("/users/addfriend success", response); this.getFriendList(); this.errorMsg = "" }
 			)
 			.catch(
-				error => { console.log("msg = ", error.response.data.error, "full error = ", error), this.errorMsg = error.response.data.error }
+				error => { console.log(" /users/addfriend msg = ", error.response.data.error, "full error = ", error), this.errorMsg = error.response.data.error }
 			)
 		},
 
@@ -86,7 +74,7 @@ export default defineComponent({
 			console.log("friend to delete =" ,friendUsername)
 			await http.delete('/users/deletefriend', {data:{username: friendUsername}})
 			.then(
-				response => { console.log("success", response); this.getFriendList(); this.errorMsg = "" }
+				response => { console.log("/users/deletefriend success", response); this.getFriendList(); this.errorMsg = "" }
 			)
 			.catch(
 				error => { this.errorMsg = error.response.data.error }

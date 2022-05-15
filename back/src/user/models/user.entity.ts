@@ -7,6 +7,7 @@ export type Friend = {
 	username: string;
 	firstname: string;
 	lastname: string;
+	status: string;
 }
 
 @Entity()

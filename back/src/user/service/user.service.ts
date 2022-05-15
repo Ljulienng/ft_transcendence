@@ -39,6 +39,7 @@ export class UserService {
 	add(user: User): any {
 		user.firstname = uniqueNamesGenerator({dictionaries: [names]})
 		user.lastname = uniqueNamesGenerator({dictionaries: [names]})
+		user.status = "Offline"
 
 		return from(this.userRepository.save(user));
 	}
@@ -188,12 +189,14 @@ export class UserService {
 			let friend: Friend = {
 				username: "",
 				firstname: "",
-				lastname: ""
+				lastname: "",
+				status: "Offline"
 			};
 
 			friend.username = friendInfo.username;
 			friend.firstname = friendInfo.firstname;
 			friend.lastname = friendInfo.lastname;
+			friend.status = friendInfo.status
 
 			return friend;
 		}
