@@ -46,7 +46,7 @@
             <ul>
                 <li v-for="channel in channelList" :key="channel">
                     {{channel.id}} - "{{channel.name}}" : created by {{channel.owner.username}}
-                    {{channel.messages}}
+                    <!-- {{channel.messages}} -->
                 </li>
             </ul>
         </div>
