@@ -9,7 +9,7 @@ import { User } from "src/user/models/user.entity"
 import { UserJwtPayload } from "../interfaces/jwt-payload.interface"
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class TwoFaStrategy extends PassportStrategy(Strategy, 'twofa') {
 	constructor ( private userService: UserService ) {
 		super({
 			secretOrKey: 'SECRET',
@@ -28,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 	}
 
 	async validate(payload: any): Promise<User> {
-		console.log('jwt validate');
+		console.log('twofa validate');
 		const { username, auth } = payload;
 		const user = await this.userService.findByUsername(username); // to change\
 		console.log("twoFAEnabled =", user.twoFAEnabled)
@@ -36,6 +36,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 			throw new UnauthorizedException('User not found');
 		}
 
+        if (auth !== true) {
+			throw new UnauthorizedException('Double authentificaton needed');
+        }
+        
 		return user
 	}
 }
