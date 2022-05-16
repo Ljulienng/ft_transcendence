@@ -1,5 +1,4 @@
 <template>
-<<<<<<< HEAD
   <div id="chat">
     <div class="createChat">
       <h3>Create new channel</h3>
@@ -8,8 +7,7 @@
         <div class="one_elem">
           <input type="radio" value="public" v-model="privacy" />
           <label for="public">Public</label>
-=======
-    <div id='chat'>
+    <!-- <div id='chat'>
 
         <div class="createChat">
             <h3>Create new channel</h3>
@@ -53,14 +51,12 @@
                 <li v-for="channel in channelList" :key="channel">
                     {{channel.id}} - "{{channel.name}}" : created by {{channel.owner.username}}
                         <div v-for="message in messageList" :key="message">
-                            <!-- channel.id = {{channel.id}}   message.channelId = {{message.channelId}} -->
                             <div v-if="channel.id == message.channelId">
                                 message : {{message.content}}
                             </div>
                         </div>
                 </li>
-            </ul>
->>>>>>> 6d0545ed (front(chat): create chat interface components)
+            </ul> -->
         </div>
         <div>
           <input type="radio" value="protected" v-model="privacy" />
@@ -299,7 +295,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-<<<<<<< HEAD
 div {
   color: white;
 }
@@ -311,41 +306,39 @@ button {
   border: thin solid #cccccc;
 }
 </style>
-=======
-    div {
-        color: white;
-    }
-    ul {
-	padding-left: 10%;
-    }
-    button {
-        color: white;
-        border: thin solid #CCCCCC
-    }
-    .myOptions {
-        color: blue;
-    }
-    .myOptions .layout {
-        color: 'green';
-    }
-    .myOptions .size {
-        height: 34;
-        padding: 7;
-        width: 100;
-    }
-    .myOptions .items {
-        --delay: .4;
-        --preSelected: 'unknown';
-        --disabled: false;
-        --labels: [
-            {name: 'Off', color: 'white', backgroundColor: 'blue'}, 
-            {name: 'On', color: 'white', backgroundColor: 'blue'}
-            ];
-        /* --labels: [
-            {name: 'Public', color: 'white', backgroundColor: 'green'}, 
-            {name: 'Private', color: 'white', backgroundColor: 'green'},
-            {name: 'Protected', color: 'white', backgroundColor: 'green'}
-        ] */
-    }
-</style>
->>>>>>> 6d0545ed (front(chat): create chat interface components)
+//     div {
+//         color: white;
+//     }
+//     ul {
+// 	padding-left: 10%;
+//     }
+//     button {
+//         color: white;
+//         border: thin solid #CCCCCC
+//     }
+//     .myOptions {
+//         color: blue;
+//     }
+//     .myOptions .layout {
+//         color: 'green';
+//     }
+//     .myOptions .size {
+//         height: 34;
+//         padding: 7;
+//         width: 100;
+//     }
+//     .myOptions .items {
+//         --delay: .4;
+//         --preSelected: 'unknown';
+//         --disabled: false;
+//         --labels: [
+//             {name: 'Off', color: 'white', backgroundColor: 'blue'}, 
+//             {name: 'On', color: 'white', backgroundColor: 'blue'}
+//             ];
+//         /* --labels: [
+//             {name: 'Public', color: 'white', backgroundColor: 'green'}, 
+//             {name: 'Private', color: 'white', backgroundColor: 'green'},
+//             {name: 'Protected', color: 'white', backgroundColor: 'green'}
+//         ] */
+//     }
+// </style>
