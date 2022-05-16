@@ -1,7 +1,6 @@
 import { Repository } from 'typeorm';
 import { Channel } from '../models/channel.entity';
 import { CreateChannelDto } from '../models/channel.dto';
-import { Message } from 'src/message/models/message.entity';
 import { MessageService } from 'src/message/service/message.service';
 import { User } from 'src/user/models/user.entity';
 import { JoinChannelDto } from '../models/channel.dto';
@@ -21,12 +20,12 @@ export declare class ChannelService {
     createChannel(createChannel: CreateChannelDto, userId: number): Promise<void>;
     checkPasswordMatch(sentPassword: string, hashExpectedPassword: string): Promise<boolean>;
     addUserToChannel(joinChannel: JoinChannelDto, userId: number): Promise<void>;
-    removeUserToChannel(channelSent: Channel, userId: number): Promise<void>;
+    removeUserToChannel(leaveChannel: Channel, userId: number): Promise<void>;
     changePassword(channelId: number, userId: number, passwords: PasswordI): Promise<void>;
     deleteChannel(channelId: number): Promise<Channel>;
     updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto): Promise<void>;
     deleteChannelMember(userId: number, channelId: number): Promise<void>;
-    getChannelMessagesByRoomName(room: string): Promise<Message[]>;
-    getChannelMessagesByRoomId(roomId: number): Promise<Message[]>;
-    saveMessage(userId: number, createMessageDto: CreateMessageDto): Promise<Message>;
+    getChannelMessagesByRoomName(room: string): Promise<import("../../message/models/message.entity").Message[]>;
+    getChannelMessagesByRoomId(roomId: number): Promise<import("../../message/models/message.entity").Message[]>;
+    saveMessage(userId: number, createMessageDto: CreateMessageDto): Promise<import("../../message/models/message.entity").Message>;
 }

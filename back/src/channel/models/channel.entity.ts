@@ -22,7 +22,7 @@ export class Channel {
     @Column({ nullable: false, default: ChannelType.private })
     type: ChannelType;
 
-    @Column({ nullable: true, default: null })
+    @Column({ nullable: true, default: null }) 
 	password: string;
 
 	@CreateDateColumn({ type: 'timestamp', default: () => 'now()' })

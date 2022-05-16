@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateMessageDto } from '../models/message.dto';
@@ -17,9 +17,11 @@ export class MessageService {
        return await this.messageRepository.find();
    }
 
-  async findMessageById(messageId: string): Promise<Message> {
+  async findMessageById(messageId: number): Promise<Message> {
       return await this.messageRepository.findOneOrFail({
-          where: { id: Number(messageId) }
+          where: {
+              id: messageId
+            }
       });
   }
 
@@ -40,11 +42,12 @@ export class MessageService {
     return await this.messageRepository.save(newMessage);
   }
 
- async delete(messageId: string) {
+ async deleteMessage(messageId: number) {
      const message = await this.findMessageById(messageId);  
      if (!message) {
          throw new NotFoundException();
      }
      return await this.messageRepository.remove(message);
  }
+
 }

@@ -3,14 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Channel, ChannelType} from '../models/channel.entity'
 import { CreateChannelDto, UpdateChannelDto } from '../models/channel.dto';
-import { Message } from 'src/message/models/message.entity';
 import { MessageService } from 'src/message/service/message.service';
-import { UserService } from 'src/user/service/user.service';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/models/user.entity';
 import { JoinChannelDto } from '../models/channel.dto';
 import { PasswordI } from '../models/password.interface';
-import { ChannelMember } from 'src/channelMember/models/channelMember.entity';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
 import { CreateMessageDto } from 'src/message/models/message.dto';
@@ -100,11 +97,12 @@ export class ChannelService {
    async addUserToChannel(joinChannel: JoinChannelDto, userId: number) {
         const user = await this.userRepository.findOne({id: userId});
         
-        // select * from channel where channel.id=channelSent.id
-        const welcomingChannel = await this.channelRepository
-            .createQueryBuilder('channel')
-            .where('channel.id = :channelId', {channelId: joinChannel.id})
-            .getOne();
+        // select * from channel where channel.id=joinChannel.id
+        const welcomingChannel = await this.findChannelById(joinChannel.id);
+        // const welcomingChannel = await this.channelRepository
+        //     .createQueryBuilder('channel')
+        //     .where('channel.id = :channelId', {channelId: joinChannel.id})
+        //     .getOne();
         
         if (welcomingChannel.type !== ChannelType.public) {
             if (welcomingChannel.password) {
@@ -119,26 +117,29 @@ export class ChannelService {
             throw new UnauthorizedException('user already in this channel');
         }
 
-        this.channelMemberService.createMember(user, welcomingChannel, false); // add the user to the channel
+        this.channelMemberService.createMember(user, welcomingChannel, false);
         await this.channelRepository.save(welcomingChannel);    // update the channel
    }
 
-   async removeUserToChannel(channelSent: Channel, userId: number) {
+   async removeUserToChannel(leaveChannel: Channel, userId: number) {
         const user = await this.userRepository.findOne({id: userId});
         
-        // const channelToLeave = await this.findChannelById(channelSent.id);
-        const channelToLeave = await this.channelRepository
-            .createQueryBuilder('channel')
-            .where('channel.id = :channelId', {channelId: channelSent.id})
-            .getOne();
+        // select * from channel where channel.id=leaveChannel.id
+        const channelToLeave = await this.findChannelById(leaveChannel.id);
+        // const channelToLeave = await this.channelRepository
+        //     .createQueryBuilder('channel')
+        //     .where('channel.id = :channelId', {channelId: leaveChannel.id})
+        //     .getOne();
         
+        if (!(this.channelMemberService.findOne(user, channelToLeave))) {
+                throw new UnauthorizedException('user not in this channel');
+            }
         
-            // remove the user to the channel
-
+        this.channelMemberService.deleteMember(user, channelToLeave);
         await this.channelRepository.save(channelToLeave);   // update the channel
    }
 
-   /* only owner/can change the password */
+   /* only owner can change the password */
    async changePassword(channelId: number, userId: number, passwords: PasswordI)
    {
         console.log('user:', userId, ' changes password of channel:', channelId, ' [new pass:', passwords.newPassword,']');

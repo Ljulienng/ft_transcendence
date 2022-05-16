@@ -7,8 +7,8 @@ export declare class MessageService {
     private messageRepository;
     constructor(messageRepository: Repository<Message>);
     findAll(): Promise<Message[]>;
-    findMessageById(messageId: string): Promise<Message>;
+    findMessageById(messageId: number): Promise<Message>;
     findMessagesByChannel(channel: Channel): Promise<Message[]>;
     save(user: User, channel: Channel, message: CreateMessageDto): Promise<Message>;
-    delete(messageId: string): Promise<Message>;
+    deleteMessage(messageId: number): Promise<Message>;
 }

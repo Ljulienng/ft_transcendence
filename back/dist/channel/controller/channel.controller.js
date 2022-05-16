@@ -16,12 +16,11 @@ exports.ChannelController = void 0;
 const common_1 = require("@nestjs/common");
 const channel_service_1 = require("../service/channel.service");
 const channel_dto_1 = require("../models/channel.dto");
-const message_service_1 = require("../../message/service/message.service");
+const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
 const channelMember_dto_1 = require("../../channelMember/models/channelMember.dto");
 let ChannelController = class ChannelController {
-    constructor(channelService, messageService) {
+    constructor(channelService) {
         this.channelService = channelService;
-        this.messageService = messageService;
     }
     findAll() {
         return this.channelService.findAll();
@@ -37,13 +36,13 @@ let ChannelController = class ChannelController {
         return this.channelService.getChannelMessagesByRoomId(channel.id);
     }
     async createChannel(request, channelDto) {
-        await this.channelService.createChannel(channelDto, 1);
+        await this.channelService.createChannel(channelDto, request.user.id);
     }
     changePassword(channelId, request, passwords) {
-        return this.channelService.changePassword(channelId, 1, passwords);
+        return this.channelService.changePassword(channelId, request.user.id, passwords);
     }
     async updateMemberChannel(request, userId, channelId, updates) {
-        return await this.channelService.updateChannelMember(1, userId, channelId, updates);
+        return await this.channelService.updateChannelMember(request.user.id, userId, channelId, updates);
     }
     async deleteChannel(channelId) {
         return await this.channelService.deleteChannel(channelId);
@@ -80,6 +79,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "findMessagesByChannelId", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
@@ -88,6 +88,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "createChannel", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)(':channelId/changePass'),
     __param(0, (0, common_1.Param)('channelId')),
     __param(1, (0, common_1.Req)()),
@@ -97,6 +98,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ChannelController.prototype, "changePassword", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Patch)(':channelId/:userId'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('userId')),
@@ -123,8 +125,7 @@ __decorate([
 ], ChannelController.prototype, "deleteChannelMember", null);
 ChannelController = __decorate([
     (0, common_1.Controller)('channel'),
-    __metadata("design:paramtypes", [channel_service_1.ChannelService,
-        message_service_1.MessageService])
+    __metadata("design:paramtypes", [channel_service_1.ChannelService])
 ], ChannelController);
 exports.ChannelController = ChannelController;
 //# sourceMappingURL=channel.controller.js.map

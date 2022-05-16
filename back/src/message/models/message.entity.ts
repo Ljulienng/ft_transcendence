@@ -16,14 +16,14 @@ export class Message {
 	@CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
 	readonly createdTime: Date;
 
-    @ManyToOne(() => Channel, channel => channel.messages, {
-        onDelete: 'CASCADE',    // delete all messages if the channel is deleted
-    })
-    channel: Channel;
-
-    @ManyToOne(() => User, user => user.id, {
+    @ManyToOne(() => User, user => user.id, { 
         eager: true,
         onDelete: 'CASCADE',
     })
     user: User;
+
+    @ManyToOne(() => Channel, channel => channel.messages, {
+        onDelete: 'CASCADE',    // delete all messages if the channel is deleted
+    })
+    channel: Channel;
 }

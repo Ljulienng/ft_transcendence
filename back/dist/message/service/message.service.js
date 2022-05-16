@@ -26,7 +26,9 @@ let MessageService = class MessageService {
     }
     async findMessageById(messageId) {
         return await this.messageRepository.findOneOrFail({
-            where: { id: Number(messageId) }
+            where: {
+                id: messageId
+            }
         });
     }
     async findMessagesByChannel(channel) {
@@ -44,7 +46,7 @@ let MessageService = class MessageService {
         });
         return await this.messageRepository.save(newMessage);
     }
-    async delete(messageId) {
+    async deleteMessage(messageId) {
         const message = await this.findMessageById(messageId);
         if (!message) {
             throw new common_1.NotFoundException();

@@ -76,10 +76,7 @@ let ChannelService = class ChannelService {
     }
     async addUserToChannel(joinChannel, userId) {
         const user = await this.userRepository.findOne({ id: userId });
-        const welcomingChannel = await this.channelRepository
-            .createQueryBuilder('channel')
-            .where('channel.id = :channelId', { channelId: joinChannel.id })
-            .getOne();
+        const welcomingChannel = await this.findChannelById(joinChannel.id);
         if (welcomingChannel.type !== channel_entity_1.ChannelType.public) {
             if (welcomingChannel.password) {
                 const match = this.checkPasswordMatch(welcomingChannel.password, joinChannel.password);
@@ -94,12 +91,13 @@ let ChannelService = class ChannelService {
         this.channelMemberService.createMember(user, welcomingChannel, false);
         await this.channelRepository.save(welcomingChannel);
     }
-    async removeUserToChannel(channelSent, userId) {
+    async removeUserToChannel(leaveChannel, userId) {
         const user = await this.userRepository.findOne({ id: userId });
-        const channelToLeave = await this.channelRepository
-            .createQueryBuilder('channel')
-            .where('channel.id = :channelId', { channelId: channelSent.id })
-            .getOne();
+        const channelToLeave = await this.findChannelById(leaveChannel.id);
+        if (!(this.channelMemberService.findOne(user, channelToLeave))) {
+            throw new common_1.UnauthorizedException('user not in this channel');
+        }
+        this.channelMemberService.deleteMember(user, channelToLeave);
         await this.channelRepository.save(channelToLeave);
     }
     async changePassword(channelId, userId, passwords) {

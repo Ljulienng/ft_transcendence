@@ -20,14 +20,13 @@ let MessageController = class MessageController {
         this.messageService = messageService;
     }
     findAll() {
-        console.log("return all messages");
         return this.messageService.findAll();
     }
-    findMessageById(id) {
-        return;
+    findMessageById(messageId) {
+        return this.messageService.findMessageById(messageId);
     }
-    deleteMessage(id) {
-        return;
+    deleteMessage(messageId) {
+        return this.messageService.deleteMessage(messageId);
     }
 };
 __decorate([
@@ -37,17 +36,17 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], MessageController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Get)(':messageId'),
+    __param(0, (0, common_1.Param)('messageId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], MessageController.prototype, "findMessageById", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Delete)(':messageId'),
+    __param(0, (0, common_1.Param)('messageId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], MessageController.prototype, "deleteMessage", null);
 MessageController = __decorate([

@@ -4,6 +4,6 @@ export declare class Message {
     readonly id: number;
     content: string;
     readonly createdTime: Date;
-    channel: Channel;
     user: User;
+    channel: Channel;
 }

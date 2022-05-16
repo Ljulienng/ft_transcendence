@@ -28,18 +28,18 @@ __decorate([
     __metadata("design:type", Date)
 ], Message.prototype, "createdTime", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => channel_entity_1.Channel, channel => channel.messages, {
-        onDelete: 'CASCADE',
-    }),
-    __metadata("design:type", channel_entity_1.Channel)
-], Message.prototype, "channel", void 0);
-__decorate([
     (0, typeorm_1.ManyToOne)(() => user_entity_1.User, user => user.id, {
         eager: true,
         onDelete: 'CASCADE',
     }),
     __metadata("design:type", user_entity_1.User)
 ], Message.prototype, "user", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => channel_entity_1.Channel, channel => channel.messages, {
+        onDelete: 'CASCADE',
+    }),
+    __metadata("design:type", channel_entity_1.Channel)
+], Message.prototype, "channel", void 0);
 Message = __decorate([
     (0, typeorm_1.Entity)('messages')
 ], Message);
