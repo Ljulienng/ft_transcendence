@@ -9,7 +9,6 @@ import Home from '@/views/Home.vue'
 import Chat from '@/views/Chat.vue'
 import myChat from '@/views/myChat.vue'
 
-
 const routes = [
 	{
 		name: 'Home',

@@ -4,6 +4,7 @@
         <div class="createChat">
             <h3>Create new channel</h3>
             Name <input type="text" maxlength="20" v-model="name"/>
+            <toggle-switch :options= "myOptions" />
             <div>
                 <div class="one_elem">
                     <input type="radio" value="public" v-model="privacy"/>
@@ -147,5 +148,30 @@ export default defineComponent({
     button {
         color: white;
         border: thin solid #CCCCCC
+    }
+    .myOptions {
+        color: blue;
+    }
+    .myOptions .layout {
+        color: 'green';
+    }
+    .myOptions .size {
+        height: 34;
+        padding: 7;
+        width: 100;
+    }
+    .myOptions .items {
+        --delay: .4;
+        --preSelected: 'unknown';
+        --disabled: false;
+        --labels: [
+            {name: 'Off', color: 'white', backgroundColor: 'blue'}, 
+            {name: 'On', color: 'white', backgroundColor: 'blue'}
+            ];
+        /* --labels: [
+            {name: 'Public', color: 'white', backgroundColor: 'green'}, 
+            {name: 'Private', color: 'white', backgroundColor: 'green'},
+            {name: 'Protected', color: 'white', backgroundColor: 'green'}
+        ] */
     }
 </style>

@@ -8,6 +8,7 @@ import router from "./router";
 import store from "./store";
 import 'vue-universal-modal/dist/index.css'
 import VueUniversalModal from 'vue-universal-modal'
+import ToggleSwitch from '../node_modules/vuejs-toggle-switch/src/components/ToggleSwitch.vue'
 // import axios from 'axios'
 
 const app = createApp(App);
@@ -21,4 +22,5 @@ app.use(VueUniversalModal, {
 	teleportTarget: '#my-modals',
 	modalComponent: 'MyModal',
 })
+app.component('ToggleSwitch', ToggleSwitch)
 app.mount("#app");
