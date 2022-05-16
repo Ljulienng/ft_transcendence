@@ -31,7 +31,7 @@ export class ChannelController {
     async findMessagesByChannelId(@Param('channelId') channelId: number) {
         const channel = await this.channelService.findChannelById(channelId);
         return this.channelService.getChannelMessagesByRoomId(channel.id);
-    }
+    } 
 
     @Get(':channelId/members')
     async findMembersByChannelId(@Param('channelId') channelId: number) {

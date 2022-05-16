@@ -9,6 +9,6 @@ export declare class MessageService {
     findAll(): Promise<Message[]>;
     findMessageById(messageId: number): Promise<Message>;
     findMessagesByChannel(channel: Channel): Promise<Message[]>;
-    save(user: User, channel: Channel, message: CreateMessageDto): Promise<Message>;
+    saveMessage(user: User, channel: Channel, message: CreateMessageDto): Promise<Message>;
     deleteMessage(messageId: number): Promise<Message>;
 }

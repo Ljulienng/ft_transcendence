@@ -38,7 +38,7 @@ let MessageService = class MessageService {
             }
         });
     }
-    async save(user, channel, message) {
+    async saveMessage(user, channel, message) {
         const newMessage = this.messageRepository.create({
             user: user,
             content: message.content,

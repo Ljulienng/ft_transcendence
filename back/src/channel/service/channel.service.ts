@@ -90,8 +90,30 @@ export class ChannelService {
     ** create DM channel
     ** user1 creates the channel
     */
-    createDmChannel(createChannel: CreateChannelDto, user1Id: number, user2Id: number) {
+    async createDmChannel(createChannel: CreateChannelDto, user1Id: number, user2Id: number) {
+        const user1 = await this.userRepository.findOne({id: user1Id});
+        const user2 = await this.userRepository.findOne({id: user2Id});
         
+        if (!user1 || !user2) {
+            throw new UnauthorizedException('user does not exist');
+        }
+
+        if (this.channelRepository.findOne({name: createChannel.name})) {
+            throw new UnauthorizedException('this name is already used');  
+        }
+
+        const newChannel = this.channelRepository.create({
+            name: createChannel.name,
+            type: ChannelType.private,
+            messages: [],
+            channelMembers: [],
+            owner: user1,
+       });
+
+       console.log('new DM channel created : ', newChannel);
+       await this.channelRepository.save(newChannel);
+       await this.channelMemberService.createMember(user1, newChannel, true);
+       await this.channelMemberService.createMember(user2, newChannel, true);
     }
 
     /* check if the password sent is the right one */
@@ -231,10 +253,10 @@ export class ChannelService {
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
 
-    async saveMessage(userId: number, createMessageDto: CreateMessageDto/*message: string, channelId: number*/) {
+    async saveMessage(userId: number, createMessageDto: CreateMessageDto) {
         const user = await this.userRepository.findOne({id: userId});
         const currentChannel = await this.findChannelById(createMessageDto.channelId);
-        return await this.messageService.save(user, currentChannel, createMessageDto);
+        return await this.messageService.saveMessage(user, currentChannel, createMessageDto);
       }
     
 }

@@ -74,7 +74,26 @@ let ChannelService = class ChannelService {
         await this.channelRepository.save(newChannel);
         await this.channelMemberService.createMember(user, newChannel, true);
     }
-    createDmChannel(createChannel, user1Id, user2Id) {
+    async createDmChannel(createChannel, user1Id, user2Id) {
+        const user1 = await this.userRepository.findOne({ id: user1Id });
+        const user2 = await this.userRepository.findOne({ id: user2Id });
+        if (!user1 || !user2) {
+            throw new common_1.UnauthorizedException('user does not exist');
+        }
+        if (this.channelRepository.findOne({ name: createChannel.name })) {
+            throw new common_1.UnauthorizedException('this name is already used');
+        }
+        const newChannel = this.channelRepository.create({
+            name: createChannel.name,
+            type: channel_entity_1.ChannelType.private,
+            messages: [],
+            channelMembers: [],
+            owner: user1,
+        });
+        console.log('new DM channel created : ', newChannel);
+        await this.channelRepository.save(newChannel);
+        await this.channelMemberService.createMember(user1, newChannel, true);
+        await this.channelMemberService.createMember(user2, newChannel, true);
     }
     async checkPasswordMatch(sentPassword, hashExpectedPassword) {
         return await bcrypt.compare(sentPassword, hashExpectedPassword);
@@ -165,7 +184,7 @@ let ChannelService = class ChannelService {
     async saveMessage(userId, createMessageDto) {
         const user = await this.userRepository.findOne({ id: userId });
         const currentChannel = await this.findChannelById(createMessageDto.channelId);
-        return await this.messageService.save(user, currentChannel, createMessageDto);
+        return await this.messageService.saveMessage(user, currentChannel, createMessageDto);
     }
 };
 ChannelService = __decorate([
