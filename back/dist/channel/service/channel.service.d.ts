@@ -1,0 +1,33 @@
+import { Repository } from 'typeorm';
+import { Channel } from '../models/channel.entity';
+import { CreateChannelDto } from '../models/channel.dto';
+import { MessageService } from 'src/message/service/message.service';
+import { User } from 'src/user/models/user.entity';
+import { JoinChannelDto } from '../models/channel.dto';
+import { PasswordI } from '../models/password.interface';
+import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
+import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
+import { CreateMessageDto } from 'src/message/models/message.dto';
+export declare class ChannelService {
+    private channelRepository;
+    private userRepository;
+    private channelMemberService;
+    private messageService;
+    constructor(channelRepository: Repository<Channel>, userRepository: Repository<User>, channelMemberService: ChannelMemberService, messageService: MessageService);
+    findAll(): Promise<Channel[]>;
+    findChannelById(channelId: number): Promise<Channel>;
+    findChannelByName(channelName: string): Promise<Channel>;
+    createChannel(createChannel: CreateChannelDto, userId: number): Promise<void>;
+    createDmChannel(createChannel: CreateChannelDto, user1Id: number, user2Id: number): Promise<void>;
+    checkPasswordMatch(sentPassword: string, hashExpectedPassword: string): Promise<boolean>;
+    addUserToChannel(joinChannel: JoinChannelDto, userId: number): Promise<void>;
+    removeUserToChannel(leaveChannel: Channel, userId: number): Promise<void>;
+    changePassword(channelId: number, userId: number, passwords: PasswordI): Promise<void>;
+    deleteChannel(userId: number, channelId: number): Promise<Channel>;
+    getChannelMembers(channel: Channel): Promise<import("../../channelMember/models/channelMember.entity").ChannelMember[]>;
+    updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto): Promise<void>;
+    deleteChannelMember(userId: number, channelId: number): Promise<void>;
+    getChannelMessagesByRoomName(room: string): Promise<import("../../message/models/message.entity").Message[]>;
+    getChannelMessagesByRoomId(roomId: number): Promise<import("../../message/models/message.entity").Message[]>;
+    saveMessage(userId: number, createMessageDto: CreateMessageDto): Promise<import("../../message/models/message.entity").Message>;
+}

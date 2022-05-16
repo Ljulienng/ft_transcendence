@@ -20,6 +20,12 @@ export class ChannelMemberService {
         })
     }
 
+    async findChannelMembers(channel: Channel) {
+        return await this.channelMemberRepository.find({
+            channel: channel,
+        })
+    }
+
     async createMember(user: User, channel: Channel, admin: boolean) {
         const newMember = this.channelMemberRepository.create({
             admin: admin,
@@ -54,6 +60,7 @@ export class ChannelMemberService {
         const memberToUpdate = await this.findOne(userToUpdate, channel);
         const muteOrBanTime = 1000 * 60;  // arbitrary time [1000 = 1 second]
         console.log(updates);
+        console.log('mute or ban time = ', muteOrBanTime / 1000 / 60, ' minutes');
         
         if (!this.updateAllowed(memberWhoUpdate, memberToUpdate, channel, updates)) {
             throw new HttpException('you can\'t update this channel member', HttpStatus.FORBIDDEN);
