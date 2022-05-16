@@ -1,15 +1,19 @@
-import { Controller, Get, UseGuards, Req, Res, UnauthorizedException, ConsoleLogger } from '@nestjs/common';
+import { Controller, Get, Body, UseGuards, Req, Res, UnauthorizedException, Delete ,ConsoleLogger, Param, Post, HttpCode } from '@nestjs/common';
 import { FortyTwoService } from './fortytwo.service';
 import { AuthGuard } from '@nestjs/passport'
 import { get } from 'http';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { FortyTwoAuthGuard } from './guards/fortytwo.guard';
+import { User } from 'src/user/models/user.entity';
+import { from, Observable, of, switchMap, map } from 'rxjs';
+import { TwoFactorAuthenticationService } from './twofactorauth.service'
 import { JwtService } from "@nestjs/jwt"
+import { TwoFAAuth } from './guards/twoFA.guard';
 import { UserService } from 'src/user/service/user.service';
 
 @Controller()
 export class AuthController {
-  constructor(private readonly fortyTwoService: FortyTwoService, private userService: UserService ,private jwtService: JwtService) {}
+  constructor(private readonly fortyTwoService: FortyTwoService, private userService: UserService, private jwtService: JwtService, private twoFAService: TwoFactorAuthenticationService ) {}
 
   @UseGuards(FortyTwoAuthGuard)
   @Get('/auth/42')
@@ -31,6 +35,8 @@ export class AuthController {
   async FortyTwoAuthRedirect(@Req() req, @Res({passthrough: true}) res) {
     const payload = { username: req.user['username'], auth: false };
 		const accessToken = await this.jwtService.signAsync(payload);
+    if (req.user.status === 'Offline')
+      req.user.status = 'Online';
 		res.cookie('jwt', accessToken, {httpOnly: true})
 		res.redirect('http://localhost:3001/home');
   }
@@ -38,22 +44,111 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('userinfo')
   async userinfo(@Req() req) {
-    // return req.user;
     try {
-		// const cookie = req.cookies['jwt'];
-  
-		// const data = await this.jwtService.verifyAsync(cookie);
-		// if (!data) {
-		//   throw new UnauthorizedException("User not found");
-		// }
-  
-		// const user = await this.userService.findOne(data['email']); //A changer 
     const user = req.user;
-    console.log("userinfo ", user);
 
 		return user;
 	  } catch (e) {
 		throw new UnauthorizedException("wtf");
 	  }
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/twofa/generate')
+  async register(@Res() response, @Req() req) {
+    const { otpauthUrl } = await this.twoFAService.generateTwoFactorAuthenticationSecret(req.user);
+ 
+    return this.twoFAService.pipeQrCodeStream(response, otpauthUrl);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/twofa/turn-on')
+  @HttpCode(200)
+  async turnOnTwoFactorAuthentication(
+    @Req() req,
+    @Body() twoFactorAuthenticationCode) {
+      // console.log('twoFactorAuthenticationCode = ', twoFactorAuthenticationCode.twoFactorAuthenticationCode);
+    const isCodeValid = this.twoFAService.isTwoFactorAuthenticationCodeValid(
+      twoFactorAuthenticationCode.twoFactorAuthenticationCode, req.user
+    );
+    if (!isCodeValid) {
+      throw new UnauthorizedException('Wrong authentication code');
+    }
+    // console.log('double FA ACTIVATED FOR ', req.user.username)
+    await this.userService.turnOnTwoFactorAuthentication(req.user.id);
+  }
+
+  @Post('/twofa/turn-off')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard, TwoFAAuth)
+  async turnOffTwoFactorAuthentication(
+    @Req() req,
+    @Res({passthrough: true}) res,
+    @Body() twoFactorAuthenticationCode) {
+      // console.log('twoFactorAuthenticationCode = ', twoFactorAuthenticationCode.twoFactorAuthenticationCodeTwo);
+    const user: User = req.user;
+    const isCodeValid = this.twoFAService.isTwoFactorAuthenticationCodeValid(
+      twoFactorAuthenticationCode.twoFactorAuthenticationCodeTwo, req.user
+    );
+
+    if (!isCodeValid) {
+      throw new UnauthorizedException('Wrong authentication code');
+    }
+    // console.log('double FA DEACTIVATED FOR ', req.user.username)
+    await this.userService.turnOffTwoFactorAuthentication(req.user.id);
+  
+    const payload = { username: req.user['username'], auth: false };
+		const accessToken = await this.jwtService.signAsync(payload);
+		res.clearCookie('jwt');
+    res.cookie('jwt', accessToken, {httpOnly: true})
+		// res.redirect('http://localhost:3001/home');
+  }
+  
+  @UseGuards(JwtAuthGuard)
+  @Post('/twofa/authenticate')
+  @HttpCode(200)
+  async twoFAAuthenticate(
+    @Req() req,
+    @Res({passthrough: true}) res,
+    @Body() twoFactorAuthenticationCode) {
+    const user: User = req.user;
+
+      // console.log('twoFactorAuthenticationCode = ', twoFactorAuthenticationCode.twoFactorAuthenticationCode);
+    const isCodeValid = this.twoFAService.isTwoFactorAuthenticationCodeValid(
+      twoFactorAuthenticationCode.twoFactorAuthenticationCode, req.user
+    );
+    if (!isCodeValid) {
+      throw new UnauthorizedException('Wrong authentication code');
+    }
+    // console.log('TWOFA AUTHENTICATE =', req.user.username, user.twoFASecret)
+
+    const payload = { username: req.user['username'], auth: true };
+		const accessToken = await this.jwtService.signAsync(payload);
+		// res.clearCookie('jwt');
+    
+    res.cookie('jwt', accessToken, {httpOnly: true})
+    // console.log('check payload ', payload)
+    // console.log('check accessToken ', accessToken)
+		// res.redirect('http://localhost:3001/home');
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/twofa/check')
+  async checkAuthentication(@Req()req) {
+    const user: User = req.user;
+    const decode = this.jwtService.decode(req.cookies.jwt);
+
+    // console.log('check auth ', decode['auth'])
+
+    if (user.twoFAEnabled === true && decode['auth'] === true)
+      return (true)
+    else
+      return (false)
+  }
+
+	@UseGuards(JwtAuthGuard)
+	@Delete('/logout')
+	logout(@Res({passthrough: true}) res) {
+		res.clearCookie('jwt');
+	}
 }

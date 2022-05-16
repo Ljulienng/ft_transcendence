@@ -1,7 +1,7 @@
 <template>
   <div class="body">
     <div class="welcome">
-      Welcome, {{getUserProfile.userName}}
+      Welcome, {{getUserProfile.userName}} you are {{getUserProfile.status}}
     </div>
     <div class="split">
       <div class="lcol">
@@ -39,15 +39,66 @@
 <script lang="ts">
 import '../assets/css/style.scss'
 import { defineComponent } from "@vue/runtime-core";
-import { mapGetters } from "vuex";
+import store from '../store';
+import http from '../http-common'
+
+export interface UserProfile {
+		id: number,
+		userName: string,
+		email: string,
+		status: string,
+}
 
 export default defineComponent({
   name: "Home",
-  computed: {
-    ...mapGetters("auth", {
-      getUserProfile: "getUserProfile",
-    }),
+  data() {
+    return {
+      getUserProfile: {} as UserProfile
+    }
   },
+
+  methods: {
+    setUser() {
+      this.getUserProfile = store.getters['auth/getUserProfile']
+    },
+
+    connectUser() {
+      const userSocket = store.getters['auth/getUserSocket'].id
+  
+      if (!userSocket)
+        store.dispatch('auth/setUserSocket')
+      store.dispatch('auth/setUserStatus', 'Online');
+    },
+
+    getId() {
+      const userId = store.getters['auth/getUserProfile'].id
+      const userSocket = store.getters['auth/getUserSocket'].id
+      if (userId)
+        console.log('userId = ', userId)
+      // if (userSocket)
+        console.log('userSocket = ', userSocket)
+      return userId;
+    },
+
+    setStatus() {
+      http.post('/users/setstatus', {newStatus: 'Online'})
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    }
+  },
+
+  created() {
+    this.setUser();
+    if (this.getUserProfile.status === 'Offline')
+      this.connectUser();
+    // this.getId();
+
+    // this.setStatus()
+  }
 });
 </script>
 

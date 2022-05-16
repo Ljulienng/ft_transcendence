@@ -26,6 +26,7 @@ export default defineComponent({
 			// eslint-disable-next-line
 			selectedFile: null as any,
 			success: false,
+			// eslint-disable-next-line
 			image: null as any,
 		}
 	},

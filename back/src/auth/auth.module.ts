@@ -6,6 +6,8 @@ import { FortyTwoStrategy } from "./strategy/fortytwo.strategy";
 import { JwtModule } from "@nestjs/jwt"
 import { AuthController } from './auth.controller'
 import { JwtStrategy } from "./strategy/jwt.strategy";
+import { TwoFactorAuthenticationService } from "./twofactorauth.service";
+import { TwoFaStrategy } from './strategy/twoFA.strategy'
 
 @Module({
 	imports: [
@@ -20,7 +22,9 @@ import { JwtStrategy } from "./strategy/jwt.strategy";
 	providers: [
 		FortyTwoStrategy,
 		JwtStrategy,
+		TwoFaStrategy,
 		FortyTwoService,
+		TwoFactorAuthenticationService
 	],
 	exports: [
 		JwtModule,

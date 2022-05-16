@@ -1,12 +1,14 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { Message } from "src/message/models/message.entity";
 import { Channel } from "src/channel/models/channel.entity";
+import { colors } from "unique-names-generator";
 import { ChannelMember } from "src/channelMember/models/channelMember.entity";
 
 export type Friend = {
 	username: string;
 	firstname: string;
 	lastname: string;
+	status: string;
 }
 
 @Entity()
@@ -35,9 +37,9 @@ export class User {
 	banned: boolean;
 
 	@Column({ nullable: true, default: null,})
-	twoFASecret: string
+	twoFASecret?: string
 
-	@Column({ nullable: true, default: null,})
+	@Column({default: false,})
 	twoFAEnabled: boolean
 
 	@CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
@@ -54,6 +56,9 @@ export class User {
 
 	@Column("simple-array", {nullable: true})
 	friends: string[];
+
+	@Column({default: 'Offline'})
+	status: string;
 
 	@Column({nullable: true})
 	profileImage: string;

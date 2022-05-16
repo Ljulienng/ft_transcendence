@@ -1,8 +1,11 @@
-# compiled output
-*/dist
-back/dist/
-*/node_modules
-/back/uploads
+.DS_Store
+node_modules
+dist
+
+
+# local env files
+.env.local
+.env.*.local
 
 # Logs
 logs
@@ -13,20 +16,22 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# OS
-.DS_Store
-
 # Tests
-/coverage
-/.nyc_output
+coverage
+.nyc_output
 
 # IDEs and editors
 /.idea
+*.suo
+*.ntvs*
+*.njsproj
 .project
 .classpath
 .c9/
 *.launch
 .settings/
+*.sln
+*.sw?
 *.sublime-workspace
 
 # IDE - VSCode
