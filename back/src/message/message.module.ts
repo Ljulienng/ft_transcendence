@@ -1,17 +1,17 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MessageController } from './controller/message.controller';
 import { Message } from './models/message.entity';
 import { MessageService } from './service/message.service';
-import { ChannelModule } from 'src/channel/channel.module';
+import { UserModule } from 'src/user/user.module';
+
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Message]),
-    forwardRef(() => ChannelModule),
-  ],
+],
   controllers: [MessageController],
   providers: [MessageService],
-  exports: [MessageService],
+  exports: [MessageService], 
 })
 export class MessageModule {}

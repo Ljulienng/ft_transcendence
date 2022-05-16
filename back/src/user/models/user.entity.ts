@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, PrimaryGene
 import { Message } from "src/message/models/message.entity";
 import { Channel } from "src/channel/models/channel.entity";
 import { colors } from "unique-names-generator";
+import { ChannelMember } from "src/channelMember/models/channelMember.entity";
 
 export type Friend = {
 	username: string;
@@ -49,6 +50,9 @@ export class User {
 
 	@OneToMany(() => Channel, channel => channel.owner)
 	channels: Channel[];
+
+	@OneToMany(() => ChannelMember, channelMember => channelMember.user)
+	channelMembers: ChannelMember[];
 
 	@Column("simple-array", {nullable: true})
 	friends: string[];

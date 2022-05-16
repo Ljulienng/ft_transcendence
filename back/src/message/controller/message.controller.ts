@@ -1,29 +1,31 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { MessageService } from '../service/message.service';
-import { MessageDto } from '../models/message.dto';
+import { CreateMessageDto } from '../models/message.dto';
 
 @Controller('message') 
 export class MessageController {
-    constructor(private readonly messageService: MessageService) {}
+    constructor(
+        private readonly messageService: MessageService
+    ) {}
 
     @Get()
     findAll() {
-        return ;
+        return this.messageService.findAll();
     }
 
-    @Get(':id')
-    findMessageById(@Param('id') id: string) {
-        return ;
+    @Get(':messageId')
+    findMessageById(@Param('messageId') messageId: number) {
+        return this.messageService.findMessageById(messageId);
     }
 
-    @Post()
-    createMessage(@Body() messageDto: MessageDto) {
-        return ;
-    }
+    // @Post()
+    // createMessage(@Body() createMessage: CreateMessageDto) {
+    //     return this.messageService.saveMessage(createMessage);
+    // }
 
-    @Delete(':id')
-    deleteMessage(@Param('id') id: string) {
-        return ;
+    @Delete(':messageId')
+    deleteMessage(@Param('messageId') messageId: number) {
+        return this.messageService.deleteMessage(messageId);
     }
 
 }

@@ -28,6 +28,10 @@
 				<span class="material-icons">group</span>
 				<span class="text">Show users</span>
 			</router-link>
+			<router-link to="/chat" class="button">
+				<span class="material-icons">chat</span>
+				<span class="text">Chat</span>
+			</router-link>
 			<!-- <router-link to="/userprofile" class="button">
 				<span class="material-icons">account_circle</span>
 				<span class="text">User Profile</span>

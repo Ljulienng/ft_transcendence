@@ -8,6 +8,7 @@ import FriendList from '@/views/FriendList.vue'
 import UserProfile from '@/views/UserProfile.vue'
 import Home from '@/views/Home.vue'
 // import http from '../http-common'
+import Chat from '@/views/Chat.vue'
 
 
 const routes = [
@@ -53,6 +54,11 @@ const routes = [
 		path: '/friendlist',
 		component: FriendList,
 		meta: {requiredAuth: true}
+	},
+	{
+		name: 'chat',
+		path: '/chat',
+		component: Chat
 	},
 	{
 		name: 'UserProfile',
