@@ -35,6 +35,10 @@ let ChannelController = class ChannelController {
         const channel = await this.channelService.findChannelById(channelId);
         return this.channelService.getChannelMessagesByRoomId(channel.id);
     }
+    async findMembersByChannelId(channelId) {
+        const channel = await this.channelService.findChannelById(channelId);
+        return this.channelService.getChannelMembers(channel);
+    }
     async createChannel(request, channelDto) {
         await this.channelService.createChannel(channelDto, request.user.id);
     }
@@ -44,8 +48,8 @@ let ChannelController = class ChannelController {
     async updateMemberChannel(request, userId, channelId, updates) {
         return await this.channelService.updateChannelMember(request.user.id, userId, channelId, updates);
     }
-    async deleteChannel(channelId) {
-        return await this.channelService.deleteChannel(channelId);
+    async deleteChannel(request, channelId) {
+        return await this.channelService.deleteChannel(request.user.id, channelId);
     }
     async deleteChannelMember(userId, channelId) {
         return await this.channelService.deleteChannelMember(userId, channelId);
@@ -79,6 +83,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "findMessagesByChannelId", null);
 __decorate([
+    (0, common_1.Get)(':channelId/members'),
+    __param(0, (0, common_1.Param)('channelId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ChannelController.prototype, "findMembersByChannelId", null);
+__decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Req)()),
@@ -109,10 +120,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "updateMemberChannel", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Delete)(':channelId'),
-    __param(0, (0, common_1.Param)('channelId')),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('channelId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Object, Number]),
     __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "deleteChannel", null);
 __decorate([

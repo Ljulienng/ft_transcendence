@@ -18,11 +18,13 @@ export declare class ChannelService {
     findChannelById(channelId: number): Promise<Channel>;
     findChannelByName(channelName: string): Promise<Channel>;
     createChannel(createChannel: CreateChannelDto, userId: number): Promise<void>;
+    createDmChannel(createChannel: CreateChannelDto, user1Id: number, user2Id: number): void;
     checkPasswordMatch(sentPassword: string, hashExpectedPassword: string): Promise<boolean>;
     addUserToChannel(joinChannel: JoinChannelDto, userId: number): Promise<void>;
     removeUserToChannel(leaveChannel: Channel, userId: number): Promise<void>;
     changePassword(channelId: number, userId: number, passwords: PasswordI): Promise<void>;
-    deleteChannel(channelId: number): Promise<Channel>;
+    deleteChannel(userId: number, channelId: number): Promise<Channel>;
+    getChannelMembers(channel: Channel): Promise<import("../../channelMember/models/channelMember.entity").ChannelMember[]>;
     updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto): Promise<void>;
     deleteChannelMember(userId: number, channelId: number): Promise<void>;
     getChannelMessagesByRoomName(room: string): Promise<import("../../message/models/message.entity").Message[]>;

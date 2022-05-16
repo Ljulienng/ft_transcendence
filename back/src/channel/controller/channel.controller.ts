@@ -28,9 +28,15 @@ export class ChannelController {
     }
 
     @Get(':channelId/messages')
-    async findMessagesByChannelId(@Param('channelId') channelId: number): Promise<CreateMessageDto[]> {
+    async findMessagesByChannelId(@Param('channelId') channelId: number) {
         const channel = await this.channelService.findChannelById(channelId);
         return this.channelService.getChannelMessagesByRoomId(channel.id);
+    }
+
+    @Get(':channelId/members')
+    async findMembersByChannelId(@Param('channelId') channelId: number) {
+        const channel = await this.channelService.findChannelById(channelId);
+        return this.channelService.getChannelMembers(channel);
     }
 
     // test : curl -v  -X POST -d '{"name":"room42", "type": 1,  "password":"supersecuremdp"}' -H "Content-Type: application/json" http://localhost:3000/channel/
@@ -63,10 +69,12 @@ export class ChannelController {
         return await this.channelService.updateChannelMember(request.user.id, userId, channelId, updates);
     }
 
+    @UseGuards(JwtAuthGuard) // user has to be connected
     @Delete(':channelId')
     async deleteChannel(
+        @Req() request,
         @Param('channelId') channelId: number) {
-        return await this.channelService.deleteChannel(channelId);
+        return await this.channelService.deleteChannel(request.user.id, channelId);
     }
 
     @Delete(':channelId/:userId')

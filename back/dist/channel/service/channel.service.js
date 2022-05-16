@@ -46,6 +46,9 @@ let ChannelService = class ChannelService {
         if (!user) {
             throw new common_1.UnauthorizedException('user does not exist');
         }
+        if (this.channelRepository.findOne({ name: createChannel.name })) {
+            throw new common_1.UnauthorizedException('this name is already used');
+        }
         const newChannel = this.channelRepository.create({
             name: createChannel.name,
             type: createChannel.type,
@@ -70,6 +73,8 @@ let ChannelService = class ChannelService {
         console.log('new channel created : ', newChannel);
         await this.channelRepository.save(newChannel);
         await this.channelMemberService.createMember(user, newChannel, true);
+    }
+    createDmChannel(createChannel, user1Id, user2Id) {
     }
     async checkPasswordMatch(sentPassword, hashExpectedPassword) {
         return await bcrypt.compare(sentPassword, hashExpectedPassword);
@@ -97,11 +102,15 @@ let ChannelService = class ChannelService {
         if (!(this.channelMemberService.findOne(user, channelToLeave))) {
             throw new common_1.UnauthorizedException('user not in this channel');
         }
-        this.channelMemberService.deleteMember(user, channelToLeave);
-        await this.channelRepository.save(channelToLeave);
+        if (user.id === channelToLeave.owner.id) {
+            await this.channelRepository.delete(channelToLeave);
+        }
+        else {
+            this.channelMemberService.deleteMember(user, channelToLeave);
+            await this.channelRepository.save(channelToLeave);
+        }
     }
     async changePassword(channelId, userId, passwords) {
-        console.log('user:', userId, ' changes password of channel:', channelId, ' [new pass:', passwords.newPassword, ']');
         const channel = await this.findChannelById(channelId);
         if (userId !== channel.owner.id) {
             throw new common_1.HttpException('you are not authorized to change the password', common_1.HttpStatus.FORBIDDEN);
@@ -115,17 +124,22 @@ let ChannelService = class ChannelService {
         if (!(await this.checkPasswordMatch(passwords.oldPassword, channel.password))) {
             throw new common_1.HttpException('current password does not match', common_1.HttpStatus.FORBIDDEN);
         }
-        console.log('password changed');
         const saltOrRounds = await bcrypt.genSalt();
         const password = await bcrypt.hash(passwords.newPassword, saltOrRounds);
         this.channelRepository.update(channel.id, { password });
     }
-    async deleteChannel(channelId) {
+    async deleteChannel(userId, channelId) {
         const channel = await this.findChannelById(channelId);
         if (!channel) {
             throw new common_1.NotFoundException();
         }
+        if (userId != channel.owner.id) {
+            throw new common_1.HttpException('only the owner can delete channels', common_1.HttpStatus.FORBIDDEN);
+        }
         return await this.channelRepository.remove(channel);
+    }
+    async getChannelMembers(channel) {
+        return await this.channelMemberService.findChannelMembers(channel);
     }
     async updateChannelMember(userId, memberId, channelId, updates) {
         const userWhoUpdate = await this.userRepository.findOne({ id: userId });
