@@ -10,20 +10,24 @@ import { UserService } from './user/service/user.service';
 import { UserModule } from './user/user.module';
 import { ChannelModule } from './channel/channel.module';
 import { MessageModule } from './message/message.module';
+import { ChatModule } from './chat/chat.module';
+import { ChannelMemberModule } from './channelMember/channelMember.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal: true}),
-    TypeOrmModule.forRoot({ // for PostGres
+    TypeOrmModule.forRoot({ // for PostGres 
       type: 'postgres',
-      url: process.env.DATABASE_URL,
-      //url: "postgres://user:password@localhost:5432/db",
+      // url: process.env.DATABASE_URL,
+      url: "postgres://user:password@localhost:5432/db",
       autoLoadEntities: true,
       synchronize: true
     }),
     UserModule,
     AuthModule,
-    MessageModule
+    MessageModule,
+    ChatModule,
+    ChannelMemberModule
   ],
   controllers: [AppController],
   providers: [AppService]

@@ -47,7 +47,7 @@ export default defineComponent({
     ...mapGetters("auth", {
       getUserProfile: "getUserProfile",
     }),
-  }
+  },
 });
 </script>
 

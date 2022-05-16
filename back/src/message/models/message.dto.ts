@@ -1,19 +1,9 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { Message } from './message.entity';
+import { User } from "src/user/models/user.entity";
 
-export class MessageDto {
+export class CreateMessageDto {
 
-    @IsNotEmpty()
-    @IsNumber()
-    userId: number;
-
-    @IsNotEmpty()
-    @IsString()
+    // user: User;
     content: string;
-
-    constructor(message: Message) {
-        this.userId = message.user.id;
-        this.content = message.content;
-    }
+    channelId?: number;
 
 }

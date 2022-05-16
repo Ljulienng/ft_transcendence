@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MessageDto } from '../models/message.dto';
+import { CreateMessageDto } from '../models/message.dto';
 import { Message } from '../models/message.entity';
+import { Channel } from 'src/channel/models/channel.entity';
+import { User } from 'src/user/models/user.entity';
 
 @Injectable()
 export class MessageService {
@@ -11,39 +13,41 @@ export class MessageService {
         private messageRepository: Repository<Message>,
     ) {}
 
-    /*
-    ** get all messages
-    */
    async findAll(): Promise<Message[]> {
        return await this.messageRepository.find();
    }
 
-   /*
-   ** get one message by its id
-   */
-  async findMessageById(messageId: string): Promise<Message> {
+  async findMessageById(messageId: number): Promise<Message> {
       return await this.messageRepository.findOneOrFail({
-          where: { id: Number(messageId) }
+          where: {
+              id: messageId
+            }
       });
   }
 
-  /*
-  ** create one message
-  */
-  create(messageDto: MessageDto) {
-      const message = this.messageRepository.create(messageDto);
-      return this.messageRepository.save(message);
+  async findMessagesByChannel(channel: Channel): Promise<Message[]> {
+    return await this.messageRepository.find({
+        where: {
+            channel: channel
+        }
+    });
+}
+
+  async save(user: User, channel: Channel, message: CreateMessageDto) {
+    const newMessage = this.messageRepository.create({
+        user: user,
+        content: message.content,
+        channel: channel,
+    });  
+    return await this.messageRepository.save(newMessage);
   }
 
-  /*
-  ** remove one message
-  */
- async delete(messageId: string) {
-     const message = await this.findMessageById(messageId);
+ async deleteMessage(messageId: number) {
+     const message = await this.findMessageById(messageId);  
      if (!message) {
          throw new NotFoundException();
      }
-     return this.messageRepository.remove(message);
+     return await this.messageRepository.remove(message);
  }
 
 }

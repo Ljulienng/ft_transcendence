@@ -4,7 +4,7 @@
 		<div class="signup-connect">
 			<h1>Create your account</h1>
 			<a href="http://localhost:3000/auth/42" class="btn btn-social btn-42" v-on:click="ftAuth"><i class="fa fa-user"></i> Sign in with 42</a>
-			<a href="#" class="btn btn-social btn-google"><i class="fa fa-google"></i> Sign in with Google</a>
+			<a v-on:click="norminetAuth" class="btn btn-social btn-google"><i class="fa fa-google"></i> Sign in with norminet</a>
 		</div>	
 	</div>
 </div>
@@ -12,14 +12,24 @@
 </template>
 
 <script lang='ts'>
-// import axios from 'axios'
-
+import http from "../http-common"
 import { defineComponent } from "@vue/runtime-core";
 
 export default defineComponent({
   methods:{
     ftAuth() {
       return ('http://localhost:3000/auth/42');
+    },
+
+    norminetAuth() {
+      http.get('/norminet')
+      .then(res => {
+        console.log(res);
+        this.$router.push("http://localhost:3001/home")
+      })
+      .catch(err => {
+        console.log("err norminet = ", err)
+      })
     }
   }
 })
