@@ -10,6 +10,7 @@ import { UserService } from './user/service/user.service';
 import { UserModule } from './user/user.module';
 import { ChannelModule } from './channel/channel.module';
 import { MessageModule } from './message/message.module';
+import { PongModule } from './pong/pong.module';
 import { ChatModule } from './chat/chat.module';
 import { ChannelMemberModule } from './channelMember/channelMember.module';
 
@@ -27,7 +28,8 @@ import { ChannelMemberModule } from './channelMember/channelMember.module';
     AuthModule,
     MessageModule,
     ChatModule,
-    ChannelMemberModule
+    ChannelMemberModule,
+    PongModule
   ],
   controllers: [AppController],
   providers: [AppService]
