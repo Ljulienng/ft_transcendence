@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200&display=swap');
 .page {
     height: 100%;
     width: 100%;
@@ -20,6 +21,21 @@ h4 {
     color: #fff774;
     font-size: 24px;
 }
+h5 {
+    color: #595959;
+    font-size: 24px;
+    font-family: 'Inter';
+}
+text {
+    color: #000000;
+    font-size: 24px;
+    font-family: 'Inter';
+    font-weight: 600;
+}
+.error {
+    color: #ff0000;
+    font-family: 'Inter';
+}
 .mybtn {
     height: 50px;
     width: 200px;
@@ -29,6 +45,7 @@ h4 {
     border-radius: 20px;
     border: 2px solid #fff774;
     margin: 5px;
+    background: none;
 }
 .mybtn:hover {
     height: 50px;
@@ -48,6 +65,22 @@ h4 {
     border-radius: 20px;
     margin-top: 10px;
     overflow:scroll;
+}
+.form {
+    height: 370px;
+    width: 695px;
+    background-color: #c4c4c480;
+    border-radius: 20px;
+
+    padding: 10px;
+    text-align: center;
+
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
 }
 .boxhead {
     height: 150px;
@@ -111,4 +144,18 @@ h4 {
     display: inline-block;
     padding: 3px;
     transform: rotate(45deg);
+}
+.field {
+    height: 40px;
+    width: 420px;
+    border-radius: 20px;
+    border: 0px;
+    // margin: 5%;
+    margin-bottom: 0%;
+    padding-left: 3%;
+    font-family: 'Inter';
+    font-size: 16px;
+}
+.toggle_switch{
+    margin: 5%;
 }
