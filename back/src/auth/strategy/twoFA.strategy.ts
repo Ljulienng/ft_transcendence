@@ -31,7 +31,7 @@ export class TwoFaStrategy extends PassportStrategy(Strategy, 'twofa') {
 		console.log('twofa validate');
 		const { username, auth } = payload;
 		const user = await this.userService.findByUsername(username); // to change\
-		console.log("twoFAEnabled =", user.twoFAEnabled)
+		// console.log("twoFAEnabled =", user.twoFAEnabled)
 		if (!user) {
 			throw new UnauthorizedException('User not found');
 		}
