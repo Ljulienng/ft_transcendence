@@ -37,13 +37,13 @@ export class User {
 	banned: boolean;
 
 	@Column({ nullable: true, default: null,})
-	twoFASecret?: string
+	twoFASecret?: string;
 
-	@Column({default: false,})
-	twoFAEnabled: boolean
+	@Column({ nullable: true, default: false,})
+	twoFAEnabled: boolean;
 
 	@CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
-	readonly createdTime: Date
+	readonly createdTime: Date;
 
 	@OneToMany(() => Message, message => message.channel)
 	messages: Message[];
