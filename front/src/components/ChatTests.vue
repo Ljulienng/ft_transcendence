@@ -13,7 +13,7 @@
                     <input type="radio" value="protected" v-model="privacy" />
                     <label for="protected">Protected</label>
                 </div>
-                <div>
+                <div> 
                     <input type="radio" value="private" v-model="privacy" />
                     <label for="private">Private</label>
                 </div>        
@@ -114,7 +114,7 @@ export default defineComponent({
                 privacy: this.privacy,
                 password: this.password,
              }
-            http.post('/channel', channel, { withCredentials: true });
+            http.post('/channel/createChannel', channel, { withCredentials: true });
             this.getChannelList();
             this.name = '';
             this.privacy = '';

@@ -94,7 +94,7 @@ __decorate([
 ], ChannelController.prototype, "findMembersByChannelId", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Post)('createChannel'),
+    (0, common_1.Post)('/createChannel'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -103,7 +103,7 @@ __decorate([
 ], ChannelController.prototype, "createChannel", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Post)('createDmChannel'),
+    (0, common_1.Post)('/createDmChannel'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Body)()),

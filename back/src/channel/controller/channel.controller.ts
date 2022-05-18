@@ -41,16 +41,16 @@ export class ChannelController {
 
     // test : curl -v  -X POST -d '{"name":"room42", "type": 1,  "password":"supersecuremdp"}' -H "Content-Type: application/json" http://localhost:3000/channel/createChannel
     @UseGuards(JwtAuthGuard) // user has to be connected
-    @Post('createChannel')
+    @Post('/createChannel')
     async createChannel(
         @Req() request,
         @Body() channelDto: CreateChannelDto) {
-        await this.channelService.createChannel(channelDto, request.user.id);
+            await this.channelService.createChannel(channelDto, request.user.id);
     }
 
     // test : curl -v  -X POST -d '{"secondUserId": "2", { "name":"room42", "type": 1,  "password":"supersecuremdp" }}' -H "Content-Type: application/json" http://localhost:3000/channel/
     @UseGuards(JwtAuthGuard) // user has to be connected
-    @Post('createDmChannel')
+    @Post('/createDmChannel')
     async createDmChannel(
         @Req() request,
         @Body() secondUserId: number,

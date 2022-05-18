@@ -46,7 +46,8 @@ let ChannelService = class ChannelService {
         if (!user) {
             throw new common_1.UnauthorizedException('user does not exist');
         }
-        if (this.channelRepository.findOne({ name: createChannel.name })) {
+        const isSameChatName = await this.channelRepository.findOne({ name: createChannel.name });
+        if (isSameChatName) {
             throw new common_1.UnauthorizedException('this name is already used');
         }
         const newChannel = this.channelRepository.create({
@@ -80,7 +81,8 @@ let ChannelService = class ChannelService {
         if (!user1 || !user2) {
             throw new common_1.UnauthorizedException('user does not exist');
         }
-        if (this.channelRepository.findOne({ name: createChannel.name })) {
+        const isSameChatName = await this.channelRepository.findOne({ name: createChannel.name });
+        if (isSameChatName) {
             throw new common_1.UnauthorizedException('this name is already used');
         }
         const newChannel = this.channelRepository.create({

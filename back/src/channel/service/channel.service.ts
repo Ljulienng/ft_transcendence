@@ -50,12 +50,12 @@ export class ChannelService {
     /* create channel */
    async createChannel(createChannel: CreateChannelDto, userId: number) {
         const user = await this.userRepository.findOne({id: userId});
-        
         if (!user) {
             throw new UnauthorizedException('user does not exist');
         }
 
-        if (this.channelRepository.findOne({name: createChannel.name})) {
+        const isSameChatName = await this.channelRepository.findOne({name: createChannel.name});
+        if (isSameChatName) {
             throw new UnauthorizedException('this name is already used');  
         }
 
@@ -67,7 +67,7 @@ export class ChannelService {
             channelMembers: [],
             owner: user,
        });
-
+ 
        if (newChannel.type === ChannelType.protected || newChannel.type === ChannelType.private) {
            if (!newChannel.password) {
                 throw new BadRequestException('need a password for private or protected channel');
@@ -98,7 +98,8 @@ export class ChannelService {
             throw new UnauthorizedException('user does not exist');
         }
 
-        if (this.channelRepository.findOne({name: createChannel.name})) {
+        const isSameChatName = await this.channelRepository.findOne({name: createChannel.name});
+        if (isSameChatName) {
             throw new UnauthorizedException('this name is already used');  
         }
 
@@ -109,7 +110,6 @@ export class ChannelService {
             channelMembers: [],
             owner: user1,
        });
-
        console.log('new DM channel created : ', newChannel);
        await this.channelRepository.save(newChannel);
        await this.channelMemberService.createMember(user1, newChannel, true);
