@@ -42,6 +42,9 @@ let ChannelController = class ChannelController {
     async createChannel(request, channelDto) {
         await this.channelService.createChannel(channelDto, request.user.id);
     }
+    async createDmChannel(request, secondUserId, channelDto) {
+        await this.channelService.createDmChannel(channelDto, request.user.id, secondUserId);
+    }
     changePassword(channelId, request, passwords) {
         return this.channelService.changePassword(channelId, request.user.id, passwords);
     }
@@ -91,13 +94,23 @@ __decorate([
 ], ChannelController.prototype, "findMembersByChannelId", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.Post)(),
+    (0, common_1.Post)('createChannel'),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, channel_dto_1.CreateChannelDto]),
     __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "createChannel", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('createDmChannel'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Number, channel_dto_1.CreateChannelDto]),
+    __metadata("design:returntype", Promise)
+], ChannelController.prototype, "createDmChannel", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)(':channelId/changePass'),

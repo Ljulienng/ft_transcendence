@@ -39,13 +39,23 @@ export class ChannelController {
         return this.channelService.getChannelMembers(channel);
     }
 
-    // test : curl -v  -X POST -d '{"name":"room42", "type": 1,  "password":"supersecuremdp"}' -H "Content-Type: application/json" http://localhost:3000/channel/
+    // test : curl -v  -X POST -d '{"name":"room42", "type": 1,  "password":"supersecuremdp"}' -H "Content-Type: application/json" http://localhost:3000/channel/createChannel
     @UseGuards(JwtAuthGuard) // user has to be connected
-    @Post()
+    @Post('createChannel')
     async createChannel(
         @Req() request,
         @Body() channelDto: CreateChannelDto) {
         await this.channelService.createChannel(channelDto, request.user.id);
+    }
+
+    // test : curl -v  -X POST -d '{"secondUserId": "2", { "name":"room42", "type": 1,  "password":"supersecuremdp" }}' -H "Content-Type: application/json" http://localhost:3000/channel/
+    @UseGuards(JwtAuthGuard) // user has to be connected
+    @Post('createDmChannel')
+    async createDmChannel(
+        @Req() request,
+        @Body() secondUserId: number,
+        @Body() channelDto: CreateChannelDto) {
+        await this.channelService.createDmChannel(channelDto, request.user.id, secondUserId);
     }
 
     // test : curl -v -X POST -d '{"oldPassword":"oldpass", "newPassword":"newpass"}' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/changePass

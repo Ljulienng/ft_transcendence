@@ -11,6 +11,7 @@ export declare class ChannelController {
     findMessagesByChannelId(channelId: number): Promise<import("../../message/models/message.entity").Message[]>;
     findMembersByChannelId(channelId: number): Promise<import("../../channelMember/models/channelMember.entity").ChannelMember[]>;
     createChannel(request: any, channelDto: CreateChannelDto): Promise<void>;
+    createDmChannel(request: any, secondUserId: number, channelDto: CreateChannelDto): Promise<void>;
     changePassword(channelId: number, request: any, passwords: PasswordI): Promise<void>;
     updateMemberChannel(request: any, userId: number, channelId: number, updates: UpdateMemberChannelDto): Promise<void>;
     deleteChannel(request: any, channelId: number): Promise<import("../models/channel.entity").Channel>;

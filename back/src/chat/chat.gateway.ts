@@ -60,7 +60,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('joinChannel')
     async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
         await this.channelService.addUserToChannel(joinChannel, client.data.user.id);
-    }
+    } 
 
     @SubscribeMessage('leaveChannel') 
     async leaveChannel(client: Socket, channel: Channel) {
