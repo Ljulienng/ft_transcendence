@@ -21,6 +21,7 @@ import { TwoFAAuth } from "src/auth/guards/twoFA.guard";
 import { SocketGuard } from "src/auth/guards/socket.guard";
 import { User } from "src/user/models/user.entity";
 import { channel } from "diagnostics_channel";
+import { receiveMessageOnPort } from "worker_threads";
 /*
 ** OnGatewayInit        : need to implement afterInit()
 ** OnGatewayConnection  : need to implement handleConnection()
@@ -117,6 +118,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('leaveChannel') 
     async leaveChannel(client: Socket, channel: Channel) {
         await this.channelService.removeUserToChannel(channel, client.data.user.id);
+
         // this.server.to
     }
 

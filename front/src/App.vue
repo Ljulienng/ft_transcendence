@@ -1,118 +1,134 @@
-
 <template>
   <div class="app">
-    <Sidebar/>
-
-	<router-view />
-	<MyModal/>
-	<div id="my-modals"/>
+    <!-- <Notifications
+		group="foo-css"
+		position="bottom left"
+		:speed="500"
+	/> -->
+    <Sidebar />
+    <router-view />
+    <MyModal />
+    <div id="my-modals" />
   </div>
 </template>
 
-<script lamg='ts'>
+<script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import http from './http-common'
-import store from './store'
-import router from './router'
+import http from "./http-common";
+import store from "./store";
+import router from "./router";
 
-import { mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 
 export default defineComponent({
-	computed: {
-		...mapGetters("auth", {
-		getUserProfile: "getUserProfile",
-		}),
-	},
+  computed: {
+    ...mapGetters("auth", {
+      getUserProfile: "getUserProfile",
+    }),
+  },
 
+  methods: {
+    async checkUserstatus() {
+      let userProfile = store.getters["auth/getUserProfile"];
 
-	methods: {
-		async checkUserstatus() {
-			let userProfile = store.getters["auth/getUserProfile"];
+      if (userProfile.id === 0) {
+        await store.dispatch("auth/userProfile");
+        userProfile = store.getters["auth/getUserProfile"];
+      }
 
-			if (userProfile.id === 0) {
-				await store.dispatch("auth/userProfile");
-				userProfile = store.getters["auth/getUserProfile"];
-			}
+      if (userProfile.id === 0) router.push("http://localhost:3001/authmodal");
+      const userId = store.getters["auth/getUserProfile"].id;
 
-			if (userProfile.id === 0)
-				router.push('http://localhost:3001/authmodal')
-			const userId = store.getters['auth/getUserProfile'].id
+      // console.log('userId = ', userId);
+      // const userSocket = store.getters['auth/getUserSocket'].id
 
-			// console.log('userId = ', userId);
-			// const userSocket = store.getters['auth/getUserSocket'].id
-	
-			// if (!userSocket)
-			// 	store.dispatch('auth/setUserSocket')
-			if (userId)
-				await store.dispatch('auth/setUserStatus', 'Online');
-		},
-		
-		setOffline() {
-			const userSocket = store.getters['auth/getUserSocket'].id
-	
-			if (!userSocket)
-				store.dispatch('auth/setUserSocket')
-			store.dispatch('auth/setUserStatus', 'Offline');
-			http.post('/users/setstatus', {newStatus: 'Offline'})
-			.then(res => {
-				console.log(res);
-			})
-			.catch(err => {
-				console.log(err);
-			})
-		}
-	},
+      // if (!userSocket)
+      // 	store.dispatch('auth/setUserSocket')
+      if (userId) await store.dispatch("auth/setUserStatus", "Online");
+    },
 
-	created(){
-		window.addEventListener('beforeunload', this.setOffline) 
-		this.checkUserstatus();
-	},
-})
+    setOffline() {
+      const userSocket = store.getters["auth/getUserSocket"].id;
+
+      if (!userSocket) store.dispatch("auth/setUserSocket");
+      store.dispatch("auth/setUserStatus", "Offline");
+      http
+        .post("/users/setstatus", { newStatus: "Offline" })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    show(group, type = "") {
+      const text = `
+				This is notification text!
+				<br>
+				Date: ${new Date()}
+			`;
+      this.$notify({
+        group,
+        title: `Test ${type} notification #${this.id++}`,
+        text,
+        type,
+        data: {
+          randomNumber: Math.random(),
+        },
+      });
+    },
+  },
+
+  created() {
+    console.log("heho");
+    window.addEventListener("beforeunload", this.setOffline);
+    this.checkUserstatus();
+  },
+});
 </script>
 
-<script>
-</script>
+<script></script>
 
 <style lang="scss">
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 
 :root {
-	--primary: #fff774;
-	--primary-alt: #fff774;
-	--grey: #c4c4c4;
-	--dark: #2e2e2e;
-	--dark-alt: #595959;
-	--light: #f1f5f9;
-	--sidebar-width: 250px;
+  --primary: #fff774;
+  --primary-alt: #fff774;
+  --grey: #c4c4c4;
+  --dark: #2e2e2e;
+  --dark-alt: #595959;
+  --light: #f1f5f9;
+  --sidebar-width: 250px;
 }
 
 * {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-	font-family: 'Fira sans', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Fira sans", sans-serif;
 }
 body {
-	background-image: url('~@/assets/background.jpg');
-	background-repeat: no-repeat;
-	background-size: cover;
+  background-image: url("~@/assets/background.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 button {
-	cursor: pointer;
-	appearance: none;
-	border: none;
-	outline: none;
-	background: none;
+  cursor: pointer;
+  appearance: none;
+  border: none;
+  outline: none;
+  background: none;
 }
 
 .app {
-	display: flex;
-	main {
-		flex: 1 1 0;
-		padding: 2rem;
-		@media (max-width: 1024px) {
-			padding-left: 6rem;
-		}
+  display: flex;
+  main {
+    flex: 1 1 0;
+    padding: 2rem;
+    @media (max-width: 1024px) {
+      padding-left: 6rem;
+    }
   }
 }
 </style>
