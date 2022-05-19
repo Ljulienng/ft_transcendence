@@ -118,7 +118,8 @@ let ChannelService = class ChannelService {
                 }
             }
         }
-        if (this.channelMemberService.findOne(user, welcomingChannel)) {
+        const channelMember = await this.channelMemberService.findOne(user, welcomingChannel);
+        if (channelMember) {
             throw new common_1.UnauthorizedException('user already in this channel');
         }
         await this.channelMemberService.createMember(user, welcomingChannel, false, false);

@@ -143,13 +143,7 @@ export class ChannelService {
    */
    async addUserToChannel(joinChannel: JoinChannelDto, userId: number) {
         const user = await this.userRepository.findOne({id: userId});
-        
-        // select * from channel where channel.id=joinChannel.id
         const welcomingChannel = await this.findChannelById(joinChannel.id);
-        // const welcomingChannel = await this.channelRepository
-            // .createQueryBuilder('channel')
-            // .where('channel.id = :channelId', {channelId: joinChannel.id})
-            // .getOne();
         
         if (welcomingChannel.type !== ChannelType.public) {
             if (welcomingChannel.password) {
@@ -160,28 +154,19 @@ export class ChannelService {
             }
         }
 
-        if (this.channelMemberService.findOne(user, welcomingChannel)) {
+        const channelMember = await this.channelMemberService.findOne(user, welcomingChannel);
+
+        if (channelMember) {
             throw new UnauthorizedException('user already in this channel');
         }
 
-        await this.channelMemberService.createMember(user, welcomingChannel, false, false);
-        
-        // add the channel of the channelJoined list of the user
-        // this.userService.addJoinedChannel(user, welcomingChannel);
-        
+        await this.channelMemberService.createMember(user, welcomingChannel, false, false);    
         await this.channelRepository.save(welcomingChannel);
    }
 
    async removeUserToChannel(leaveChannel: Channel, userId: number) {
         const user = await this.userRepository.findOne({id: userId});
-        
-        // select * from channel where channel.id=leaveChannel.id
         const channelToLeave = await this.findChannelById(leaveChannel.id);
-        // const channelToLeave = await this.channelRepository
-        //     .createQueryBuilder('channel')
-        //     .where('channel.id = :channelId', {channelId: leaveChannel.id})
-        //     .getOne();
-        
         const channelMember = await this.channelMemberService.findOne(user, channelToLeave);
 
         if (!channelMember) {
@@ -194,13 +179,8 @@ export class ChannelService {
             await this.channelRepository.delete(channelToLeave);
         } else {
             this.channelMemberService.deleteMember(user, channelToLeave);
-            
-            // remove the channel of the channelJoined list of the user
-            // this.userService.removeJoinedChannel(user.id, channelToLeave)
-            
             await this.channelRepository.save(channelToLeave);
         }
-       
    }
 
    /* only owner can change the password */
