@@ -70,21 +70,9 @@ export default defineComponent({
 
 	},
 
-	mounted() {
-		this.socket.on('sendMessageToClient', (data) => {
-			console.log("send msg to client = ", data)
-			// this.getMessageList();
-		}),
-		this.socket.on('channelMessages', (data) => {
-			console.log("channelMessages = ", data)
-			this.messageList = data;
-			// this.getMessageList();
-		}),
-		this.socket.on('joinChannel', (data) => {
-			console.log("joinChannel = ", data)
-			// this.getMessageList();
-		})
-	},
+	// mounted() {
+
+	// },
 
 	// unmounted() {
 	// 	this.test.close;
@@ -92,11 +80,6 @@ export default defineComponent({
 
 	created() {
 		console.log("Channelbox created");
-	// 	// this.getMessageList();
-	// 	// const test = io('http://localhost:3000/channel', {  withCredentials: true});
-	// 	// console.log("test socket = ", this.test)
-	// 	// console.log("user socket = ", this.$store.getters["auth/getUserSocket"])
-	// 	// this.socket.on()
 
 
 	}

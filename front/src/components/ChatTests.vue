@@ -46,7 +46,9 @@
             <ul>
                 <li v-for="channel in channelList" :key="channel">
                     {{channel.id}} - "{{channel.name}}" : created by {{channel.owner.username}}
+                    <button @click="joinChannel(channel.id, channel.type)">join channel</button>
                     <button @click="showChannel(channel.id)">show channel</button>
+                
                     <!-- {{channel.messages}} -->
                 </li>
             </ul>
@@ -157,16 +159,20 @@ export default defineComponent({
         //     this.socket.emit('sendMessageToServer', this.message);
         // },
 
-        // joinChannel() {
-        //     console.log('join channel : ', this.channelToJoin.id);
-        //     this.socket.emit('joinChannel', this.channelToJoin);
-        // }
+        joinChannel(channelId: number, channelType: string) {
+            const channelToJoin =  {
+                id: channelId,
+                type: channelType,
+                password: '',
+                // userId: 0,
+            }
+
+            console.log('join channel : ', channelToJoin);
+            this.socket.emit('joinChannel', channelToJoin);
+        }
     },
 
-    created() {
-        // this.socket = io('localhost:3000/chat', {  withCredentials: true });
-        this.getChannelList();
-        
+    mounted() {
         this.socket.on('sendMessageToClient', (data) => {
             console.log(data);
         })
@@ -174,6 +180,11 @@ export default defineComponent({
         this.socket.on('channelJoined', (data) => {
             console.log(data);
         })
+    },
+
+    created() {
+        // this.socket = io('localhost:3000/chat', {  withCredentials: true });
+        this.getChannelList();
     },
 
     // computed: {

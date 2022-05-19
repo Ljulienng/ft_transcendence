@@ -7,6 +7,7 @@ import { Student } from "src/user/dto/student.dto"
 import { User, Friend } from '../models/user.entity';
 import { isNumber } from 'class-validator';
 import { names, uniqueNamesGenerator } from 'unique-names-generator';
+import { JwtService } from '@nestjs/jwt';
 
 
 @Injectable()
@@ -15,6 +16,7 @@ export class UserService {
 	constructor(
 		@InjectRepository(User)
 		protected userRepository: Repository<User>,
+		private jwtService: JwtService
 	) {}
 
 	async onModuleInit(): Promise<void> {
@@ -89,6 +91,12 @@ export class UserService {
 
 	findAll(): any {
 		return from(this.userRepository.find());
+	}
+
+	async findByCookie(cookie: any): Promise<User> {
+		// Decode cookie to a payload then search within rep using username from payload
+		const user = await this.userRepository.findOne({username: this.jwtService.decode(cookie)["username"]});
+		return user;
 	}
 
 	findByUserId(userId: number): Observable<User> {
