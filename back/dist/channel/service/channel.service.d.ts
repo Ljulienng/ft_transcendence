@@ -30,7 +30,7 @@ export declare class ChannelService {
     deleteChannel(userId: number, channelId: number): Promise<Channel>;
     updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto): Promise<void>;
     deleteChannelMember(userId: number, channelId: number): Promise<void>;
-    getChannelMessagesByChannelName(channelName: string): Promise<import("../../message/models/message.entity").Message[]>;
-    getChannelMessagesByChannelId(channelId: number): Promise<import("../../message/models/message.entity").Message[]>;
+    findChannelMessagesByChannelName(channelName: string): Promise<import("../../message/models/message.entity").Message[]>;
+    findChannelMessagesByChannelId(channelId: number): Promise<import("../../message/models/message.entity").Message[]>;
     saveMessage(userId: number, createMessageDto: CreateMessageDto): Promise<import("../../message/models/message.entity").Message>;
 }

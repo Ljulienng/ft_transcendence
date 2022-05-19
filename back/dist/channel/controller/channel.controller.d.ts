@@ -9,7 +9,8 @@ export declare class ChannelController {
     findChannelById(channelId: number): Promise<import("../models/channel.entity").Channel>;
     findChannelByName(name: string): Promise<import("../models/channel.entity").Channel>;
     findMessagesByChannelId(channelId: number): Promise<import("../../message/models/message.entity").Message[]>;
-    getMembersByChannelId(channelId: number): Promise<import("../../channelMember/models/channelMember.entity").ChannelMember[]>;
+    findChannelMembersByChannelId(channelId: number): Promise<import("../../channelMember/models/channelMember.entity").ChannelMember[]>;
+    findChannelOwner(channelId: number): Promise<import("../../channelMember/models/channelMember.entity").ChannelMember>;
     createChannel(request: any, channelDto: CreateChannelDto): Promise<void>;
     createDmChannel(request: any, secondUserId: number, channelDto: CreateChannelDto): Promise<void>;
     changePassword(channelId: number, request: any, passwords: PasswordI): Promise<void>;

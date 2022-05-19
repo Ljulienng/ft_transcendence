@@ -179,12 +179,12 @@ let ChannelService = class ChannelService {
         const channel = await this.findChannelById(channelId);
         return await this.channelMemberService.deleteMember(user, channel);
     }
-    async getChannelMessagesByChannelName(channelName) {
+    async findChannelMessagesByChannelName(channelName) {
         const channel = await this.findChannelByName(channelName);
         const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
-    async getChannelMessagesByChannelId(channelId) {
+    async findChannelMessagesByChannelId(channelId) {
         const channel = await this.findChannelById(channelId);
         const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());

@@ -261,7 +261,7 @@ export class ChannelService {
     ** get all the messages of a channel
     ** returns most recent last
     */
-    async getChannelMessagesByChannelName(channelName: string) {
+    async findChannelMessagesByChannelName(channelName: string) {
         const channel = await this.findChannelByName(channelName);
         const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
@@ -271,7 +271,7 @@ export class ChannelService {
     ** get all the messages of a channel
     ** returns most recent last
     */
-    async getChannelMessagesByChannelId(channelId: number) {
+    async findChannelMessagesByChannelId(channelId: number) {
         const channel = await this.findChannelById(channelId);
         const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());

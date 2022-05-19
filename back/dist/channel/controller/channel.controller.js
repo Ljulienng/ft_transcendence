@@ -33,10 +33,13 @@ let ChannelController = class ChannelController {
     }
     async findMessagesByChannelId(channelId) {
         const channel = await this.channelService.findChannelById(channelId);
-        return this.channelService.getChannelMessagesByChannelId(channel.id);
+        return this.channelService.findChannelMessagesByChannelId(channel.id);
     }
-    async getMembersByChannelId(channelId) {
+    async findChannelMembersByChannelId(channelId) {
         return this.channelService.findMembers(channelId);
+    }
+    async findChannelOwner(channelId) {
+        return this.channelService.findOwner(channelId);
     }
     async createChannel(request, channelDto) {
         await this.channelService.createChannel(channelDto, request.user.id);
@@ -90,7 +93,14 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
-], ChannelController.prototype, "getMembersByChannelId", null);
+], ChannelController.prototype, "findChannelMembersByChannelId", null);
+__decorate([
+    (0, common_1.Get)(':channelId/owner'),
+    __param(0, (0, common_1.Param)('channelId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ChannelController.prototype, "findChannelOwner", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)('/createChannel'),
