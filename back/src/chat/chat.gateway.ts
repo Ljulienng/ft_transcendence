@@ -34,8 +34,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     constructor(
         private channelService: ChannelService,
-        private messageService: MessageService,
-        private userService: UserService,
+        // private messageService: MessageService,
+        // private userService: UserService,
     ){}
 
     afterInit(server: any) {
@@ -47,8 +47,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     */ 
     async handleConnection(client: Socket, room: string) {
         client.join(room);                          // add this client to the room
-        this.server.to(room).emit('client_join');   // send the info to other members of this channel
-        const messages = await this.channelService.getChannelMessagesByRoomName(room);   // MODIFY dto
+        this.server.to(room).emit('channelJoined');   // send the info to other members of this channel
+        const messages = await this.channelService.getChannelMessagesByChannelName(room);   // MODIFY dto
         this.server.to(client.id).emit('channelMessages', messages);    // send messages of the channel to the new user
     }
 

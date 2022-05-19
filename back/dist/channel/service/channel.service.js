@@ -167,24 +167,24 @@ let ChannelService = class ChannelService {
         const channel = await this.findChannelById(channelId);
         return await this.channelMemberService.deleteMember(user, channel);
     }
-    async getChannelMessagesByRoomName(room) {
-        const channel = await this.findChannelByName(room);
+    async getChannelMessagesByChannelName(channelName) {
+        const channel = await this.findChannelByName(channelName);
         const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
-    async getChannelMessagesByRoomId(roomId) {
-        const channel = await this.findChannelById(roomId);
+    async getChannelMessagesByChannelId(channelId) {
+        const channel = await this.findChannelById(channelId);
         const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
     async saveMessage(userId, createMessageDto) {
         const user = await this.userRepository.findOne({ id: userId });
-        const currentChannel = await this.findChannelById(createMessageDto.channelId);
-        const channelMember = await this.channelMemberService.findOne(user, currentChannel);
+        const channel = await this.findChannelById(createMessageDto.channelId);
+        const channelMember = await this.channelMemberService.findOne(user, channel);
         if (!channelMember) {
-            throw new common_1.HttpException('the user is not a channel member', common_1.HttpStatus.FORBIDDEN);
+            throw new common_1.HttpException('this user is not a channel member', common_1.HttpStatus.FORBIDDEN);
         }
-        return await this.messageService.saveMessage(user, currentChannel, createMessageDto);
+        return await this.messageService.saveMessage(user, channel, createMessageDto);
     }
 };
 ChannelService = __decorate([

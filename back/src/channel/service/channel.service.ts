@@ -231,8 +231,8 @@ export class ChannelService {
     ** get all the messages of a channel
     ** returns most recent last
     */
-    async getChannelMessagesByRoomName(room: string) {
-        const channel = await this.findChannelByName(room);
+    async getChannelMessagesByChannelName(channelName: string) {
+        const channel = await this.findChannelByName(channelName);
         const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
@@ -241,20 +241,20 @@ export class ChannelService {
     ** get all the messages of a channel
     ** returns most recent last
     */
-    async getChannelMessagesByRoomId(roomId: number) {
-        const channel = await this.findChannelById(roomId);
+    async getChannelMessagesByChannelId(channelId: number) {
+        const channel = await this.findChannelById(channelId);
         const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
 
     async saveMessage(userId: number, createMessageDto: CreateMessageDto) {
         const user = await this.userRepository.findOne({id: userId});
-        const currentChannel = await this.findChannelById(createMessageDto.channelId);
-        const channelMember = await this.channelMemberService.findOne(user, currentChannel);
+        const channel = await this.findChannelById(createMessageDto.channelId);
+        const channelMember = await this.channelMemberService.findOne(user, channel);
         if (!channelMember) {
-            throw new HttpException('the user is not a channel member', HttpStatus.FORBIDDEN);
+            throw new HttpException('this user is not a channel member', HttpStatus.FORBIDDEN);
         }
-        return await this.messageService.saveMessage(user, currentChannel, createMessageDto);
+        return await this.messageService.saveMessage(user, channel, createMessageDto);
       }
     
 }

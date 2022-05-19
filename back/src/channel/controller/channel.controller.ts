@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ChannelService } from '../service/channel.service';
 import { CreateChannelDto } from '../models/channel.dto';
-import { CreateMessageDto } from 'src/message/models/message.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PasswordI } from '../models/password.interface';
 import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
@@ -30,7 +29,7 @@ export class ChannelController {
     @Get(':channelId/messages')
     async findMessagesByChannelId(@Param('channelId') channelId: number) {
         const channel = await this.channelService.findChannelById(channelId);
-        return this.channelService.getChannelMessagesByRoomId(channel.id);
+        return this.channelService.getChannelMessagesByChannelId(channel.id);
     } 
 
     @Get(':channelId/members')

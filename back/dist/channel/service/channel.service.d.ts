@@ -27,7 +27,7 @@ export declare class ChannelService {
     getChannelMembers(channel: Channel): Promise<import("../../channelMember/models/channelMember.entity").ChannelMember[]>;
     updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto): Promise<void>;
     deleteChannelMember(userId: number, channelId: number): Promise<void>;
-    getChannelMessagesByRoomName(room: string): Promise<import("../../message/models/message.entity").Message[]>;
-    getChannelMessagesByRoomId(roomId: number): Promise<import("../../message/models/message.entity").Message[]>;
+    getChannelMessagesByChannelName(channelName: string): Promise<import("../../message/models/message.entity").Message[]>;
+    getChannelMessagesByChannelId(channelId: number): Promise<import("../../message/models/message.entity").Message[]>;
     saveMessage(userId: number, createMessageDto: CreateMessageDto): Promise<import("../../message/models/message.entity").Message>;
 }

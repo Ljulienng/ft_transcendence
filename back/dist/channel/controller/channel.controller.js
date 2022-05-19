@@ -33,7 +33,7 @@ let ChannelController = class ChannelController {
     }
     async findMessagesByChannelId(channelId) {
         const channel = await this.channelService.findChannelById(channelId);
-        return this.channelService.getChannelMessagesByRoomId(channel.id);
+        return this.channelService.getChannelMessagesByChannelId(channel.id);
     }
     async findMembersByChannelId(channelId) {
         const channel = await this.channelService.findChannelById(channelId);

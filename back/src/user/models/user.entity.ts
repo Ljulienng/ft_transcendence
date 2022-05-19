@@ -46,7 +46,7 @@ export class User {
 	readonly createdTime: Date;
 
 	@OneToMany(() => Message, message => message.channel)
-	messages: Message[];
+	messages: Message[]; 
 
 	@OneToMany(() => Channel, channel => channel.owner)
 	channels: Channel[];
