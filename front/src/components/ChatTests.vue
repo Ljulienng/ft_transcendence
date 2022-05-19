@@ -56,7 +56,7 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core"
 import axios from 'axios'
-import io from 'socket.io-client'
+import { io, Socket} from 'socket.io-client'
 import http from "../http-common"
 import MessageI from '../types/interfaces/message.interface'
 import { mapGetters } from "vuex";
@@ -65,7 +65,7 @@ export default defineComponent({
     
     data() {
         return {
-            socket: io('http://localhost:3000/chat', {  withCredentials: true }),
+            socket: io(),
             channelList: [],
             message: {
                 content: '',
@@ -139,17 +139,18 @@ export default defineComponent({
         }
     },
 
-    created() {
-        this.socket = io('localhost:3000/chat', {  withCredentials: true });
+    mounted() {
+        if (this.socket.connected == false)
+            this.socket = io('http://localhost:3000/chat', {  withCredentials: true });
         this.getChannelList();
         this.socket.on('sendMessageToClient', (data) => {
             console.log(data);
         })
     },
 
-    computed: {
-    ...mapGetters("auth", { getUserProfile: "getUserProfile",})
-    },
+    // computed: {
+    // ...mapGetters("auth", { getUserProfile: "getUserProfile",})
+    // },
 
 
 })
