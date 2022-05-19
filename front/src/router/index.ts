@@ -58,7 +58,8 @@ const routes = [
 	{
 		name: 'chat',
 		path: '/chat',
-		component: Chat
+		component: Chat,
+		meta: {requiredAuth: true}
 	},
 	{
 		name: 'UserProfile',

@@ -179,7 +179,7 @@ export class ChannelService {
         
         if (!(this.channelMemberService.findOne(user, channelToLeave))) {
                 throw new UnauthorizedException('user not in this channel');
-            }
+        }
         
         // if the owner leave the channel, we delete the channel
         // else we just delete the member
@@ -274,9 +274,9 @@ export class ChannelService {
         const user = await this.userRepository.findOne({id: userId});
         const channel = await this.findChannelById(createMessageDto.channelId);
         const channelMember = await this.channelMemberService.findOne(user, channel);
-        if (!channelMember) {
-            throw new HttpException('this user is not a channel member', HttpStatus.FORBIDDEN);
-        }
+        // if (!channelMember) {
+        //     throw new HttpException('this user is not a channel member', HttpStatus.FORBIDDEN);
+        // }
         return await this.messageService.saveMessage(user, channel, createMessageDto);
       }
     

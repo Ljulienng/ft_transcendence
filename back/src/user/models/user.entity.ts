@@ -54,7 +54,7 @@ export class User {
 	@OneToMany(() => ChannelMember, channelMember => channelMember.user)
 	channelMembers: ChannelMember[];
 
-	@Column("simple-array", {nullable: true})
+	@Column("simple-array", {default: true})
 	joinedChannels: Channel[];
 
 	@Column("simple-array", {nullable: true})

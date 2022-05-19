@@ -226,6 +226,10 @@ export class UserService {
 		return (friendList);
 	}
 
+	joinedChannel(user: User) {
+		return user.joinedChannels
+	}
+
 	async setStatus(user: User, newStatus: string) {
 		// if (newStatus !== 'Online'  'Offline'  'In game'  'Away'  'Occupied')
 		// 	throw new HttpException("Incorrect user status", HttpStatus.FORBIDDEN)
@@ -260,6 +264,8 @@ export class UserService {
 	}
 
 	addJoinedChannel(user: User, welcomingChannel: Channel) {
+		if (user.joinedChannels === null)
+			user.joinedChannels = []
 		user.joinedChannels.push(welcomingChannel);
 	}
 }

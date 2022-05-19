@@ -3,7 +3,7 @@
 		<p>{{channel}}</p>
 		<div class="messageList">
 			<p v-for="msg in messageList" :key="msg">
-				{{ msg.content }}
+				{{ msg.user.username }}: {{ msg.content }}
 			</p>
 		</div>
 		<div>
@@ -44,20 +44,12 @@ export default defineComponent({
             },
 			socket: this.socketChannel,
             messageList: [] as MessageI[],
+            messageList2: [] as MessageI[]
+
 		}
 	},
 
 	methods: {
-		// async getMessageList() {
-        //     try {
-        //         const response = await http.get('http://localhost:3000/channel/' + this.channel + '/messages');
-        //         this.messageList = response.data;
-        //         console.log('get messageList of channel ', this.channel, ' : ', response.data);
-        //     } catch (error) {
-        //         console.log(error);
-        //     }
-        // },
-
 		sendMessage() {
 			this.message.userId = this.currentUser.id;
 			this.message.username = this.currentUser.username;
@@ -68,18 +60,32 @@ export default defineComponent({
 
         },
 
+		async getMessages() {
+			this.socket.emit('getChannelMsg', this.channel);
+			await this.socket.on('getChannelMessages', (data) => {
+				this.messageList = data;
+			})
+		}
+
 	},
 
-	// mounted() {
+	mounted() {
+		this.socket.on('messageSent', (data) => {
+			console.log('updated');
+			this.getMessages();
+		})
 
-	// },
+	},
 
 	// unmounted() {
 	// 	this.test.close;
 	// },
 
 	created() {
+        console.log('socket = ', this.socket)
+
 		console.log("Channelbox created");
+		this.getMessages()
 
 
 	}

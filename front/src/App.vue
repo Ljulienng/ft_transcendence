@@ -38,13 +38,13 @@ export default defineComponent({
 				router.push('http://localhost:3001/authmodal')
 			const userId = store.getters['auth/getUserProfile'].id
 
-			console.log('userId = ', userId);
+			// console.log('userId = ', userId);
 			// const userSocket = store.getters['auth/getUserSocket'].id
 	
 			// if (!userSocket)
 			// 	store.dispatch('auth/setUserSocket')
 			if (userId)
-				store.dispatch('auth/setUserStatus', 'Online');
+				await store.dispatch('auth/setUserStatus', 'Online');
 		},
 		
 		setOffline() {

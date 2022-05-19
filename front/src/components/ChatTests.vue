@@ -41,6 +41,12 @@
             in channel <input type="text" maxlength="100" v-model="message.channelId"/>  
         </div><br>
 
+
+        <!-- <div class="channelTabs">
+                <button @click="showChannel(channel.id)">show channel </button>
+                <button @click="showChannel(channel.id)">show channel</button>
+
+        </div> -->
         <div class="channelList">
             <h3>Channel list</h3>
             <ul>
@@ -61,11 +67,11 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core"
-import axios from 'axios'
 import { io } from 'socket.io-client'
 import http from "../http-common"
 import MessageI from '../types/interfaces/message.interface'
 import ChannelBox from './ChannelBox.vue'
+import store from '../store'
 
 export default defineComponent({ 
     components: {
@@ -74,7 +80,7 @@ export default defineComponent({
 
     data() {
         return {
-            socket: io('localhost:3000/chat', {  withCredentials: true }),
+            socket: store.getters["auth/getUserSocket"],
             channelList: [],
             message: {
                 content: '',
@@ -115,9 +121,18 @@ export default defineComponent({
 
         async getChannelList() {
             try {
-                const response = await axios.get('http://localhost:3000/channel');
+                const response = await http.get('/channel');
                 this.channelList = response.data;
-                console.log('get channelList : ', response.data);
+            } catch (error) {
+                console.log(error);
+            }
+        },
+
+        async getJoinedChannelList() {
+            try {
+                const response = await http.get('/users/joinedchannel');
+                // this.channelList = response.data;
+                console.log('get joinedchannelList : ', response.data);
             } catch (error) {
                 console.log(error);
             }
@@ -125,7 +140,7 @@ export default defineComponent({
 
         async getMessageList() {
             try {
-                const response = await axios.get('http://localhost:3000/channel/' + this.channelId + '/messages');
+                const response = await http.get('/channel/' + this.channelId + '/messages');
                 this.messageList = response.data;
                 console.log('get messageList of channel ', this.channelId, ' : ', response.data);
             } catch (error) {
@@ -169,27 +184,40 @@ export default defineComponent({
 
             console.log('join channel : ', channelToJoin);
             this.socket.emit('joinChannel', channelToJoin);
-        }
+        },
+
     },
 
     mounted() {
-        this.socket.on('sendMessageToClient', (data) => {
-            console.log(data);
-        })
+        if (this.socket === undefined) {
+                // this.socket = store.getters["auth/getUserSocket"]
 
-        this.socket.on('channelJoined', (data) => {
-            console.log(data);
-        })
+            this.socket =  store.getters["auth/getUserSocket"]
+            console.log('bruh', this.socket);
+        }
+             
+        // this.socket.on('sendMessageToClient', (data) => {
+        //     console.log(data);
+        // // })
+
+        // this.socket.on('channelJoined', (data) => {
+        //     console.log(data);
+        // })
     },
+
+    // beforeMount() {
+    //     if (this.socket === undefined) {
+    //             // this.socket = store.getters["auth/getUserSocket"]
+
+    //         this.socket =  store.getters["auth/getUserSocket"]
+    //         console.log('bruh', this.socket);
+    //     }
+    // },
 
     created() {
-        // this.socket = io('localhost:3000/chat', {  withCredentials: true });
         this.getChannelList();
+        this.getJoinedChannelList()
     },
-
-    // computed: {
-    // ...mapGetters("auth", { getUserProfile: "getUserProfile",})
-    // },
 
 
 })

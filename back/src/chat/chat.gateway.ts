@@ -20,13 +20,14 @@ import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { TwoFAAuth } from "src/auth/guards/twoFA.guard";
 import { SocketGuard } from "src/auth/guards/socket.guard";
 import { User } from "src/user/models/user.entity";
+import { channel } from "diagnostics_channel";
 /*
 ** OnGatewayInit        : need to implement afterInit()
 ** OnGatewayConnection  : need to implement handleConnection()
 ** OnGatewayDisconnect  : need to implement handleDisconnect()
 */
 
-export interface socketUserI {
+export interface SocketUserI {
     socketId: string;
     user: User;
 }
@@ -41,7 +42,7 @@ export interface socketUserI {
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
     @WebSocketServer() server: Server;  // instance of socket server
-    socketList: socketUserI[] = []; // Socket connected linked to their users entities list
+    socketList: SocketUserI[] = []; // Socket connected linked to their users entities list
     
     constructor(
         private channelService: ChannelService,
@@ -58,14 +59,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     */ 
     // @UseGuards(SocketGuard)
     async handleConnection(client: Socket, room: string) {
-        let newSocket: socketUserI = {
+        let newSocket: SocketUserI = {
             socketId: '',
             user: null
         }
         // Link client socket to his user entity
         newSocket.socketId = client.id;
         newSocket.user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
-        console.log('client connected to the chat, user = ', newSocket.user.username);
+        if (newSocket.user)
+            console.log('client connected to the chat, user = ', newSocket.user.username);
         this.socketList.push(newSocket);
         // console.log("from socket list = ", this.socketList.find(socket => socket.socketId === client.id)))
         // client.on('room', function(room) {
@@ -87,6 +89,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     /* connect user to a channel */
     @UseGuards(SocketGuard)
+    @SubscribeMessage('getChannelMsg')
+    async getChannelMsg(client: Socket, channelId: number) {
+        const channel = await this.channelService.findChannelById(channelId);
+        const messages = await this.channelService.getChannelMessagesByChannelName(channel.name)
+
+        // console.log('MESSAGE = ', messages)
+
+        this.server.to(client.id).emit('getChannelMessages', messages)
+    }
+
+    @UseGuards(SocketGuard)
     @SubscribeMessage('joinChannel')
     async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
         const userId = await this.socketList.find(socket => socket.socketId === client.id).user.id
@@ -100,21 +113,24 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     } 
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)
+    @UseGuards(SocketGuard)
     @SubscribeMessage('leaveChannel') 
     async leaveChannel(client: Socket, channel: Channel) {
         await this.channelService.removeUserToChannel(channel, client.data.user.id);
-        this.server.to
+        // this.server.to
     }
 
      /*
      ** add a new message
      */
+    @UseGuards(SocketGuard)
     @SubscribeMessage('sendMessageToServer') 
     async sendMessage(client: Socket, createMessageDto: CreateMessageDto /*message: string, channelId: number*/) {
         console.log('Message sent to the back in channel ', createMessageDto);
         // client.emit('messageSent', message, channelId);
         this.server.emit('sendMessageToClient', createMessageDto.content);
-        await this.channelService.saveMessage(/*client.id*/1, createMessageDto/*.content, createMessageDto.channelId*/);
+        this.server.emit('messageSent', createMessageDto.content);
+        await this.channelService.saveMessage(/*client.id*/createMessageDto.userId, createMessageDto/*.content, createMessageDto.channelId*/);
     }
 
 
