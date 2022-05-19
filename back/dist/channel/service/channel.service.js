@@ -46,7 +46,8 @@ let ChannelService = class ChannelService {
         if (!user) {
             throw new common_1.UnauthorizedException('user does not exist');
         }
-        if (this.channelRepository.findOne({ name: createChannel.name })) {
+        const isSameChatName = await this.channelRepository.findOne({ name: createChannel.name });
+        if (isSameChatName) {
             throw new common_1.UnauthorizedException('this name is already used');
         }
         const newChannel = this.channelRepository.create({
@@ -64,9 +65,6 @@ let ChannelService = class ChannelService {
             if (newChannel.password.length < 8) {
                 throw new common_1.HttpException('password too short', common_1.HttpStatus.FORBIDDEN);
             }
-            if (newChannel.password.length > 20) {
-                throw new common_1.HttpException('password too long', common_1.HttpStatus.FORBIDDEN);
-            }
             const saltOrRounds = await bcrypt.genSalt();
             newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);
         }
@@ -80,7 +78,8 @@ let ChannelService = class ChannelService {
         if (!user1 || !user2) {
             throw new common_1.UnauthorizedException('user does not exist');
         }
-        if (this.channelRepository.findOne({ name: createChannel.name })) {
+        const isSameChatName = await this.channelRepository.findOne({ name: createChannel.name });
+        if (isSameChatName) {
             throw new common_1.UnauthorizedException('this name is already used');
         }
         const newChannel = this.channelRepository.create({
@@ -137,9 +136,6 @@ let ChannelService = class ChannelService {
         if (passwords.newPassword.length < 8) {
             throw new common_1.HttpException('password too short', common_1.HttpStatus.FORBIDDEN);
         }
-        if (passwords.newPassword.length > 20) {
-            throw new common_1.HttpException('password too long', common_1.HttpStatus.FORBIDDEN);
-        }
         if (!(await this.checkPasswordMatch(passwords.oldPassword, channel.password))) {
             throw new common_1.HttpException('current password does not match', common_1.HttpStatus.FORBIDDEN);
         }
@@ -171,20 +167,24 @@ let ChannelService = class ChannelService {
         const channel = await this.findChannelById(channelId);
         return await this.channelMemberService.deleteMember(user, channel);
     }
-    async getChannelMessagesByRoomName(room) {
-        const channel = await this.findChannelByName(room);
+    async getChannelMessagesByChannelName(channelName) {
+        const channel = await this.findChannelByName(channelName);
         const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
-    async getChannelMessagesByRoomId(roomId) {
-        const channel = await this.findChannelById(roomId);
+    async getChannelMessagesByChannelId(channelId) {
+        const channel = await this.findChannelById(channelId);
         const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
     async saveMessage(userId, createMessageDto) {
         const user = await this.userRepository.findOne({ id: userId });
-        const currentChannel = await this.findChannelById(createMessageDto.channelId);
-        return await this.messageService.saveMessage(user, currentChannel, createMessageDto);
+        const channel = await this.findChannelById(createMessageDto.channelId);
+        const channelMember = await this.channelMemberService.findOne(user, channel);
+        if (!channelMember) {
+            throw new common_1.HttpException('this user is not a channel member', common_1.HttpStatus.FORBIDDEN);
+        }
+        return await this.messageService.saveMessage(user, channel, createMessageDto);
     }
 };
 ChannelService = __decorate([

@@ -14,7 +14,7 @@ import { JoinChannelDto } from "src/channel/models/channel.dto";
 import { ChannelService } from "src/channel/service/channel.service";
 import { CreateMessageDto } from "src/message/models/message.dto";
 import { MessageService } from "src/message/service/message.service";
-
+import { UserService } from "src/user/service/user.service";
 /*
 ** OnGatewayInit        : need to implement afterInit()
 ** OnGatewayConnection  : need to implement handleConnection()
@@ -34,7 +34,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     constructor(
         private channelService: ChannelService,
-        private messageService: MessageService, 
+        // private messageService: MessageService,
+        // private userService: UserService,
     ){}
 
     afterInit(server: any) {
@@ -50,8 +51,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             console.log('room joined = ', room)
         });
         client.join(room);                          // add this client to the room
-        this.server.to(room).emit('client_join');   // send the info to other members of this channel
-        const messages = await this.channelService.getChannelMessagesByRoomName(room);   // MODIFY dto
+        this.server.to(room).emit('channelJoined');   // send the info to other members of this channel
+        const messages = await this.channelService.getChannelMessagesByChannelName(room);   // MODIFY dto
         this.server.to(client.id).emit('channelMessages', messages);    // send messages of the channel to the new user
     }
 
@@ -62,8 +63,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     /* connect user to a channel */
     @SubscribeMessage('joinChannel')
     async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
+        console.log(client);
         await this.channelService.addUserToChannel(joinChannel, client.data.user.id);
-    }
+    } 
 
     @SubscribeMessage('leaveChannel') 
     async leaveChannel(client: Socket, channel: Channel) {

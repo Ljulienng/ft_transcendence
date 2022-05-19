@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ChannelService } from '../service/channel.service';
 import { CreateChannelDto } from '../models/channel.dto';
-import { CreateMessageDto } from 'src/message/models/message.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PasswordI } from '../models/password.interface';
 import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
@@ -30,7 +29,7 @@ export class ChannelController {
     @Get(':channelId/messages')
     async findMessagesByChannelId(@Param('channelId') channelId: number) {
         const channel = await this.channelService.findChannelById(channelId);
-        return this.channelService.getChannelMessagesByRoomId(channel.id);
+        return this.channelService.getChannelMessagesByChannelId(channel.id);
     } 
 
     @Get(':channelId/members')
@@ -39,13 +38,23 @@ export class ChannelController {
         return this.channelService.getChannelMembers(channel);
     }
 
-    // test : curl -v  -X POST -d '{"name":"room42", "type": 1,  "password":"supersecuremdp"}' -H "Content-Type: application/json" http://localhost:3000/channel/
+    // test : curl -v  -X POST -d '{"name":"room42", "type": 1,  "password":"supersecuremdp"}' -H "Content-Type: application/json" http://localhost:3000/channel/createChannel
     @UseGuards(JwtAuthGuard) // user has to be connected
-    @Post()
+    @Post('/createChannel')
     async createChannel(
         @Req() request,
         @Body() channelDto: CreateChannelDto) {
-        await this.channelService.createChannel(channelDto, request.user.id);
+            await this.channelService.createChannel(channelDto, request.user.id);
+    }
+
+    // test : curl -v  -X POST -d '{"secondUserId": "2", { "name":"room42", "type": 1,  "password":"supersecuremdp" }}' -H "Content-Type: application/json" http://localhost:3000/channel/
+    @UseGuards(JwtAuthGuard) // user has to be connected
+    @Post('/createDmChannel')
+    async createDmChannel(
+        @Req() request,
+        @Body() secondUserId: number,
+        @Body() channelDto: CreateChannelDto) {
+        await this.channelService.createDmChannel(channelDto, request.user.id, secondUserId);
     }
 
     // test : curl -v -X POST -d '{"oldPassword":"oldpass", "newPassword":"newpass"}' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/changePass

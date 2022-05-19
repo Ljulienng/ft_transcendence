@@ -21,7 +21,7 @@ import { ChannelMemberModule } from './channelMember/channelMember.module';
       // url: process.env.DATABASE_URL,
       url: "postgres://user:password@localhost:5432/db",
       autoLoadEntities: true,
-      synchronize: true
+      synchronize: true // false for production, with true typeOrm creates tables every time we run the app
     }),
     UserModule,
     AuthModule,

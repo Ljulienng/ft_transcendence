@@ -13,7 +13,7 @@
                     <input type="radio" value="protected" v-model="privacy" />
                     <label for="protected">Protected</label>
                 </div>
-                <div>
+                <div> 
                     <input type="radio" value="private" v-model="privacy" />
                     <label for="private">Private</label>
                 </div>        
@@ -60,11 +60,10 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core"
 import axios from 'axios'
-import { io, Socket } from 'socket.io-client'
+import { io } from 'socket.io-client'
 import http from "../http-common"
 import MessageI from '../types/interfaces/message.interface'
 import ChannelBox from './ChannelBox.vue'
-import { mapGetters } from "vuex";
 
 export default defineComponent({ 
     components: {
@@ -139,7 +138,7 @@ export default defineComponent({
                 privacy: this.privacy,
                 password: this.password,
              }
-            http.post('/channel', channel, { withCredentials: true });
+            http.post('/channel/createChannel', channel, { withCredentials: true });
             this.getChannelList();
             this.name = '';
             this.privacy = '';
@@ -167,14 +166,19 @@ export default defineComponent({
     created() {
         // this.socket = io('localhost:3000/chat', {  withCredentials: true });
         this.getChannelList();
+        
         this.socket.on('sendMessageToClient', (data) => {
+            console.log(data);
+        })
+
+        this.socket.on('channelJoined', (data) => {
             console.log(data);
         })
     },
 
-    computed: {
-    ...mapGetters("auth", { getUserProfile: "getUserProfile",})
-    },
+    // computed: {
+    // ...mapGetters("auth", { getUserProfile: "getUserProfile",})
+    // },
 
 
 })

@@ -50,7 +50,6 @@ export class ChannelService {
     /* create channel */
    async createChannel(createChannel: CreateChannelDto, userId: number) {
         const user = await this.userRepository.findOne({id: userId});
-        
         if (!user) {
             throw new UnauthorizedException('user does not exist');
         }
@@ -59,6 +58,10 @@ export class ChannelService {
         //     console.log("went there in find one")
         //     throw new UnauthorizedException('this name is already used');  
         // }
+        const isSameChatName = await this.channelRepository.findOne({name: createChannel.name});
+        if (isSameChatName) {
+            throw new UnauthorizedException('this name is already used');  
+        }
 
         
         const newChannel = this.channelRepository.create({
@@ -69,7 +72,7 @@ export class ChannelService {
             channelMembers: [],
             owner: user,
        });
-
+ 
        if (newChannel.type === ChannelType.protected || newChannel.type === ChannelType.private) {
            if (!newChannel.password) {
                 throw new BadRequestException('need a password for private or protected channel');
@@ -77,9 +80,6 @@ export class ChannelService {
            if (newChannel.password.length < 8) {
                 throw new HttpException('password too short', HttpStatus.FORBIDDEN);
            }
-           if (newChannel.password.length > 20) {
-                throw new HttpException('password too long', HttpStatus.FORBIDDEN);
-            }
             const saltOrRounds = await bcrypt.genSalt();
             newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);
        }
@@ -100,7 +100,8 @@ export class ChannelService {
             throw new UnauthorizedException('user does not exist');
         }
 
-        if (this.channelRepository.findOne({name: createChannel.name})) {
+        const isSameChatName = await this.channelRepository.findOne({name: createChannel.name});
+        if (isSameChatName) {
             throw new UnauthorizedException('this name is already used');  
         }
 
@@ -111,7 +112,6 @@ export class ChannelService {
             channelMembers: [],
             owner: user1,
        });
-
        console.log('new DM channel created : ', newChannel);
        await this.channelRepository.save(newChannel);
        await this.channelMemberService.createMember(user1, newChannel, true);
@@ -195,9 +195,6 @@ export class ChannelService {
         if (passwords.newPassword.length < 8) {
             throw new HttpException('password too short', HttpStatus.FORBIDDEN);
         }
-        if (passwords.newPassword.length > 20) {
-            throw new HttpException('password too long', HttpStatus.FORBIDDEN);
-        }
         if (!( await this.checkPasswordMatch(passwords.oldPassword, channel.password))) {
             throw new HttpException('current password does not match', HttpStatus.FORBIDDEN);
         }
@@ -239,8 +236,8 @@ export class ChannelService {
     ** get all the messages of a channel
     ** returns most recent last
     */
-    async getChannelMessagesByRoomName(room: string) {
-        const channel = await this.findChannelByName(room);
+    async getChannelMessagesByChannelName(channelName: string) {
+        const channel = await this.findChannelByName(channelName);
         const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
@@ -249,16 +246,20 @@ export class ChannelService {
     ** get all the messages of a channel
     ** returns most recent last
     */
-    async getChannelMessagesByRoomId(roomId: number) {
-        const channel = await this.findChannelById(roomId);
+    async getChannelMessagesByChannelId(channelId: number) {
+        const channel = await this.findChannelById(channelId);
         const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
 
     async saveMessage(userId: number, createMessageDto: CreateMessageDto) {
         const user = await this.userRepository.findOne({id: userId});
-        const currentChannel = await this.findChannelById(createMessageDto.channelId);
-        return await this.messageService.saveMessage(user, currentChannel, createMessageDto);
+        const channel = await this.findChannelById(createMessageDto.channelId);
+        const channelMember = await this.channelMemberService.findOne(user, channel);
+        if (!channelMember) {
+            throw new HttpException('this user is not a channel member', HttpStatus.FORBIDDEN);
+        }
+        return await this.messageService.saveMessage(user, channel, createMessageDto);
       }
     
 }
