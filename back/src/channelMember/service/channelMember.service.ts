@@ -26,8 +26,9 @@ export class ChannelMemberService {
         })
     }
 
-    async createMember(user: User, channel: Channel, admin: boolean) {
+    async createMember(user: User, channel: Channel, owner: boolean, admin: boolean) {
         const newMember = this.channelMemberRepository.create({
+            owner: owner,
             admin: admin,
             user: user,
             channel: channel,
@@ -44,7 +45,7 @@ export class ChannelMemberService {
         if (memberWhoUpdate.admin == false) {
             return false;
         }
-        if (updates.admin && channel.owner.id != memberWhoUpdate.user.id) {
+        if (updates.admin && !memberWhoUpdate.owner) {
             return false;
         }
 

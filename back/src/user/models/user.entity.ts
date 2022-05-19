@@ -48,14 +48,14 @@ export class User {
 	@OneToMany(() => Message, message => message.channel)
 	messages: Message[]; 
 
-	@OneToMany(() => Channel, channel => channel.owner)
+	@OneToMany(() => Channel, channel => channel.user)
 	channels: Channel[];
 
 	@OneToMany(() => ChannelMember, channelMember => channelMember.user)
 	channelMembers: ChannelMember[];
 
-	@Column("simple-array", {nullable: true})
-	joinedChannels: Channel[];
+	// @Column("simple-array", {nullable: true})
+	// joinedChannels: Channel[];
 
 	@Column("simple-array", {nullable: true})
 	friends: string[];

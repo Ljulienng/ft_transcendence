@@ -42,10 +42,10 @@ export class Channel {
 	})
 	channelMembers: ChannelMember[];
 
-    @ManyToOne(() => User, owner => owner.id, {
+    @ManyToOne(() => User, user => user.id, {
         eager: true,
         onDelete: 'CASCADE',
     })
-    owner: User;
+    user: User;
 
 }

@@ -9,6 +9,9 @@ export class ChannelMember {
 	readonly id: number;
 
     @Column({ default: false })
+	owner: boolean;
+
+    @Column({ default: false })
 	admin: boolean;
 
     @Column({ default: false })

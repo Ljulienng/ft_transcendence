@@ -248,14 +248,14 @@ export class UserService {
 		});
 	}
 	
-	async removeJoinedChannel(userId: number, channelToLeave: Channel) {
-		const user = await this.userRepository.findOne({id: userId});
-		const tmp = user.joinedChannels.find(channel => channel.id === channelToLeave.id);
-        const index = user.joinedChannels.indexOf(tmp, 0);
-        user.joinedChannels.splice(index, 1);
-	}
+	// async removeJoinedChannel(userId: number, channelToLeave: Channel) {
+	// 	const user = await this.userRepository.findOne({id: userId});
+	// 	const tmp = user.joinedChannels.find(channel => channel.id === channelToLeave.id);
+    //     const index = user.joinedChannels.indexOf(tmp, 0);
+    //     user.joinedChannels.splice(index, 1);
+	// }
 
-	addJoinedChannel(user: User, welcomingChannel: Channel) {
-		user.joinedChannels.push(welcomingChannel);
-	}
+	// addJoinedChannel(user: User, welcomingChannel: Channel) {
+	// 	user.joinedChannels.push(welcomingChannel);
+	// }
 }
