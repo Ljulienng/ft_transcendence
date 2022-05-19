@@ -46,9 +46,13 @@
             <ul>
                 <li v-for="channel in channelList" :key="channel">
                     {{channel.id}} - "{{channel.name}}" : created by {{channel.owner.username}}
+                    <button @click="showChannel(channel.id)">show channel</button>
                     <!-- {{channel.messages}} -->
                 </li>
             </ul>
+        </div>
+        <div v-if="showBox === true">
+            <ChannelBox v-bind:channel="selectedChannel" v-bind:socketChannel="socket"></ChannelBox>
         </div>
     </div>
 </template>
@@ -56,16 +60,20 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core"
 import axios from 'axios'
-import io from 'socket.io-client'
+import { io, Socket } from 'socket.io-client'
 import http from "../http-common"
 import MessageI from '../types/interfaces/message.interface'
+import ChannelBox from './ChannelBox.vue'
 import { mapGetters } from "vuex";
 
 export default defineComponent({ 
-    
+    components: {
+        ChannelBox,
+    },
+
     data() {
         return {
-            socket: io('http://localhost:3000/chat', {  withCredentials: true }),
+            socket: io('localhost:3000/chat', {  withCredentials: true }),
             channelList: [],
             message: {
                 content: '',
@@ -82,11 +90,28 @@ export default defineComponent({
             password: '',
             privacy: '',           
             channelId: 0,
+            selectedChannel: 0,
+            showBox: false,
         }
     },
 
 
     methods: {
+        showChannel(channelId: number) {
+            if (this.showBox === true && channelId === this.selectedChannel ) {
+                this.showBox = false;
+            }
+            else if (this.showBox === true && channelId !== this.selectedChannel) {
+                console.log("test")
+                this.selectedChannel = channelId;
+            }
+            else {
+                this.showBox = true
+                this.selectedChannel = channelId;
+
+            }
+        },
+
         async getChannelList() {
             try {
                 const response = await axios.get('http://localhost:3000/channel');
@@ -128,19 +153,19 @@ export default defineComponent({
             this.channelId = 0;
         },
 
-        sendMessage() {
-            console.log('sendMessage - on channelId ', this.message.channelId, this.message.content);
-            this.socket.emit('sendMessageToServer', this.message);
-        },
+        // sendMessage() {
+        //     console.log('sendMessage - on channelId ', this.message.channelId, this.message.content);
+        //     this.socket.emit('sendMessageToServer', this.message);
+        // },
 
-        joinChannel() {
-            console.log('join channel : ', this.channelToJoin.id);
-            this.socket.emit('joinChannel', this.channelToJoin);
-        }
+        // joinChannel() {
+        //     console.log('join channel : ', this.channelToJoin.id);
+        //     this.socket.emit('joinChannel', this.channelToJoin);
+        // }
     },
 
     created() {
-        this.socket = io('localhost:3000/chat', {  withCredentials: true });
+        // this.socket = io('localhost:3000/chat', {  withCredentials: true });
         this.getChannelList();
         this.socket.on('sendMessageToClient', (data) => {
             console.log(data);

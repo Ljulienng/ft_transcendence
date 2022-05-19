@@ -76,10 +76,6 @@ export class UserService {
 		const tmp = await this.userRepository.findOne({username: userName})
 		const regex = /^[a-zA-Z0-9_]+$/
 
-		// console.log("username: ", userName);
-		// console.log("tmp: ", tmp);
-		// console.log("currentUser: ", (await currentUser).username);
-		// console.log("regexp = ", regex.test(userName));
 		if (tmp)
 			throw new HttpException('Username already taken', HttpStatus.FORBIDDEN);
 		else if ((await currentUser).username === userName)

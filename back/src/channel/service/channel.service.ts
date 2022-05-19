@@ -55,10 +55,12 @@ export class ChannelService {
             throw new UnauthorizedException('user does not exist');
         }
 
-        if (this.channelRepository.findOne({name: createChannel.name})) {
-            throw new UnauthorizedException('this name is already used');  
-        }
+        // if (this.channelRepository.findOne({name: createChannel.name})) {
+        //     console.log("went there in find one")
+        //     throw new UnauthorizedException('this name is already used');  
+        // }
 
+        
         const newChannel = this.channelRepository.create({
             name: createChannel.name,
             type: createChannel.type,

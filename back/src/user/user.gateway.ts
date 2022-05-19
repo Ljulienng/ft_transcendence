@@ -1,6 +1,12 @@
 import { Socket, Server } from "socket.io";
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayConnection, OnGatewayDisconnect} from "@nestjs/websockets"
 import { UserService } from "./service/user.service";
+import { Req } from "@nestjs/common";
+
+// export type UserSocket = {
+// 	socketId: string,
+// 	userId: number,
+// }
 
 @WebSocketGateway({
 	namespace: '/user',
@@ -13,9 +19,14 @@ import { UserService } from "./service/user.service";
 export class UserGateway {
 	@WebSocketServer() server: Server;
 
-	constructor(private userService: UserService) {}
+	constructor(
+		private userService: UserService
+	) {}
+	// connectedUser: []
 
 	async handleConnection(client: Socket) {
+		// console.log(req)
+
 		console.log('Client connected to the server');
 	}
 
@@ -23,7 +34,7 @@ export class UserGateway {
 	async connectUser(client: Socket, username: string) {
 		const user = await this.userService.findByUsername(username);
 
-		console.log('user:', user, 'is connected');
+		console.log('user:', user.username, 'is connected');
 		this.userService.setStatus(user, 'Online');
 	}
 

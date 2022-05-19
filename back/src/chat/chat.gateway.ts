@@ -46,6 +46,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     */ 
     async handleConnection(client: Socket, room: string) {
         console.log('client connected to the chat');
+        client.on('room', function(room) {
+            console.log('room joined = ', room)
+        });
         client.join(room);                          // add this client to the room
         this.server.to(room).emit('client_join');   // send the info to other members of this channel
         const messages = await this.channelService.getChannelMessagesByRoomName(room);   // MODIFY dto
