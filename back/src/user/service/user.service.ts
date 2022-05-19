@@ -248,6 +248,7 @@ export class UserService {
 		});
 	}
 	
+
 	// async removeJoinedChannel(userId: number, channelToLeave: Channel) {
 	// 	const user = await this.userRepository.findOne({id: userId});
 	// 	const tmp = user.joinedChannels.find(channel => channel.id === channelToLeave.id);

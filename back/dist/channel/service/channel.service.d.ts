@@ -19,7 +19,8 @@ export declare class ChannelService {
     findAll(): Promise<Channel[]>;
     findChannelById(channelId: number): Promise<Channel>;
     findChannelByName(channelName: string): Promise<Channel>;
-    findMembersByChannel(): Promise<void>;
+    findMembers(channelId: number): Promise<import("../../channelMember/models/channelMember.entity").ChannelMember[]>;
+    findOwner(channelId: number): Promise<import("../../channelMember/models/channelMember.entity").ChannelMember>;
     createChannel(createChannel: CreateChannelDto, userId: number): Promise<void>;
     createDmChannel(createChannel: CreateChannelDto, user1Id: number, user2Id: number): Promise<void>;
     checkPasswordMatch(sentPassword: string, hashExpectedPassword: string): Promise<boolean>;
@@ -27,7 +28,6 @@ export declare class ChannelService {
     removeUserToChannel(leaveChannel: Channel, userId: number): Promise<void>;
     changePassword(channelId: number, userId: number, passwords: PasswordI): Promise<void>;
     deleteChannel(userId: number, channelId: number): Promise<Channel>;
-    getChannelMembers(channel: Channel): Promise<import("../../channelMember/models/channelMember.entity").ChannelMember[]>;
     updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto): Promise<void>;
     deleteChannelMember(userId: number, channelId: number): Promise<void>;
     getChannelMessagesByChannelName(channelName: string): Promise<import("../../message/models/message.entity").Message[]>;

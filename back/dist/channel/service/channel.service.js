@@ -43,7 +43,13 @@ let ChannelService = class ChannelService {
             name: channelName
         });
     }
-    async findMembersByChannel() {
+    async findMembers(channelId) {
+        const channel = await this.findChannelById(channelId);
+        return await this.channelMemberService.findMembers(channel);
+    }
+    async findOwner(channelId) {
+        const channel = await this.findChannelById(channelId);
+        return await this.channelMemberService.findOwner(channel);
     }
     async createChannel(createChannel, userId) {
         const user = await this.userRepository.findOne({ id: userId });
@@ -161,9 +167,6 @@ let ChannelService = class ChannelService {
             throw new common_1.HttpException('only the owner can delete channels', common_1.HttpStatus.FORBIDDEN);
         }
         return await this.channelRepository.remove(channel);
-    }
-    async getChannelMembers(channel) {
-        return await this.channelMemberService.findChannelMembers(channel);
     }
     async updateChannelMember(userId, memberId, channelId, updates) {
         const userWhoUpdate = await this.userRepository.findOne({ id: userId });

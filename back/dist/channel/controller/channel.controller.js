@@ -35,9 +35,8 @@ let ChannelController = class ChannelController {
         const channel = await this.channelService.findChannelById(channelId);
         return this.channelService.getChannelMessagesByChannelId(channel.id);
     }
-    async findMembersByChannelId(channelId) {
-        const channel = await this.channelService.findChannelById(channelId);
-        return this.channelService.getChannelMembers(channel);
+    async getMembersByChannelId(channelId) {
+        return this.channelService.findMembers(channelId);
     }
     async createChannel(request, channelDto) {
         await this.channelService.createChannel(channelDto, request.user.id);
@@ -91,7 +90,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
-], ChannelController.prototype, "findMembersByChannelId", null);
+], ChannelController.prototype, "getMembersByChannelId", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)('/createChannel'),

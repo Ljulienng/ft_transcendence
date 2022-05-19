@@ -33,9 +33,8 @@ export class ChannelController {
     } 
 
     @Get(':channelId/members')
-    async findMembersByChannelId(@Param('channelId') channelId: number) {
-        const channel = await this.channelService.findChannelById(channelId);
-        return this.channelService.getChannelMembers(channel);
+    async getMembersByChannelId(@Param('channelId') channelId: number) {
+        return this.channelService.findMembers(channelId);
     }
 
     // test : curl -v  -X POST -d '{"name":"room42", "type": 1,  "password":"supersecuremdp"}' -H "Content-Type: application/json" http://localhost:3000/channel/createChannel

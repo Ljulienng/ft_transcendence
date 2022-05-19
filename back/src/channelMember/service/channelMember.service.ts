@@ -20,9 +20,16 @@ export class ChannelMemberService {
         })
     }
 
-    async findChannelMembers(channel: Channel) {
+    async findMembers(channel: Channel) {
         return await this.channelMemberRepository.find({
             channel: channel,
+        })
+    }
+
+    async   findOwner(channel: Channel) {
+        return await this.channelMemberRepository.findOne({
+            channel: channel,
+            owner: true, 
         })
     }
 

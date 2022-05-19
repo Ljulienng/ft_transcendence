@@ -50,8 +50,14 @@ export class ChannelService {
         });
     }
 
-    async findMembersByChannel() {
+    async findMembers(channelId: number) {
+        const channel = await this.findChannelById(channelId);
+        return await this.channelMemberService.findMembers(channel);
+    }
 
+    async   findOwner(channelId: number) {
+        const channel = await this.findChannelById(channelId);
+        return await this.channelMemberService.findOwner(channel);
     }
 
     /* create channel */
@@ -236,10 +242,6 @@ export class ChannelService {
         // );
 
         return await this.channelRepository.remove(channel);
-    }
-
-    async getChannelMembers(channel: Channel) {
-        return await this.channelMemberService.findChannelMembers(channel);
     }
 
     async updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto) {
