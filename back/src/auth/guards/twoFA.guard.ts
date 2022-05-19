@@ -21,7 +21,7 @@ export class TwoFAAuth implements CanActivate {
 			throw new ForbiddenException('User doesn\'t exist')
 
 		const decode = this.jwtService.decode(req.cookies.jwt)
-		console.log("DECODED JWT = ", decode)
+		// console.log("DECODED JWT = ", decode)
 		if (decode['auth'] === false && user.twoFAEnabled === true)
 			throw new ForbiddenException('User need to authenticate')
 

@@ -2,7 +2,8 @@ import { User } from "src/user/models/user.entity";
 
 export class CreateMessageDto {
 
-    // user: User;
+    userId: number;
+    username: string;
     content: string;
     channelId: number;
 

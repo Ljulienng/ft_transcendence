@@ -11,6 +11,7 @@ import { PasswordI } from '../models/password.interface';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
 import { CreateMessageDto } from 'src/message/models/message.dto';
+import { UserService } from 'src/user/service/user.service';
 
 @Injectable()
 export class ChannelService {
@@ -19,6 +20,8 @@ export class ChannelService {
         private channelRepository: Repository<Channel>,
         @InjectRepository(User)
         private userRepository: Repository<User>,
+        @Inject(UserService)
+        private userService: UserService,
         @Inject(ChannelMemberService)
         private channelMemberService: ChannelMemberService,
         @Inject(MessageService)
@@ -54,11 +57,16 @@ export class ChannelService {
             throw new UnauthorizedException('user does not exist');
         }
 
+        // if (this.channelRepository.findOne({name: createChannel.name})) {
+        //     console.log("went there in find one")
+        //     throw new UnauthorizedException('this name is already used');  
+        // }
         const isSameChatName = await this.channelRepository.findOne({name: createChannel.name});
         if (isSameChatName) {
             throw new UnauthorizedException('this name is already used');  
         }
 
+        
         const newChannel = this.channelRepository.create({
             name: createChannel.name,
             type: createChannel.type,
@@ -81,6 +89,9 @@ export class ChannelService {
        console.log('new channel created : ', newChannel);
        await this.channelRepository.save(newChannel);
        await this.channelMemberService.createMember(user, newChannel, true);
+       
+       // add the channel of the channelJoined list of the user
+       this.userService.addJoinedChannel(user, newChannel);
     }
 
     /*
@@ -131,9 +142,9 @@ export class ChannelService {
         // select * from channel where channel.id=joinChannel.id
         const welcomingChannel = await this.findChannelById(joinChannel.id);
         // const welcomingChannel = await this.channelRepository
-        //     .createQueryBuilder('channel')
-        //     .where('channel.id = :channelId', {channelId: joinChannel.id})
-        //     .getOne();
+            // .createQueryBuilder('channel')
+            // .where('channel.id = :channelId', {channelId: joinChannel.id})
+            // .getOne();
         
         if (welcomingChannel.type !== ChannelType.public) {
             if (welcomingChannel.password) {
@@ -148,7 +159,11 @@ export class ChannelService {
             throw new UnauthorizedException('user already in this channel');
         }
 
-        this.channelMemberService.createMember(user, welcomingChannel, false);
+        await this.channelMemberService.createMember(user, welcomingChannel, false);
+        
+        // add the channel of the channelJoined list of the user
+        this.userService.addJoinedChannel(user, welcomingChannel);
+        
         await this.channelRepository.save(welcomingChannel);
    }
 
@@ -164,7 +179,7 @@ export class ChannelService {
         
         if (!(this.channelMemberService.findOne(user, channelToLeave))) {
                 throw new UnauthorizedException('user not in this channel');
-            }
+        }
         
         // if the owner leave the channel, we delete the channel
         // else we just delete the member
@@ -172,6 +187,10 @@ export class ChannelService {
             await this.channelRepository.delete(channelToLeave);
         } else {
             this.channelMemberService.deleteMember(user, channelToLeave);
+            
+            // remove the channel of the channelJoined list of the user
+            this.userService.removeJoinedChannel(user.id, channelToLeave)
+            
             await this.channelRepository.save(channelToLeave);
         }
     
@@ -207,6 +226,10 @@ export class ChannelService {
         if (userId != channel.owner.id) {
             throw new HttpException('only the owner can delete channels', HttpStatus.FORBIDDEN);
         }
+        channel.channelMembers.forEach(
+            member => this.userService.removeJoinedChannel(member.user.id, channel)
+        );
+
         return await this.channelRepository.remove(channel);
     }
 
@@ -251,9 +274,9 @@ export class ChannelService {
         const user = await this.userRepository.findOne({id: userId});
         const channel = await this.findChannelById(createMessageDto.channelId);
         const channelMember = await this.channelMemberService.findOne(user, channel);
-        if (!channelMember) {
-            throw new HttpException('this user is not a channel member', HttpStatus.FORBIDDEN);
-        }
+        // if (!channelMember) {
+        //     throw new HttpException('this user is not a channel member', HttpStatus.FORBIDDEN);
+        // }
         return await this.messageService.saveMessage(user, channel, createMessageDto);
       }
     

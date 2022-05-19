@@ -19,6 +19,7 @@ export interface State {
 const state = () => ({
 	loginApiStatus: "",
 	twoFAauth: false,
+	socket: null,
 	userProfile:{
 		id:0,
 		userName:"",
@@ -52,10 +53,10 @@ const actions = {
 		console.log('set user status info = ', userStatus)
 
 		if (userStatus === 'Online') {
-			commit('connectUser');
+			await commit('connectUser');
 		}
 		else if (userStatus === 'Offline')
-			commit('disconnectUser');
+			await commit('disconnectUser');
 		else {
 			console.log('status unknown');
 			return ;
@@ -97,7 +98,6 @@ const mutations = {
 	setUserSocket(state: State) {
 		if (!state.socket)
 			state.socket = io('http://localhost:3000/user', {  withCredentials: true });
-		console.log('socket = ', state.socket);
 	},
 	setTwoFAauth(state: State, data: boolean) {
 		state.twoFAauth = data;
