@@ -143,7 +143,12 @@ export default defineComponent({
         if (this.socket.connected == false)
             this.socket = io('http://localhost:3000/chat', {  withCredentials: true });
         this.getChannelList();
+        
         this.socket.on('sendMessageToClient', (data) => {
+            console.log(data);
+        })
+
+        this.socket.on('channelJoined', (data) => {
             console.log(data);
         })
     },

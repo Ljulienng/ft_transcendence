@@ -75,9 +75,6 @@ export class ChannelService {
            if (newChannel.password.length < 8) {
                 throw new HttpException('password too short', HttpStatus.FORBIDDEN);
            }
-           if (newChannel.password.length > 20) {
-                throw new HttpException('password too long', HttpStatus.FORBIDDEN);
-            }
             const saltOrRounds = await bcrypt.genSalt();
             newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);
        }
@@ -193,9 +190,6 @@ export class ChannelService {
         if (passwords.newPassword.length < 8) {
             throw new HttpException('password too short', HttpStatus.FORBIDDEN);
         }
-        if (passwords.newPassword.length > 20) {
-            throw new HttpException('password too long', HttpStatus.FORBIDDEN);
-        }
         if (!( await this.checkPasswordMatch(passwords.oldPassword, channel.password))) {
             throw new HttpException('current password does not match', HttpStatus.FORBIDDEN);
         }
@@ -256,6 +250,10 @@ export class ChannelService {
     async saveMessage(userId: number, createMessageDto: CreateMessageDto) {
         const user = await this.userRepository.findOne({id: userId});
         const currentChannel = await this.findChannelById(createMessageDto.channelId);
+        const channelMember = await this.channelMemberService.findOne(user, currentChannel);
+        if (!channelMember) {
+            throw new HttpException('the user is not a channel member', HttpStatus.FORBIDDEN);
+        }
         return await this.messageService.saveMessage(user, currentChannel, createMessageDto);
       }
     
