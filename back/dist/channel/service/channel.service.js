@@ -21,10 +21,12 @@ const message_service_1 = require("../../message/service/message.service");
 const bcrypt = require("bcrypt");
 const user_entity_1 = require("../../user/models/user.entity");
 const channelMember_service_1 = require("../../channelMember/service/channelMember.service");
+const user_service_1 = require("../../user/service/user.service");
 let ChannelService = class ChannelService {
-    constructor(channelRepository, userRepository, channelMemberService, messageService) {
+    constructor(channelRepository, userRepository, userService, channelMemberService, messageService) {
         this.channelRepository = channelRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
         this.channelMemberService = channelMemberService;
         this.messageService = messageService;
     }
@@ -71,6 +73,7 @@ let ChannelService = class ChannelService {
         console.log('new channel created : ', newChannel);
         await this.channelRepository.save(newChannel);
         await this.channelMemberService.createMember(user, newChannel, true);
+        this.userService.addJoinedChannel(user, newChannel);
     }
     async createDmChannel(createChannel, user1Id, user2Id) {
         const user1 = await this.userRepository.findOne({ id: user1Id });
@@ -111,7 +114,8 @@ let ChannelService = class ChannelService {
         if (this.channelMemberService.findOne(user, welcomingChannel)) {
             throw new common_1.UnauthorizedException('user already in this channel');
         }
-        this.channelMemberService.createMember(user, welcomingChannel, false);
+        await this.channelMemberService.createMember(user, welcomingChannel, false);
+        this.userService.addJoinedChannel(user, welcomingChannel);
         await this.channelRepository.save(welcomingChannel);
     }
     async removeUserToChannel(leaveChannel, userId) {
@@ -125,6 +129,7 @@ let ChannelService = class ChannelService {
         }
         else {
             this.channelMemberService.deleteMember(user, channelToLeave);
+            this.userService.removeJoinedChannel(user.id, channelToLeave);
             await this.channelRepository.save(channelToLeave);
         }
     }
@@ -151,6 +156,7 @@ let ChannelService = class ChannelService {
         if (userId != channel.owner.id) {
             throw new common_1.HttpException('only the owner can delete channels', common_1.HttpStatus.FORBIDDEN);
         }
+        channel.channelMembers.forEach(member => this.userService.removeJoinedChannel(member.user.id, channel));
         return await this.channelRepository.remove(channel);
     }
     async getChannelMembers(channel) {
@@ -191,10 +197,12 @@ ChannelService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(channel_entity_1.Channel)),
     __param(1, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __param(2, (0, common_1.Inject)(channelMember_service_1.ChannelMemberService)),
-    __param(3, (0, common_1.Inject)(message_service_1.MessageService)),
+    __param(2, (0, common_1.Inject)(user_service_1.UserService)),
+    __param(3, (0, common_1.Inject)(channelMember_service_1.ChannelMemberService)),
+    __param(4, (0, common_1.Inject)(message_service_1.MessageService)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
+        user_service_1.UserService,
         channelMember_service_1.ChannelMemberService,
         message_service_1.MessageService])
 ], ChannelService);

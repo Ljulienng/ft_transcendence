@@ -13,7 +13,7 @@ import { ChannelMemberModule } from 'src/channelMember/channelMember.module';
   imports: [
     TypeOrmModule.forFeature([Channel]),
     TypeOrmModule.forFeature([Message]), 
-    TypeOrmModule.forFeature([User]), 
+    TypeOrmModule.forFeature([User]),
     forwardRef(() => MessageModule), 
     forwardRef(() => UserModule),
     forwardRef(() => ChannelMemberModule),

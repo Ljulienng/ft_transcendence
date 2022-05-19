@@ -1,4 +1,4 @@
-import { ConsoleLogger, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConsoleLogger, HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { from, Observable, of, switchMap, map, tap} from 'rxjs';
 import { getConnection, Repository } from 'typeorm';
@@ -7,6 +7,7 @@ import { Student } from "src/user/dto/student.dto"
 import { User, Friend } from '../models/user.entity';
 import { isNumber } from 'class-validator';
 import { names, uniqueNamesGenerator } from 'unique-names-generator';
+import { Channel } from 'src/channel/models/channel.entity';
 
 
 @Injectable()
@@ -153,7 +154,7 @@ export class UserService {
 		if (tmp) {
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user is already in your friendlist.')
 		}
-		else {
+		else { 
 			user.friends.push(String(friend.id))
 		}
 		await this.userRepository.save(user);
@@ -246,5 +247,15 @@ export class UserService {
 			twoFAEnabled: false
 		});
 	}
-		
+	
+	async removeJoinedChannel(userId: number, channelToLeave: Channel) {
+		const user = await this.userRepository.findOne({id: userId});
+		const tmp = user.joinedChannels.find(channel => channel.id === channelToLeave.id);
+        const index = user.joinedChannels.indexOf(tmp, 0);
+        user.joinedChannels.splice(index, 1);
+	}
+
+	addJoinedChannel(user: User, welcomingChannel: Channel) {
+		user.joinedChannels.push(welcomingChannel);
+	}
 }
