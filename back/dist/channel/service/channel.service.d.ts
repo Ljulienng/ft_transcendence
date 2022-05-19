@@ -8,12 +8,14 @@ import { PasswordI } from '../models/password.interface';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
 import { CreateMessageDto } from 'src/message/models/message.dto';
+import { UserService } from 'src/user/service/user.service';
 export declare class ChannelService {
     private channelRepository;
     private userRepository;
+    private userService;
     private channelMemberService;
     private messageService;
-    constructor(channelRepository: Repository<Channel>, userRepository: Repository<User>, channelMemberService: ChannelMemberService, messageService: MessageService);
+    constructor(channelRepository: Repository<Channel>, userRepository: Repository<User>, userService: UserService, channelMemberService: ChannelMemberService, messageService: MessageService);
     findAll(): Promise<Channel[]>;
     findChannelById(channelId: number): Promise<Channel>;
     findChannelByName(channelName: string): Promise<Channel>;

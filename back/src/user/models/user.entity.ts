@@ -55,6 +55,9 @@ export class User {
 	channelMembers: ChannelMember[];
 
 	@Column("simple-array", {nullable: true})
+	joinedChannels: Channel[];
+
+	@Column("simple-array", {nullable: true})
 	friends: string[];
 
 	@Column({default: 'Offline'})
