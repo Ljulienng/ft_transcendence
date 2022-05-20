@@ -76,7 +76,7 @@ export class ChannelController {
         return this.channelService.changePassword(channelId, request.user.id, passwords);
     }
 
-    // test : curl -v  -X Post -d '{"muted": true }' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/{userId}
+    // test : curl -v  -X POST -d '{"muted": true }' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/{userId}
     @UseGuards(JwtAuthGuard)
     @Post(':channelId/:userId')
     async updateMemberChannel(
@@ -87,12 +87,13 @@ export class ChannelController {
         return await this.channelService.updateChannelMember(request.user.id, userId, channelId, updates);
     }
 
-    @UseGuards(JwtAuthGuard)
+    // test : curl -v -X DELETE http://localhost:3000/channel/{channelId}
+    // @UseGuards(JwtAuthGuard)
     @Delete(':channelId')
     async deleteChannel(
         @Req() request,
         @Param('channelId') channelId: number) {
-        return await this.channelService.deleteChannel(request.user.id, channelId);
+        return await this.channelService.deleteChannel(1/*request.user.id*/, channelId);
     }
 
     @Delete(':channelId/:userId')

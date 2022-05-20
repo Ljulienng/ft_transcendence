@@ -69,15 +69,10 @@ export class ChannelService {
             throw new UnauthorizedException('user does not exist');
         }
 
-        // if (this.channelRepository.findOne({name: createChannel.name})) {
-        //     console.log("went there in find one")
-        //     throw new UnauthorizedException('this name is already used');  
-        // }
         const isSameChatName = await this.channelRepository.findOne({name: createChannel.name});
         if (isSameChatName) {
             throw new UnauthorizedException('this name is already used');  
         }
-
         
         const newChannel = this.channelRepository.create({
             name: createChannel.name,
@@ -214,15 +209,17 @@ export class ChannelService {
     async deleteChannel(userId: number, channelId: number) {
         const user = await this.userRepository.findOne({id: userId});
         const channel = await this.findChannelById(channelId);
+        console.log("user:", user);
+        console.log("channel:", channel);
         const channelMember = await this.channelMemberService.findOne(user, channel);
 
         if (!channel) {
             throw new NotFoundException();
         }
+        console.log("member:", channelMember);
         if (!channelMember.owner) {
             throw new HttpException('only the owner can delete channels', HttpStatus.FORBIDDEN);
         }
-
         return await this.channelRepository.remove(channel);
     }
 

@@ -13,16 +13,19 @@ export class ChannelMemberService {
         private channelMemberRepository: Repository<ChannelMember>,
     ) {}
    
-    async findOne(user: User, channel: Channel) {
+    // ne fonctionne pas
+    async findOne(user: User, channel: Channel): Promise<ChannelMember> {
         return await this.channelMemberRepository.findOne({
-            user: user,
-            channel: channel,
+            where: {
+                user: user,
+                channel: channel,
+            },
         })
     }
 
     async findMembers(channel: Channel) {
         return await this.channelMemberRepository.find({
-                channel: channel,
+            channel: channel,
         })
     }
 

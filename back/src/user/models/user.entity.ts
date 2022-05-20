@@ -51,7 +51,9 @@ export class User {
 	@OneToMany(() => Channel, channel => channel.user)
 	channels: Channel[];
 
-	@OneToMany(() => ChannelMember, channelMember => channelMember.user)
+	@OneToMany(() => ChannelMember, channelMember => channelMember.user, {
+		cascade: true,
+	})
 	channelMembers: ChannelMember[];
 
 	@Column("simple-array", {nullable: true})
