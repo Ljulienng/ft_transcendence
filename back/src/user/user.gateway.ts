@@ -94,7 +94,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('getChannelMsg')
     async getChannelMsg(client: Socket, channelId: number) {
         const channel = await this.channelService.findChannelById(channelId);
-        const messages = await this.channelService.getChannelMessagesByChannelName(channel.name)
+        const messages = await this.channelService.findChannelMessagesByChannelName(channel.name)
 
         // console.log('MESSAGE = ', messages)
 
@@ -110,7 +110,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const room = await this.channelService.findChannelById(joinChannel.id);
         client.join(room.name);
         this.server.to(room.name).emit('channelJoined', "Hello you join the channe");
-        const messages = await this.channelService.getChannelMessagesByChannelName(room.name);
+        const messages = await this.channelService.findChannelMessagesByChannelName(room.name);
         this.server.to(client.id).emit('channelMessages', messages); 
     } 
 

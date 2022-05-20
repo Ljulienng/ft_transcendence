@@ -93,7 +93,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('getChannelMsg')
     async getChannelMsg(client: Socket, channelId: number) {
         const channel = await this.channelService.findChannelById(channelId);
-        const messages = await this.channelService.getChannelMessagesByChannelName(channel.name)
+        const messages = await this.channelService.findChannelMessagesByChannelName(channel.name)
 
         // console.log('MESSAGE = ', messages)
 
