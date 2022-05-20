@@ -81,7 +81,6 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import { io } from "socket.io-client";
 import http from "../http-common";
 import MessageI from "../types/interfaces/message.interface";
 import ChannelBox from "./ChannelBox.vue";
@@ -213,10 +212,7 @@ export default defineComponent({
 
   mounted() {
     if (this.socket === undefined) {
-      // this.socket = store.getters["auth/getUserSocket"]
-
       this.socket = store.getters["auth/getUserSocket"];
-      console.log("bruh", this.socket);
     }
 
     // this.socket.on('sendMessageToClient', (data) => {

@@ -1,6 +1,6 @@
 <template>
-  <div id="app">
-    <h2>
+  <div id="test">
+    <!-- <h2>
       Vue.js Notification
       <br />
       <a
@@ -11,29 +11,29 @@
       <a href="https://github.com/kyvg/vue3-notification/" target="issues"
         >Github</a
       >
-    </h2>
+    </h2> -->
     <!-- CSS animation example -->
-    <notifications group="foo-css" position="bottom left" :speed="500" />
+    <!-- <notifications group="foo-css" position="bottom left" :speed="500" /> -->
 
     <!-- Velocity animation example -->
-    <notifications
+    <!-- <notifications
       group="foo-velocity"
       position="bottom right"
       animation-type="velocity"
       :speed="500"
-    />
+    /> -->
 
     <!-- Custom style example -->
-    <notifications
+    <!-- <notifications
       group="custom-style"
       position="top center"
       classes="n-light"
       :max="3"
       :width="400"
-    />
+    /> -->
 
     <!-- Custom template example -->
-    <notifications
+    <!-- <notifications
       group="custom-template"
       :duration="5000"
       :width="500"
@@ -58,10 +58,10 @@
           </div>
         </div>
       </template>
-    </notifications>
+    </notifications> -->
 
     <!-- Full width example -->
-    <notifications group="full-width" width="100%" />
+    <!-- <notifications group="full-width" width="100%" />
 
     <div class="content">
       <p>CSS animation:</p>
@@ -108,7 +108,7 @@
         <p />
         <button @click="show('full-width')">show bottom (full width)</button>
       </div>
-    </div>
+    </div> -->
     <button
       class="btn btn-primary"
       data-bs-target="#collapseTarget"
