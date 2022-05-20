@@ -11,7 +11,6 @@ import { PasswordI } from '../models/password.interface';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
 import { CreateMessageDto } from 'src/message/models/message.dto';
-import { UserService } from 'src/user/service/user.service';
 
 @Injectable()
 export class ChannelService {
@@ -20,8 +19,6 @@ export class ChannelService {
         private channelRepository: Repository<Channel>,
         @InjectRepository(User)
         private userRepository: Repository<User>,
-        @Inject(UserService)
-        private userService: UserService,
         @Inject(ChannelMemberService)
         private channelMemberService: ChannelMemberService,
         @Inject(MessageService)
@@ -94,9 +91,6 @@ export class ChannelService {
        console.log('new channel created : ', newChannel);
        await this.channelRepository.save(newChannel);
        await this.channelMemberService.createMember(user, newChannel, true, true);
-       
-       // add the channel of the channelJoined list of the user
-    //    this.userService.addJoinedChannel(user, newChannel);
     }
 
     /*
@@ -170,8 +164,8 @@ export class ChannelService {
         const channelMember = await this.channelMemberService.findOne(user, channelToLeave);
 
         if (!channelMember) {
-                throw new UnauthorizedException('user not in this channel');
-            }
+            throw new UnauthorizedException('user not in this channel');
+        }
         
         // if the owner leave the channel, we delete the channel
         // else we just delete the member
@@ -217,9 +211,6 @@ export class ChannelService {
         if (!channelMember.owner) {
             throw new HttpException('only the owner can delete channels', HttpStatus.FORBIDDEN);
         }
-        // channel.channelMembers.forEach(
-        //     member => this.userService.removeJoinedChannel(member.user.id, channel)
-        // );
 
         return await this.channelRepository.remove(channel);
     }

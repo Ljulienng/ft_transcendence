@@ -42,7 +42,6 @@ export class ChannelController {
         return this.channelService.findOwner(channelId);
     }
     
-
     // test : curl -v  -X POST -d '{"name":"room42", "type": 1,  "password":"supersecuremdp"}' -H "Content-Type: application/json" http://localhost:3000/channel/createChannel
     @UseGuards(JwtAuthGuard) // user has to be connected
     @Post('/createChannel')
@@ -53,7 +52,7 @@ export class ChannelController {
     }
 
     // test : curl -v  -X POST -d '{"secondUserId": "2", { "name":"room42", "type": 1,  "password":"supersecuremdp" }}' -H "Content-Type: application/json" http://localhost:3000/channel/
-    @UseGuards(JwtAuthGuard) // user has to be connected
+    @UseGuards(JwtAuthGuard)
     @Post('/createDmChannel')
     async createDmChannel(
         @Req() request,
@@ -63,7 +62,7 @@ export class ChannelController {
     }
 
     // test : curl -v -X POST -d '{"oldPassword":"oldpass", "newPassword":"newpass"}' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/changePass
-    @UseGuards(JwtAuthGuard) // user has to be connected
+    @UseGuards(JwtAuthGuard)
     @Post(':channelId/changePass')
     changePassword(
         @Param('channelId') channelId: number,
@@ -72,9 +71,9 @@ export class ChannelController {
         return this.channelService.changePassword(channelId, request.user.id, passwords);
     }
 
-    // test : curl -v  -X PATCH -d '{"muted": true }' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/{userId}
-    @UseGuards(JwtAuthGuard) // user has to be connected
-    @Patch(':channelId/:userId')
+    // test : curl -v  -X Post -d '{"muted": true }' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/{userId}
+    @UseGuards(JwtAuthGuard)
+    @Post(':channelId/:userId')
     async updateMemberChannel(
         @Req() request,
         @Param('userId') userId: number,
@@ -83,7 +82,7 @@ export class ChannelController {
         return await this.channelService.updateChannelMember(request.user.id, userId, channelId, updates);
     }
 
-    @UseGuards(JwtAuthGuard) // user has to be connected
+    @UseGuards(JwtAuthGuard)
     @Delete(':channelId')
     async deleteChannel(
         @Req() request,
