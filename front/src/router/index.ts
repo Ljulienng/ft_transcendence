@@ -7,6 +7,7 @@ import TwoFaAuth from '@/components/TwoFaAuth.vue'
 import FriendList from '@/views/FriendList.vue'
 import UserProfile from '@/views/UserProfile.vue'
 import Home from '@/views/Home.vue'
+import Test from '@/views/Test.vue'
 // import http from '../http-common'
 import Chat from '@/views/Chat.vue'
 
@@ -22,6 +23,11 @@ const routes = [
 		path: '/',
 		component: Home,
 		meta: {requiredAuth: true}
+	},
+	{
+		name: 'Test',
+		path: '/test',
+		component: Test,
 	},
 	{
 		name: 'Home',
@@ -58,7 +64,8 @@ const routes = [
 	{
 		name: 'chat',
 		path: '/chat',
-		component: Chat
+		component: Chat,
+		meta: {requiredAuth: true}
 	},
 	{
 		name: 'UserProfile',

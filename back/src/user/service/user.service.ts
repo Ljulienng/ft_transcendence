@@ -7,6 +7,7 @@ import { Student } from "src/user/dto/student.dto"
 import { User, Friend } from '../models/user.entity';
 import { isNumber } from 'class-validator';
 import { names, uniqueNamesGenerator } from 'unique-names-generator';
+import { JwtService } from '@nestjs/jwt';
 import { Channel } from 'src/channel/models/channel.entity';
 
 
@@ -16,6 +17,7 @@ export class UserService {
 	constructor(
 		@InjectRepository(User)
 		protected userRepository: Repository<User>,
+		private jwtService: JwtService
 	) {}
 
 	async onModuleInit(): Promise<void> {
@@ -77,10 +79,6 @@ export class UserService {
 		const tmp = await this.userRepository.findOne({username: userName})
 		const regex = /^[a-zA-Z0-9_]+$/
 
-		// console.log("username: ", userName);
-		// console.log("tmp: ", tmp);
-		// console.log("currentUser: ", (await currentUser).username);
-		// console.log("regexp = ", regex.test(userName));
 		if (tmp)
 			throw new HttpException('Username already taken', HttpStatus.FORBIDDEN);
 		else if ((await currentUser).username === userName)
@@ -94,6 +92,12 @@ export class UserService {
 
 	findAll(): any {
 		return from(this.userRepository.find());
+	}
+
+	async findByCookie(cookie: any): Promise<User> {
+		// Decode cookie to a payload then search within rep using username from payload
+		const user = await this.userRepository.findOne({username: this.jwtService.decode(cookie)["username"]});
+		return user;
 	}
 
 	findByUserId(userId: number): Observable<User> {
@@ -222,6 +226,10 @@ export class UserService {
 		return (friendList);
 	}
 
+	joinedChannel(user: User) {
+		return user.joinedChannels
+	}
+
 	async setStatus(user: User, newStatus: string) {
 		// if (newStatus !== 'Online'  'Offline'  'In game'  'Away'  'Occupied')
 		// 	throw new HttpException("Incorrect user status", HttpStatus.FORBIDDEN)
@@ -247,4 +255,17 @@ export class UserService {
 			twoFAEnabled: false
 		});
 	}
+	
+	// async removeJoinedChannel(userId: number, channelToLeave: Channel) {
+	// 	const user = await this.userRepository.findOne({id: userId});
+	// 	const tmp = user.joinedChannels.find(channel => channel.id === channelToLeave.id);
+    //     const index = user.joinedChannels.indexOf(tmp, 0);
+    //     user.joinedChannels.splice(index, 1);
+	// }
+
+	// addJoinedChannel(user: User, welcomingChannel: Channel) {
+	// 	if (user.joinedChannels === null)
+	// 		user.joinedChannels = []
+	// 	user.joinedChannels.push(welcomingChannel);
+	// }
 }

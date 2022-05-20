@@ -64,11 +64,16 @@ export class ChannelService {
             throw new UnauthorizedException('user does not exist');
         }
 
+        // if (this.channelRepository.findOne({name: createChannel.name})) {
+        //     console.log("went there in find one")
+        //     throw new UnauthorizedException('this name is already used');  
+        // }
         const isSameChatName = await this.channelRepository.findOne({name: createChannel.name});
         if (isSameChatName) {
             throw new UnauthorizedException('this name is already used');  
         }
 
+        
         const newChannel = this.channelRepository.create({
             name: createChannel.name,
             type: createChannel.type,
@@ -165,6 +170,7 @@ export class ChannelService {
 
         if (!channelMember) {
             throw new UnauthorizedException('user not in this channel');
+
         }
         
         // if the owner leave the channel, we delete the channel
@@ -252,9 +258,9 @@ export class ChannelService {
         const user = await this.userRepository.findOne({id: userId});
         const channel = await this.findChannelById(createMessageDto.channelId);
         const channelMember = await this.channelMemberService.findOne(user, channel);
-        if (!channelMember) {
-            throw new HttpException('this user is not a channel member', HttpStatus.FORBIDDEN);
-        }
+        // if (!channelMember) {
+        //     throw new HttpException('this user is not a channel member', HttpStatus.FORBIDDEN);
+        // }
         return await this.messageService.saveMessage(user, channel, createMessageDto);
       }
     

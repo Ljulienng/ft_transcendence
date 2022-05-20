@@ -69,6 +69,19 @@ export class UserController {
 	}
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get('/joinedchannel')
+	async getJoinedChannel(@Req() req) {
+		try {
+			const user = req.user;
+
+			return await this.userService.joinedChannel(user);
+		} catch(e) {
+			throw new UnauthorizedException("Error: getFriendList");
+
+		}
+	}
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Post('/addfriend')
 	async addFriend(@Req() req, @Body() friendToAdd) {
 		let user: User;

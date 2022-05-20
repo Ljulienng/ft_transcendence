@@ -10,7 +10,10 @@
     "start": "node main.js"
   },
   "dependencies": {
+    "@kyvg/vue3-notification": "^2.3.4",
+    "@popperjs/core": "^2.11.5",
     "axios": "^0.26.1",
+    "bootstrap": "^5.1.3",
     "core-js": "^3.8.3",
     "gallium": "^0.2.1",
     "material-icons": "^1.10.8",

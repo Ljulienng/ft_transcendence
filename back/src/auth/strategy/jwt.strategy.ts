@@ -31,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 		console.log('jwt validate');
 		const { username, auth } = payload;
 		const user = await this.userService.findByUsername(username); // to change\
-		console.log("twoFAEnabled =", user.twoFAEnabled)
+		// console.log("twoFAEnabled =", user.twoFAEnabled)
 		if (!user) {
 			throw new UnauthorizedException('User not found');
 		}
