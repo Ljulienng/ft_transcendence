@@ -22,7 +22,7 @@ export class ChannelMemberService {
 
     async findMembers(channel: Channel) {
         return await this.channelMemberRepository.find({
-            channel: channel,
+                channel: channel,
         })
     }
 
@@ -30,6 +30,13 @@ export class ChannelMemberService {
         return await this.channelMemberRepository.findOne({
             channel: channel,
             owner: true, 
+        })
+    }
+
+    async   findAdmins(channel: Channel) {
+        return await this.channelMemberRepository.find({
+            channel: channel,
+            admin: true, 
         })
     }
 
@@ -94,6 +101,6 @@ export class ChannelMemberService {
 
     async deleteMember(user: User, channel: Channel) {
         const memberToRemove = await this.findOne(user, channel);
-        await this.channelMemberRepository.delete(memberToRemove);
+        await this.channelMemberRepository.remove(memberToRemove);
     }
 }
