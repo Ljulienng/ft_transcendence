@@ -35,6 +35,7 @@ export class Channel {
 	})
 	messages: Message[];
 	
+	// a channel can have various members
 	@OneToMany(() => ChannelMember, channelMember => channelMember.channel, {
 		cascade: true,
 		eager: true,
@@ -42,10 +43,11 @@ export class Channel {
 	})
 	channelMembers: ChannelMember[];
 
-    @ManyToOne(() => User, owner => owner.id, {
+	// a user can be in various channels (useful relation to get the list of channels by user)
+    @ManyToOne(() => User, user => user.id, {
         eager: true,
         onDelete: 'CASCADE',
     })
-    owner: User;
+    user: User;
 
 }

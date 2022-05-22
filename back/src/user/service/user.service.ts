@@ -1,12 +1,15 @@
-import { ConsoleLogger, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConsoleLogger, HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { from, Observable, of, switchMap, map } from 'rxjs';
+import { from, Observable, of, switchMap, map, tap} from 'rxjs';
 import { getConnection, Repository } from 'typeorm';
 import { UserDto } from '../models/user.dto';
 import { Student } from "src/user/dto/student.dto"
 import { User, Friend } from '../models/user.entity';
 import { isNumber } from 'class-validator';
 import { names, uniqueNamesGenerator } from 'unique-names-generator';
+import { JwtService } from '@nestjs/jwt';
+import { Channel } from 'src/channel/models/channel.entity';
+
 
 @Injectable()
 export class UserService {
@@ -14,6 +17,7 @@ export class UserService {
 	constructor(
 		@InjectRepository(User)
 		protected userRepository: Repository<User>,
+		private jwtService: JwtService
 	) {}
 
 	async onModuleInit(): Promise<void> {
@@ -38,6 +42,7 @@ export class UserService {
 	add(user: User): any {
 		user.firstname = uniqueNamesGenerator({dictionaries: [names]})
 		user.lastname = uniqueNamesGenerator({dictionaries: [names]})
+		user.status = "Offline"
 
 		return from(this.userRepository.save(user));
 	}
@@ -48,6 +53,7 @@ export class UserService {
 		console.log('Student Added');
 		tmp.username = user.username;
 		tmp.email = user.email;
+		tmp.status = 'Offline';
 
 		return from(this.userRepository.save(user));
 	}
@@ -61,6 +67,7 @@ export class UserService {
 		delete user.username;
 		delete user.firstname;
 		delete user.lastname;
+		delete user.status;
 
 		return from(this.userRepository.update(id, user)).pipe(
 			switchMap(() => this.userRepository.findOne({id: id}))
@@ -72,10 +79,6 @@ export class UserService {
 		const tmp = await this.userRepository.findOne({username: userName})
 		const regex = /^[a-zA-Z0-9_]+$/
 
-		// console.log("username: ", userName);
-		// console.log("tmp: ", tmp);
-		// console.log("currentUser: ", (await currentUser).username);
-		// console.log("regexp = ", regex.test(userName));
 		if (tmp)
 			throw new HttpException('Username already taken', HttpStatus.FORBIDDEN);
 		else if ((await currentUser).username === userName)
@@ -89,6 +92,12 @@ export class UserService {
 
 	findAll(): any {
 		return from(this.userRepository.find());
+	}
+
+	async findByCookie(cookie: any): Promise<User> {
+		// Decode cookie to a payload then search within rep using username from payload
+		const user = await this.userRepository.findOne({username: this.jwtService.decode(cookie)["username"]});
+		return user;
 	}
 
 	findByUserId(userId: number): Observable<User> {
@@ -119,12 +128,18 @@ export class UserService {
 
 		// }
 		userTmp = await this.userRepository.findOne({username: username});
-		if (userTmp)
+		if (userTmp) {
+			if (userTmp.status === 'Offline')
+				userTmp.status = 'Online';
 			return userTmp;
+		}
 		const { email } = user;
 		userTmp = await this.userRepository.findOne({email: email});
-		if (userTmp)
+		if (userTmp) {
+			if (userTmp.status === 'Offline')
+				userTmp.status = 'Online';
 			return userTmp;
+		}
 		const newUser = await this.addStudent(user);
 		return newUser;
 
@@ -143,7 +158,7 @@ export class UserService {
 		if (tmp) {
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user is already in your friendlist.')
 		}
-		else {
+		else { 
 			user.friends.push(String(friend.id))
 		}
 		await this.userRepository.save(user);
@@ -179,12 +194,14 @@ export class UserService {
 			let friend: Friend = {
 				username: "",
 				firstname: "",
-				lastname: ""
+				lastname: "",
+				status: "Offline"
 			};
 
 			friend.username = friendInfo.username;
 			friend.firstname = friendInfo.firstname;
 			friend.lastname = friendInfo.lastname;
+			friend.status = friendInfo.status
 
 			return friend;
 		}
@@ -209,4 +226,33 @@ export class UserService {
 		return (friendList);
 	}
 
+	joinedChannel(user: User) {
+		return user.channels
+	}
+
+	async setStatus(user: User, newStatus: string) {
+		// if (newStatus !== 'Online'  'Offline'  'In game'  'Away'  'Occupied')
+		// 	throw new HttpException("Incorrect user status", HttpStatus.FORBIDDEN)
+		if (newStatus === 'Online' || 'Offline')
+			console.log("user", user.username , "is", newStatus)
+		user.status = newStatus;
+		this.userRepository.save(user)
+	}
+
+	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+		return this.userRepository.update(userId, {
+			twoFASecret: secret
+		});
+	}
+
+	async turnOnTwoFactorAuthentication(userId: number) {
+		return this.userRepository.update(userId, {
+			twoFAEnabled: true
+		});
+	}
+	async turnOffTwoFactorAuthentication(userId: number) {
+		return this.userRepository.update(userId, {
+			twoFAEnabled: false
+		});
+	}
 }

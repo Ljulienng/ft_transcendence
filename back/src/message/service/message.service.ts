@@ -33,7 +33,7 @@ export class MessageService {
     });
 }
 
-  async save(user: User, channel: Channel, message: CreateMessageDto) {
+  async saveMessage(user: User, channel: Channel, message: CreateMessageDto) {
     const newMessage = this.messageRepository.create({
         user: user,
         content: message.content,

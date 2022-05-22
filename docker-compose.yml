@@ -21,12 +21,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-front
-    volumes:
-      - '.:/app'
-      - '/app/node_modules'
+    # volumes:
+    #   - '.:/app'
+    #   - '/app/node_modules'
     ports:
       - '3001:8080'
     restart: always
+    # volumes:
+    #   - type: bind
+    #     source: ./front
+    #     target: /usr/src/app-front
 
   postgres:
     image: postgres

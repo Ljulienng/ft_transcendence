@@ -12,6 +12,7 @@ import path = require('path');
 import { map } from 'rxjs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
+import { TwoFAAuth } from 'src/auth/guards/twoFA.guard';
 // import { UserI } from '../models/user.interface';
 
 export const storage = {
@@ -42,6 +43,7 @@ export class UserController {
 		return this.userService.delete(idToDelete);
 	}
 
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get()
 	findAll() {
 		return this.userService.findAll();
@@ -49,11 +51,11 @@ export class UserController {
 
 	@Get('/info/:userId')
 	findUserById(@Param('userId') userId: number): Observable<User> {
-		console.log("went in userId");
+		// console.log("went in userId");
 		return this.userService.findByUserId(userId);
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get('/friendlist')
 	async getFriendList(@Req() req) {
 		try {
@@ -66,7 +68,20 @@ export class UserController {
 		}
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get('/joinedchannel')
+	async getJoinedChannel(@Req() req) {
+		try {
+			const user = req.user;
+
+			return await this.userService.joinedChannel(user);
+		} catch(e) {
+			throw new UnauthorizedException("Error: getFriendList");
+
+		}
+	}
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Post('/addfriend')
 	async addFriend(@Req() req, @Body() friendToAdd) {
 		let user: User;
@@ -78,7 +93,7 @@ export class UserController {
 		}
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Delete('/deletefriend')
 	async deleteFriend(@Req() req, @Body() friendToDelete) {
 		try {
@@ -92,7 +107,7 @@ export class UserController {
 		}
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Post('/setusername')
 	async userInfo(@Req() req, @Body() userName) {
 	  try {
@@ -106,10 +121,10 @@ export class UserController {
 	}
 
 	@Post('/uploadavatar')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@UseInterceptors(FileInterceptor('image', storage))
 	uploadFile(@UploadedFile() file, @Req() req): Observable<Object> {
-		console.log("filename = ", file.filename)
+		// console.log("filename = ", file.filename)
 		const user: User = req.user;
 
 		return this.userService.updateOne(user.id, {profileImage: file.filename}).pipe(
@@ -119,10 +134,23 @@ export class UserController {
 		// return of({imagePath: file.path});
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get('/avatar')
 	findProfileImage(@Req() req, @Res() res) {
-		return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + req.user.profileImage)))
+		if (req.user.profileImage)
+			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + req.user.profileImage)))
+		else
+			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + 'default/default.jpg')))
 	}
 
+	// @UseGuards(JwtAuthGuard, TwoFAAuth)
+	// @Get('/status/:username')
+	// async getUserStatus(@Param('username') username: string): Promise<string> {
+	//   // let user: User;
+	// 	const user = await this.userService.findOne({username: username});
+	// 	// console.log("status user = ", user);
+
+	// 	return user.status
+	// }
+  
 }
