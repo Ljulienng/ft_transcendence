@@ -88,12 +88,12 @@ export class ChannelController {
     }
 
     // test : curl -v -X DELETE http://localhost:3000/channel/{channelId}
-    // @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard)
     @Delete(':channelId')
-    async deleteChannel(
+    async deleteChannel( 
         @Req() request,
         @Param('channelId') channelId: number) {
-        return await this.channelService.deleteChannel(1/*request.user.id*/, channelId);
+        return await this.channelService.deleteChannel(request.user.id, channelId);
     }
 
     @Delete(':channelId/:userId')

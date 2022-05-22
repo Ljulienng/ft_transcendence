@@ -50,6 +50,7 @@ export class ChannelMemberService {
             user: user,
             channel: channel,
         });
+        console.log('newMember : ', newMember);
         await this.channelMemberRepository.save(newMember);
     }
 

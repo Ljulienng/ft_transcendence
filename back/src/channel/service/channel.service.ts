@@ -143,7 +143,8 @@ export class ChannelService {
    async addUserToChannel(joinChannel: JoinChannelDto, userId: number) {
         const user = await this.userRepository.findOne({id: userId});
         const welcomingChannel = await this.findChannelById(joinChannel.id);
-        
+        console.log('addUserToChannel user : ', user);
+        console.log('addUserToChannel welcomingChannel : ', welcomingChannel);
         if (welcomingChannel.type !== ChannelType.public) {
             if (welcomingChannel.password) {
                 const match = this.checkPasswordMatch(welcomingChannel.password, joinChannel.password);
@@ -159,8 +160,8 @@ export class ChannelService {
             throw new UnauthorizedException('user already in this channel');
         }
 
-        await this.channelMemberService.createMember(user, welcomingChannel, false, false);    
         await this.channelRepository.save(welcomingChannel);
+        await this.channelMemberService.createMember(user, welcomingChannel, false, false);    
    }
 
    async removeUserToChannel(leaveChannel: Channel, userId: number) {
@@ -209,8 +210,8 @@ export class ChannelService {
     async deleteChannel(userId: number, channelId: number) {
         const user = await this.userRepository.findOne({id: userId});
         const channel = await this.findChannelById(channelId);
-        console.log("user:", user);
-        console.log("channel:", channel);
+        console.log("user:::", user);
+        console.log("channel:::", channel);
         const channelMember = await this.channelMemberService.findOne(user, channel);
 
         if (!channel) {
