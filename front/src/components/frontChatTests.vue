@@ -17,7 +17,13 @@
 					<br>
 				</div>
 				<br>
-				<input type="submit" class="mybtn" value="create channel" @click="createChat">
+				<input
+					type="submit"
+					class="mybtn"
+					value="Submit"
+					@submit="checkForm"
+				>
+					<!-- value="create channel" @click="createChat" -->
 			</form>
 				</div>
 		<br>
@@ -196,12 +202,9 @@ export default defineComponent({
 
 		createChat() {
 			console.log(
-				"chat created : name=",
-				this.name,
-				" privacy=",
-				this.privacy,
-				" password=",
-				this.password
+				"chat created : name=", this.name,
+				" privacy=", this.privacy,
+				" password=", this.password
 			);
 			let channel = {
 				name: this.name,
@@ -243,6 +246,14 @@ export default defineComponent({
 			}
 		},
 
+		checkForm(): boolean {
+			console.log("Check Create Channel form");
+			if ("password" in this.err && this.err["password"] != '') {
+				return false;
+			}
+			this.createChat()
+			return true;
+		}
 		// sendMessage() {
 		//     console.log('sendMessage - on channelId ', this.message.channelId, this.message.content);
 		//     this.socket.emit('sendMessageToServer', this.message);
