@@ -8,10 +8,14 @@ import router from "./router";
 import store from "./store";
 import 'vue-universal-modal/dist/index.css'
 import VueUniversalModal from 'vue-universal-modal'
+<<<<<<< HEAD
 import Notifications from '@kyvg/vue3-notification'
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
 
+=======
+import ToggleSwitch from '../node_modules/vuejs-toggle-switch/src/components/ToggleSwitch.vue'
+>>>>>>> 6d0545ed (front(chat): create chat interface components)
 // import axios from 'axios'
 
 const app = createApp(App);
@@ -27,4 +31,5 @@ app.use(VueUniversalModal, {
 	teleportTarget: '#my-modals',
 	modalComponent: 'MyModal',
 })
+app.component('ToggleSwitch', ToggleSwitch)
 app.mount("#app");

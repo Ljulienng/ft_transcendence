@@ -12,7 +12,6 @@ import Test from '@/views/Test.vue'
 import Chat from '@/views/Chat.vue'
 // import Chat from '@/views/myChat.vue'
 
-
 const routes = [
 	// {
 	// 	name: 'Base',
