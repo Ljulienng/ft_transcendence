@@ -95,6 +95,7 @@ export default defineComponent({
     return {
       socket: store.getters["auth/getUserSocket"],
       channelList: [],
+      joinedChannelList: [],
       message: {
         content: "",
         channelId: 0,
@@ -142,6 +143,7 @@ export default defineComponent({
         const response = await http.get("/users/joinedchannel");
         // this.channelList = response.data;
         console.log("get joinedchannelList : ", response.data);
+        this.joinedChannelList = response.data;
       } catch (error) {
         console.log(error);
       }

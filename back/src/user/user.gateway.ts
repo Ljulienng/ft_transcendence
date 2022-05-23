@@ -110,7 +110,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         
         const room = await this.channelService.findChannelById(joinChannel.id);
         client.join(room.name);
-        this.server.to(room.name).emit('channelJoined', "Hello you join the channe");
+        console.log("Channel user = ", await this.channelService.findMembers(room.id))
+        this.server.to(room.name).emit('channelJoined', "Hello you join the channel");
         const messages = await this.channelService.findChannelMessagesByChannelName(room.name);
         this.server.to(client.id).emit('channelMessages', messages); 
     } 
