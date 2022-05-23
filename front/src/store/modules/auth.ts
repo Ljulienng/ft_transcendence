@@ -104,7 +104,7 @@ const mutations = {
 	},
 
 	connectUser(state: State) {
-		console.log('connect user with socket n ', state.socket)
+		console.log('connect user with socket :', state.socket)
 		state.userProfile.status = "Online"
 		state.socket.emit('connectUser', state.userProfile.userName,)
 	},

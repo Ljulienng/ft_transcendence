@@ -20,6 +20,8 @@
 <script lang="ts">
 import http from "../http-common";
 import { defineComponent } from "@vue/runtime-core";
+import store from "../store";
+import router from "../router";
 
 export default defineComponent({
   methods: {

@@ -27,10 +27,10 @@ services:
     ports:
       - '3001:8080'
     restart: always
-    # volumes:
-    #   - type: bind
-    #     source: ./front
-    #     target: /usr/src/app-front
+    volumes:
+      - type: bind
+        source: ./front
+        target: /usr/src/app-front
 
   postgres:
     image: postgres
