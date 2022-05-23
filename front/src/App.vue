@@ -61,22 +61,22 @@ export default defineComponent({
           console.log(err);
         });
     },
-    show(group, type = "") {
-      const text = `
-				This is notification text!
-				<br>
-				Date: ${new Date()}
-			`;
-      this.$notify({
-        group,
-        title: `Test ${type} notification #${this.id++}`,
-        text,
-        type,
-        data: {
-          randomNumber: Math.random(),
-        },
-      });
-    },
+    // show(group, type = "") {
+    //   const text = `
+		// 		This is notification text!
+		// 		<br>
+		// 		Date: ${new Date()}
+		// 	`;
+    //   this.$notify({
+    //     group,
+    //     title: `Test ${type} notification #${this.id++}`,
+    //     text,
+    //     type,
+    //     data: {
+    //       randomNumber: Math.random(),
+    //     },
+    //   });
+    // },
   },
 
   created() {

@@ -1,42 +1,49 @@
 <template>
-<div class='modal'>
+<div class='modalAuth'>
 	<div class="signup">
 		<div class="signup-connect">
 			<h1>Create your account</h1>
-			<a href="http://localhost:3000/auth/42" class="btn btn-social btn-42" v-on:click="ftAuth"><i class="fa fa-user"></i> Sign in with 42</a>
-			<a v-on:click="norminetAuth" class="btn btn-social btn-google"><i class="fa fa-google"></i> Sign in with norminet</a>
+			<a
+        href="http://localhost:3000/auth/42"
+        class="btn btn-social btn-42"
+        v-on:click="ftAuth"
+        ><i class="fa fa-user"></i> Sign in with 42</a
+      >
+			<a v-on:click="norminetAuth" class="btn btn-social btn-google"
+        ><i class="fa fa-google"></i> Sign in with norminet</a
+      >
 		</div>	
 	</div>
 </div>
 	
 </template>
 
-<script lang='ts'>
-import http from "../http-common"
+<script lang="ts">
+import http from "../http-common";
 import { defineComponent } from "@vue/runtime-core";
 
 export default defineComponent({
-  methods:{
+  methods: {
     ftAuth() {
-      return ('http://localhost:3000/auth/42');
+      return "http://localhost:3000/auth/42";
     },
 
     norminetAuth() {
-      http.get('/norminet')
-      .then(res => {
-        console.log(res);
-        this.$router.push("http://localhost:3001/home")
-      })
-      .catch(err => {
-        console.log("err norminet = ", err)
-      })
-    }
-  }
-})
+      http
+        .get('/norminet')
+        .then(res => {
+          console.log(res);
+          this.$router.push("http://localhost:3001/home")
+        })
+        .catch(err => {
+          console.log("err norminet = ", err)
+        });
+    },
+  },
+});
 </script>
 
 <style scoped scss lang="scss">
-
 .modal {
   position: absolute;
   top: 50%;
@@ -73,7 +80,7 @@ Buttons
   position: relative;
   
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     z-index: 1;
     top: 0;
@@ -148,7 +155,7 @@ Form
   
   button {
     width: 100%;
-    outline: none!important;
+    outline: none !important;
     background: linear-gradient(-5deg, hsl(86, 61%, 44%), hsl(86, 65%, 54%));
     border: none;
     text-transform: uppercase;

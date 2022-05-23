@@ -4,6 +4,7 @@ import HelloWorld from "./components/HelloWorld.vue";
 import Sidebar from "./components/Sidebar.vue";
 import UploadAvatar from "./components/UploadAvatar.vue"
 import ChatTests from "./components/ChatTests.vue"
+import frontChatTests from "./components/frontChatTests.vue"
 import router from "./router";
 import store from "./store";
 import 'vue-universal-modal/dist/index.css'
@@ -24,6 +25,7 @@ app.component("UploadAvatar", UploadAvatar);
 app.use(Notifications);
 app.component("HelloWorld", HelloWorld);
 app.component("ChatTests", ChatTests);
+app.component("frontChatTests", frontChatTests);
 app.use(VueUniversalModal, {
 	teleportTarget: '#my-modals',
 	modalComponent: 'MyModal',
