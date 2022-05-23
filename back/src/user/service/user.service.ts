@@ -231,7 +231,7 @@ export class UserService {
 
 	joinedChannel(user: User) {
 		return this.channelService.findChannelsByUser(user);
-		// return user.channels
+		// return user.joinedChannels
 	}
 
 	async setStatus(user: User, newStatus: string) {

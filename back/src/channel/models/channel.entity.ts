@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, OneToMany, ManyToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, ManyToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable, JoinColumn } from "typeorm";
 import { IsOptional } from 'class-validator';
 import { Message } from "src/message/models/message.entity";
 import { User } from "src/user/models/user.entity";
@@ -44,10 +44,13 @@ export class Channel {
 	channelMembers: Channel[];
 
 	// a user can be in various channels (useful relation to get the list of channels by user)
-    @ManyToOne(() => User, user => user.id, {
+    @ManyToOne(() => User, user => user.ownedChannels, {
     	eager: true,
         onDelete: 'CASCADE',
     })
     owner: User;
 
+	@ManyToMany(() => User, user => user.joinedChannels)
+	@JoinTable()
+	users: User[];
 }

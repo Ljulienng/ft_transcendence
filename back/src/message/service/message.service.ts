@@ -10,7 +10,7 @@ import { User } from 'src/user/models/user.entity';
 export class MessageService {
     constructor(
         @InjectRepository(Message)
-        private messageRepository: Repository<Message>,
+        private messageRepository: Repository<Message>, 
     ) {}
 
    async findAll(): Promise<Message[]> {

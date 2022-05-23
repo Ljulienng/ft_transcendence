@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { Message } from "src/message/models/message.entity";
 import { Channel } from "src/channel/models/channel.entity";
 import { colors } from "unique-names-generator";
@@ -48,8 +48,12 @@ export class User {
 	@OneToMany(() => Message, message => message.channel)
 	messages: Message[]; 
 
+	// only where user is owner
 	@OneToMany(() => Channel, channel => channel.owner)
-	channels: Channel[];
+	ownedChannels: Channel[];
+
+	@ManyToMany(() => Channel, channel => channel.users)
+	joinedChannels: Channel[];
 
 	@OneToMany(() => ChannelMember, channelMember => channelMember.user, {
 		cascade: true,
