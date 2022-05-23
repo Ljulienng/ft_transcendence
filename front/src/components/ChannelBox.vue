@@ -67,8 +67,9 @@ export default defineComponent({
     },
 
     async getMessages() {
+      console.log('heho')
       this.socket.emit("getChannelMsg", this.channel);
-      await this.socket.on("getChannelMessages", (data: MessageI[]) => {
+      this.socket.on("getChannelMessages", (data: MessageI[]) => {
         this.messageList = data;
       });
     },
@@ -79,8 +80,10 @@ export default defineComponent({
       this.socket = store.getters["auth/getUserSocket"];
     }
     this.socket.on("messageSent", (data: unknown) => {
-      console.log("updated ", data);
-      this.getMessages();
+      this.socket.emit("getChannelMsg", this.channel);
+    });
+    this.socket.on("getChannelMessages" + this.currentUser.id, (data: MessageI[]) => {
+      this.messageList = data;
     });
   },
 

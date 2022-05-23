@@ -96,9 +96,10 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const channel = await this.channelService.findChannelById(channelId);
         const messages = await this.channelService.getChannelMessagesByChannelName(channel.name)
 
-        // console.log('MESSAGE = ', messages)
+        const index = await this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
+        console.log(this.socketList[index].user.username ,'wants the msgs');
 
-        this.server.to(client.id).emit('getChannelMessages', messages)
+        this.server.emit('getChannelMessages' + this.socketList[index].user.id, messages)
     }
 
     @UseGuards(SocketGuard)
@@ -131,8 +132,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         console.log('Message sent to the back in channel ', createMessageDto);
         // client.emit('messageSent', message, channelId);
         this.server.emit('sendMessageToClient', createMessageDto.content);
-        this.server.emit('messageSent', createMessageDto.content);
         await this.channelService.saveMessage(/*client.id*/createMessageDto.userId, createMessageDto/*.content, createMessageDto.channelId*/);
+        this.server.emit('messageSent', createMessageDto.content);
     }
 
 
