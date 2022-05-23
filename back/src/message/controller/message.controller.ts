@@ -18,11 +18,6 @@ export class MessageController {
         return this.messageService.findMessageById(messageId);
     }
 
-    // @Post()
-    // createMessage(@Body() createMessage: CreateMessageDto) {
-    //     return this.messageService.saveMessage(createMessage);
-    // }
-
     @Delete(':messageId')
     deleteMessage(@Param('messageId') messageId: number) {
         return this.messageService.deleteMessage(messageId);

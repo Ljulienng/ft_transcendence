@@ -13,7 +13,6 @@ export class ChannelMemberService {
         private channelMemberRepository: Repository<ChannelMember>,
     ) {}
    
-    // ne fonctionne pas
     async findOne(user: User, channel: Channel): Promise<ChannelMember> {
         return await this.channelMemberRepository.findOne({
             where: {
@@ -25,21 +24,27 @@ export class ChannelMemberService {
 
     async findMembers(channel: Channel) {
         return await this.channelMemberRepository.find({
-            channel: channel,
+            where: {
+                channel: channel,
+            },
         })
     }
 
     async   findOwner(channel: Channel) {
         return await this.channelMemberRepository.findOne({
-            channel: channel,
-            owner: true, 
+            where: {
+                channel: channel,
+                owner: true,
+            },
         })
     }
 
     async   findAdmins(channel: Channel) {
         return await this.channelMemberRepository.find({
-            channel: channel,
-            admin: true, 
+            where: {
+                channel: channel,
+                admin: true,
+            },
         })
     }
 
@@ -59,14 +64,16 @@ export class ChannelMemberService {
     **      - need to be an admin
     **      - need to be the owner if you want to set a member as admin
     */
-    updateAllowed(memberWhoUpdate: ChannelMember, memberToUpdate: ChannelMember, channel: Channel, updates: UpdateMemberChannelDto): boolean {
-        if (memberWhoUpdate.admin == false) {
+    updateAllowed(member: ChannelMember, memberToUpdate: ChannelMember, channel: Channel, updates: UpdateMemberChannelDto): boolean {
+        if (!member || !memberToUpdate) {
             return false;
         }
-        if (updates.admin && !memberWhoUpdate.owner) {
+        if (member.admin == false) {
             return false;
         }
-
+        if (updates.admin && !member.owner) {
+            return false;
+        }
         return true;
     }
 
@@ -103,8 +110,8 @@ export class ChannelMemberService {
         }
     }
 
-    async deleteMember(user: User, channel: Channel) {
-        const memberToRemove = await this.findOne(user, channel);
+    async deleteMember(userToRemove: User, channel: Channel) {
+        const memberToRemove = await this.findOne(userToRemove, channel);
         await this.channelMemberRepository.remove(memberToRemove);
     }
 }

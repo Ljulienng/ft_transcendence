@@ -4,6 +4,7 @@ import { CreateChannelDto } from '../models/channel.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PasswordI } from '../models/password.interface';
 import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
+import { Channel } from '../models/channel.entity';
 
 @Controller('channel')
 export class ChannelController {
@@ -12,18 +13,18 @@ export class ChannelController {
     ) {}
 
     @Get()
-    findAll() {
-        return this.channelService.findAll();
+    async findAll() {
+        return await this.channelService.findAll();
     }
 
     @Get(':channelId')
-    findChannelById(@Param('channelId') channelId: number) {
-        return this.channelService.findChannelById(channelId);
+    async findChannelById(@Param('channelId') channelId: number) {
+        return await this.channelService.findChannelById(channelId);
     }
 
     @Get(':name')
-    findChannelByName(@Param('name') name: string) {
-        return this.channelService.findChannelByName(name);
+    async findChannelByName(@Param('name') name: string) {
+        return await this.channelService.findChannelByName(name);
     }
 
     @Get(':channelId/messages')
@@ -69,11 +70,11 @@ export class ChannelController {
     // test : curl -v -X POST -d '{"oldPassword":"oldpass", "newPassword":"newpass"}' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/changePass
     @UseGuards(JwtAuthGuard)
     @Post(':channelId/changePass')
-    changePassword(
+    async changePassword(
         @Param('channelId') channelId: number,
         @Req() request,
         @Body() passwords: PasswordI) {
-        return this.channelService.changePassword(channelId, request.user.id, passwords);
+        return await this.channelService.changePassword(channelId, request.user.id, passwords);
     }
 
     // test : curl -v  -X POST -d '{"muted": true }' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/{userId}
@@ -81,10 +82,10 @@ export class ChannelController {
     @Post(':channelId/:userId')
     async updateMemberChannel(
         @Req() request,
-        @Param('userId') userId: number,
+        @Param('userId') memberId: number,
         @Param('channelId') channelId: number,
         @Body() updates: UpdateMemberChannelDto) {
-        return await this.channelService.updateChannelMember(request.user.id, userId, channelId, updates);
+        return await this.channelService.updateChannelMember(request.user.id, memberId, channelId, updates);
     }
 
     // test : curl -v -X DELETE http://localhost:3000/channel/{channelId}
@@ -98,9 +99,9 @@ export class ChannelController {
 
     @Delete(':channelId/:userId')
     async deleteChannelMember(
-        @Param('userId') userId: number,
+        @Param('userId') memberId: number,
         @Param('channelId') channelId: number) {
-        return await this.channelService.deleteChannelMember(userId, channelId);
+        return await this.channelService.deleteChannelMember(channelId, memberId);
     }
 
 }

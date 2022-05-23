@@ -117,8 +117,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // @UseGuards(JwtAuthGuard, TwoFAAuth)
     @UseGuards(SocketGuard)
     @SubscribeMessage('leaveChannel') 
-    async leaveChannel(client: Socket, channel: Channel) {
-        await this.channelService.removeUserToChannel(channel, client.data.user.id);
+    async leaveChannel(client: Socket, channelId: number) {
+        await this.channelService.deleteChannelMember(channelId, client.data.user.id);
         // this.server.to
     }
 
