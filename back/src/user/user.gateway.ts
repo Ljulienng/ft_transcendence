@@ -94,7 +94,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('getChannelMsg')
     async getChannelMsg(client: Socket, channelId: number) {
         const channel = await this.channelService.findChannelById(channelId);
-        const messages = await this.channelService.getChannelMessagesByChannelName(channel.name)
+        const messages = await this.channelService.findChannelMessagesByChannelName(channel.name)
 
         const index = await this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
         console.log(this.socketList[index].user.username ,'wants the msgs');
@@ -111,15 +111,15 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const room = await this.channelService.findChannelById(joinChannel.id);
         client.join(room.name);
         this.server.to(room.name).emit('channelJoined', "Hello you join the channe");
-        const messages = await this.channelService.getChannelMessagesByChannelName(room.name);
+        const messages = await this.channelService.findChannelMessagesByChannelName(room.name);
         this.server.to(client.id).emit('channelMessages', messages); 
     } 
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)
     @UseGuards(SocketGuard)
     @SubscribeMessage('leaveChannel') 
-    async leaveChannel(client: Socket, channel: Channel) {
-        await this.channelService.removeUserToChannel(channel, client.data.user.id);
+    async leaveChannel(client: Socket, channelId: number) {
+        await this.channelService.deleteChannelMember(channelId, client.data.user.id);
         // this.server.to
     }
 

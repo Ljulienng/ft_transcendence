@@ -11,7 +11,6 @@ import { PasswordI } from '../models/password.interface';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
 import { CreateMessageDto } from 'src/message/models/message.dto';
-import { UserService } from 'src/user/service/user.service';
 
 @Injectable()
 export class ChannelService {
@@ -20,8 +19,6 @@ export class ChannelService {
         private channelRepository: Repository<Channel>,
         @InjectRepository(User)
         private userRepository: Repository<User>,
-        @Inject(UserService)
-        private userService: UserService,
         @Inject(ChannelMemberService)
         private channelMemberService: ChannelMemberService,
         @Inject(MessageService)
@@ -39,15 +36,46 @@ export class ChannelService {
     /* get channel by its id */
    async findChannelById(channelId: number): Promise<Channel> {
         return await this.channelRepository.findOne({
-            id: channelId
+            where: {
+                id: channelId
+            },
         });
    }
 
     /* get channel by its name */
    async findChannelByName(channelName: string): Promise<Channel> {
         return await this.channelRepository.findOne({
-            name: channelName
+            where : {
+                name: channelName
+            },
         });
+    }
+
+    /* get channel members */
+    async findMembers(channelId: number) {
+        const channel = await this.findChannelById(channelId);
+        return await this.channelMemberService.findMembers(channel);
+    }
+
+    /* get the channel owner */
+    async   findOwner(channelId: number) {
+        const channel = await this.findChannelById(channelId);
+        return await this.channelMemberService.findOwner(channel);
+    }
+
+    /* get channel admins */
+    async   findAdmins(channelId: number) {
+        const channel = await this.findChannelById(channelId);
+        return await this.channelMemberService.findAdmins(channel);
+    }
+
+    async findChannelsByUser(user: User){
+        return await this.channelRepository.find
+        ({
+            where: {
+                owner: user,
+            },
+        })
     }
 
     /* create channel */
@@ -57,15 +85,10 @@ export class ChannelService {
             throw new UnauthorizedException('user does not exist');
         }
 
-        // if (this.channelRepository.findOne({name: createChannel.name})) {
-        //     console.log("went there in find one")
-        //     throw new UnauthorizedException('this name is already used');  
-        // }
         const isSameChatName = await this.channelRepository.findOne({name: createChannel.name});
         if (isSameChatName) {
             throw new UnauthorizedException('this name is already used');  
         }
-
         
         const newChannel = this.channelRepository.create({
             name: createChannel.name,
@@ -86,12 +109,10 @@ export class ChannelService {
             const saltOrRounds = await bcrypt.genSalt();
             newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);
        }
-       console.log('new channel created : ', newChannel);
+
        await this.channelRepository.save(newChannel);
-       await this.channelMemberService.createMember(user, newChannel, true);
-       
-       // add the channel of the channelJoined list of the user
-       this.userService.addJoinedChannel(user, newChannel);
+       await this.channelMemberService.createMember(user, newChannel, true, true);
+       console.log('new channel created : ', newChannel);
     }
 
     /*
@@ -117,11 +138,12 @@ export class ChannelService {
             messages: [],
             channelMembers: [],
             owner: user1,
-       });
-       console.log('new DM channel created : ', newChannel);
+       }); 
+
        await this.channelRepository.save(newChannel);
-       await this.channelMemberService.createMember(user1, newChannel, true);
-       await this.channelMemberService.createMember(user2, newChannel, true);
+       await this.channelMemberService.createMember(user1, newChannel, true, true);
+       await this.channelMemberService.createMember(user2, newChannel, false, true);
+       console.log('new DM channel created : ', newChannel);
     }
 
     /* check if the password sent is the right one */
@@ -130,7 +152,7 @@ export class ChannelService {
    }
 
    /*
-   ** a user wants to integrate a channel
+   ** the user wants to integrate a channel
    ** need to check if :
    **       - the password is correct (private/protected only)
    **       - the user is not already in the channel
@@ -138,14 +160,9 @@ export class ChannelService {
    */
    async addUserToChannel(joinChannel: JoinChannelDto, userId: number) {
         const user = await this.userRepository.findOne({id: userId});
-        
-        // select * from channel where channel.id=joinChannel.id
         const welcomingChannel = await this.findChannelById(joinChannel.id);
-        // const welcomingChannel = await this.channelRepository
-            // .createQueryBuilder('channel')
-            // .where('channel.id = :channelId', {channelId: joinChannel.id})
-            // .getOne();
-        
+        console.log('addUserToChannel user : ', user);
+        console.log('addUserToChannel welcomingChannel : ', welcomingChannel);
         if (welcomingChannel.type !== ChannelType.public) {
             if (welcomingChannel.password) {
                 const match = this.checkPasswordMatch(welcomingChannel.password, joinChannel.password);
@@ -155,55 +172,58 @@ export class ChannelService {
             }
         }
 
-        if (this.channelMemberService.findOne(user, welcomingChannel)) {
+        const channelMember = await this.channelMemberService.findOne(user, welcomingChannel);
+
+        if (channelMember) {
             throw new UnauthorizedException('user already in this channel');
         }
 
-        await this.channelMemberService.createMember(user, welcomingChannel, false);
-        
-        // add the channel of the channelJoined list of the user
-        this.userService.addJoinedChannel(user, welcomingChannel);
-        
         await this.channelRepository.save(welcomingChannel);
+        await this.channelMemberService.createMember(user, welcomingChannel, false, false);    
    }
 
-   async removeUserToChannel(leaveChannel: Channel, userId: number) {
+    /*
+   ** the user wants to leave a channel
+   ** need to check if :
+   **       - the user is a member of this channel
+   **       - the user is the channel owner (in this case, remove the channel)
+   */
+   async deleteChannelMember(leaveChannelId: number, userId: number) {
         const user = await this.userRepository.findOne({id: userId});
-        
-        // select * from channel where channel.id=leaveChannel.id
-        const channelToLeave = await this.findChannelById(leaveChannel.id);
-        // const channelToLeave = await this.channelRepository
-        //     .createQueryBuilder('channel')
-        //     .where('channel.id = :channelId', {channelId: leaveChannel.id})
-        //     .getOne();
-        
-        if (!(this.channelMemberService.findOne(user, channelToLeave))) {
-                throw new UnauthorizedException('user not in this channel');
+        const channelToLeave = await this.findChannelById(leaveChannelId);
+        const channelMember = await this.channelMemberService.findOne(user, channelToLeave);
+
+        if (!channelMember) {
+            throw new UnauthorizedException('user not in this channel');
+
         }
         
         // if the owner leave the channel, we delete the channel
         // else we just delete the member
-        if (user.id === channelToLeave.owner.id) {
+        if (channelMember.owner) {
             await this.channelRepository.delete(channelToLeave);
         } else {
             this.channelMemberService.deleteMember(user, channelToLeave);
-            
-            // remove the channel of the channelJoined list of the user
-            this.userService.removeJoinedChannel(user.id, channelToLeave)
-            
             await this.channelRepository.save(channelToLeave);
         }
-    
-        
    }
 
-   /* only owner can change the password */
+   /*
+   ** the user wants to change the channel password
+   ** need to check if :
+   **       - the user is a member of this channel
+   **       - the user is the channel owner
+   **       - the new password is not too short (could increase the constraints...)
+   **       - security check : old channel password == old password sent by owner
+   */
    async changePassword(channelId: number, userId: number, passwords: PasswordI)
    {
         // console.log('user:', userId, ' changes password of channel:', channelId, ' [new pass:', passwords.newPassword,']');
+        const user = await this.userRepository.findOne({id: userId});
         const channel = await this.findChannelById(channelId);
+        const channelMember = await this.channelMemberService.findOne(user, channel);
 
-        if (userId !== channel.owner.id) {
+        if (!channelMember.owner) {
             throw new HttpException('you are not authorized to change the password', HttpStatus.FORBIDDEN);
         }
         if (passwords.newPassword.length < 8) {
@@ -217,26 +237,30 @@ export class ChannelService {
         this.channelRepository.update(channel.id, { password });
    }
 
-    /* remove channel */
+    /* 
+    ** the  user wants to remove a channel
+    ** need to check if :
+    **       - the user is a member of this channel
+    **       - the user is the channel owner
+    */
     async deleteChannel(userId: number, channelId: number) {
+        const user = await this.userRepository.findOne({id: userId});
         const channel = await this.findChannelById(channelId);
+        const channelMember = await this.channelMemberService.findOne(user, channel);
+
         if (!channel) {
             throw new NotFoundException();
         }
-        if (userId != channel.owner.id) {
+        console.log("member:", channelMember);
+        if (!channelMember.owner) {
             throw new HttpException('only the owner can delete channels', HttpStatus.FORBIDDEN);
         }
-        channel.channelMembers.forEach(
-            member => this.userService.removeJoinedChannel(member.user.id, channel)
-        );
-
         return await this.channelRepository.remove(channel);
     }
 
-    async getChannelMembers(channel: Channel) {
-        return await this.channelMemberService.findChannelMembers(channel);
-    }
-
+    /*
+    ** the  user wants to update element(s) of a channel member (ban, mute or/and admin)
+    */
     async updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto) {
         const userWhoUpdate = await this.userRepository.findOne({id: userId});
         const userToUpdate = await this.userRepository.findOne({id: memberId});
@@ -244,17 +268,11 @@ export class ChannelService {
         return await this.channelMemberService.updateMember(userWhoUpdate, userToUpdate, channel, updates);
     }
 
-    async deleteChannelMember(userId: number, channelId: number) {
-        const user = await this.userRepository.findOne({id: userId});
-        const channel = await this.findChannelById(channelId);
-        return await this.channelMemberService.deleteMember(user, channel);
-    }
-
     /*
     ** get all the messages of a channel
     ** returns most recent last
     */
-    async getChannelMessagesByChannelName(channelName: string) {
+    async findChannelMessagesByChannelName(channelName: string) {
         const channel = await this.findChannelByName(channelName);
         const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
@@ -264,7 +282,7 @@ export class ChannelService {
     ** get all the messages of a channel
     ** returns most recent last
     */
-    async getChannelMessagesByChannelId(channelId: number) {
+    async findChannelMessagesByChannelId(channelId: number) {
         const channel = await this.findChannelById(channelId);
         const messages = await this.messageService.findMessagesByChannel(channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
@@ -274,9 +292,9 @@ export class ChannelService {
         const user = await this.userRepository.findOne({id: userId});
         const channel = await this.findChannelById(createMessageDto.channelId);
         const channelMember = await this.channelMemberService.findOne(user, channel);
-        // if (!channelMember) {
-        //     throw new HttpException('this user is not a channel member', HttpStatus.FORBIDDEN);
-        // }
+        if (!channelMember) {
+            throw new HttpException('this user is not a channel member', HttpStatus.FORBIDDEN);
+        }
         return await this.messageService.saveMessage(user, channel, createMessageDto);
       }
     

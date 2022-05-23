@@ -21,7 +21,7 @@ export class MessageService {
       return await this.messageRepository.findOneOrFail({
           where: {
               id: messageId
-            }
+            },
       });
   }
 
@@ -29,7 +29,7 @@ export class MessageService {
     return await this.messageRepository.find({
         where: {
             channel: channel
-        }
+        },
     });
 }
 
