@@ -1,6 +1,6 @@
 import { ConsoleLogger, HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { from, Observable, of, switchMap, map, tap} from 'rxjs';
+import { from, Observable, of, switchMap, map, tap, ConnectableObservable} from 'rxjs';
 import { getConnection, Repository } from 'typeorm';
 import { UserDto } from '../models/user.dto';
 import { Student } from "src/user/dto/student.dto"
@@ -9,6 +9,7 @@ import { isNumber } from 'class-validator';
 import { names, uniqueNamesGenerator } from 'unique-names-generator';
 import { JwtService } from '@nestjs/jwt';
 import { Channel } from 'src/channel/models/channel.entity';
+import { ChannelService } from 'src/channel/service/channel.service';
 
 
 @Injectable()
@@ -17,7 +18,9 @@ export class UserService {
 	constructor(
 		@InjectRepository(User)
 		protected userRepository: Repository<User>,
-		private jwtService: JwtService
+		private jwtService: JwtService,
+		@Inject(ChannelService)
+		private channelService: ChannelService,
 	) {}
 
 	async onModuleInit(): Promise<void> {
@@ -227,7 +230,8 @@ export class UserService {
 	}
 
 	joinedChannel(user: User) {
-		return user.channels
+		return this.channelService.findChannelsByUser(user);
+		// return user.channels
 	}
 
 	async setStatus(user: User, newStatus: string) {

@@ -45,9 +45,9 @@ export class Channel {
 
 	// a user can be in various channels (useful relation to get the list of channels by user)
     @ManyToOne(() => User, user => user.id, {
-        eager: true,
+    	eager: true,
         onDelete: 'CASCADE',
     })
-    user: User;
+    owner: User;
 
 }

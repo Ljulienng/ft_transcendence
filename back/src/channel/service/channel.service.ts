@@ -69,6 +69,15 @@ export class ChannelService {
         return await this.channelMemberService.findAdmins(channel);
     }
 
+    async findChannelsByUser(user: User){
+        return await this.channelRepository.find
+        ({
+            where: {
+                owner: user,
+            },
+        })
+    }
+
     /* create channel */
    async createChannel(createChannel: CreateChannelDto, userId: number) {
         const user = await this.userRepository.findOne({id: userId});
@@ -87,7 +96,7 @@ export class ChannelService {
             password: createChannel.password,
             messages: [],
             channelMembers: [],
-            user: user,
+            owner: user,
        });
  
        if (newChannel.type === ChannelType.protected || newChannel.type === ChannelType.private) {
@@ -128,7 +137,7 @@ export class ChannelService {
             type: ChannelType.private,
             messages: [],
             channelMembers: [],
-            user: user1,
+            owner: user1,
        }); 
 
        await this.channelRepository.save(newChannel);
