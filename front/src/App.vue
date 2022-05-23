@@ -8,9 +8,8 @@
     <Sidebar />
     <router-view />
     <!-- <teleport :to="someVar" v-if="someVar"> -->
-    <div id="my-modals">
-      <MyModal />
-    </div>
+    <div id="my-modals"/>
+      <!-- <MyModal /> -->
   </div>
 </template>
 

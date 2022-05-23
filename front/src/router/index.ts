@@ -93,26 +93,6 @@ const router = createRouter({
 	routes,
 })
 
-// router.beforeEach(async (to, from, next) => {
-// 	if (to.meta.checkIfAuth) {
-// 		let userProfile = store.getters["auth/getUserProfile"];
-// 		if (userProfile.id !== 0) {
-// 			console.log("user profile in checkIfAuth = ", userProfile.id)
-// 			userProfile = await store.dispatch("auth/userProfile")
-// 			if (userProfile.id === 0)
-// 				return next();
-// 			else
-// 				return next({ path: "/" });
-// 		}
-// 			// return next({ path: "/" });
-// 		// }
-// 		// else
-// 		// 	return next();
-// 		return next();
-
-// 	}
-// });
-
 router.beforeEach(async (to, from, next) => {
 	if (to.meta.requiredAuth) {
 	let userProfile = store.getters["auth/getUserProfile"];
@@ -146,21 +126,5 @@ router.beforeEach(async (to, from, next) => {
 	}
 	return next();
 });
-
-// router.beforeEach(async (to, from, next) => {
-// 	if (to.) {
-// 	let userProfile = store.getters["auth/getUserProfile"];
-// 		if (userProfile.id === 0) {
-// 			await store.dispatch("auth/userProfile");
-// 			userProfile = store.getters["auth/getUserProfile"];
-// 			if (userProfile.id === 0) {
-// 				return next({ path: "/authmodal" });
-// 			} else {
-// 				return next();
-// 			}
-// 		}
-// 	}
-// 	return next();
-// });
 
 export default router;

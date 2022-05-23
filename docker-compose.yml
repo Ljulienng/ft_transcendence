@@ -12,11 +12,11 @@ services:
       NODE_ENV: development
       PORT: 3000
     ports:
-      - '3000:3000'
+      - "3000:3000"
     restart: always
     volumes:
-      - './back:/usr/src/app-back'
-      - '/usr/src/app-back/node_modules'
+      - "./back:/usr/src/app-back"
+      - "/usr/src/app-back/node_modules"
     # volumes:
     #   - type: bind
     #     source: ./back
@@ -28,25 +28,25 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-front
-    volumes:
-      - './front:/usr/src/app-front'
-      - '/usr/src/app-front/node_modules'
     # volumes:
     #   - '.:/app'
     #   - '/app/node_modules'
     ports:
-      - '3001:8080'
+      - "3001:8080"
     restart: always
     volumes:
-      - type: bind
-        source: ./front
-        target: /usr/src/app-front
+      - "./front:/usr/src/app-front"
+      - "/usr/src/app-front/node_modules"
+    # volumes:
+    #   - type: bind
+    #     source: ./front
+    #     target: /usr/src/app-front
 
   postgres:
     image: postgres
     restart: always
     ports:
-      - '5432:5432'
+      - "5432:5432"
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: user

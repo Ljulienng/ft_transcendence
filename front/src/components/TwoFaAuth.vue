@@ -6,7 +6,7 @@
     :close="closeModal"
     :options="options"
   >
-    <div class="modal">
+    <div class="twofa-modal">
       <p>Enter authentification code</p>
       <p v-if="errorMsg !== ''" style="color: red; font-size: 12px">
 				{{errorMsg}}
@@ -99,13 +99,16 @@ export default defineComponent({
       closeModal
     }
   },
-
+  
+  created() {
+    console.log('isShow = ', this.isShow);
+  }
 })
 
 </script>
 
 <style scoped lang="scss">
-.modal {
+.twofa-modal {
   width: 300px;
   padding: 30px;
   box-sizing: border-box;
