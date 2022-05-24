@@ -103,7 +103,6 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@vue/runtime-core";
 import { Options, Vue } from "vue-class-component";
 
 @Options({
