@@ -11,7 +11,7 @@ import {
 import { UserService } from "./service/user.service";
 import { Channel } from "src/channel/models/channel.entity"
 import { CreateMessageDto } from "src/message/models/message.dto";
-
+import { CreateMessageUserDto } from "src/messageUser/models/messageUser.dto";
 import { JoinChannelDto } from "src/channel/models/channel.dto";
 import { SocketUserI } from "src/chat/chat.gateway";
 import { ChannelService } from "src/channel/service/channel.service";
@@ -88,7 +88,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 
 
-	/* ============= CHAT PART ============*/
+	/* ============= CHANNELcc CHAT PART ============*/
 
 	@UseGuards(SocketGuard)
     @SubscribeMessage('getChannelMsg')
@@ -136,6 +136,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this.channelService.saveMessage(/*client.id*/createMessageDto.userId, createMessageDto/*.content, createMessageDto.channelId*/);
         this.server.emit('messageSent', createMessageDto.content);
     }
+
+    /* ============= USER CHAT PART ============*/
 
 
 }

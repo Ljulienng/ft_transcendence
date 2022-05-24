@@ -155,5 +155,20 @@ export class UserController {
 		}
 
 	}
-  
+
+	// =========== PRIVATE CHAT PART =============
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get("/message/:friendUsername")
+	async getMessages(@Param('friendUsername') friendUsername: string, @Req() req) {
+		try {
+			const user = req.user;
+			const friend = await this.userService.findByUsername(friendUsername);
+			const messages = await this.userService.getMessage(user.id, friend.id)
+
+			return messages;
+		} catch(e) {
+			console.log(e)
+		}
+	}
 }

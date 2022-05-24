@@ -76,6 +76,15 @@
         v-bind:socketChannel="socket"
       ></ChannelBox>
     </div>
+    <div class="friendList">
+      <h3>friend list</h3>
+      <ul>
+        <li v-for="friend in friendList" :key="friend">
+          {{friend.username}}
+        </li>
+
+      </ul>
+    </div >
   </div>
 </template>
 
@@ -96,6 +105,7 @@ export default defineComponent({
       socket: store.getters["auth/getUserSocket"],
       channelList: [],
       joinedChannelList: [],
+      friendList: [],
       message: {
         content: "",
         channelId: 0,
@@ -117,6 +127,15 @@ export default defineComponent({
   },
 
   methods: {
+		async getFriendList() {
+			try{
+				const response = await http.get('/users/friendlist');
+				this.friendList = response.data;
+			} catch (e) {
+				console.log(e);
+			}
+  },
+
     showChannel(channelId: number) {
       if (this.showBox === true && channelId === this.selectedChannel) {
         this.showBox = false;
@@ -236,8 +255,12 @@ export default defineComponent({
   // },
 
   created() {
+    this.getFriendList();
     this.getChannelList();
     this.getJoinedChannelList();
+    http.get('/message/norminet').then((response) => {
+      console.log(response)
+    })
   },
 });
 </script>

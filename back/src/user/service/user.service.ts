@@ -10,7 +10,9 @@ import { names, uniqueNamesGenerator } from 'unique-names-generator';
 import { JwtService } from '@nestjs/jwt';
 import { Channel } from 'src/channel/models/channel.entity';
 import { ChannelService } from 'src/channel/service/channel.service';
-
+import { MessageUser } from 'src/messageUser/models/messageUser.entity';
+import { MessageUserService } from 'src/messageUser/service/messageUser.service';
+import { CreateMessageUserDto } from 'src/messageUser/models/messageUser.dto';
 
 @Injectable()
 export class UserService {
@@ -21,6 +23,9 @@ export class UserService {
 		private jwtService: JwtService,
 		@Inject(ChannelService)
 		private channelService: ChannelService,
+		@Inject(MessageUserService)
+		private messageUserService: MessageUserService,
+
 	) {}
 
 	async onModuleInit(): Promise<void> {
@@ -258,5 +263,20 @@ export class UserService {
 		return this.userRepository.update(userId, {
 			twoFAEnabled: false
 		});
+	}
+
+	async saveMessage(userId: number, createMessageUserDto: CreateMessageUserDto) {
+        const sender = await this.userRepository.findOne({id: userId});
+        const receiver = await this.userRepository.findOne({id: createMessageUserDto.receiverlId});
+        if (!receiver) {
+            throw new HttpException('this user doesn\'t exist', HttpStatus.FORBIDDEN);
+        }
+        return await this.messageUserService.saveMessage(sender, receiver, createMessageUserDto);
+	}
+
+	async getMessage(authorId: number, receiverlId: number) {
+		const messages =  await this.messageUserService.getMessages(authorId, receiverlId);
+
+		return messages;
 	}
 }

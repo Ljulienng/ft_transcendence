@@ -12,6 +12,7 @@ import { ChannelModule } from './channel/channel.module';
 import { MessageModule } from './message/message.module';
 import { ChatModule } from './chat/chat.module';
 import { ChannelMemberModule } from './channelMember/channelMember.module';
+import { MessageUserModule } from './messageUser/messageUser.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ChannelMemberModule } from './channelMember/channelMember.module';
       autoLoadEntities: true,
       synchronize: true // false for production, with true typeOrm creates tables every time we run the app
     }),
+    MessageUserModule,
     UserModule,
     AuthModule,
     MessageModule,
