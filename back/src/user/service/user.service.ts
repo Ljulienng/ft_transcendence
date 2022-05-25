@@ -232,13 +232,14 @@ export class UserService {
 		return (friendList);
 	}
 
-	async joinedChannel(user: User): Promise<number[]> {
+	async joinedChannel(user: User): Promise<Channel[]> {
 		const channelMembers = await this.channelMemberService.findChannelsByUser(user);
 		const channelsId: number[] = [];
-		channelMembers.forEach(c => {
-			channelsId.push(c.channelId)
+		channelMembers.forEach(cm => {
+			channelsId.push(cm.channelId);
 		});
-		return channelsId;
+		const channels = await this.channelService.findChannelsById(channelsId);
+		return channels;
 	}
 
 	async setStatus(user: User, newStatus: string) {
