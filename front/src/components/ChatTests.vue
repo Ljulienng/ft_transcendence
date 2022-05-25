@@ -69,21 +69,28 @@
           <!-- {{channel.messages}} -->
         </li>
       </ul>
+      <div v-if="showBox === true">
+        <ChannelBox
+          v-bind:channel="selectedChannel"
+          v-bind:socketChannel="socket"
+        ></ChannelBox>
+      </div>
     </div>
-    <div v-if="showBox === true">
-      <ChannelBox
-        v-bind:channel="selectedChannel"
-        v-bind:socketChannel="socket"
-      ></ChannelBox>
-    </div>
+
     <div class="friendList">
       <h3>friend list</h3>
       <ul>
         <li v-for="friend in friendList" :key="friend">
           {{friend.username}}
+        <button @click="showUser(friend.id)">show chat</button>
         </li>
-
       </ul>
+      <div v-if="showChatBox === true">
+        <PrivateChatBox
+          v-bind:receiverId="selectedUser"
+          v-bind:socket="socket"
+        ></PrivateChatBox>
+      </div>
     </div >
   </div>
 </template>
@@ -93,11 +100,13 @@ import { defineComponent } from "@vue/runtime-core";
 import http from "../http-common";
 import MessageI from "../types/interfaces/message.interface";
 import ChannelBox from "./ChannelBox.vue";
+import PrivateChatBox from "./PrivateChatBox.vue"
 import store from "../store";
 
 export default defineComponent({
   components: {
     ChannelBox,
+    PrivateChatBox
   },
 
   data() {
@@ -122,7 +131,10 @@ export default defineComponent({
       privacy: "",
       channelId: 0,
       selectedChannel: 0,
+      selectedUser: 0,
       showBox: false,
+      showChatBox: false,
+      
     };
   },
 
@@ -134,7 +146,19 @@ export default defineComponent({
 			} catch (e) {
 				console.log(e);
 			}
-  },
+    },
+
+    showUser(userId: number) {
+      if (this.showChatBox === true && userId === this.selectedUser) {
+        this.showChatBox = false;
+      } else if (this.showChatBox === true && userId !== this.selectedUser) {
+        console.log("test user");
+        this.selectedUser = userId;
+      } else {
+        this.showChatBox = true;
+        this.selectedUser = userId;
+      }
+    },
 
     showChannel(channelId: number) {
       if (this.showBox === true && channelId === this.selectedChannel) {

@@ -200,12 +200,14 @@ export class UserService {
 		if (friendInfo !== undefined) {
 
 			let friend: Friend = {
+				id: 0,
 				username: "",
 				firstname: "",
 				lastname: "",
 				status: "Offline"
 			};
 
+			friend.id = friendInfo.id;
 			friend.username = friendInfo.username;
 			friend.firstname = friendInfo.firstname;
 			friend.lastname = friendInfo.lastname;
@@ -274,8 +276,10 @@ export class UserService {
         return await this.messageUserService.saveMessage(sender, receiver, createMessageUserDto);
 	}
 
-	async getMessage(authorId: number, receiverlId: number) {
-		const messages =  await this.messageUserService.getMessages(authorId, receiverlId);
+	async getMessage(senderId: number, receiverlId: number) {
+		const sender = await this.userRepository.findOne({id: senderId});
+		const receiver = await this.userRepository.findOne({id: receiverlId});
+		const messages =  await this.messageUserService.getMessages(sender, receiver);
 
 		return messages;
 	}

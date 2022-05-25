@@ -17,6 +17,8 @@ import { SocketUserI } from "src/chat/chat.gateway";
 import { ChannelService } from "src/channel/service/channel.service";
 import { SocketGuard } from "src/auth/guards/socket.guard";
 import { UseGuards } from "@nestjs/common";
+import { Observable } from 'rxjs'
+import { User } from "./models/user.entity";
 
 
 
@@ -132,12 +134,35 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async sendMessage(client: Socket, createMessageDto: CreateMessageDto /*message: string, channelId: number*/) {
         console.log('Message sent to the back in channel ', createMessageDto);
         // client.emit('messageSent', message, channelId);
-        this.server.emit('sendMessageToClient', createMessageDto.content);
+        // this.server.emit('sendMessageToClient', createMessageDto.content);
         await this.channelService.saveMessage(/*client.id*/createMessageDto.userId, createMessageDto/*.content, createMessageDto.channelId*/);
         this.server.emit('messageSent', createMessageDto.content);
     }
 
     /* ============= USER CHAT PART ============*/
 
+	@UseGuards(SocketGuard)
+    @SubscribeMessage('getUserMsg')
+    async getUserMsg(client: Socket, userId: number) {
+        const sender :User = await this.socketList.find(socket => socket.socketId === client.id).user
+        const receiver: User = await this.userService.findOne({id: userId});
+        console.log(sender.username ,'wants the msgs');
+        const messages = await this.userService.getMessage(sender.id, receiver.id)
+
+
+        this.server.emit('getUserMessages' + receiver.id, messages)
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('sendMessageToUser') 
+    async sendMessageUser(client: Socket, createMessageUserDto: CreateMessageUserDto /*message: string, channelId: number*/) {
+        console.log('Message sent to the back in channel ', createMessageUserDto);
+        const senderSocketId = await this.socketList.find(socket => socket.user.id === createMessageUserDto.receiverlId).socketId
+        // client.emit('messageSent', message, channelId);
+        // this.server.emit('sendMessageToClient', createMessageUserDto.content);
+
+        await this.userService.saveMessage(/*client.id*/createMessageUserDto.senderId, createMessageUserDto/*.content, createMessageUserDto.channelId*/);
+        this.server.to(senderSocketId).emit('messageSentFromUser', createMessageUserDto.content);
+    }
 
 }
