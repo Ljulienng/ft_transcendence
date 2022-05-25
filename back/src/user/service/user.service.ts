@@ -235,10 +235,14 @@ export class UserService {
 	async joinedChannel(user: User): Promise<Channel[]> {
 		const channelMembers = await this.channelMemberService.findChannelsByUser(user);
 		const channelsId: number[] = [];
+		const channels: Channel[] = [];
+		
 		channelMembers.forEach(cm => {
 			channelsId.push(cm.channelId);
 		});
-		const channels = await this.channelService.findChannelsById(channelsId);
+		for (const id in channelsId)  {
+			channels.push(await this.channelService.findChannelById(channelsId[id]));		// });
+		}
 		return channels;
 	}
 

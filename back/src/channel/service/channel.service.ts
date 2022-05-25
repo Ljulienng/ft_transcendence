@@ -43,16 +43,6 @@ export class ChannelService {
         });
    }
 
-   /* get channels thanks to a pool of channel id */
-   async findChannelsById(channelsId: number[]): Promise<Channel[]> {
-        const channels: Channel[] = [];
-        for (const id in channelsId) {
-            channels.push(await this.findChannelById(channelsId[id]));
-        }
-        return channels;
-    }
-
-
     /* get channel by its name */
    async findChannelByName(channelName: string): Promise<Channel> {
         return await this.channelRepository.findOne({
