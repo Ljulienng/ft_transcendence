@@ -52,13 +52,20 @@ export class MessageUserService {
 
  async getMessages(sender: User, receiver: User) {
     console.log("userMessage ");
-     const messages = await this.messageUserRepository
-     .createQueryBuilder("messageUser")
-     .where("messageUser.sender = :sender AND messageUser.receiver = :receiver", {sender: sender, receiver: receiver})
-     .andWhere("messageUser.sender = :receiver AND messageUser.receiver = :sender", {sender: sender, receiver: receiver})
-     .getMany();
+     const messages = await this.messageUserRepository.find({
+         where: [ // OR STATEMENT: searching for message where the user is the sender and also the receiver
+            {
+            sender: sender,
+            receiver: receiver
+            },
+            {
+            sender: receiver,
+            receiver: sender
+            }
+        ]
+    })
 
-     console.log("userMessage = ", messages);
+    //  console.log("userMessage = ", messages);
 
      return messages
  }

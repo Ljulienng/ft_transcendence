@@ -164,11 +164,12 @@ export class UserController {
 		try {
 			const user = req.user;
 			const friend = await this.userService.findByUsername(friendUsername);
+			console.log("friend = ", friend)
 			const messages = await this.userService.getMessage(user.id, friend.id)
 
 			return messages;
 		} catch(e) {
-			console.log(e)
+			console.log("/message/:friendUsername", e)
 		}
 	}
 }

@@ -145,8 +145,9 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('getUserMsg')
     async getUserMsg(client: Socket, userId: number) {
         const sender :User = await this.socketList.find(socket => socket.socketId === client.id).user
-        const receiver: User = await this.userService.findOne({id: userId});
-        console.log(sender.username ,'wants the msgs');
+        console.log("getUserMsg = ", userId)
+        const receiver :User = await this.userService.findOne({id: userId});
+        console.log(sender.username ,'wants the msgs from ', userId);
         const messages = await this.userService.getMessage(sender.id, receiver.id)
 
 
@@ -155,14 +156,17 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('sendMessageToUser') 
-    async sendMessageUser(client: Socket, createMessageUserDto: CreateMessageUserDto /*message: string, channelId: number*/) {
+    async sendMessageUser(client: Socket, createMessageUserDto: CreateMessageUserDto) {
         console.log('Message sent to the back in channel ', createMessageUserDto);
-        const senderSocketId = await this.socketList.find(socket => socket.user.id === createMessageUserDto.receiverlId).socketId
+        const senderSocket = await this.socketList.find(socket => socket.user.id === createMessageUserDto.receiverId)
+        console.log('senderSocket = ', senderSocket)
         // client.emit('messageSent', message, channelId);
         // this.server.emit('sendMessageToClient', createMessageUserDto.content);
 
-        await this.userService.saveMessage(/*client.id*/createMessageUserDto.senderId, createMessageUserDto/*.content, createMessageUserDto.channelId*/);
-        this.server.to(senderSocketId).emit('messageSentFromUser', createMessageUserDto.content);
+        await this.userService.saveMessage(createMessageUserDto.senderId, createMessageUserDto);
+        // this.server.emit('messageSentFromUser' + createMessageUserDto.senderId, createMessageUserDto.content);
+        this.server.emit('messageSentFromUser', createMessageUserDto.content);
+
     }
 
 }

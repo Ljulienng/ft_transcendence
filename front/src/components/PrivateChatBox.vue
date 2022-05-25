@@ -3,7 +3,7 @@
     <p>{{ channel }}</p>
     <div class="messageList">
       <p v-for="msg in messageList" :key="msg">
-        {{ msg.senderId }}: {{ msg.content }}
+        {{ msg.sender.username }}: {{ msg.content }}
       </p>
     </div>
     <div>
@@ -50,6 +50,7 @@ export default defineComponent({
   methods: {
     sendMessage() {
       this.message.senderId = this.currentUser.id;
+      this.message.sender = this.currentUser.username
       this.message.receiverId = this.receiverId;
       console.log(
         "sendMessage - on User ",
@@ -62,7 +63,7 @@ export default defineComponent({
     },
 
     async getMessages() {
-      console.log("heho");
+      console.log("heho", this.receiverId);
       this.socket.emit("getUserMsg", this.receiverId);
       this.socket.on("getUserMessages" + this.receiverId, (data: MessageUserI[]) => {
         this.messageList = data;
@@ -75,7 +76,8 @@ export default defineComponent({
       this.socket = store.getters["auth/getUserSocket"];
     }
     this.socket.on("messageSentFromUser", () => {
-      this.socket.emit("getUserMsg", this.channel);
+        console.log("euh i ", this.receiverId)
+      this.socket.emit("getUserMsg", this.receiverId);
       // console.log("data");
     });
     this.socket.on(

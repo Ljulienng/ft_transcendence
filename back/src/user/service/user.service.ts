@@ -269,16 +269,16 @@ export class UserService {
 
 	async saveMessage(userId: number, createMessageUserDto: CreateMessageUserDto) {
         const sender = await this.userRepository.findOne({id: userId});
-        const receiver = await this.userRepository.findOne({id: createMessageUserDto.receiverlId});
+        const receiver = await this.userRepository.findOne({id: createMessageUserDto.receiverId});
         if (!receiver) {
             throw new HttpException('this user doesn\'t exist', HttpStatus.FORBIDDEN);
         }
         return await this.messageUserService.saveMessage(sender, receiver, createMessageUserDto);
 	}
 
-	async getMessage(senderId: number, receiverlId: number) {
+	async getMessage(senderId: number, receiverId: number) {
 		const sender = await this.userRepository.findOne({id: senderId});
-		const receiver = await this.userRepository.findOne({id: receiverlId});
+		const receiver = await this.userRepository.findOne({id: receiverId});
 		const messages =  await this.messageUserService.getMessages(sender, receiver);
 
 		return messages;

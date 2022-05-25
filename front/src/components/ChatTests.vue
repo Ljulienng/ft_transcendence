@@ -282,9 +282,9 @@ export default defineComponent({
     this.getFriendList();
     this.getChannelList();
     this.getJoinedChannelList();
-    http.get('/message/norminet').then((response) => {
-      console.log(response)
-    })
+    // http.get('/message/norminet').then((response) => {
+    //   console.log(response)
+    // })
   },
 });
 </script>
