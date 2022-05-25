@@ -10,6 +10,7 @@ import { names, uniqueNamesGenerator } from 'unique-names-generator';
 import { JwtService } from '@nestjs/jwt';
 import { Channel } from 'src/channel/models/channel.entity';
 import { ChannelService } from 'src/channel/service/channel.service';
+import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 
 
 @Injectable()
@@ -21,6 +22,8 @@ export class UserService {
 		private jwtService: JwtService,
 		@Inject(ChannelService)
 		private channelService: ChannelService,
+		@Inject(ChannelMemberService)
+		private channelMemberService: ChannelMemberService,
 	) {}
 
 	async onModuleInit(): Promise<void> {
@@ -229,9 +232,13 @@ export class UserService {
 		return (friendList);
 	}
 
-	joinedChannel(user: User) {
-		return this.channelService.findChannelsByUser(user);
-		// return user.joinedChannels
+	async joinedChannel(user: User): Promise<number[]> {
+		const channelMembers = await this.channelMemberService.findChannelsByUser(user);
+		const channelsId: number[] = [];
+		channelMembers.forEach(c => {
+			channelsId.push(c.channelId)
+		});
+		return channelsId;
 	}
 
 	async setStatus(user: User, newStatus: string) {

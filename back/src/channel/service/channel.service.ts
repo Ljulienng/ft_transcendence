@@ -70,17 +70,6 @@ export class ChannelService {
         return await this.channelMemberService.findAdmins(channel);
     }
 
-    // !!! only return the channel where the user is the owner !!!
-    async findChannelsByUser(user: User){
-        return (await this.channelRepository.find({
-            where: {
-                owner: user,
-            },
-            // relations: ["users"],
-        }))
-        .sort((a, b)=> b.createdTime.getTime() - a.createdTime.getTime())
-    }
-
     /* create channel */
    async createChannel(createChannel: CreateChannelDto, userId: number) {
         const user = await this.userRepository.findOne({id: userId});

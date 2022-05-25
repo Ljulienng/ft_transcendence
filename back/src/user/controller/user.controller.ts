@@ -76,7 +76,7 @@ export class UserController {
 
 			return await this.userService.joinedChannel(user);
 		} catch(e) {
-			throw new UnauthorizedException("Error: getFriendList");
+			throw new UnauthorizedException("Error: getJoinedChannel");
 
 		}
 	}

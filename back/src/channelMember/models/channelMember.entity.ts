@@ -8,6 +8,9 @@ export class ChannelMember {
 	@PrimaryGeneratedColumn() 
 	readonly id: number;
 
+    @Column({nullable: false})
+    channelId: number
+
     @Column({ default: false })
 	owner: boolean;
 

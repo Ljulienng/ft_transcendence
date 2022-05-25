@@ -64,7 +64,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	async handleDisconnect(client: Socket) {
         const index = await this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
-        console.log(this.socketList[index].user.username ,'has disconnected from the server');
+        // console.log(this.socketList[index].user.username ,'has disconnected from the server');
         if (index > -1)
             this.socketList.splice(index, 1);
         // this.docketListthis.socketList.find(socket => socket.socketId === client.id)

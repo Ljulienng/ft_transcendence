@@ -1,11 +1,9 @@
 import { Column, CreateDateColumn, Entity, JoinTable, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { IsOptional } from 'class-validator';
 import { Channel } from "src/channel/models/channel.entity";
-import { UserController } from "src/user/controller/user.controller";
 import { User } from 'src/user/models/user.entity'
 
-@Entity('messages') 
-export class Message {
+@Entity('messageChannel') 
+export class MessageChannel {
 	
     @PrimaryGeneratedColumn()
 	readonly id: number;

@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToMany, ManyToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable, JoinColumn } from "typeorm";
 import { IsOptional } from 'class-validator';
-import { Message } from "src/message/models/message.entity";
+import { MessageChannel } from "src/message/models/messageChannel.entity";
 import { User } from "src/user/models/user.entity";
 import { ChannelMember } from "src/channelMember/models/channelMember.entity";
 
@@ -28,12 +28,12 @@ export class Channel {
 	@CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
 	readonly createdTime: Date
 
-	@OneToMany(() => Message, message => message.channel, {
+	@OneToMany(() => MessageChannel, message => message.channel, {
 		cascade: true, 
 		eager: true, // Source entity object loads the target entity objects as well
 		nullable: true,
 	})
-	messages: Message[];
+	messages: MessageChannel[];
 	
 	// a channel can have various members
 	@OneToMany(() => ChannelMember, channelMember => channelMember.channel, {
@@ -50,7 +50,4 @@ export class Channel {
     })
     owner: User;
 
-	@ManyToMany(() => User, user => user.joinedChannels)
-	@JoinTable()
-	users: User[];
 }
