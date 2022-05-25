@@ -232,6 +232,10 @@ export class UserService {
 		return (friendList);
 	}
 
+	async ownedChannel(user: User): Promise<Channel[]> {
+		return await this.channelService.findChannelsWhereUserIsOwner(user);
+	}
+
 	async joinedChannel(user: User): Promise<Channel[]> {
 		const channelMembers = await this.channelMemberService.findChannelsByUser(user);
 		const channelsId: number[] = [];
@@ -241,7 +245,7 @@ export class UserService {
 			channelsId.push(cm.channelId);
 		});
 		for (const id in channelsId)  {
-			channels.push(await this.channelService.findChannelById(channelsId[id]));		// });
+			channels.push(await this.channelService.findChannelById(channelsId[id]));
 		}
 		return channels;
 	}
