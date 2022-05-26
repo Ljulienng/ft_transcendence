@@ -57,29 +57,66 @@
         </div> -->
     <nav>
       <div class="nav nav-tabs" id="nav-tab" role="tablist">
-        <button class="nav-link active" id="nav-channel-tab" data-bs-toggle="tab" data-bs-target="#nav-channel" type="button" role="tab" aria-controls="nav-channel" aria-selected="true">Channels</button>
-        <button class="nav-link" id="nav-friends-tab" data-bs-toggle="tab" data-bs-target="#nav-friends" type="button" role="tab" aria-controls="nav-friends" aria-selected="false">Friends</button>
-        <button class="nav-link" id="nav-joinedChannel-tab" data-bs-toggle="tab" data-bs-target="#nav-joinedChannel" type="button" role="tab" aria-controls="nav-joinedChannel" aria-selected="false">My channels</button>
+        <button
+          class="nav-link active"
+          id="nav-channel-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-channel"
+          type="button"
+          role="tab"
+          aria-controls="nav-channel"
+          aria-selected="true"
+        >
+          Channels
+        </button>
+        <button
+          class="nav-link"
+          id="nav-friends-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-friends"
+          type="button"
+          role="tab"
+          aria-controls="nav-friends"
+          aria-selected="false"
+        >
+          Friends
+        </button>
+        <button
+          class="nav-link"
+          id="nav-joinedChannel-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-joinedChannel"
+          type="button"
+          role="tab"
+          aria-controls="nav-joinedChannel"
+          aria-selected="false"
+        >
+          My channels
+        </button>
       </div>
     </nav>
     <div class="tab-content" id="nav-tabContent">
-      <div class="tab-pane fade show active" id="nav-channel" role="tabpanel" aria-labelledby="nav-channel-tab"> <!-- CHANNEL LIST -->
+      <div
+        class="tab-pane fade show active"
+        id="nav-channel"
+        role="tabpanel"
+        aria-labelledby="nav-channel-tab"
+      >
+        <!-- CHANNEL LIST -->
         <div class="channelList">
           <ul>
             <li v-for="channel in channelList" :key="channel">
               <!-- <div v-if="this.joinedChannelList.includes(channel.id) === false"> -->
-                {{ channel.id }} - "{{ channel.name }}" : created by
-                {{ channel.owner.username }}
-                <div v-if="!checkIfJoined(channel.id)">
-                  <button @click="joinChannel(channel.id, channel.type)">
-                  join channel 
-                  </button>
-                </div>
-                <div v-else>
-                  JOINED
-                </div>
+              {{ channel.id }} - "{{ channel.name }}" : created by
+              {{ channel.owner.username }}
+              <div v-if="checkIfJoined(channel.id)">
+                <button @click="joinChannel(channel.id, channel.type)">
+                  join channel
+                </button>
+              </div>
+              <div v-else>JOINED</div>
               <!-- </div> -->
-              <!-- {{channel.messages}} -->
+              <!-- {{channel.message}} -->
             </li>
           </ul>
           <div v-if="showBox === true">
@@ -90,12 +127,17 @@
           </div>
         </div>
       </div>
-      <div class="tab-pane fade" id="nav-friends" role="tabpanel" aria-labelledby="nav-friends-tab">
+      <div
+        class="tab-pane fade"
+        id="nav-friends"
+        role="tabpanel"
+        aria-labelledby="nav-friends-tab"
+      >
         <div class="friendList">
           <ul>
             <li v-for="friend in friendList" :key="friend">
-              {{friend.username}}
-            <button @click="showUser(friend.id)">show chat</button>
+              {{ friend.username }}
+              <button @click="showUser(friend.id)">show chat</button>
             </li>
           </ul>
           <div v-if="showChatBox === true">
@@ -104,9 +146,14 @@
               v-bind:socket="socket"
             ></PrivateChatBox>
           </div>
-        </div >
+        </div>
       </div>
-      <div class="tab-pane fade" id="nav-joinedChannel" role="tabpanel" aria-labelledby="nav-joinedChannel-tab">
+      <div
+        class="tab-pane fade"
+        id="nav-joinedChannel"
+        role="tabpanel"
+        aria-labelledby="nav-joinedChannel-tab"
+      >
         <div class="joinedChannelList">
           <ul>
             <li v-for="channel in joinedChannelList" :key="channel">
@@ -126,21 +173,22 @@
         </div>
       </div>
     </div>
-  </div>    
+  </div>
 </template>
 
 <script lang="ts">
+/* eslint-disable */
 import { defineComponent } from "@vue/runtime-core";
-import http from "../http-common";
-import MessageI from "../types/interfaces/message.interface";
+import http from "../../http-common";
+import MessageI from "../../types/interfaces/message.interface";
 import ChannelBox from "./ChannelBox.vue";
-import PrivateChatBox from "./PrivateChatBox.vue"
-import store from "../store";
+import PrivateChatBox from "./PrivateChatBox.vue";
+import store from "../../store";
 
 export default defineComponent({
   components: {
     ChannelBox,
-    PrivateChatBox
+    PrivateChatBox,
   },
 
   data() {
@@ -168,18 +216,17 @@ export default defineComponent({
       selectedUser: 0,
       showBox: false,
       showChatBox: false,
-      
     };
   },
 
   methods: {
-		async getFriendList() {
-			try{
-				const response = await http.get('/users/friendlist');
-				this.friendList = response.data;
-			} catch (e) {
-				console.log(e);
-			}
+    async getFriendList() {
+      try {
+        const response = await http.get("/users/friendlist");
+        this.friendList = response.data;
+      } catch (e) {
+        console.log(e);
+      }
     },
 
     showUser(userId: number) {
@@ -206,17 +253,15 @@ export default defineComponent({
 
     async checkIfJoined(channelId: number) {
       let bool;
-      await this.joinedChannelList.forEach(channel => {
-        if (channelId === channel.id)
-          bool = true
-      })
-      console.log("bool = ", bool, "for userId = ", channelId)
-      if (bool === true)
-        return true
+      await this.joinedChannelList.forEach((channel) => {
+        if (channelId === channel.id) bool = true;
+      });
+      console.log("bool = ", bool, "for userId = ", channelId);
+      if (bool === true) return true;
       // if (bool === true)
       //   return bool
       else {
-        console.log("ntm")
+        console.log("ntm");
         return false;
       }
     },
@@ -342,9 +387,9 @@ export default defineComponent({
     this.getFriendList();
     this.getJoinedChannelList();
     this.getChannelList();
-      // http.get('/message/norminet').then((response) => {
-      //   console.log(response)
-      // })
+    // http.get('/message/norminet').then((response) => {
+    //   console.log(response)
+    // })
   },
 });
 </script>

@@ -9,7 +9,7 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import http from "../http-common";
-import TwoFactorModal from "../components/TwoFactorModal.vue";
+import TwoFactorModal from "../components/auth/TwoFactorModal.vue";
 import store from "../store";
 
 export default defineComponent({

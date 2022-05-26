@@ -1,9 +1,9 @@
 <template>
-  <div class="chatBox">
+  <div class="channelBox">
     <p>{{ channel }}</p>
     <div class="messageList">
       <p v-for="msg in messageList" :key="msg">
-        {{ msg.sender.username }}: {{ msg.content }}
+        {{ msg.user.username }}: {{ msg.content }}
       </p>
     </div>
     <div>
@@ -20,16 +20,19 @@
 </template>
 
 <script lang="ts">
-import MessageUserI from "../types/interfaces/message.interface";
+import MessageI from "../../types/interfaces/message.interface";
+import { Socket } from "socket.io-client";
 // import http from "../http-common";
 import { defineComponent } from "@vue/runtime-core";
-import store from "../store";
+import store from "../../store";
 
 export default defineComponent({
   props: {
-    receiverId: {
+    channel: {
       type: Number,
-      default: 0
+    },
+    socketChannel: {
+      type: Socket,
     },
   },
 
@@ -38,36 +41,35 @@ export default defineComponent({
       // test: io('http://localhost:3000/channel', {  withCredentials: true}),
       currentUser: store.getters["auth/getUserProfile"],
       message: {
-        senderId: 0,
-        sender: "",
-        receiverId: 0,
+        userId: 0,
+        username: "",
         content: "",
+        channelId: this.channel,
       },
       socket: store.getters["auth/getUserSocket"],
-      messageList: [] as MessageUserI[],
-      messageList2: [] as MessageUserI[],
+      messageList: [] as MessageI[],
+      messageList2: [] as MessageI[],
     };
   },
 
   methods: {
     sendMessage() {
-      this.message.senderId = this.currentUser.id;
-      this.message.sender = this.currentUser.username
-      this.message.receiverId = this.receiverId;
+      this.message.userId = this.currentUser.id;
+      this.message.username = this.currentUser.username;
       console.log(
-        "sendMessage - on User ",
-        this.message.receiverId,
+        "sendMessage - on channelId ",
+        this.message.channelId,
         this.message.content
       );
-      this.socket.emit("sendMessageToUser", this.message);
+      this.socket.emit("sendMessageToServer", this.message);
       // this.socket.emit('sendMessageToServer', this.message);
       // this.getMessageList();
     },
 
     async getMessages() {
-      console.log("heho", this.receiverId);
-      this.socket.emit("getUserMsg", this.receiverId);
-      this.socket.on("getUserMessages" + this.receiverId, (data: MessageUserI[]) => {
+      console.log("heho");
+      this.socket.emit("getChannelMsg", this.channel);
+      this.socket.on("getChannelMessages", (data: MessageI[]) => {
         this.messageList = data;
       });
     },
@@ -77,14 +79,13 @@ export default defineComponent({
     if (this.socket === undefined) {
       this.socket = store.getters["auth/getUserSocket"];
     }
-    this.socket.on("messageSentFromUser", () => {
-        console.log("euh i ", this.receiverId)
-      this.socket.emit("getUserMsg", this.receiverId);
+    this.socket.on("messageSent", () => {
+      this.socket.emit("getChannelMsg", this.channel);
       // console.log("data");
     });
     this.socket.on(
-      "getUserMessages" + this.receiverId,
-      (data: MessageUserI[]) => {
+      "getChannelMessages" + this.currentUser.id,
+      (data: MessageI[]) => {
         this.messageList = data;
       }
     );
@@ -95,9 +96,9 @@ export default defineComponent({
   // },
 
   created() {
-    console.log("socket = ", this.socket, "other user id = ", this.receiverId);
+    console.log("socket = ", this.socket);
 
-    console.log("chatbox created");
+    console.log("Channelbox created");
     this.getMessages();
   },
   // setup() {
@@ -106,7 +107,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.chatBox {
+.channelBox {
   float: right;
 }
 </style>
