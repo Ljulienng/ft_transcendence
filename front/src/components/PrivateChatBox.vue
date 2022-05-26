@@ -29,6 +29,7 @@ export default defineComponent({
   props: {
     receiverId: {
       type: Number,
+      default: 0
     },
   },
 
@@ -38,6 +39,7 @@ export default defineComponent({
       currentUser: store.getters["auth/getUserProfile"],
       message: {
         senderId: 0,
+        sender: "",
         receiverId: 0,
         content: "",
       },

@@ -7,6 +7,7 @@ export default interface MessageI {
 
 export default interface MessageUserI {
 	senderId: number;
+	sender: string;
 	receiverId: number;
 	content: string;
 }
