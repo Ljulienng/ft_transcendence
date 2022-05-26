@@ -1,5 +1,5 @@
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
-import { Message } from "src/message/models/message.entity";
+import { MessageChannel } from "src/message/models/messageChannel.entity";
 import { Channel } from "src/channel/models/channel.entity";
 
 
@@ -37,7 +37,7 @@ export class UserDto {
 	createdTime: Date
 
 	@IsOptional()
-	messages: Message[];
+	messages: MessageChannel[];
 
 	@IsOptional()
 	channels: Channel[];

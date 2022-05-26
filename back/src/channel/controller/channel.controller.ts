@@ -97,6 +97,7 @@ export class ChannelController {
         return await this.channelService.deleteChannel(request.user.id, channelId);
     }
 
+    // test : curl -v -X DELETE http://localhost:3000/channel/{channelId}/{userId}
     @Delete(':channelId/:userId')
     async deleteChannelMember(
         @Param('userId') memberId: number,

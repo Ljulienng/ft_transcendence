@@ -55,44 +55,78 @@
                 <button @click="showChannel(channel.id)">show channel</button>
 
         </div> -->
-    <div class="channelList">
-      <h3>Channel list</h3>
-      <ul>
-        <li v-for="channel in channelList" :key="channel">
-          {{ channel.id }} - "{{ channel.name }}" : created by
-          {{ channel.owner.username }}
-          <button @click="joinChannel(channel.id, channel.type)">
-            join channel
-          </button>
-          <button @click="showChannel(channel.id)">show channel</button>
+    <nav>
+      <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <button class="nav-link active" id="nav-channel-tab" data-bs-toggle="tab" data-bs-target="#nav-channel" type="button" role="tab" aria-controls="nav-channel" aria-selected="true">Channels</button>
+        <button class="nav-link" id="nav-friends-tab" data-bs-toggle="tab" data-bs-target="#nav-friends" type="button" role="tab" aria-controls="nav-friends" aria-selected="false">Friends</button>
+        <button class="nav-link" id="nav-joinedChannel-tab" data-bs-toggle="tab" data-bs-target="#nav-joinedChannel" type="button" role="tab" aria-controls="nav-joinedChannel" aria-selected="false">My channels</button>
+      </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade show active" id="nav-channel" role="tabpanel" aria-labelledby="nav-channel-tab"> <!-- CHANNEL LIST -->
+        <div class="channelList">
+          <ul>
+            <li v-for="channel in channelList" :key="channel">
+              <!-- <div v-if="this.joinedChannelList.includes(channel.id) === false"> -->
+                {{ channel.id }} - "{{ channel.name }}" : created by
+                {{ channel.owner.username }}
+                <div v-if="!checkIfJoined(channel.id)">
+                  <button @click="joinChannel(channel.id, channel.type)">
+                  join channel 
+                  </button>
+                </div>
+                <div v-else>
+                  JOINED
+                </div>
+              <!-- </div> -->
+              <!-- {{channel.messages}} -->
+            </li>
+          </ul>
+          <div v-if="showBox === true">
+            <ChannelBox
+              v-bind:channel="selectedChannel"
+              v-bind:socketChannel="socket"
+            ></ChannelBox>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="nav-friends" role="tabpanel" aria-labelledby="nav-friends-tab">
+        <div class="friendList">
+          <ul>
+            <li v-for="friend in friendList" :key="friend">
+              {{friend.username}}
+            <button @click="showUser(friend.id)">show chat</button>
+            </li>
+          </ul>
+          <div v-if="showChatBox === true">
+            <PrivateChatBox
+              v-bind:receiverId="selectedUser"
+              v-bind:socket="socket"
+            ></PrivateChatBox>
+          </div>
+        </div >
+      </div>
+      <div class="tab-pane fade" id="nav-joinedChannel" role="tabpanel" aria-labelledby="nav-joinedChannel-tab">
+        <div class="joinedChannelList">
+          <ul>
+            <li v-for="channel in joinedChannelList" :key="channel">
+              {{ channel.id }} - "{{ channel.name }}" : created by
+              {{ channel.owner.username }}
+              <button @click="showChannel(channel.id)">show channel</button>
 
-          <!-- {{channel.messages}} -->
-        </li>
-      </ul>
-      <div v-if="showBox === true">
-        <ChannelBox
-          v-bind:channel="selectedChannel"
-          v-bind:socketChannel="socket"
-        ></ChannelBox>
+              <!-- {{channel.messages}} -->
+            </li>
+          </ul>
+          <div v-if="showBox === true">
+            <ChannelBox
+              v-bind:channel="selectedChannel"
+              v-bind:socketChannel="socket"
+            ></ChannelBox>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div class="friendList">
-      <h3>friend list</h3>
-      <ul>
-        <li v-for="friend in friendList" :key="friend">
-          {{friend.username}}
-        <button @click="showUser(friend.id)">show chat</button>
-        </li>
-      </ul>
-      <div v-if="showChatBox === true">
-        <PrivateChatBox
-          v-bind:receiverId="selectedUser"
-          v-bind:socket="socket"
-        ></PrivateChatBox>
-      </div>
-    </div >
-  </div>
+  </div>    
 </template>
 
 <script lang="ts">
@@ -112,8 +146,8 @@ export default defineComponent({
   data() {
     return {
       socket: store.getters["auth/getUserSocket"],
-      channelList: [],
-      joinedChannelList: [],
+      channelList: [] as any[],
+      joinedChannelList: [] as any[],
       friendList: [],
       message: {
         content: "",
@@ -152,7 +186,6 @@ export default defineComponent({
       if (this.showChatBox === true && userId === this.selectedUser) {
         this.showChatBox = false;
       } else if (this.showChatBox === true && userId !== this.selectedUser) {
-        console.log("test user");
         this.selectedUser = userId;
       } else {
         this.showChatBox = true;
@@ -164,7 +197,6 @@ export default defineComponent({
       if (this.showBox === true && channelId === this.selectedChannel) {
         this.showBox = false;
       } else if (this.showBox === true && channelId !== this.selectedChannel) {
-        console.log("test");
         this.selectedChannel = channelId;
       } else {
         this.showBox = true;
@@ -172,10 +204,38 @@ export default defineComponent({
       }
     },
 
+    async checkIfJoined(channelId: number) {
+      let bool;
+      await this.joinedChannelList.forEach(channel => {
+        if (channelId === channel.id)
+          bool = true
+      })
+      console.log("bool = ", bool, "for userId = ", channelId)
+      if (bool === true)
+        return true
+      // if (bool === true)
+      //   return bool
+      else {
+        console.log("ntm")
+        return false;
+      }
+    },
+
     async getChannelList() {
       try {
         const response = await http.get("/channel");
         this.channelList = response.data;
+        // this.joinedChannelList.forEach(joinedChannel => {
+        //     this.channelList.forEach(channel => {
+
+        //       if (channel.id === joinedChannel.id) {
+        //         const index = this.channelList.indexOf(channel);
+        //         this.channelList.splice(index, 1)
+        //       }
+        //     })
+        // })
+        // if (this.channelList[0].id === this.joinedChannelList[0].id)
+        //   console.log("testeeee")
       } catch (error) {
         console.log(error);
       }
@@ -280,11 +340,11 @@ export default defineComponent({
 
   created() {
     this.getFriendList();
-    this.getChannelList();
     this.getJoinedChannelList();
-    // http.get('/message/norminet').then((response) => {
-    //   console.log(response)
-    // })
+    this.getChannelList();
+      // http.get('/message/norminet').then((response) => {
+      //   console.log(response)
+      // })
   },
 });
 </script>

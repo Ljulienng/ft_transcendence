@@ -13,6 +13,8 @@ import { ChannelService } from 'src/channel/service/channel.service';
 import { MessageUser } from 'src/messageUser/models/messageUser.entity';
 import { MessageUserService } from 'src/messageUser/service/messageUser.service';
 import { CreateMessageUserDto } from 'src/messageUser/models/messageUser.dto';
+import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
+
 
 @Injectable()
 export class UserService {
@@ -25,7 +27,8 @@ export class UserService {
 		private channelService: ChannelService,
 		@Inject(MessageUserService)
 		private messageUserService: MessageUserService,
-
+		@Inject(ChannelMemberService)
+		private channelMemberService: ChannelMemberService,
 	) {}
 
 	async onModuleInit(): Promise<void> {
@@ -236,9 +239,22 @@ export class UserService {
 		return (friendList);
 	}
 
-	joinedChannel(user: User) {
-		return this.channelService.findChannelsByUser(user);
-		// return user.channels
+	async ownedChannel(user: User): Promise<Channel[]> {
+		return await this.channelService.findChannelsWhereUserIsOwner(user);
+	}
+
+	async joinedChannel(user: User): Promise<Channel[]> {
+		const channelMembers = await this.channelMemberService.findChannelsByUser(user);
+		const channelsId: number[] = [];
+		const channels: Channel[] = [];
+		
+		channelMembers.forEach(cm => {
+			channelsId.push(cm.channelId);
+		});
+		for (const id in channelsId)  {
+			channels.push(await this.channelService.findChannelById(channelsId[id]));
+		}
+		return channels;
 	}
 
 	async setStatus(user: User, newStatus: string) {

@@ -48,8 +48,17 @@ export class ChannelMemberService {
         })
     }
 
+    async findChannelsByUser(user: User) {
+        return await this.channelMemberRepository.find({
+            where: {
+                user: user,
+            }
+        })
+    }
+
     async createMember(user: User, channel: Channel, owner: boolean, admin: boolean) {
         const newMember = this.channelMemberRepository.create({
+            channelId: channel.id,
             owner: owner,
             admin: admin,
             user: user,

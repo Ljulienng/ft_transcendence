@@ -11,6 +11,7 @@ import { PasswordI } from '../models/password.interface';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
 import { CreateMessageDto } from 'src/message/models/message.dto';
+import { ChannelMember } from 'src/channelMember/models/channelMember.entity';
 
 @Injectable()
 export class ChannelService {
@@ -69,13 +70,14 @@ export class ChannelService {
         return await this.channelMemberService.findAdmins(channel);
     }
 
-    async findChannelsByUser(user: User){
-        return await this.channelRepository.find
-        ({
+    /* get channels where user = owner */
+    async   findChannelsWhereUserIsOwner(user: User) {
+        console.log("find owner");
+        return await this.channelRepository.find({
             where: {
                 owner: user,
             },
-        })
+        });
     }
 
     /* create channel */
@@ -173,7 +175,6 @@ export class ChannelService {
         }
 
         const channelMember = await this.channelMemberService.findOne(user, welcomingChannel);
-
         if (channelMember) {
             throw new UnauthorizedException('user already in this channel');
         }
