@@ -17,6 +17,7 @@ import { SocketUserI } from "src/chat/chat.gateway";
 import { ChannelService } from "src/channel/service/channel.service";
 import { SocketGuard } from "src/auth/guards/socket.guard";
 import { UseGuards } from "@nestjs/common";
+import { CreateChannelDto } from "src/channel/models/channel.dto";
 import { Observable } from 'rxjs'
 import { User } from "./models/user.entity";
 
@@ -90,7 +91,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 
 
-	/* ============= CHANNELcc CHAT PART ============*/
+	/* ============= CHANNEL CHAT PART ============*/
 
 	@UseGuards(SocketGuard)
     @SubscribeMessage('getChannelMsg')
@@ -104,16 +105,37 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.emit('getChannelMessages' + this.socketList[index].user.id, messages)
     }
 
+	@UseGuards(SocketGuard)
+    @SubscribeMessage('createChannel')
+    async createChannel(client: Socket, createChannel: CreateChannelDto) {
+        const user = await this.socketList.find(socket => socket.socketId === client.id).user
+
+        await this.channelService.createChannel(createChannel, user.id);
+        this.server.emit("updateChannel", await this.channelService.findAll());
+        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
+    }
+
+	@UseGuards(SocketGuard)
+    @SubscribeMessage('deleteChannel')
+    async deleteChannel(client: Socket, channelId: number) {
+        const user = await this.socketList.find(socket => socket.socketId === client.id).user
+
+        await this.channelService.deleteChannel(user.id, channelId);
+        this.server.emit("updateChannel", await this.channelService.findAll());
+        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
+    }
+
     @UseGuards(SocketGuard)
     @SubscribeMessage('joinChannel')
     async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
-        const userId = await this.socketList.find(socket => socket.socketId === client.id).user.id
-        await this.channelService.addUserToChannel(joinChannel, userId);
+        const user = await this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.addUserToChannel(joinChannel, user.id);
         
         const room = await this.channelService.findChannelById(joinChannel.id);
         client.join(room.name);
         console.log("Channel user = ", await this.channelService.findMembers(room.id))
         this.server.to(room.name).emit('channelJoined', "Hello you join the channel");
+        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
         const messages = await this.channelService.findChannelMessagesByChannelName(room.name);
         this.server.to(client.id).emit('channelMessages', messages); 
     } 

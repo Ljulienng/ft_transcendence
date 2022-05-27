@@ -37,19 +37,6 @@
     </div>
     <br />
 
-    <div>
-      <button @click="sendMessage">Send message</button>
-      <input
-        type="text"
-        maxlength="100"
-        v-model="message.content"
-        class="inputMessage"
-      />
-      in channel
-      <input type="text" maxlength="100" v-model="message.channelId" />
-    </div>
-    <br />
-
     <!-- <div class="channelTabs">
                 <button @click="showChannel(channel.id)">show channel </button>
                 <button @click="showChannel(channel.id)">show channel</button>
@@ -109,12 +96,10 @@
               <!-- <div v-if="this.joinedChannelList.includes(channel.id) === false"> -->
               {{ channel.id }} - "{{ channel.name }}" : created by
               {{ channel.owner.username }}
-              <div v-if="checkIfJoined(channel.id)">
-                <button @click="joinChannel(channel.id, channel.type)">
-                  join channel
-                </button>
-              </div>
-              <div v-else>JOINED</div>
+              <button @click="joinChannel(channel.id, channel.type)">
+                join channel
+              </button>
+
               <!-- </div> -->
               <!-- {{channel.message}} -->
             </li>
@@ -181,6 +166,7 @@
 import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 import MessageI from "../../types/interfaces/message.interface";
+import ChannelI from "../../types/interfaces/channel.interface";
 import ChannelBox from "./ChannelBox.vue";
 import PrivateChatBox from "./PrivateChatBox.vue";
 import store from "../../store";
@@ -302,6 +288,8 @@ export default defineComponent({
         const response = await http.get(
           "/channel/" + this.channelId + "/messages"
         );
+        // console.log(data);
+
         this.messageList = response.data;
         console.log(
           "get messageList of channel ",
@@ -328,8 +316,8 @@ export default defineComponent({
         privacy: this.privacy,
         password: this.password,
       };
-      http.post("/channel/createChannel", channel, { withCredentials: true });
-      this.getChannelList();
+      // http.post("/channel/createChannel", channel, { withCredentials: true });
+      this.socket.emit("createChannel", channel);
       this.name = "";
       this.privacy = "";
       this.password = "";
@@ -337,8 +325,9 @@ export default defineComponent({
 
     deleteChat() {
       console.log("delete channel");
-      http.delete("/channel/" + this.channelId);
-      this.getChannelList();
+      this.socket.emit("deleteChannel", this.channelId);
+      // http.delete("/channel/" + this.channelId);
+      // this.getChannelList();
       this.channelId = 0;
     },
 
@@ -365,6 +354,13 @@ export default defineComponent({
       this.socket = store.getters["auth/getUserSocket"];
     }
 
+    this.socket.on("updateChannel", (data: ChannelI[]) => {
+      this.channelList = data;
+    });
+
+    this.socket.on("updateJoinedChannel", (data: ChannelI[]) => {
+      this.joinedChannelList = data;
+    });
     // this.socket.on('sendMessageToClient', (data) => {
     //     console.log(data);
     // // })
