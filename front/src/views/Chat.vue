@@ -1,7 +1,7 @@
 <template>
-        <v-row>
+        <!-- <v-row> -->
             <ChatTests :socket="socket" />
-        </v-row>
+        <!-- </v-row> -->
 </template>
 
 <script lang="ts">

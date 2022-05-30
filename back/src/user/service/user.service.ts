@@ -1,6 +1,6 @@
 import { ConsoleLogger, HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { from, Observable, of, switchMap, map, tap, ConnectableObservable} from 'rxjs';
+import { from, Observable, of, switchMap, map, tap} from 'rxjs';
 import { getConnection, Repository } from 'typeorm';
 import { UserDto } from '../models/user.dto';
 import { Student } from "src/user/dto/student.dto"
@@ -10,10 +10,10 @@ import { names, uniqueNamesGenerator } from 'unique-names-generator';
 import { JwtService } from '@nestjs/jwt';
 import { Channel } from 'src/channel/models/channel.entity';
 import { ChannelService } from 'src/channel/service/channel.service';
-import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 import { MessageUser } from 'src/messageUser/models/messageUser.entity';
 import { MessageUserService } from 'src/messageUser/service/messageUser.service';
 import { CreateMessageUserDto } from 'src/messageUser/models/messageUser.dto';
+import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 
 @Injectable()
 export class UserService {
@@ -24,10 +24,10 @@ export class UserService {
 		private jwtService: JwtService,
 		@Inject(ChannelService)
 		private channelService: ChannelService,
-		@Inject(ChannelMemberService)
-		private channelMemberService: ChannelMemberService,
 		@Inject(MessageUserService)
 		private messageUserService: MessageUserService,
+		@Inject(ChannelMemberService)
+		private channelMemberService: ChannelMemberService,
 	) {}
 
 	async onModuleInit(): Promise<void> {
@@ -134,9 +134,7 @@ export class UserService {
 		let userTmp: User = undefined;
 		
 		const { username } = user;
-		// if (user.email === "norminet") { // create second user for testing purposes
 
-		// }
 		userTmp = await this.userRepository.findOne({username: username});
 		if (userTmp) {
 			if (userTmp.status === 'Offline')
@@ -155,6 +153,8 @@ export class UserService {
 
 	}
 
+	// ================ FRIENDS ===================
+
 	async addFriend(user: User, friendToAdd: any) {
 		const friend = await this.userRepository.findOne({username: friendToAdd.friendUsername});
 		if (user.friends === null)
@@ -165,6 +165,8 @@ export class UserService {
 
 		const tmp = user.friends.find(el => el === String(friend.id))
 
+		if (await this.checkIfBlocked(user, friend.id))
+			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user you are trying to add is blocked.')
 		if (tmp) {
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user is already in your friendlist.')
 		}
@@ -174,8 +176,17 @@ export class UserService {
 		await this.userRepository.save(user);
 	}
 
-	async deleteFriend(user: User, friendToDelete: any) {
-		const friend = await this.userRepository.findOne({username: friendToDelete.username});
+	async checkIfFriend(user: User, userId: string) {
+		const tmp = await user.friends.find((friend) => friend === userId)
+
+		if (tmp)
+			return true;
+		else
+			return false
+	}
+
+	async deleteFriend(user: User, friendToDelete: string) {
+		const friend = await this.userRepository.findOne({username: friendToDelete});
 
 		if (!friend) {
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
@@ -202,12 +213,14 @@ export class UserService {
 		if (friendInfo !== undefined) {
 
 			let friend: Friend = {
+				id: 0,
 				username: "",
 				firstname: "",
 				lastname: "",
 				status: "Offline"
 			};
 
+			friend.id = friendInfo.id;
 			friend.username = friendInfo.username;
 			friend.firstname = friendInfo.firstname;
 			friend.lastname = friendInfo.lastname;
@@ -226,15 +239,16 @@ export class UserService {
 		let friendList = [];
 		let friend;
 
-		// console.log("user.friends = ", user.friends)
 		for (let i = 0; user.friends[i]; i++) {
 			if ((friend = await this.retrieveFriendInfo(user.friends[i])) !== undefined){
 				friendList.push(friend);
 			}
 		}
-		// console.log("Friendlist = ", friendList)
 		return (friendList);
 	}
+
+	// ================ CHANNEL ===================
+
 
 	async ownedChannel(user: User): Promise<Channel[]> {
 		return await this.channelService.findChannelsWhereUserIsOwner(user);
@@ -253,6 +267,9 @@ export class UserService {
 		}
 		return channels;
 	}
+
+	// ================ DOUBLE FA AUTHENTICATION ===================
+
 
 	async setStatus(user: User, newStatus: string) {
 		// if (newStatus !== 'Online'  'Offline'  'In game'  'Away'  'Occupied')
@@ -280,18 +297,95 @@ export class UserService {
 		});
 	}
 
+	// ================ MESSAGES ===================
+
+
 	async saveMessage(userId: number, createMessageUserDto: CreateMessageUserDto) {
         const sender = await this.userRepository.findOne({id: userId});
-        const receiver = await this.userRepository.findOne({id: createMessageUserDto.receiverlId});
-        if (!receiver) {
+        const receiver = await this.userRepository.findOne({id: createMessageUserDto.receiverId});
+
+        if (!receiver)
             throw new HttpException('this user doesn\'t exist', HttpStatus.FORBIDDEN);
-        }
         return await this.messageUserService.saveMessage(sender, receiver, createMessageUserDto);
 	}
 
-	async getMessage(authorId: number, receiverlId: number) {
-		const messages =  await this.messageUserService.getMessages(authorId, receiverlId);
+	async getMessage(senderId: number, receiverId: number) {
+		const sender = await this.userRepository.findOne({id: senderId});
+		const receiver = await this.userRepository.findOne({id: receiverId});
+		const messages =  await this.messageUserService.getMessages(sender, receiver);
 
 		return messages;
 	}
+
+	// ================ BLOCKED USER ===================
+
+	async getBlockedUser(user: User) {
+		if (user.blocked === null)
+			user.blocked = [];
+		let blockedList = [];
+		let blockedUser;
+
+		for (let i = 0; user.blocked[i]; i++) {
+			if ((blockedUser = await this.retrieveFriendInfo(user.blocked[i])) !== undefined){
+				blockedList.push(blockedUser);
+			}
+		}
+		return (blockedList)
+	}
+
+	async blockUser(user: User, userId: number) {
+		if (user.blocked === null)
+			user.blocked = [];
+
+		if (this.checkIfFriend(user, String(userId))){
+			
+			
+		}
+
+		if (await this.checkIfBlocked(user, userId))
+			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user is already blocked.');
+		else
+			user.blocked.push(String(userId));
+		await this.userRepository.save(user);
+	}
+
+	async unblockUser(user: User, userId: number) {
+		const tmp = await user.blocked.find(el => el === String(userId));
+
+		if (!tmp)
+			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user isn\'t blocked.');
+		else {
+			const index = user.blocked.indexOf(tmp, 0);
+
+			user.blocked.splice(index, 0);
+		}
+		await this.userRepository.save(user);
+	}
+
+	async checkIfBlocked(user: User, userId: number) {
+		if (user.blocked === null)
+			user.blocked = [];
+		const tmp = await user.blocked.find(el => el === String(userId));
+		if (tmp) {
+			console.log("tmp = ", tmp)
+			
+			return true;
+		}
+		else
+			return false
+	}
+
+	async checkIfInOtherBlocked(user: User, userId: number) {
+		const otherUser = await this.userRepository.findOne({id: userId});
+		const tmp = await otherUser.blocked.find(el => el === String(user.id));
+
+		if (!otherUser)
+			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'User doesn\'t exist.');
+		if (tmp)
+			return true;
+		else
+			return false
+	}
+
+
 }

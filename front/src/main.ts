@@ -2,8 +2,8 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import HelloWorld from "./components/HelloWorld.vue";
 import Sidebar from "./components/Sidebar.vue";
-import UploadAvatar from "./components/UploadAvatar.vue"
-import ChatTests from "./components/ChatTests.vue"
+import UploadAvatar from "./components/user/UploadAvatar.vue"
+import ChatTests from "./components/chat/ChatTests.vue"
 import router from "./router";
 import store from "./store";
 import 'vue-universal-modal/dist/index.css'

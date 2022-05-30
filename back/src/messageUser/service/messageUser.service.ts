@@ -50,14 +50,22 @@ export class MessageUserService {
      return await this.messageUserRepository.remove(message);
  }
 
- async getMessages(authorId: number, receiverId: number) {
-     const messages = this.messageUserRepository
-     .createQueryBuilder("messageUser")
-     .where("messageUser.authorId = :author", {author: authorId})
-     .andWhere("messageUser.receiverId = :receiver", {receiveir: receiverId})
-     .getMany();
+ async getMessages(sender: User, receiver: User) {
+    console.log("userMessage ");
+     const messages = await this.messageUserRepository.find({
+         where: [ // OR STATEMENT: searching for message where the user is the sender and also the receiver
+            {
+            sender: sender,
+            receiver: receiver
+            },
+            {
+            sender: receiver,
+            receiver: sender
+            }
+        ]
+    })
 
-     console.log("userMessage = ", messages);
+    //  console.log("userMessage = ", messages);
 
      return messages
  }
