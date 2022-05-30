@@ -1,9 +1,12 @@
-<template>
-  <div class="board">
-    <h1>Pong</h1>
-    <canvas id="canvas" tabindex="0" width="640" height="480" @click.once="waitingForOpponent" @mousemove="playerMove" @keydown="playerMove">
-      {{ unsupportedMsg }}
-    </canvas>
+<template lang="html">
+  <div class="container">
+    <!-- <h1>Pong</h1> -->
+    <div class="board" ref="board">
+      <canvas id="canvas" ref="canvas" tabindex="0" :width="width" :height="height" @click.once="waitingForplayerLeft"
+        @mousemove="playerMove" @keydown="playerMove">
+        {{ unsupportedMsg }}
+      </canvas>
+    </div>
   </div>
 </template>
 
@@ -13,21 +16,27 @@ import io from 'socket.io-client'
 import PointI from '../types/interfaces/point.interface'
 import PongI from '../types/interfaces/pong.interface'
 
+// DONE: determine wich playerRight am i
+// TODO: => Why left i playing right side ?!
+
 // TODO: ball
+// TODO: updateBall func to convert datas receive from back
 
 // TODO: fix init ball direction
 // TODO: fix paddle collision with canvas border (mouse/keyboard)
-// TODO: waitingForOpponent animation
+// TODO: waiting for opponent animation
 // TODO: pause menu
 // TODO: player/game STATE
 // TODO: Countdown before game start
-// TODO: mirror game ?
+// TODO: mirror game in option?
+// TODO: implement pause menu
+// TODO: timeout event for 'oppenent gave up due to misconnexion'
 
 const State = {
-  PAUSE: 0,
+  NONE: 0,
   PLAY: 1,
+  PAUSE: 2
 };
-
 
 export default defineComponent({
   name: 'Pong',
@@ -35,21 +44,23 @@ export default defineComponent({
     return {
       socket: io(),
       pong: {} as PongI,
-      state: State.PAUSE,
-      unsupportedMsg: 'Sorry, your browser does not support canvas.'
+      state: State.NONE,
+      unsupportedMsg: 'Sorry, your browser does not support canvas.',
+      width: 640,
+      height: 480
     };
   },
   methods: {
     initPong() {
       this.pong.canvas = document.getElementById('canvas') as HTMLCanvasElement;
       this.pong.context = this.pong.canvas.getContext('2d') as CanvasRenderingContext2D;
-      this.pong.player_dimensions = {x: 5, y: 100};
-      this.pong.player = {
-        y: this.pong.canvas.height / 2 - this.pong.player_dimensions.y / 2,
+      this.pong.playerSize = { x: this.pong.canvas.width / 128, y: this.pong.canvas.height / 8 };
+      this.pong.playerRight = {
+        y: this.pong.canvas.height / 2 - this.pong.playerSize.y / 2,
         score: 0
       };
-      this.pong.opponent = {
-        y: this.pong.canvas.height / 2 - this.pong.player_dimensions.y / 2,
+      this.pong.playerLeft = {
+        y: this.pong.canvas.height / 2 - this.pong.playerSize.y / 2,
         score: 0
       };
       this.pong.ball = {
@@ -57,11 +68,11 @@ export default defineComponent({
           x: this.pong.canvas.width / 2,
           y: this.pong.canvas.width / 2
         },
-        radius: 5,
-        speed: {x: 2, y: 2},
-        max_speed: 25
+        radius: 5
+        // speed: { x: 2, y: 2 },
+        // max_speed: 25
       },
-      this.pong.fps = 30;
+        this.pong.isLeftSide = false;
     },
     start() {
       this.pong.context.fillStyle = 'black';
@@ -71,13 +82,47 @@ export default defineComponent({
       this.pong.context.textAlign = 'center';
       this.pong.context.fillText('CLICK TO START', this.pong.canvas.width / 2, this.pong.canvas.height / 2);
     },
-    waitingForOpponent() {
+    waitingForplayerLeft() {
       this.pong.context.fillStyle = 'black';
       this.pong.context.fillRect(0, 0, this.pong.canvas.width, this.pong.canvas.height);
       this.pong.context.fillStyle = 'lightgrey';
       this.pong.context.textAlign = 'center';
       this.pong.context.font = '40px Orbitron';
       this.pong.context.fillText('Waiting for opponent...', this.pong.canvas.width / 2, this.pong.canvas.height / 2);
+      this.state = State.PAUSE;
+
+      if (this.socket.connected == false) {
+        this.socket = io('localhost:3000/play', { withCredentials: true });
+      }
+
+      this.socket.on('pause', () => {
+        this.state = State.PAUSE;
+        this.pause();
+      });
+
+      this.socket.on('start', async (isLeftSide: boolean) => {
+        console.log(this.socket.id + ': isLeftSide ? ' + isLeftSide);
+        this.pong.isLeftSide = isLeftSide;
+        this.state = State.PLAY;
+
+        this.socket.on('opponentMove', async (y: number) => {
+          y = y / 100 * this.pong.canvas.height;
+          await this.$nextTick();
+          if (this.pong.isLeftSide) {
+            this.pong.playerLeft.y = y;
+          } else {
+            this.pong.playerRight.y = y;
+          }
+        });
+
+        this.socket.on('ballMove', (pos: PointI) => {
+          this.pong.ball.pos = pos;
+        });
+
+        // TODO: scores event
+        await this.$nextTick();
+        this.play();
+      });
       this.socket.emit('playerReady');
     },
     pause() {
@@ -89,6 +134,13 @@ export default defineComponent({
       this.pong.context.fillText('Waiting for opponent...', this.pong.canvas.width / 2, this.pong.canvas.height / 2);
     },
     draw() {
+      if (this.state == State.NONE) {
+        this.start();
+        return;
+      } else if (this.state == State.PAUSE) {
+        this.pause();
+        return;
+      }
       // Draw fields
       this.pong.context.fillStyle = 'black';
       this.pong.context.fillRect(0, 0, this.pong.canvas.width, this.pong.canvas.height);
@@ -100,70 +152,76 @@ export default defineComponent({
       this.pong.context.lineTo(this.pong.canvas.width / 2, this.pong.canvas.height);
       this.pong.context.stroke();
 
-      // Draw players
+      // Draw scores
+      //this.pong.context.fillStyle = 'lightgrey';
+      //this.pong.context.font = '64px Orbitron';
+      //this.pong.context.textAlign = 'center';
+      //this.pong.context.fillText(this.pong.playerRight.score.toString(), this.pong.canvas.width, this.pong.canvas.height);
+      //this.pong.context.fillText(this.pong.playerLeft.score.toString(), this.pong.canvas.width - 100, 100);
+
+      // Draw playerRight
       this.pong.context.fillStyle = 'lightgrey';
-      this.pong.context.fillRect(0, this.pong.player.y, this.pong.player_dimensions.x, this.pong.player_dimensions.y);
-      this.pong.context.fillRect(this.pong.canvas.width - this.pong.player_dimensions.x, this.pong.opponent.y, this.pong.player_dimensions.x, this.pong.player_dimensions.y);
+      this.pong.context.fillRect(0, this.pong.playerRight.y, this.pong.playerSize.x, this.pong.playerSize.y);
+
+      // Draw playerLeft
+      this.pong.context.fillRect(this.pong.canvas.width - this.pong.playerSize.x, this.pong.playerLeft.y, this.pong.playerSize.x, this.pong.playerSize.y);
 
       // Draw ball
       this.pong.context.beginPath();
       this.pong.context.fillStyle = 'lightgrey';
       this.pong.context.arc(this.pong.ball.pos.x, this.pong.ball.pos.y, this.pong.ball.radius, 0, Math.PI * 2, false);
       this.pong.context.fill();
-
-      // Draw scores
-      this.pong.context.fillStyle = 'lightgrey';
-      this.pong.context.font = '64px Orbitron';
-      this.pong.context.textAlign = 'center';
-      this.pong.context.fillText(this.pong.player.score.toString(), 100, 100);
-      this.pong.context.fillText(this.pong.opponent.score.toString(), this.pong.canvas.width - 100, 100);
     },
     playerMove(e: Event) {
+      if (this.state != State.PLAY)
+        return;
+      const playerToMove = this.pong.isLeftSide ? this.pong.playerRight : this.pong.playerLeft; // TODO: ?? why is this reverted ?!
       if (e.type == 'mousemove') {
         let rect = this.pong.canvas.getBoundingClientRect();
         let mouseLocation = ((e as MouseEvent).clientY - rect.top) / (rect.bottom - rect.top) * this.pong.canvas.height;
-        if (mouseLocation > this.pong.canvas.height - this.pong.player_dimensions.y / 2) {
-            this.pong.player.y = this.pong.canvas.height - this.pong.player_dimensions.y;
+        if (mouseLocation > this.pong.canvas.height - this.pong.playerSize.y / 2) {
+          playerToMove.y = this.pong.canvas.height - this.pong.playerSize.y;
         } else {
-            this.pong.player.y = mouseLocation - this.pong.player_dimensions.y / 2;
+          playerToMove.y = mouseLocation - this.pong.playerSize.y / 2;
         }
       } else if (e.type == 'keydown') {
-      if ((e as KeyboardEvent).key == 'w') {
-        if (this.pong.player.y > 0) {
-          this.pong.player.y -= 10;
-        }
+        if ((e as KeyboardEvent).key == 'w') {
+          if (playerToMove.y > 0) {
+            playerToMove.y -= 10;
+          }
         } else if ((e as KeyboardEvent).key == 's') {
-          if (this.pong.player.y < this.pong.canvas.height - this.pong.player_dimensions.y) {
-            this.pong.player.y += 10;
+          if (playerToMove.y < this.pong.canvas.height - this.pong.playerSize.y) {
+            playerToMove.y += 10;
           }
         }
       }
-      this.socket.emit('playerMove', this.pong.player.y);
+      this.draw();
+      this.socket.emit('playerMove', {x: playerToMove.y, y: this.pong.canvas.height} );
     },
+    /*
     ballMove() {
       // Rebounds on top and bottom
       if (this.pong.ball.pos.y > this.pong.canvas.height || this.pong.ball.pos.y < 0)
         this.pong.ball.speed.y *= -1;
-
       // Update ball pos
       this.pong.ball.pos.x += this.pong.ball.speed.x;
       this.pong.ball.pos.y += this.pong.ball.speed.y;
-
       // Check collisions with players
-      if (this.pong.ball.pos.x > this.pong.canvas.width - this.pong.player_dimensions.x) {
-        this.collide(this.pong.opponent.y);
-      } else if (this.pong.ball.pos.x < this.pong.player_dimensions.x) {
-        this.collide(this.pong.player.y);
+      if (this.pong.ball.pos.x > this.pong.canvas.width - this.pong.playerSize.x) {
+        this.collide(this.pong.playerLeft.y);
+      } else if (this.pong.ball.pos.x < this.pong.playerSize.x) {
+        this.collide(this.pong.playerRight.y);
       }
+      this.draw();
     },
     collide(y: number) {
-      // The player does not hit the ball
-      if (this.pong.ball.pos.y < y || this.pong.ball.pos.y > y + this.pong.player_dimensions.y) {
+      // The playerRight does not hit the ball
+      if (this.pong.ball.pos.y < y || this.pong.ball.pos.y > y + this.pong.playerSize.y) {
         // Increment scores
         if (this.pong.ball.pos.x < this.pong.canvas.width / 2) {
-          this.pong.opponent.score += 1;
+          this.pong.playerLeft.score += 1;
         } else if (this.pong.ball.pos.x >= this.pong.canvas.width / 2) {
-          this.pong.player.score += 1;
+          this.pong.playerRight.score += 1;
         }
 
         // Reset ball pos
@@ -171,8 +229,8 @@ export default defineComponent({
         this.pong.ball.pos.y = this.pong.canvas.height / 2;
 
         // Reset players pos
-        this.pong.player.y = this.pong.canvas.height / 2 - this.pong.player_dimensions.y / 2;
-        this.pong.opponent.y = this.pong.canvas.height / 2 - this.pong.player_dimensions.y / 2;
+        this.pong.playerRight.y = this.pong.canvas.height / 2 - this.pong.playerSize.y / 2;
+        this.pong.playerLeft.y = this.pong.canvas.height / 2 - this.pong.playerSize.y / 2;
 
         // Reset speed
         this.pong.ball.speed.x = 2;
@@ -186,8 +244,8 @@ export default defineComponent({
         }
 
         // 
-        let impact = this.pong.ball.pos.y - y - this.pong.player_dimensions.y / 2;
-        let ratio = 100 / (this.pong.player_dimensions.y / 2);
+        let impact = this.pong.ball.pos.y - y - this.pong.playerSize.y / 2;
+        let ratio = 100 / (this.pong.playerSize.y / 2);
         this.pong.ball.speed.y = Math.round(impact * ratio / 20);
         if (this.pong.ball.speed.y > this.pong.ball.max_speed) {
           this.pong.ball.speed.y = this.pong.ball.max_speed;
@@ -196,85 +254,48 @@ export default defineComponent({
         }
       }
     },
+    */
     play() {
       this.draw();
-      this.ballMove();
-      setTimeout(() => {
-        if (this.state == State.PLAY) {
-          requestAnimationFrame(this.play);
-        }
-      }, 1000 / this.pong.fps);
+      requestAnimationFrame(this.play);
     },
+    async resizeCanvas() {
+      await this.$nextTick();
+      if ((this.$refs.board as HTMLDivElement).offsetWidth * 0.66 <= (this.$refs.board as HTMLDivElement).offsetHeight) {
+        this.width = (this.$refs.board as HTMLDivElement).offsetWidth * 0.98;
+        this.height = (this.$refs.board as HTMLDivElement).offsetWidth * 0.66 * 0.98;
+      } else if ((this.$refs.board as HTMLDivElement).offsetHeight * 1.33 <= (this.$refs.board as HTMLDivElement).offsetWidth) {
+        this.height = (this.$refs.board as HTMLDivElement).offsetHeight * 0.98;
+        this.width = (this.$refs.board as HTMLDivElement).offsetHeight * 1.33 * 0.98;
+      }
+      await this.$nextTick();
+      this.pong.playerSize.x = this.pong.canvas.width / 100;
+      this.pong.playerSize.y = this.pong.canvas.height / 3.3;
+      await this.$nextTick();
+      this.draw();
+    }
   },
-  mounted() {
-    if (this.socket.connected == false)
-      this.socket = io('http://localhost:3000/play', { withCredentials: true });
-
-    this.socket.on('start', (ballSpeed: PointI) => {
-      console.log('game starting ' , ballSpeed);
-      this.pong.ball.speed = ballSpeed;
-      this.state = State.PLAY;
-      this.play();
-    });
-
-    this.socket.on('pause', () => {
-      this.state = State.PLAY;
-      this.pause();
-    });
-
-    this.socket.on('opponentMove', (y: number) => {
-      //console.log('opponentMoved to ' + y);
-      this.pong.opponent.y = y;
-    });
-
+  async mounted() {
     this.initPong();
+    window.addEventListener("resize", this.resizeCanvas);
+    await this.resizeCanvas();
     this.start();
   }
 });
 </script>
 
 <style lang="scss" scoped>
+.container {
+  width: 100%;
+}
+
+.board {
+  width: 100%;
+  height: 100vh;
+}
+
 #canvas {
-  margin-left: 250px;
   font-family: 'Orbitron', sans-serif;
   font-weight: 900;
 }
 </style>
-
-<!--
-  //methods: {
-  //    move(e: Element) {
-  //        if (e.type == 'mousemove') {
-  //            let rect = this.canvas.getBoundingClientRect();
-  //            let mouseLocation = (e.clientY - rect.top) / (rect.bottom - rect.top) * this.canvas.height;
-  //            if (mouseLocation > this.canvas.height - this.player_height / 2) {
-  //                this.player.pos = this.canvas.height - this.player_height;
-  //            } else {
-  //                this.player.pos = mouseLocation - this.player_height / 2;
-  //            }
-  //        }
-  //        if (e.type == 'keydown') {
-  //            // Player 1
-  //            if (e.key == 'w') {
-  //                if (this.player.pos > 0) {
-  //                    this.player.pos -= 10;
-  //                }
-  //            } else if (e.key == 's') {
-  //                if (this.player.pos < this.canvas.height - this.player_height) {
-  //                    this.player.pos += 10;
-  //                }
-  //            }
-  //            // Player 2
-  //            if (e.key == 'ArrowUp') {
-  //                if (this.opponent.pos > 0) {
-  //                    this.opponent.pos -= 10;
-  //                }
-  //            } else if (e.key == 'ArrowDown') {
-  //                if (this.opponent.pos < this.canvas.height - this.player_height) {
-  //                    this.opponent.pos += 10;
-  //                }
-  //            }
-  //        }
-  //    },
-  //},
--->

@@ -3,11 +3,11 @@ import PlayerI from './player.interface'
 import BallI from './ball.interface'
 
 export default interface PongI {
-	canvas: HTMLCanvasElement;
-	context: CanvasRenderingContext2D;
-	player_dimensions: PointI;
-	player: PlayerI;
-	opponent: PlayerI;
-	ball: BallI;
-  fps: number;
+  canvas: HTMLCanvasElement;
+  context: CanvasRenderingContext2D;
+  playerSize: PointI;
+  playerRight: PlayerI;
+  playerLeft: PlayerI;
+  ball: BallI;
+  isLeftSide: boolean;
 }

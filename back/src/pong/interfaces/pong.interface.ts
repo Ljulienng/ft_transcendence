@@ -20,17 +20,24 @@ export interface Player {
   y: number;
   score: number;
   state: PlayerState;
+  canvas: HTMLCanvasElement;
 }
 
 export interface Ball {
   pos: Point;
+  radius: number;
+  speed: Point;
+  maxSpeed: number;
 }
 
 export interface Pong {
-  server: Server
-  player1: Player;
-  player2: Player;
-  ball: Ball;
+  server: Server;
   state: PongState;
+  fps: number;
+  playerSize: Point;
+  playerLeft: Player;
+  playerRight: Player;
+  ball: Ball;
+  boardSize: Point;
 }
 

@@ -12,7 +12,6 @@ import Test from '@/views/Test.vue'
 // import http from '../http-common'
 import Chat from '@/views/Chat.vue'
 
-
 const routes = [
 	// {
 	// 	name: 'Base',
@@ -33,6 +32,7 @@ const routes = [
 	{
 		name: 'Home',
 		path: '/home',
+		alias: ['/'],
 		component: Home,
 		meta: {requiredAuth: true}
 	},
