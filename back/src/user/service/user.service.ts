@@ -166,7 +166,7 @@ export class UserService {
 
 		const tmp = user.friends.find(el => el === String(friend.id))
 
-		if (this.checkIfBlocked(user, friend.id))
+		if (await this.checkIfBlocked(user, friend.id))
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user you are trying to add is blocked.')
 		if (tmp) {
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user is already in your friendlist.')
@@ -177,8 +177,17 @@ export class UserService {
 		await this.userRepository.save(user);
 	}
 
-	async deleteFriend(user: User, friendToDelete: any) {
-		const friend = await this.userRepository.findOne({username: friendToDelete.username});
+	async checkIfFriend(user: User, userId: string) {
+		const tmp = await user.friends.find((friend) => friend === userId)
+
+		if (tmp)
+			return true;
+		else
+			return false
+	}
+
+	async deleteFriend(user: User, friendToDelete: string) {
+		const friend = await this.userRepository.findOne({username: friendToDelete});
 
 		if (!friend) {
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
@@ -329,7 +338,12 @@ export class UserService {
 		if (user.blocked === null)
 			user.blocked = [];
 
-		if (this.checkIfBlocked(user, userId))
+		if (this.checkIfFriend(user, String(userId))){
+			
+			
+		}
+
+		if (await this.checkIfBlocked(user, userId))
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user is already blocked.');
 		else
 			user.blocked.push(String(userId));
@@ -350,9 +364,14 @@ export class UserService {
 	}
 
 	async checkIfBlocked(user: User, userId: number) {
+		if (user.blocked === null)
+			user.blocked = [];
 		const tmp = await user.blocked.find(el => el === String(userId));
-		if (tmp)
+		if (tmp) {
+			console.log("tmp = ", tmp)
+			
 			return true;
+		}
 		else
 			return false
 	}

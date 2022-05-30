@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, getCurrentScope } from "@vue/runtime-core";
+import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 import store from "../../store";
 

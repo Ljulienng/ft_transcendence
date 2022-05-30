@@ -24,6 +24,7 @@
           {{ friend.username }} ({{ friend.firstname }}, {{ friend.lastname }})
           is {{ friend.status }} {{ this.userStatus }}
           <button v-on:click="deleteFriend(friend.username)">DELETE</button>
+          <button v-on:click="blockUser(friend.id)">BLOCK</button>
         </li>
       </ul>
     </div>
@@ -105,8 +106,8 @@ export default defineComponent({
       }, sec * 1000);
     },
 
-    blockuser(userToBlock: number) {
-      this.socket.emit("blockUser", this.userToBlock);
+    async blockuser(userToBlock: number) {
+      this.socket.emit("blockUser", userToBlock);
     },
   },
 

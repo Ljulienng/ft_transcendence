@@ -115,7 +115,7 @@ export class UserController {
 			// console.log("friend to delete= " ,friendToDelete)
 			const user = req.user;
 			
-			await this.userService.deleteFriend(user, friendToDelete);
+			await this.userService.deleteFriend(user, friendToDelete.username);
 
 		} catch (e) {
 			throw e
