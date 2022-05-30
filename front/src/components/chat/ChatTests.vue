@@ -256,17 +256,6 @@ export default defineComponent({
       try {
         const response = await http.get("/channel");
         this.channelList = response.data;
-        // this.joinedChannelList.forEach(joinedChannel => {
-        //     this.channelList.forEach(channel => {
-
-        //       if (channel.id === joinedChannel.id) {
-        //         const index = this.channelList.indexOf(channel);
-        //         this.channelList.splice(index, 1)
-        //       }
-        //     })
-        // })
-        // if (this.channelList[0].id === this.joinedChannelList[0].id)
-        //   console.log("testeeee")
       } catch (error) {
         console.log(error);
       }
@@ -330,11 +319,6 @@ export default defineComponent({
       // this.getChannelList();
       this.channelId = 0;
     },
-
-    // sendMessage() {
-    //     console.log('sendMessage - on channelId ', this.message.channelId, this.message.content);
-    //     this.socket.emit('sendMessageToServer', this.message);
-    // },
 
     joinChannel(channelId: number, channelType: string) {
       const channelToJoin = {

@@ -157,7 +157,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         console.log('Message sent to the back in channel ', createMessageDto);
         // client.emit('messageSent', message, channelId);
         // this.server.emit('sendMessageToClient', createMessageDto.content);
-        await this.channelService.saveMessage(/*client.id*/createMessageDto.userId, createMessageDto/*.content, createMessageDto.channelId*/);
+        await this.channelService.saveMessage(createMessageDto.userId, createMessageDto);
         this.server.emit('messageSent', createMessageDto.content);
     }
 
@@ -188,7 +188,25 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this.userService.saveMessage(createMessageUserDto.senderId, createMessageUserDto);
         // this.server.emit('messageSentFromUser' + createMessageUserDto.senderId, createMessageUserDto.content);
         this.server.emit('messageSentFromUser', createMessageUserDto.content);
-
     }
+
+    /* ============= BLOCK USER ============*/
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('blockUser') 
+    async blockUser(client: Socket, userId: number) {
+        const user :User = await this.socketList.find(socket => socket.socketId === client.id).user;
+        
+        await this.userService.blockUser(user, userId);
+        this.server.emit('updateBlocked/' + user.id);
+    }
+
+    // @UseGuards(SocketGuard)
+    // @SubscribeMessage('blockUser') 
+    // async blockUser(client: Socket, userId: number) {
+    //     const user :User = await this.socketList.find(socket => socket.socketId === client.id).user;
+        
+    //     await this.userService.blockUser(user, userId);
+    // }
 
 }

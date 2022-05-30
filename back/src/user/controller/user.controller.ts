@@ -94,6 +94,8 @@ export class UserController {
 		}
 	}
 
+	// =========== FRIENDS =============
+
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Post('/addfriend')
 	async addFriend(@Req() req, @Body() friendToAdd) {
@@ -119,6 +121,8 @@ export class UserController {
 			throw e
 		}
 	}
+
+	// =========== USER PROFILE  =============
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Post('/setusername')
@@ -177,12 +181,26 @@ export class UserController {
 		try {
 			const user = req.user;
 			const friend = await this.userService.findByUsername(friendUsername);
-			console.log("friend = ", friend)
 			const messages = await this.userService.getMessage(user.id, friend.id)
 
 			return messages;
 		} catch(e) {
 			console.log("/message/:friendUsername", e)
 		}
+	}
+
+	// =========== BLOCK PART =============
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get("/getblocked")
+	async getBlockedList(@Req() req) {
+		try {
+			const user = req.user;
+
+			return this.userService.getBlockedUser(user);
+		} catch(e) {
+			console.log(e);
+		}
+
 	}
 }

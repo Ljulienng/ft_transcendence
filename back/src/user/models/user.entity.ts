@@ -61,6 +61,9 @@ export class User {
 	@Column("simple-array", {nullable: true})
 	friends: string[];
 
+	@Column("simple-array", {nullable: true})
+	blocked: string[];
+
 	@Column({default: 'Offline'})
 	status: string;
 
