@@ -7,8 +7,9 @@
 	/> -->
     <Sidebar />
     <router-view />
-    <MyModal />
-    <div id="my-modals" />
+    <!-- <teleport :to="someVar" v-if="someVar"> -->
+    <div id="my-modals"/>
+      <!-- <MyModal /> -->
   </div>
 </template>
 
@@ -39,11 +40,6 @@ export default defineComponent({
       if (userProfile.id === 0) router.push("http://localhost:3001/authmodal");
       const userId = store.getters["auth/getUserProfile"].id;
 
-      // console.log('userId = ', userId);
-      // const userSocket = store.getters['auth/getUserSocket'].id
-
-      // if (!userSocket)
-      // 	store.dispatch('auth/setUserSocket')
       if (userId) await store.dispatch("auth/setUserStatus", "Online");
     },
 
@@ -61,28 +57,25 @@ export default defineComponent({
           console.log(err);
         });
     },
-    // show(group, type = "") {
-    //   const text = `
-    // 		This is notification text!
-    // 		<br>
-    // 		Date: ${new Date()}
-    // 	`;
-    //   this.$notify({
-    //     group,
-    //     title: `Test ${type} notification #${this.id++}`,
-    //     text,
-    //     type,
-    //     data: {
-    //       randomNumber: Math.random(),
-    //     },
-    //   });
-    // },
+  },
+
+  async beforeCreate() {
+    let userProfile = store.getters["auth/getUserProfile"];
+
+    if (userProfile.id === 0) {
+      await store.dispatch("auth/userProfile");
+      userProfile = store.getters["auth/getUserProfile"];
+      console.log("userprofile beforecreate = ", userProfile.id);
+    }
+
+    if (userProfile.id === 0) router.push("http://localhost:3001/authmodal");
+    const userId = store.getters["auth/getUserProfile"].id;
+
+    if (userId) await store.dispatch("auth/setUserStatus", "Online");
   },
 
   created() {
-    console.log("heho");
     window.addEventListener("beforeunload", this.setOffline);
-    this.checkUserstatus();
   },
 });
 </script>

@@ -48,7 +48,20 @@ const routes = [
 	{
 		name: 'AuthModal',
 		path: '/authmodal',
-		component: AuthModal
+		component: AuthModal,
+		beforeEnter: async () => {
+			let userProfile = store.getters["auth/getUserProfile"];
+
+			if (userProfile.id === 0) {
+				await store.dispatch("auth/userProfile");
+				userProfile = store.getters["auth/getUserProfile"];
+				console.log("userprofile beforecreate = ", userProfile.id);
+			}
+		
+			console.log("userprofile beforeEnter = ", userProfile.id)
+			if (userProfile.id !== 0) router.push("http://localhost:3001/");
+			return true
+		}
 	},
 	{
 		name: 'TwoFA',
@@ -113,21 +126,5 @@ router.beforeEach(async (to, from, next) => {
 	}
 	return next();
 });
-
-// router.beforeEach(async (to, from, next) => {
-// 	if (to.) {
-// 	let userProfile = store.getters["auth/getUserProfile"];
-// 		if (userProfile.id === 0) {
-// 			await store.dispatch("auth/userProfile");
-// 			userProfile = store.getters["auth/getUserProfile"];
-// 			if (userProfile.id === 0) {
-// 				return next({ path: "/authmodal" });
-// 			} else {
-// 				return next();
-// 			}
-// 		}
-// 	}
-// 	return next();
-// });
 
 export default router;

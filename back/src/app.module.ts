@@ -12,17 +12,19 @@ import { ChannelModule } from './channel/channel.module';
 import { MessageModule } from './message/message.module';
 import { ChatModule } from './chat/chat.module';
 import { ChannelMemberModule } from './channelMember/channelMember.module';
+import { MessageUserModule } from './messageUser/messageUser.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal: true}),
     TypeOrmModule.forRoot({ // for PostGres 
       type: 'postgres',
-      // url: process.env.DATABASE_URL,
-      url: "postgres://user:password@localhost:5432/db",
+      url: process.env.DATABASE_URL,
+      // url: "postgres://user:password@localhost:5432/db",
       autoLoadEntities: true,
       synchronize: true // false for production, with true typeOrm creates tables every time we run the app
     }),
+    MessageUserModule,
     UserModule,
     AuthModule,
     MessageModule,

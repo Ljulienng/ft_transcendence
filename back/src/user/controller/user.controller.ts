@@ -156,14 +156,32 @@ export class UserController {
 			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + 'default/default.jpg')))
 	}
 
-	// @UseGuards(JwtAuthGuard, TwoFAAuth)
-	// @Get('/status/:username')
-	// async getUserStatus(@Param('username') username: string): Promise<string> {
-	//   // let user: User;
-	// 	const user = await this.userService.findOne({username: username});
-	// 	// console.log("status user = ", user);
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get('/status')
+	async getUserStatus(@Req() req): Promise<string> {
+		try {
+			const user = await this.userService.findOne({username: req.user.username});
 
-	// 	return user.status
-	// }
-  
+			return user.status
+		} catch(e) {
+			console.log(e);
+		}
+
+	}
+
+	// =========== PRIVATE CHAT PART =============
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get("/message/:friendUsername")
+	async getMessages(@Param('friendUsername') friendUsername: string, @Req() req) {
+		try {
+			const user = req.user;
+			const friend = await this.userService.findByUsername(friendUsername);
+			const messages = await this.userService.getMessage(user.id, friend.id)
+
+			return messages;
+		} catch(e) {
+			console.log(e)
+		}
+	}
 }

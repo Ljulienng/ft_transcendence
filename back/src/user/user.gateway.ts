@@ -11,7 +11,7 @@ import {
 import { UserService } from "./service/user.service";
 import { Channel } from "src/channel/models/channel.entity"
 import { CreateMessageDto } from "src/message/models/message.dto";
-
+import { CreateMessageUserDto } from "src/messageUser/models/messageUser.dto";
 import { JoinChannelDto } from "src/channel/models/channel.dto";
 import { SocketUserI } from "src/chat/chat.gateway";
 import { ChannelService } from "src/channel/service/channel.service";
@@ -88,7 +88,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 
 
-	/* ============= CHAT PART ============*/
+	/* ============= CHANNELcc CHAT PART ============*/
 
 	@UseGuards(SocketGuard)
     @SubscribeMessage('getChannelMsg')
@@ -96,9 +96,10 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const channel = await this.channelService.findChannelById(channelId);
         const messages = await this.channelService.findChannelMessagesByChannelName(channel.name)
 
-        // console.log('MESSAGE = ', messages)
+        const index = await this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
+        console.log(this.socketList[index].user.username ,'wants the msgs');
 
-        this.server.to(client.id).emit('getChannelMessages', messages)
+        this.server.emit('getChannelMessages' + this.socketList[index].user.id, messages)
     }
 
     @UseGuards(SocketGuard)
@@ -109,7 +110,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         
         const room = await this.channelService.findChannelById(joinChannel.id);
         client.join(room.name);
-        this.server.to(room.name).emit('channelJoined', "Hello you join the channe");
+        console.log("Channel user = ", await this.channelService.findMembers(room.id))
+        this.server.to(room.name).emit('channelJoined', "Hello you join the channel");
         const messages = await this.channelService.findChannelMessagesByChannelName(room.name);
         this.server.to(client.id).emit('channelMessages', messages); 
     } 
@@ -131,9 +133,11 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         console.log('Message sent to the back in channel ', createMessageDto);
         // client.emit('messageSent', message, channelId);
         this.server.emit('sendMessageToClient', createMessageDto.content);
-        this.server.emit('messageSent', createMessageDto.content);
         await this.channelService.saveMessage(/*client.id*/createMessageDto.userId, createMessageDto/*.content, createMessageDto.channelId*/);
+        this.server.emit('messageSent', createMessageDto.content);
     }
+
+    /* ============= USER CHAT PART ============*/
 
 
 }
