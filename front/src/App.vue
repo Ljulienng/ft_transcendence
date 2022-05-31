@@ -90,6 +90,7 @@ export default defineComponent({
 <script></script>
 
 <style lang="scss">
+
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 
 :root {
@@ -109,9 +110,11 @@ export default defineComponent({
   font-family: "Fira sans", sans-serif;
 }
 body {
+  background-color: var(--dark);
   background-image: url("~@/assets/background.jpg");
   background-repeat: no-repeat;
   background-size: cover;
+  height: 100vh
 }
 button {
   cursor: pointer;
@@ -130,5 +133,8 @@ button {
       padding-left: 6rem;
     }
   }
+
+$primary: #fff774;
+@import "bootstrap";
 }
 </style>

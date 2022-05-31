@@ -1,14 +1,18 @@
 <template>
 
-	<div id="friend">
+	<!-- <div id="friend"> -->
+	<div id="friend" class="pl-6" style="padding-right: 20px;">
 
 		<!-- Button trigger modal -->
-		<button type="button" 
-				class="btn btn-primary mb-1 mt-4" 
-				data-bs-toggle="modal" 
-				data-bs-target="#addFriendModal">
-			add friend...
-		</button>
+		<div class="d-flex align-items-center mt-4">
+			<h3>friends</h3>
+			<button type="button" 
+					class="btn" 
+					data-bs-toggle="modal" 
+					data-bs-target="#addFriendModal">
+				<i style="color: #fff774" class="material-icons">person_add</i>
+			</button>
+		</div>
 
 		<!-- Modal -->
 		<div class="modal fade" id="addFriendModal" tabindex="-1" aria-labelledby="addFriendModalLabel" aria-hidden="true">
@@ -19,11 +23,11 @@
 					<button id="closeModalButton" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<div class="row justify-content-center">
-						<div class="col-lg-6">
-							<form class="needs-validation" novalidate v-on:submit.prevent="addFriend">
+					<form class="needs-validation" novalidate v-on:submit.prevent="addFriend">
+						<div class="row align-items-center justify-content-between">
+							<div class="col">
 								<div class="position-relative">
-									<label for="id" class="form-label">friend username </label>
+									<!-- <label for="id" class="form-label">friend username </label> -->
 									<input
 										id="id"
 										class="form-control"
@@ -33,46 +37,50 @@
 										placeholder="Username..."
 										required
 									>
-									<div class="valid-tooltip" v-if="errorMsg === ''">
-										Looks good!
-									</div>
-								</div>
-								<div class="valid-feedback" v-if="errorMsg === ''">
-									Friend added!
 								</div>
 								<div id="validationServerUsernameFeedback" class="invalid-feedback" v-if="errorMsg !== ''" style="color: red">
 									{{errorMsg}}
 								</div>
-
 								<div id="idHelp" class="form-text" v-if="errorMsg !== ''" style="color: red">{{errorMsg}}</div>
-								
+							</div>
+							<div class="col-auto">
 								<div class="mb-4 mt-4 text-center">
-									<button
-										type="submit"
-										class="btn btn-primary"
-										value="ADD"
-										>Send friend request</button>
+									<button type="submit">
+										<i style="color: #fff774" class="material-icons">send</i>
+									</button>
 								</div>
-							</form>
+							</div>
 						</div>
-					</div>
+					</form>
 				</div>
 			</div>
 		</div>
 		</div>
 
-		<div class="container-xl">
-			<ul class="list-group mb-4 mt-4">
-				<li v-for="friend in friendList" :key="friend" class="list-group-item  d-flex justify-content-between">
-					{{friend.username}} ({{friend.firstname}}, {{friend.lastname}}) is {{friend.status}} {{this.userStatus}}
+		<div class="container-fluid widebox">
+			<ul class="list-group mb-2 mt-2">
+				<li class="list-group-item bg-transparent border-0 text-grey d-flex justify-content-between">
+					<div class="col">username</div>
+					<div class="col align-middle">firstname</div>
+					<div class="col align-middle">lastname</div>
+					<div class="col align-middle">status</div>
+					<p class="invisible">del</p>
+				</li>
+				<li v-for="friend in friendList" :key="friend" class="list-group-item bg-transparent border-0 text-white d-flex justify-content-between">
+					<div class="col">{{friend.username}}</div>
+					<div class="col align-middle">{{friend.firstname}}</div>
+					<div class="col align-middle">{{friend.lastname}}</div>
+					<div class="col align-middle">{{friend.status}}</div>
 					<button v-on:click="deleteFriend(friend.username)">
-						<span class="badge bg-primary rounded-pill">X</span>
+						<span class="material-icons">person_remove</span>
+						<!-- <span class="badge bg-primary rounded-pill">X</span> -->
 					</button>
 				</li>
 			</ul>
 		</div>
 
 	</div>
+
 </template>
 
 <script lang="ts">
@@ -108,7 +116,7 @@ export default defineComponent({
 				response => { console.log("/users/addfriend success", response);
 					this.getFriendList();
 					this.errorMsg = "";
-					(document.getElementById("closeModalButton")as any).click();
+					(document.getElementById("closeModalButton") as any).click();
 				}
 			)
 			.catch(
