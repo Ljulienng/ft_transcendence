@@ -11,12 +11,15 @@ import {
 import { UserService } from "./service/user.service";
 import { Channel } from "src/channel/models/channel.entity"
 import { CreateMessageDto } from "src/message/models/message.dto";
-
+import { CreateMessageUserDto } from "src/messageUser/models/messageUser.dto";
 import { JoinChannelDto } from "src/channel/models/channel.dto";
 import { SocketUserI } from "src/chat/chat.gateway";
 import { ChannelService } from "src/channel/service/channel.service";
 import { SocketGuard } from "src/auth/guards/socket.guard";
 import { UseGuards } from "@nestjs/common";
+import { CreateChannelDto } from "src/channel/models/channel.dto";
+import { Observable } from 'rxjs'
+import { User } from "./models/user.entity";
 
 
 
@@ -76,6 +79,11 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 		console.log('user:', user.username, 'is connected');
 		this.userService.setStatus(user, 'Online');
+        this.socketList.forEach(async (socket) => {
+            if(await this.userService.checkIfFriend(user, String(socket.user.id)))                
+                this.server.to(socket.socketId).emit("friendConnected");
+        })
+        
 	}
 
 	@SubscribeMessage('disconnectUser')
@@ -84,11 +92,15 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 		console.log('user:', user.username, 'is disconnected');
 		this.userService.setStatus(user, "Offline");
+        this.socketList.forEach(async (socket) => {
+            if(await this.userService.checkIfFriend(user, String(socket.user.id)))                
+                this.server.to(socket.socketId).emit("friendDisconnected");
+        })
 	}
 
 
 
-	/* ============= CHAT PART ============*/
+	/* ============= CHANNEL CHAT PART ============*/
 
 	@UseGuards(SocketGuard)
     @SubscribeMessage('getChannelMsg')
@@ -96,20 +108,43 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const channel = await this.channelService.findChannelById(channelId);
         const messages = await this.channelService.findChannelMessagesByChannelName(channel.name)
 
-        // console.log('MESSAGE = ', messages)
+        const index = await this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
+        console.log(this.socketList[index].user.username ,'wants the msgs');
 
-        this.server.to(client.id).emit('getChannelMessages', messages)
+        this.server.emit('getChannelMessages' + this.socketList[index].user.id, messages)
+    }
+
+	@UseGuards(SocketGuard)
+    @SubscribeMessage('createChannel')
+    async createChannel(client: Socket, createChannel: CreateChannelDto) {
+        const user = await this.socketList.find(socket => socket.socketId === client.id).user
+
+        await this.channelService.createChannel(createChannel, user.id);
+        this.server.emit("updateChannel", await this.channelService.findAll());
+        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
+    }
+
+	@UseGuards(SocketGuard)
+    @SubscribeMessage('deleteChannel')
+    async deleteChannel(client: Socket, channelId: number) {
+        const user = await this.socketList.find(socket => socket.socketId === client.id).user
+
+        await this.channelService.deleteChannel(user.id, channelId);
+        this.server.emit("updateChannel", await this.channelService.findAll());
+        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
     }
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('joinChannel')
     async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
-        const userId = await this.socketList.find(socket => socket.socketId === client.id).user.id
-        await this.channelService.addUserToChannel(joinChannel, userId);
+        const user = await this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.addUserToChannel(joinChannel, user.id);
         
         const room = await this.channelService.findChannelById(joinChannel.id);
         client.join(room.name);
-        this.server.to(room.name).emit('channelJoined', "Hello you join the channe");
+        console.log("Channel user = ", await this.channelService.findMembers(room.id))
+        this.server.to(room.name).emit('channelJoined', "Hello you join the channel");
+        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
         const messages = await this.channelService.findChannelMessagesByChannelName(room.name);
         this.server.to(client.id).emit('channelMessages', messages); 
     } 
@@ -130,10 +165,65 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async sendMessage(client: Socket, createMessageDto: CreateMessageDto /*message: string, channelId: number*/) {
         console.log('Message sent to the back in channel ', createMessageDto);
         // client.emit('messageSent', message, channelId);
-        this.server.emit('sendMessageToClient', createMessageDto.content);
+        // this.server.emit('sendMessageToClient', createMessageDto.content);
+        await this.channelService.saveMessage(createMessageDto.userId, createMessageDto);
         this.server.emit('messageSent', createMessageDto.content);
-        await this.channelService.saveMessage(/*client.id*/createMessageDto.userId, createMessageDto/*.content, createMessageDto.channelId*/);
     }
 
+    /* ============= USER CHAT PART ============*/
+
+	@UseGuards(SocketGuard)
+    @SubscribeMessage('getUserMsg')
+    async getUserMsg(client: Socket, userId: number) {
+        const sender :User = await this.socketList.find(socket => socket.socketId === client.id).user
+        console.log("getUserMsg = ", userId)
+        const receiver :User = await this.userService.findOne({id: userId});
+        console.log(sender.username ,'wants the msgs from ', userId);
+        const messages = await this.userService.getMessage(sender.id, receiver.id)
+
+
+        this.server.emit('getUserMessages' + receiver.id, messages)
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('sendMessageToUser') 
+    async sendMessageUser(client: Socket, createMessageUserDto: CreateMessageUserDto) {
+        console.log('Message sent to the back in channel ', createMessageUserDto);
+        const senderSocket = await this.socketList.find(socket => socket.user.id === createMessageUserDto.receiverId)
+        console.log('senderSocket = ', senderSocket)
+        // client.emit('messageSent', message, channelId);
+        // this.server.emit('sendMessageToClient', createMessageUserDto.content);
+
+        await this.userService.saveMessage(createMessageUserDto.senderId, createMessageUserDto);
+        // this.server.emit('messageSentFromUser' + createMessageUserDto.senderId, createMessageUserDto.content);
+        this.server.emit('messageSentFromUser', createMessageUserDto.content);
+    }
+
+    /* ============= BLOCK USER ============*/
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('blockUser') 
+    async blockUser(client: Socket, userId: number) {
+        const user :User = await this.socketList.find(socket => socket.socketId === client.id).user;
+        
+        await this.userService.blockUser(user, userId);
+        this.server.emit('updateBlocked/' + user.id);
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('unblockUser') 
+    async unblockUser(client: Socket, userId: number) {
+        const user :User = await this.socketList.find(socket => socket.socketId === client.id).user;
+        
+        await this.userService.unblockUser(user, userId);
+        this.server.emit('updateBlocked/' + user.id);
+    }
+    // @UseGuards(SocketGuard)
+    // @SubscribeMessage('blockUser') 
+    // async blockUser(client: Socket, userId: number) {
+    //     const user :User = await this.socketList.find(socket => socket.socketId === client.id).user;
+        
+    //     await this.userService.blockUser(user, userId);
+    // }
 
 }

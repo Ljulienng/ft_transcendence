@@ -5,6 +5,7 @@ import { colors } from "unique-names-generator";
 import { ChannelMember } from "src/channelMember/models/channelMember.entity";
 
 export type Friend = {
+	id: number;
 	username: string;
 	firstname: string;
 	lastname: string;
@@ -59,6 +60,9 @@ export class User {
 
 	@Column("simple-array", {nullable: true})
 	friends: string[];
+
+	@Column("simple-array", {nullable: true})
+	blocked: string[];
 
 	@Column({default: 'Offline'})
 	status: string;

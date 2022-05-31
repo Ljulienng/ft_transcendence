@@ -2,8 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import store from '../store'
 import HelloWorld from '@/components/HelloWorld.vue'
 import ShowUsers from '@/components/ShowUsers.vue'
-import AuthModal from '@/components/AuthModal.vue'
-import TwoFaAuth from '@/components/TwoFaAuth.vue'
+import AuthModal from '@/components/auth/AuthModal.vue'
+import TwoFaAuth from '@/components/auth/TwoFaAuth.vue'
 import FriendList from '@/views/FriendList.vue'
 import UserProfile from '@/views/UserProfile.vue'
 import Home from '@/views/Home.vue'
@@ -48,7 +48,20 @@ const routes = [
 	{
 		name: 'AuthModal',
 		path: '/authmodal',
-		component: AuthModal
+		component: AuthModal,
+		beforeEnter: async () => {
+			let userProfile = store.getters["auth/getUserProfile"];
+
+			if (userProfile.id === 0) {
+				await store.dispatch("auth/userProfile");
+				userProfile = store.getters["auth/getUserProfile"];
+				console.log("userprofile beforecreate = ", userProfile.id);
+			}
+		
+			console.log("userprofile beforeEnter = ", userProfile.id)
+			if (userProfile.id !== 0) router.push("http://localhost:3001/");
+			return true
+		}
 	},
 	{
 		name: 'TwoFA',
@@ -73,12 +86,12 @@ const routes = [
 		component: UserProfile,
 		meta: {requiredAuth: true}
 	},
-	{
-		name: 'Chat',
-		path: '/chat',
-		component: Chat,
-		meta: {requiredAuth: false}
-	}
+	// {
+	// 	name: 'Chat',
+	// 	path: '/chat',
+	// 	component: Chat,
+	// 	meta: {requiredAuth: false}
+	// }
 ];
 
 const router = createRouter({
@@ -119,21 +132,5 @@ router.beforeEach(async (to, from, next) => {
 	}
 	return next();
 });
-
-// router.beforeEach(async (to, from, next) => {
-// 	if (to.) {
-// 	let userProfile = store.getters["auth/getUserProfile"];
-// 		if (userProfile.id === 0) {
-// 			await store.dispatch("auth/userProfile");
-// 			userProfile = store.getters["auth/getUserProfile"];
-// 			if (userProfile.id === 0) {
-// 				return next({ path: "/authmodal" });
-// 			} else {
-// 				return next();
-// 			}
-// 		}
-// 	}
-// 	return next();
-// });
 
 export default router;

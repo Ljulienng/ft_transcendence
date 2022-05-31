@@ -4,3 +4,10 @@ export default interface MessageI {
 	content: string;
 	channelId: number;
 }
+
+export default interface MessageUserI {
+	senderId: number;
+	sender: string;
+	receiverId: number;
+	content: string;
+}
