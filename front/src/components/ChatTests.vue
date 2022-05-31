@@ -50,11 +50,6 @@
     </div>
     <br />
 
-    <!-- <div class="channelTabs">
-                <button @click="showChannel(channel.id)">show channel </button>
-                <button @click="showChannel(channel.id)">show channel</button>
-
-        </div> -->
     <div class="channelList">
       <h3>Channel list</h3>
       <ul>
@@ -191,11 +186,6 @@ export default defineComponent({
       this.getChannelList();
       this.channelId = 0;
     },
-
-    // sendMessage() {
-    //     console.log('sendMessage - on channelId ', this.message.channelId, this.message.content);
-    //     this.socket.emit('sendMessageToServer', this.message);
-    // },
 
     joinChannel(channelId: number, channelType: string) {
       const channelToJoin = {
