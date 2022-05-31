@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, OneToMany, ManyToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, ManyToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable, JoinColumn } from "typeorm";
 import { User } from "src/user/models/user.entity";
 import { Channel } from "src/channel/models/channel.entity";
 
@@ -7,6 +7,12 @@ export class ChannelMember {
 
 	@PrimaryGeneratedColumn() 
 	readonly id: number;
+
+    @Column({nullable: false})
+    channelId: number
+
+    @Column({ default: false })
+	owner: boolean;
 
     @Column({ default: false })
 	admin: boolean;
@@ -23,7 +29,7 @@ export class ChannelMember {
 	@CreateDateColumn({ nullable: true, default: null })
 	bannedEnd: Date;
 
-	@ManyToOne(() => User, member => member.id, {
+	@ManyToOne(() => User, user => user.id, {
         eager: true,
         onDelete: 'CASCADE',
     })

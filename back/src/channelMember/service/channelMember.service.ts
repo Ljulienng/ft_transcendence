@@ -13,25 +13,58 @@ export class ChannelMemberService {
         private channelMemberRepository: Repository<ChannelMember>,
     ) {}
    
-    async findOne(user: User, channel: Channel) {
+    async findOne(user: User, channel: Channel): Promise<ChannelMember> {
         return await this.channelMemberRepository.findOne({
-            user: user,
-            channel: channel,
+            where: {
+                user: user,
+                channel: channel,
+            },
         })
     }
 
-    async findChannelMembers(channel: Channel) {
+    async findMembers(channel: Channel) {
         return await this.channelMemberRepository.find({
-            channel: channel,
+            where: {
+                channel: channel,
+            },
         })
     }
 
-    async createMember(user: User, channel: Channel, admin: boolean) {
+    async   findOwner(channel: Channel) {
+        return await this.channelMemberRepository.findOne({
+            where: {
+                channel: channel,
+                owner: true,
+            },
+        })
+    }
+
+    async   findAdmins(channel: Channel) {
+        return await this.channelMemberRepository.find({
+            where: {
+                channel: channel,
+                admin: true,
+            },
+        })
+    }
+
+    async findChannelsByUser(user: User) {
+        return await this.channelMemberRepository.find({
+            where: {
+                user: user,
+            }
+        })
+    }
+
+    async createMember(user: User, channel: Channel, owner: boolean, admin: boolean) {
         const newMember = this.channelMemberRepository.create({
+            channelId: channel.id,
+            owner: owner,
             admin: admin,
             user: user,
             channel: channel,
         });
+        console.log('newMember : ', newMember);
         await this.channelMemberRepository.save(newMember);
     }
 
@@ -40,14 +73,16 @@ export class ChannelMemberService {
     **      - need to be an admin
     **      - need to be the owner if you want to set a member as admin
     */
-    updateAllowed(memberWhoUpdate: ChannelMember, memberToUpdate: ChannelMember, channel: Channel, updates: UpdateMemberChannelDto): boolean {
-        if (memberWhoUpdate.admin == false) {
+    updateAllowed(member: ChannelMember, memberToUpdate: ChannelMember, channel: Channel, updates: UpdateMemberChannelDto): boolean {
+        if (!member || !memberToUpdate) {
             return false;
         }
-        if (updates.admin && channel.owner.id != memberWhoUpdate.user.id) {
+        if (member.admin == false) {
             return false;
         }
-
+        if (updates.admin && !member.owner) {
+            return false;
+        }
         return true;
     }
 
@@ -84,8 +119,8 @@ export class ChannelMemberService {
         }
     }
 
-    async deleteMember(user: User, channel: Channel) {
-        const memberToRemove = await this.findOne(user, channel);
-        await this.channelMemberRepository.delete(memberToRemove);
+    async deleteMember(userToRemove: User, channel: Channel) {
+        const memberToRemove = await this.findOne(userToRemove, channel);
+        await this.channelMemberRepository.remove(memberToRemove);
     }
 }

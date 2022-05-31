@@ -63,10 +63,10 @@ export default defineComponent({
     },
     // show(group, type = "") {
     //   const text = `
-		// 		This is notification text!
-		// 		<br>
-		// 		Date: ${new Date()}
-		// 	`;
+    // 		This is notification text!
+    // 		<br>
+    // 		Date: ${new Date()}
+    // 	`;
     //   this.$notify({
     //     group,
     //     title: `Test ${type} notification #${this.id++}`,

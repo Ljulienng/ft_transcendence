@@ -69,6 +69,19 @@ export class UserController {
 	}
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get('/ownedchannel')
+	async getOwnedChannel(@Req() req) {
+		try {
+			const user = req.user;
+
+			return await this.userService.ownedChannel(user);
+		} catch(e) {
+			throw new UnauthorizedException("Error: getJoinedChannel");
+		
+		}
+	}
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get('/joinedchannel')
 	async getJoinedChannel(@Req() req) {
 		try {
@@ -76,8 +89,8 @@ export class UserController {
 
 			return await this.userService.joinedChannel(user);
 		} catch(e) {
-			throw new UnauthorizedException("Error: getFriendList");
-
+			throw new UnauthorizedException("Error: getJoinedChannel");
+		
 		}
 	}
 

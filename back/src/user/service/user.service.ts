@@ -1,6 +1,6 @@
 import { ConsoleLogger, HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { from, Observable, of, switchMap, map, tap} from 'rxjs';
+import { from, Observable, of, switchMap, map, tap, ConnectableObservable} from 'rxjs';
 import { getConnection, Repository } from 'typeorm';
 import { UserDto } from '../models/user.dto';
 import { Student } from "src/user/dto/student.dto"
@@ -9,6 +9,8 @@ import { isNumber } from 'class-validator';
 import { names, uniqueNamesGenerator } from 'unique-names-generator';
 import { JwtService } from '@nestjs/jwt';
 import { Channel } from 'src/channel/models/channel.entity';
+import { ChannelService } from 'src/channel/service/channel.service';
+import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 
 
 @Injectable()
@@ -17,7 +19,11 @@ export class UserService {
 	constructor(
 		@InjectRepository(User)
 		protected userRepository: Repository<User>,
-		private jwtService: JwtService
+		private jwtService: JwtService,
+		@Inject(ChannelService)
+		private channelService: ChannelService,
+		@Inject(ChannelMemberService)
+		private channelMemberService: ChannelMemberService,
 	) {}
 
 	async onModuleInit(): Promise<void> {
@@ -226,8 +232,22 @@ export class UserService {
 		return (friendList);
 	}
 
-	joinedChannel(user: User) {
-		return user.joinedChannels
+	async ownedChannel(user: User): Promise<Channel[]> {
+		return await this.channelService.findChannelsWhereUserIsOwner(user);
+	}
+
+	async joinedChannel(user: User): Promise<Channel[]> {
+		const channelMembers = await this.channelMemberService.findChannelsByUser(user);
+		const channelsId: number[] = [];
+		const channels: Channel[] = [];
+		
+		channelMembers.forEach(cm => {
+			channelsId.push(cm.channelId);
+		});
+		for (const id in channelsId)  {
+			channels.push(await this.channelService.findChannelById(channelsId[id]));
+		}
+		return channels;
 	}
 
 	async setStatus(user: User, newStatus: string) {
@@ -254,18 +274,5 @@ export class UserService {
 		return this.userRepository.update(userId, {
 			twoFAEnabled: false
 		});
-	}
-	
-	async removeJoinedChannel(userId: number, channelToLeave: Channel) {
-		const user = await this.userRepository.findOne({id: userId});
-		const tmp = user.joinedChannels.find(channel => channel.id === channelToLeave.id);
-        const index = user.joinedChannels.indexOf(tmp, 0);
-        user.joinedChannels.splice(index, 1);
-	}
-
-	addJoinedChannel(user: User, welcomingChannel: Channel) {
-		if (user.joinedChannels === null)
-			user.joinedChannels = []
-		user.joinedChannels.push(welcomingChannel);
 	}
 }

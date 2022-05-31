@@ -76,7 +76,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         // });
         // client.join(room);                   // add this client to the room
         // this.server.to(room).emit('channelJoined');   // send the info to other members of this channel
-        // const messages = await this.channelService.getChannelMessagesByChannelName(room);   // MODIFY dto
+        // const messages = await this.channelService.findChannelMessagesByChannelName(room);   // MODIFY dto
         // this.server.to(client.id).emit('channelMessages', messages);    // send messages of the channel to the new user
     }
 
@@ -93,7 +93,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('getChannelMsg')
     async getChannelMsg(client: Socket, channelId: number) {
         const channel = await this.channelService.findChannelById(channelId);
-        const messages = await this.channelService.getChannelMessagesByChannelName(channel.name)
+        const messages = await this.channelService.findChannelMessagesByChannelName(channel.name)
 
         // console.log('MESSAGE = ', messages)
 
@@ -109,15 +109,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const room = await this.channelService.findChannelById(joinChannel.id);
         client.join(room.name);
         this.server.to(room.name).emit('channelJoined', "Hello you join the channe");
-        const messages = await this.channelService.getChannelMessagesByChannelName(room.name);
+        const messages = await this.channelService.findChannelMessagesByChannelName(room.name);
         this.server.to(client.id).emit('channelMessages', messages); 
     } 
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)
     @UseGuards(SocketGuard)
     @SubscribeMessage('leaveChannel') 
-    async leaveChannel(client: Socket, channel: Channel) {
-        await this.channelService.removeUserToChannel(channel, client.data.user.id);
+    async leaveChannel(client: Socket, channelId: number) {
+        await this.channelService.deleteChannelMember(channelId, client.data.user.id);
 
         // this.server.to
     }

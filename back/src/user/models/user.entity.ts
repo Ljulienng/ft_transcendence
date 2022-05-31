@@ -1,5 +1,5 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
-import { Message } from "src/message/models/message.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { MessageChannel } from "src/message/models/messageChannel.entity";
 import { Channel } from "src/channel/models/channel.entity";
 import { colors } from "unique-names-generator";
 import { ChannelMember } from "src/channelMember/models/channelMember.entity";
@@ -45,17 +45,17 @@ export class User {
 	@CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
 	readonly createdTime: Date;
 
-	@OneToMany(() => Message, message => message.channel)
-	messages: Message[]; 
+	@OneToMany(() => MessageChannel, message => message.channel)
+	messages: MessageChannel[]; 
 
+	// only where user is owner
 	@OneToMany(() => Channel, channel => channel.owner)
-	channels: Channel[];
+	ownedChannels: Channel[];
 
-	@OneToMany(() => ChannelMember, channelMember => channelMember.user)
+	@OneToMany(() => ChannelMember, channelMember => channelMember.user, {
+		cascade: true,
+	})
 	channelMembers: ChannelMember[];
-
-	@Column("simple-array", {default: true})
-	joinedChannels: Channel[];
 
 	@Column("simple-array", {nullable: true})
 	friends: string[];
