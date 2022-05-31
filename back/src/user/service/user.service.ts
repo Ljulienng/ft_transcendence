@@ -178,7 +178,10 @@ export class UserService {
 	}
 
 	async checkIfFriend(user: User, userId: string) {
-		const tmp = await user.friends.find((friend) => friend === userId)
+		const tmp = user.friends.find((friend) => {
+			if (friend === userId)
+				return friend
+		})
 
 		if (tmp)
 			return true;
@@ -338,9 +341,9 @@ export class UserService {
 		if (user.blocked === null)
 			user.blocked = [];
 
-		if (this.checkIfFriend(user, String(userId))){
+		if (await this.checkIfFriend(user, String(userId))){
 			
-			
+			await this.deleteFriend(user, (await this.userRepository.findOne({id: userId})).username)
 		}
 
 		if (await this.checkIfBlocked(user, userId))
@@ -358,7 +361,10 @@ export class UserService {
 		else {
 			const index = user.blocked.indexOf(tmp, 0);
 
-			user.blocked.splice(index, 0);
+
+			console.log("unblocked list = ", user.blocked, index)
+
+			user.blocked.splice(index, 1);
 		}
 		await this.userRepository.save(user);
 	}
@@ -366,7 +372,7 @@ export class UserService {
 	async checkIfBlocked(user: User, userId: number) {
 		if (user.blocked === null)
 			user.blocked = [];
-		const tmp = await user.blocked.find(el => el === String(userId));
+		const tmp =  user.blocked.find(el => el === String(userId));
 		if (tmp) {
 			console.log("tmp = ", tmp)
 			

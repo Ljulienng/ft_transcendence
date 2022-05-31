@@ -19,6 +19,7 @@
     </form>
 
     <div class="friendList">
+    <h2>Friends list</h2>
       <ul>
         <li v-for="friend in friendList" :key="friend">
           {{ friend.username }} ({{ friend.firstname }}, {{ friend.lastname }})
@@ -86,6 +87,11 @@ export default defineComponent({
         });
     },
 
+    blockUser(userToBlock: number) {
+      this.socket.emit("blockUser", userToBlock);
+      this.getFriendList();
+    },
+
     async deleteFriend(friendUsername: string) {
       console.log("friend to delete =", friendUsername);
       await http
@@ -100,15 +106,6 @@ export default defineComponent({
         });
     },
 
-    friendListloop(sec: number) {
-      setInterval(() => {
-        this.getFriendList;
-      }, sec * 1000);
-    },
-
-    async blockuser(userToBlock: number) {
-      this.socket.emit("blockUser", userToBlock);
-    },
   },
 
   created() {
@@ -117,10 +114,13 @@ export default defineComponent({
   },
 
   mounted() {
-    this.interval = setInterval(async () => {
-      const response = await http.get("/users/friendlist");
-      this.friendList = response.data;
-    }, 5 * 1000); // 5 sec
+    this.socket.on("friendConnected", () => {
+      this.getFriendList()
+    }),
+    this.socket.on("friendDisconnected", () => {
+      this.getFriendList()
+    })
+
   },
 
   beforeUnmount() {
@@ -155,5 +155,6 @@ body {
 
 li {
   padding: 10px;
+  color: white
 }
 </style>
