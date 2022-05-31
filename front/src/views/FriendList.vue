@@ -47,7 +47,6 @@ export default defineComponent({
   data() {
     return {
       socket: store.getters["auth/getUserSocket"],
-      interval: 0,
       userStatus: "",
       errorMsg: "",
       friendList: [],
@@ -108,30 +107,23 @@ export default defineComponent({
 
   },
 
-  created() {
-    this.getFriendList();
-    // this.friendListloop(5);
-  },
 
   mounted() {
     this.socket.on("friendConnected", () => {
       this.getFriendList()
-    }),
+    })
+
     this.socket.on("friendDisconnected", () => {
       this.getFriendList()
     })
 
   },
 
-  beforeUnmount() {
-    clearInterval(this.interval);
+  created() {
+    this.getFriendList();
+    // this.friendListloop(5);
   },
 
-  watch: {
-    updateFriendList() {
-      this.getFriendList();
-    },
-  },
 });
 </script>
 
