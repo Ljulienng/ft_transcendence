@@ -7,9 +7,9 @@
     </button>
     <MyModal v-model="isShow" :close="closeModal" :options="options">
       <div class="usernameModal">
-        <p>Please enter a new username</p>
+        <p class="text-light">Please enter a new username</p>
         <form v-on:submit.prevent="sendForm">
-          <p>
+          <p class="text-light">
             <label for="username">Username</label>
             <input
               id="username"
@@ -18,6 +18,7 @@
               username="username"
             />
           </p>
+
           <p>
             <input
               type="submit"
@@ -26,7 +27,8 @@
             />
           </p>
         </form>
-        <button @click="closeModal">close</button>
+        <p v-if="errorMsg !== ''" style="color: red">{{ errorMsg }}</p>
+        <button @click="closeModal" class="btn-danger">close</button>
       </div>
     </MyModal>
   </div>
@@ -70,7 +72,7 @@ export default defineComponent({
             "full error = ",
             error
           ),
-            (this.errorMsg = error.response.data.error);
+            (this.errorMsg = error.response.data.message);
           // this.$router.push("/home");
         });
     },

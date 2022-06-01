@@ -2,7 +2,7 @@
   <div class="chatBox">
     <p>{{ channel }}</p>
     <div class="messageList">
-      <p v-for="msg in messageList" :key="msg">
+      <p v-for="msg in messageList.slice().reverse()" :key="msg">
         {{ msg.sender.username }}: {{ msg.content }}
       </p>
     </div>
@@ -14,6 +14,7 @@
         v-model="message.content"
         class="inputMessage"
       />
+      <p v-if="errorMsg !== ''" style="color: red">{{ errorMsg }}</p>
     </div>
     <br />
   </div>
@@ -42,6 +43,7 @@ export default defineComponent({
         receiverId: 0,
         content: "",
       },
+      errorMsg: "",
       socket: store.getters["auth/getUserSocket"],
       messageList: [] as MessageUserI[],
       messageList2: [] as MessageUserI[],
@@ -53,11 +55,7 @@ export default defineComponent({
       this.message.senderId = this.currentUser.id;
       this.message.sender = this.currentUser.username;
       this.message.receiverId = this.receiverId;
-      // console.log(
-      //   "sendMessage - on User ",
-      //   this.message.receiverId,
-      //   this.message.content
-      // );
+
       this.socket.emit("sendMessageToUser", this.message);
     },
 
@@ -77,6 +75,9 @@ export default defineComponent({
     if (this.socket === undefined) {
       this.socket = store.getters["auth/getUserSocket"];
     }
+    this.socket.on("chatBlocked", () => {
+      this.errorMsg = "Either you or him have been blocked";
+    });
     this.socket.on("messageSent", () => {
       this.socket.emit("getUserMsg", this.receiverId);
     });
@@ -102,6 +103,13 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.messageList {
+  height: 200px; /* or any height you want */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
 .chatBox {
   float: right;
 }

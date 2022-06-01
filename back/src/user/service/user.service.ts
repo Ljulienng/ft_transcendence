@@ -371,20 +371,26 @@ export class UserService {
 		await this.userRepository.save(user);
 	}
 
-	async checkIfBlocked(user: User, userId: number) {
+	// async checkIfBlocked(user: User, userId: number) {
+
+	// 	const tmp =  user.blocked.find(el => el === String(userId));
+	// 	if (tmp)
+	// 		return true;
+	// 	else
+	// 		return false
+	// }
+
+	async checkIfBlocked(user: User, otherUserId: number) {
 		if (user.blocked === null)
 			user.blocked = [];
-		const tmp =  user.blocked.find(el => el === String(userId));
-		if (tmp)
-			return true;
-		else
-			return false
-	}
 
-	async checkIfInOtherBlocked(user: User, otherUserId: number) {
 		const otherUser = await this.userRepository.findOne({id: otherUserId});
-		const ifOtherIsBlocked = otherUser.blocked.find(el => el === String(user.id));
-		const ifUserHasBeenBlocked = otherUser.blocked.find(el => el === String(user.id));
+		const ifOtherIsBlocked = user.blocked.find(el => el === String(otherUserId));
+		let ifUserHasBeenBlocked: string;
+		if (otherUser.blocked !== null)
+			ifUserHasBeenBlocked = otherUser.blocked.find(el => el === String(user.id));
+
+		console.log("User and other", ifOtherIsBlocked, ifUserHasBeenBlocked);
 
 		if (!otherUser)
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'Other user doesn\'t exist.');

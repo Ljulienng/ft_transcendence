@@ -110,7 +110,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const channel = await this.channelService.findChannelById(channelId);
         const messages = await this.channelService.findChannelMessagesByChannelName(channel.name)
 
-        const index = await this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
+        const index = this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
         console.log(this.socketList[index].user.username ,'wants the msgs');
 
         this.server.emit('getChannelMessages' + this.socketList[index].user.id, messages)
@@ -119,7 +119,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@UseGuards(SocketGuard)
     @SubscribeMessage('createChannel')
     async createChannel(client: Socket, createChannel: CreateChannelDto) {
-        const user = await this.socketList.find(socket => socket.socketId === client.id).user
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
 
         await this.channelService.createChannel(createChannel, user.id);
         this.server.emit("updateChannel", await this.channelService.findAll());
@@ -129,7 +129,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@UseGuards(SocketGuard)
     @SubscribeMessage('deleteChannel')
     async deleteChannel(client: Socket, channelId: number) {
-        const user = await this.socketList.find(socket => socket.socketId === client.id).user
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
 
         await this.channelService.deleteChannel(user.id, channelId);
         this.server.emit("updateChannel", await this.channelService.findAll());
@@ -139,7 +139,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @UseGuards(SocketGuard)
     @SubscribeMessage('joinChannel')
     async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
-        const user = await this.socketList.find(socket => socket.socketId === client.id).user
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.addUserToChannel(joinChannel, user.id);
         
         const room = await this.channelService.findChannelById(joinChannel.id);
@@ -183,23 +183,19 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         // console.log(sender.username ,'wants the msgs from ', userId);
         const messages = await this.userService.getMessage(sender.id, receiver.id)
 
-
         this.server.emit('getUserMessages' + receiver.id, messages)
     }
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('sendMessageToUser') 
     async sendMessageUser(client: Socket, createMessageUserDto: CreateMessageUserDto) {
-        console.log('Message sent to the back in channel ', createMessageUserDto);
-        const senderSocket = this.socketList.find(socket => socket.user.id === createMessageUserDto.receiverId)
-        console.log('senderSocket = ', senderSocket)
-        // client.emit('messageSent', message, channelId);
-        // this.server.emit('sendMessageToClient', createMessageUserDto.content);
+        console.log('Message sent to the back in User ', createMessageUserDto);
+        const senderSocket = this.socketList.find(socket => socket.user.id === createMessageUserDto.senderId)
         // VERIFY IF THE USER IS BLOCKED 
-        // if (await this.userService.checkIfBlocked(senderSocket.user, createMessageUserDto.receiverId)) {
-        //     this.server.emit('messageSentFromUser', createMessageUserDto.content);
-        // }
-
+        if (await this.userService.checkIfBlocked(senderSocket.user, createMessageUserDto.receiverId)) {
+            this.server.to(client.id).emit('chatBlocked', createMessageUserDto.content);
+            return ;
+        }
         await this.userService.saveMessage(createMessageUserDto.senderId, createMessageUserDto);
         // this.server.emit('messageSentFromUser' + createMessageUserDto.senderId, createMessageUserDto.content);
         this.server.to(client.id).emit('messageSent');
