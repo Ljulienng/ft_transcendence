@@ -1,14 +1,13 @@
 <template>
   <!-- universal modal -->
   <div>
-    <MyModal
-      v-if="getUserProfile.username === ''"
-      v-model="isShow"
-      :close="closeModal"
-      :options="options"
-    >
-      <div class="modal">
-        <p>Please enter a</p>
+    <br />
+    <button class="btn-primary rounded" @click="showModal">
+      Change username
+    </button>
+    <MyModal v-model="isShow" :close="closeModal" :options="options">
+      <div class="usernameModal">
+        <p>Please enter a new username</p>
         <form v-on:submit.prevent="sendForm">
           <p>
             <label for="username">Username</label>
@@ -61,7 +60,8 @@ export default defineComponent({
         .then((response) => {
           console.log(response);
           this.errorMsg = "";
-          this.$router.push("/home");
+          this.closeModal();
+          window.location.reload();
         })
         .catch((error) => {
           console.log(
@@ -70,8 +70,8 @@ export default defineComponent({
             "full error = ",
             error
           ),
-            (this.errorMsg = error.response.data.error),
-            this.$router.push("/home");
+            (this.errorMsg = error.response.data.error);
+          // this.$router.push("/home");
         });
     },
   },

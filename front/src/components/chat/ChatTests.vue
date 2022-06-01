@@ -145,7 +145,6 @@
               {{ channel.id }} - "{{ channel.name }}" : created by
               {{ channel.owner.username }}
               <button @click="showChannel(channel.id)">show channel</button>
-
               <!-- {{channel.messages}} -->
             </li>
           </ul>

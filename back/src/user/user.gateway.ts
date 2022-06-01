@@ -66,7 +66,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	async handleDisconnect(client: Socket) {
-        const index = await this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
+        const index = this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
         // console.log(this.socketList[index].user.username ,'has disconnected from the server');
         if (index > -1)
             this.socketList.splice(index, 1);
@@ -80,7 +80,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		console.log('user:', user.username, 'is connected');
 		this.userService.setStatus(user, 'Online');
         this.socketList.forEach(async (socket) => {
-            if(await this.userService.checkIfFriend(user, String(socket.user.id)))                
+            if(await this.userService.checkIfFriend(user.id, socket.user.id))                
                 this.server.to(socket.socketId).emit("friendConnected");
         })
         
@@ -90,10 +90,12 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	async disconnectUser(client: Socket, username: string) {
 		const user = await this.userService.findByUsername(username);
 
+        if (!user)
+            return ;
 		console.log('user:', user.username, 'is disconnected');
 		this.userService.setStatus(user, "Offline");
         this.socketList.forEach(async (socket) => {
-            if(await this.userService.checkIfFriend(user, String(socket.user.id)))                
+        if(await this.userService.checkIfFriend(user.id, socket.user.id))                
                 this.server.to(socket.socketId).emit("friendDisconnected");
         })
 	}
@@ -176,9 +178,9 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('getUserMsg')
     async getUserMsg(client: Socket, userId: number) {
         const sender :User = await this.socketList.find(socket => socket.socketId === client.id).user
-        console.log("getUserMsg = ", userId)
+        // console.log("getUserMsg = ", userId)
         const receiver :User = await this.userService.findOne({id: userId});
-        console.log(sender.username ,'wants the msgs from ', userId);
+        // console.log(sender.username ,'wants the msgs from ', userId);
         const messages = await this.userService.getMessage(sender.id, receiver.id)
 
 
@@ -189,14 +191,19 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('sendMessageToUser') 
     async sendMessageUser(client: Socket, createMessageUserDto: CreateMessageUserDto) {
         console.log('Message sent to the back in channel ', createMessageUserDto);
-        const senderSocket = await this.socketList.find(socket => socket.user.id === createMessageUserDto.receiverId)
+        const senderSocket = this.socketList.find(socket => socket.user.id === createMessageUserDto.receiverId)
         console.log('senderSocket = ', senderSocket)
         // client.emit('messageSent', message, channelId);
         // this.server.emit('sendMessageToClient', createMessageUserDto.content);
+        // VERIFY IF THE USER IS BLOCKED 
+        // if (await this.userService.checkIfBlocked(senderSocket.user, createMessageUserDto.receiverId)) {
+        //     this.server.emit('messageSentFromUser', createMessageUserDto.content);
+        // }
 
         await this.userService.saveMessage(createMessageUserDto.senderId, createMessageUserDto);
         // this.server.emit('messageSentFromUser' + createMessageUserDto.senderId, createMessageUserDto.content);
-        this.server.emit('messageSentFromUser', createMessageUserDto.content);
+        this.server.to(client.id).emit('messageSent');
+        this.server.emit('messageSentFromUser' + createMessageUserDto.senderId, createMessageUserDto.content);
     }
 
     /* ============= BLOCK USER ============*/
@@ -213,7 +220,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @UseGuards(SocketGuard)
     @SubscribeMessage('unblockUser') 
     async unblockUser(client: Socket, userId: number) {
-        const user :User = await this.socketList.find(socket => socket.socketId === client.id).user;
+        const user :User = this.socketList.find(socket => socket.socketId === client.id).user;
         
         await this.userService.unblockUser(user, userId);
         this.server.emit('updateBlocked/' + user.id);

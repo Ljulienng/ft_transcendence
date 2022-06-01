@@ -35,7 +35,6 @@ export default defineComponent({
 
   data() {
     return {
-      // test: io('http://localhost:3000/channel', {  withCredentials: true}),
       currentUser: store.getters["auth/getUserProfile"],
       message: {
         senderId: 0,
@@ -54,14 +53,12 @@ export default defineComponent({
       this.message.senderId = this.currentUser.id;
       this.message.sender = this.currentUser.username;
       this.message.receiverId = this.receiverId;
-      console.log(
-        "sendMessage - on User ",
-        this.message.receiverId,
-        this.message.content
-      );
+      // console.log(
+      //   "sendMessage - on User ",
+      //   this.message.receiverId,
+      //   this.message.content
+      // );
       this.socket.emit("sendMessageToUser", this.message);
-      // this.socket.emit('sendMessageToServer', this.message);
-      // this.getMessageList();
     },
 
     async getMessages() {
@@ -80,8 +77,10 @@ export default defineComponent({
     if (this.socket === undefined) {
       this.socket = store.getters["auth/getUserSocket"];
     }
-    this.socket.on("messageSentFromUser", () => {
-      console.log("euh i ", this.receiverId);
+    this.socket.on("messageSent", () => {
+      this.socket.emit("getUserMsg", this.receiverId);
+    });
+    this.socket.on("messageSentFromUser" + this.receiverId, () => {
       this.socket.emit("getUserMsg", this.receiverId);
       // console.log("data");
     });
@@ -93,13 +92,7 @@ export default defineComponent({
     );
   },
 
-  // unmounted() {
-  // 	this.test.close;
-  // },
-
   created() {
-    console.log("socket = ", this.socket, "other user id = ", this.receiverId);
-
     console.log("chatbox created");
     this.getMessages();
   },
