@@ -79,6 +79,11 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 		console.log('user:', user.username, 'is connected');
 		this.userService.setStatus(user, 'Online');
+        this.socketList.forEach(async (socket) => {
+            if(await this.userService.checkIfFriend(user, String(socket.user.id)))                
+                this.server.to(socket.socketId).emit("friendConnected");
+        })
+        
 	}
 
 	@SubscribeMessage('disconnectUser')
@@ -87,6 +92,10 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 		console.log('user:', user.username, 'is disconnected');
 		this.userService.setStatus(user, "Offline");
+        this.socketList.forEach(async (socket) => {
+            if(await this.userService.checkIfFriend(user, String(socket.user.id)))                
+                this.server.to(socket.socketId).emit("friendDisconnected");
+        })
 	}
 
 
@@ -201,6 +210,14 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.emit('updateBlocked/' + user.id);
     }
 
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('unblockUser') 
+    async unblockUser(client: Socket, userId: number) {
+        const user :User = await this.socketList.find(socket => socket.socketId === client.id).user;
+        
+        await this.userService.unblockUser(user, userId);
+        this.server.emit('updateBlocked/' + user.id);
+    }
     // @UseGuards(SocketGuard)
     // @SubscribeMessage('blockUser') 
     // async blockUser(client: Socket, userId: number) {

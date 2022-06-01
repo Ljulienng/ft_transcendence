@@ -1,6 +1,6 @@
 <template>
         <!-- <v-row> -->
-            <ChatTests :socket="socket" />
+            <ChatTests/>
         <!-- </v-row> -->
 </template>
 
