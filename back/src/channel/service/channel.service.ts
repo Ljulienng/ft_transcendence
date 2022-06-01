@@ -1,7 +1,7 @@
 import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Channel, ChannelType} from '../models/channel.entity'
+import { Channel} from '../models/channel.entity'
 import { CreateChannelDto, UpdateChannelDto } from '../models/channel.dto';
 import { MessageService } from 'src/message/service/message.service';
 import * as bcrypt from 'bcrypt';
@@ -91,7 +91,7 @@ export class ChannelService {
         if (isSameChatName) {
             throw new UnauthorizedException('this name is already used');  
         }
-        
+
         const newChannel = this.channelRepository.create({
             name: createChannel.name,
             type: createChannel.type,
@@ -101,9 +101,9 @@ export class ChannelService {
             owner: user,
        });
  
-       if (newChannel.type === ChannelType.protected || newChannel.type === ChannelType.private) {
+       if (newChannel.type === "protected") {
            if (!newChannel.password) {
-                throw new BadRequestException('need a password for private or protected channel');
+                throw new BadRequestException('need a password for protected channel');
            }
            if (newChannel.password.length < 8) {
                 throw new HttpException('password too short', HttpStatus.FORBIDDEN);
@@ -136,7 +136,7 @@ export class ChannelService {
 
         const newChannel = this.channelRepository.create({
             name: createChannel.name,
-            type: ChannelType.private,
+            type: "private",
             messages: [],
             channelMembers: [],
             owner: user1,
@@ -165,7 +165,7 @@ export class ChannelService {
         const welcomingChannel = await this.findChannelById(joinChannel.id);
         console.log('addUserToChannel user : ', user);
         console.log('addUserToChannel welcomingChannel : ', welcomingChannel);
-        if (welcomingChannel.type !== ChannelType.public) {
+        if (welcomingChannel.type === "protected") {
             if (welcomingChannel.password) {
                 const match = this.checkPasswordMatch(welcomingChannel.password, joinChannel.password);
                 if (!match) {

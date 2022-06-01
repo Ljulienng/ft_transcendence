@@ -83,7 +83,6 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             if(await this.userService.checkIfFriend(user, String(socket.user.id)))                
                 this.server.to(socket.socketId).emit("friendConnected");
         })
-        
 	}
 
 	@SubscribeMessage('disconnectUser')

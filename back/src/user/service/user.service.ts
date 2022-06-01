@@ -177,7 +177,7 @@ export class UserService {
 	}
 
 	async checkIfFriend(user: User, userId: string) {
-		const tmp = user.friends.find((friend) => {
+		const tmp = user.friends?.find((friend) => {
 			if (friend === userId)
 				return friend
 		})
@@ -194,7 +194,7 @@ export class UserService {
 		if (!friend) {
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
 		}
-		const tmp = user.friends.find(el => el === String(friend.id))
+		const tmp = user.friends?.find(el => el === String(friend.id))
 		if (tmp) {
 			// console.log("friend id deleted= ", String(friend.id))
 			const index = user.friends.indexOf(tmp, 0);
@@ -340,7 +340,7 @@ export class UserService {
 		if (user.blocked === null)
 			user.blocked = [];
 
-		if (await this.checkIfFriend(user, String(userId))){
+			if (await this.checkIfFriend(user, String(userId))){
 			
 			await this.deleteFriend(user, (await this.userRepository.findOne({id: userId})).username)
 		}
@@ -371,7 +371,7 @@ export class UserService {
 	async checkIfBlocked(user: User, userId: number) {
 		if (user.blocked === null)
 			user.blocked = [];
-		const tmp =  user.blocked.find(el => el === String(userId));
+		const tmp =  user.blocked?.find(el => el === String(userId));
 		if (tmp) {
 			console.log("tmp = ", tmp)
 			

@@ -16,9 +16,9 @@
         <toggle-switch
           class="toggle_switch"
           :options="myOptions"
-          @change="privacy = $event.value"
+          @change="type = $event.value"
         />
-        <div v-if="privacy == 'protected'">
+        <div v-if="type == 'protected'">
           <input
             type="password"
             class="field"
@@ -125,7 +125,7 @@ export default defineComponent({
       messageList: [] as MessageI[],
       name: "",
       password: "",
-      privacy: "",
+      type: "",
       channelId: 0,
       selectedChannel: 0,
       showBox: false,
@@ -223,20 +223,20 @@ export default defineComponent({
       console.log(
         "chat created : name=",
         this.name,
-        " privacy=",
-        this.privacy,
+        " type=",
+        this.type,
         " password=",
         this.password
       );
       let channel = {
         name: this.name,
-        privacy: this.privacy,
+        type: this.type,
         password: this.password,
       };
       http.post("/channel/createChannel", channel, { withCredentials: true });
       this.getChannelList();
       this.name = "";
-      this.privacy = "";
+      this.type = "";
       this.password = "";
     },
 

@@ -1,5 +1,5 @@
 import { IsOptional, IsNotEmpty, IsString, IsEnum } from 'class-validator';
-import { ChannelType } from './channel.entity';
+// import { ChannelType } from './channel.entity';
 import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateChannelDto {
@@ -9,8 +9,9 @@ export class CreateChannelDto {
     name: string;
 
     @IsNotEmpty()
-    @IsEnum(ChannelType)
-    type: ChannelType;
+    // @IsEnum(ChannelType)
+    @IsString()
+    type: string;
 
     @IsOptional()
     @IsString()
@@ -28,7 +29,7 @@ export class JoinChannelDto {
 
     @IsOptional()
     @IsString()
-    type: ChannelType;
+    type: string;
 
     @IsOptional()
     @IsString()
