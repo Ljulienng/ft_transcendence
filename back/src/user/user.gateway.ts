@@ -136,24 +136,23 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @UseGuards(SocketGuard)
     @SubscribeMessage('joinChannel')
     async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
-        const user = await this.socketList.find(socket => socket.socketId === client.id).user
-        await this.channelService.addUserToChannel(joinChannel, user.id);
-        
-        const room = await this.channelService.findChannelById(joinChannel.id);
-        client.join(room.name);
-        console.log("Channel user = ", await this.channelService.findMembers(room.id))
-        this.server.to(room.name).emit('channelJoined', "Hello you join the channel");
-        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
-        const messages = await this.channelService.findChannelMessagesByChannelName(room.name);
-        this.server.to(client.id).emit('channelMessages', messages); 
+        const userId = this.socketList.find(socket => socket.socketId === client.id).user.id
+        // const channel = await this.channelService.findChannelById(joinChannel.id);
+
+        await this.channelService.addUserToChannel(joinChannel, userId);
+        // client.join(channel.name);
+        // this.server.to(channel.name).emit('channelJoined', "Hello you join the channe");
+        // const messages = await this.channelService.findChannelMessagesByChannelName(channel.name);
+        // this.server.to(client.id).emit('channelMessages', messages); 
     } 
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)
     @UseGuards(SocketGuard)
     @SubscribeMessage('leaveChannel') 
     async leaveChannel(client: Socket, channelId: number) {
-        await this.channelService.deleteChannelMember(channelId, client.data.user.id);
-        // this.server.to
+        const userId = this.socketList.find(socket => socket.socketId === client.id).user.id
+
+        await this.channelService.deleteChannelMember(channelId, userId);
     }
 
      /*

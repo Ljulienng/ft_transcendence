@@ -92,16 +92,11 @@
         <!-- CHANNEL LIST -->
         <div class="channelList">
           <ul>
-            <li v-for="channel in channelList" :key="channel">
+              <li v-for="channel in channelListWithoutPrivate" :key="channel">
               <!-- <div v-if="this.joinedChannelList.includes(channel.id) === false"> -->
-              {{ channel.id }} : channel "{{ channel.name }}" : created by {{ channel.owner.username }}
-              <button  @click="joinChannel(channel.id, channel.type)">
-                join channel
-              </button>
-              <input v-if="channel.type == 'protected'" type="password" maxlength="20" v-model="password" placeholder="password" />
-              
-              <!-- </div> -->
-              <!-- {{channel.message}} -->
+                {{ channel.id }} [{{ channel.type }}] : channel "{{ channel.name }}" : created by {{ channel.owner.username }}
+                <button  @click="joinChannel(channel.id, channel.type)">join channel</button>
+                <input v-if="channel.type == 'protected'" type="password" maxlength="20" v-model="password" placeholder="password" />
             </li>
           </ul>
           <div v-if="showBox === true">
@@ -142,9 +137,9 @@
         <div class="joinedChannelList">
           <ul>
             <li v-for="channel in joinedChannelList" :key="channel">
-              {{ channel.id }} - "{{ channel.name }}" : created by
-              {{ channel.owner.username }}
+              {{ channel.id }} [{{ channel.type }}] - "{{ channel.name }}" : created by {{ channel.owner.username }}
               <button @click="showChannel(channel.id)">show channel</button>
+              <button @click="leaveChannel(channel.id)">leave channel</button>
 
               <!-- {{channel.messages}} -->
             </li>
@@ -181,6 +176,7 @@ export default defineComponent({
     return {
       socket: store.getters["auth/getUserSocket"],
       channelList: [] as any[],
+      channelListWithoutPrivate: [] as any[],
       joinedChannelList: [] as any[],
       friendList: [],
       message: {
@@ -257,6 +253,11 @@ export default defineComponent({
       try {
         const response = await http.get("/channel");
         this.channelList = response.data;
+        for (var channel of this.channelList) {
+          if (channel.type != "private") {
+            this.channelListWithoutPrivate.push(channel);
+          }
+        }
       } catch (error) {
         console.log(error);
       }
@@ -329,6 +330,11 @@ export default defineComponent({
       };
       console.log("join channel : ", channelToJoin);
       this.socket.emit("joinChannel", channelToJoin);
+    },
+
+    leaveChannel(channelId: number) {
+      console.log("leave channel : ", channelId);
+      this.socket.emit("leaveChannel", channelId);
     },
  
   },
