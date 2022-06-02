@@ -12,10 +12,10 @@
           <input type="radio" value="protected" v-model="type" />
           <label for="protected">Protected</label>
         </div>
-        <!-- <div>
+        <div>
           <input type="radio" value="private" v-model="type" />
           <label for="private">Private</label>
-        </div> -->
+        </div>
       </div>
       <div v-if="type == 'protected'">
         <input type="password" v-model="password" required />
@@ -94,12 +94,12 @@
           <ul>
             <li v-for="channel in channelList" :key="channel">
               <!-- <div v-if="this.joinedChannelList.includes(channel.id) === false"> -->
-              {{ channel.id }} {{ channel.type }} - "{{ channel.name }}" : created by
-              {{ channel.owner.username }}
-              <button @click="joinChannel(channel.id, channel.type)">
+              {{ channel.id }} : channel "{{ channel.name }}" : created by {{ channel.owner.username }}
+              <button  @click="joinChannel(channel.id, channel.type)">
                 join channel
               </button>
-
+              <input v-if="channel.type == 'protected'" type="password" maxlength="20" v-model="password" placeholder="password" />
+              
               <!-- </div> -->
               <!-- {{channel.message}} -->
             </li>
@@ -196,6 +196,7 @@ export default defineComponent({
       messageList: [] as MessageI[],
       name: "",
       password: "",
+      passwordJoinChannel: "",
       type: "public",
       channelId: 0,
       selectedChannel: 0,
@@ -324,13 +325,12 @@ export default defineComponent({
       const channelToJoin = {
         id: channelId,
         type: channelType,
-        password: "",
-        // userId: 0,
+        password: this.password,
       };
-
       console.log("join channel : ", channelToJoin);
       this.socket.emit("joinChannel", channelToJoin);
     },
+ 
   },
 
   mounted() {

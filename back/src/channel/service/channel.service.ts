@@ -163,11 +163,10 @@ export class ChannelService {
    async addUserToChannel(joinChannel: JoinChannelDto, userId: number) {
         const user = await this.userRepository.findOne({id: userId});
         const welcomingChannel = await this.findChannelById(joinChannel.id);
-        console.log('addUserToChannel user : ', user);
-        console.log('addUserToChannel welcomingChannel : ', welcomingChannel);
+
         if (welcomingChannel.type === "protected") {
             if (welcomingChannel.password) {
-                const match = this.checkPasswordMatch(welcomingChannel.password, joinChannel.password);
+                const match = await this.checkPasswordMatch(joinChannel.password, welcomingChannel.password);
                 if (!match) {
                     throw new UnauthorizedException('incorrect password');
                 }
