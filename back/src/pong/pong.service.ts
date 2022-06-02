@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { PlayerState, Point, Pong, PongState } from './interfaces/pong.interface';
+import { PlayerState, Pong, PongState } from './interfaces/pong.interface';
 import { Server } from 'socket.io';
+import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 
 @Injectable()
 export class PongService {
   public pong: Pong;
 
-  constructor() {
+  constructor(private schedulerRegistry: SchedulerRegistry) {
     this.pong = {
       server: undefined,
       state: PongState.OFF,
@@ -17,17 +18,15 @@ export class PongService {
       },
       playerLeft: {
         id: null,
-        y: 50,
+        y: 33,
         score: 0,
-        state: PlayerState.DISCONNECTED,
-        canvas: undefined
+        state: PlayerState.DISCONNECTED
       },
       playerRight: {
         id: null,
-        y: 50,
+        y: 33,
         score: 0,
-        state: PlayerState.DISCONNECTED,
-        canvas: undefined
+        state: PlayerState.DISCONNECTED
       },
       ball: {
         pos: {
@@ -36,8 +35,8 @@ export class PongService {
         },
         radius: 2,
         speed: {
-          x: 2,
-          y: 2
+          x: 1,
+          y: 1
         },
         maxSpeed: 25
       },
@@ -49,6 +48,43 @@ export class PongService {
   }
 
   initServer(server: Server) {
+    this.pong = {
+      server: undefined,
+      state: PongState.OFF,
+      fps: 60,
+      playerSize: {
+        x: 100 / 100, // boardSize.x / 100 = 1
+        y: 66 / 3.3   // boardSize.y / 3.3 = 20
+      },
+      playerLeft: {
+        id: null,
+        y: 33,
+        score: 0,
+        state: PlayerState.DISCONNECTED
+      },
+      playerRight: {
+        id: null,
+        y: 33,
+        score: 0,
+        state: PlayerState.DISCONNECTED
+      },
+      ball: {
+        pos: {
+          x: 50,
+          y: 33
+        },
+        radius: 2,
+        speed: {
+          x: 1,
+          y: 1
+        },
+        maxSpeed: 25
+      },
+      boardSize: {
+        x: 100,
+        y: 66
+      }
+    };
     this.pong.server = server;
     this.pong.state = PongState.ON;
     console.log('init pong');
@@ -60,9 +96,23 @@ export class PongService {
     } else if (this.pong.playerRight.id == null) {
       this.pong.playerRight.id = playerID;
     } else {
-      console.error('To many player for this game.');
+      console.error('Too many player for this game.');
     }
     console.log(`player ${playerID} joined the game.`);
+  }
+
+  playerReady(playerID: string) {
+    if (this.pong.playerLeft.id == playerID) {
+      this.pong.playerLeft.state = PlayerState.CONNECTED;
+      console.log(`Player left: ${playerID} READY !`);
+    } else if (this.pong.playerRight.id == playerID) {
+      this.pong.playerRight.state = PlayerState.CONNECTED;
+      console.log(`Player right: ${playerID} READY !`);
+    }
+    if (this.pong.playerLeft.state == PlayerState.CONNECTED
+        && this.pong.playerRight.state == PlayerState.CONNECTED) {
+      this.start();
+    }
   }
 
   disconnectPlayer(playerID: string) {
@@ -77,24 +127,8 @@ export class PongService {
     this.pong.server.emit('pause');
   }
 
-  playerReady(playerID: string) {
-    console.log('new player ready !');
-    if (this.pong.playerLeft.id == playerID) {
-      this.pong.playerLeft.state = PlayerState.CONNECTED;
-      console.log(`Player 1: ${playerID} READY !`);
-    } else if (this.pong.playerRight.id == playerID) {
-      this.pong.playerRight.state = PlayerState.CONNECTED;
-      console.log(`Player 2: ${playerID} READY !`);
-    }
-    if (this.pong.playerLeft.state == PlayerState.CONNECTED && this.pong.playerRight.state == PlayerState.CONNECTED) {
-      this.pong.server.to(this.pong.playerLeft.id).emit('start', true);
-      this.pong.server.to(this.pong.playerRight.id).emit('start', false);
-      // this.start(); // TODO:
-    }
-  }
-
   movePlayer(playerID: string, y: number, canvasHeight: number) {
-    y = y / canvasHeight * 100;
+    y = y / canvasHeight * 66;
     if (this.pong.playerLeft.id == playerID) {
       this.pong.playerLeft.y = y;
       this.pong.server.to(this.pong.playerRight.id).volatile.emit('opponentMove', y);
@@ -104,71 +138,72 @@ export class PongService {
     }
   }
 
-/*
-  ballMove() {
+  ballMove(pong: Pong, schedulerRegistry: SchedulerRegistry) {
+    const collide = (pong: Pong, y: number, schedulerRegistry: SchedulerRegistry) => {
+      if (pong.ball.pos.y < y || pong.ball.pos.y > y + pong.playerSize.y) { // player does not hit the ball
+        schedulerRegistry.deleteInterval('ballMove');
+
+        // TODO: Increment scores
+        //if (pong.ball.pos.x < pong.boardSize.x / 2) {
+        //  pong.playerLeft.score += 1;
+        //  console.log('Left player missed the ball !');
+        //} else if (pong.ball.pos.x >= pong.boardSize.x / 2) {
+        //  pong.playerRight.score += 1;
+        //  console.log('Right player missed the ball !');
+        //}
+
+        // TODO: Reset ball pos and speed
+        //pong.ball.pos.x = pong.boardSize.x / 2;
+        //pong.ball.pos.y = pong.boardSize.y / 2;
+        // pong.ball.speed.x = 1;
+
+        // Reset players pos
+        //pong.playerRight.y = pong.boardSize.y / 2 - pong.playerSize.y / 2;
+        //pong.playerLeft.y = pong.boardSize.y / 2 - pong.playerSize.y / 2;
+
+      } else { // Player hit the ball
+        // Increase speed and change direction
+        pong.ball.speed.x *= -1.1;
+        if (pong.ball.speed.x > pong.ball.maxSpeed) {
+          pong.ball.speed.x = pong.ball.maxSpeed;
+        } else if (pong.ball.speed.x < -pong.ball.maxSpeed) {
+          pong.ball.speed.x = -pong.ball.maxSpeed;
+        }
+
+        // TODO: Add a ratio to increment ball speed depending on the paddle impact position
+        //const impact = pong.ball.pos.y - y - pong.playerSize.y / 2;
+        //const ratio = 100 / (pong.playerSize.y / 2);
+        //pong.ball.speed.y = Math.round(impact * ratio / 200);
+        //if (pong.ball.speed.y > pong.ball.maxSpeed) {
+        //  pong.ball.speed.y = pong.ball.maxSpeed;
+        //} else if (pong.ball.speed.y < -pong.ball.maxSpeed) {
+        //  pong.ball.speed.y = -pong.ball.maxSpeed;
+        //}
+      }
+    };
+
     // Rebounds on top and bottom
-    if (this.pong.ball.pos.y > this.pong.boardSize.y || this.pong.ball.pos.y < 0)
-      this.pong.ball.speed.y *= -1;
+    if (pong.ball.pos.y > pong.boardSize.y || pong.ball.pos.y < 0) {
+      pong.ball.speed.y *= -1;
+    }
     // Update ball pos
-    this.pong.ball.pos.x += this.pong.ball.speed.x;
-    this.pong.ball.pos.y += this.pong.ball.speed.y;
+    pong.ball.pos.x += pong.ball.speed.x;
+    pong.ball.pos.y += pong.ball.speed.y;
+    pong.server.emit('ballMove', pong.ball.pos);
+
     // Check collisions with players
-    //if (this.pong.ball.pos.x > this.pong.boardSize.x - this.pong.playerSize.x) {
-    //  this.collide(this.pong.playerLeft.y);
-    //} else if (this.pong.ball.pos.x < this.pong.playerSize.x) {
-    //  this.collide(this.pong.playerRight.y);
-    //}
-    this.pong.server.volatile.emit('ballMove', this.pong.ball.pos, this.pong.ball.radius);
-  }
-  collide(y: number) {
-    // The playerRight does not hit the ball
-    if (this.pong.ball.pos.y < y || this.pong.ball.pos.y > y + this.pong.playerSize.y) {
-      // Increment scores
-      if (this.pong.ball.pos.x < this.pong.boardSize.x / 2) {
-        this.pong.playerLeft.score += 1;
-      } else if (this.pong.ball.pos.x >= this.pong.boardSize.x / 2) {
-        this.pong.playerRight.score += 1;
-      }
-
-      // Reset ball pos
-      this.pong.ball.pos.x = this.pong.boardSize.x / 2;
-      this.pong.ball.pos.y = this.pong.boardSize.y / 2;
-
-      // Reset players pos
-      this.pong.playerRight.y = this.pong.boardSize.y / 2 - this.pong.playerSize.y / 2;
-      this.pong.playerLeft.y = this.pong.boardSize.y / 2 - this.pong.playerSize.y / 2;
-
-      // Reset speed
-      this.pong.ball.speed.x = 2;
-    } else {
-      // Increase speed and change direction
-      this.pong.ball.speed.x *= -1.2;
-      if (this.pong.ball.speed.x > this.pong.ball.maxSpeed) {
-        this.pong.ball.speed.x = this.pong.ball.maxSpeed;
-      } else if (this.pong.ball.speed.x < -this.pong.ball.maxSpeed) {
-        this.pong.ball.speed.x = -this.pong.ball.maxSpeed;
-      }
-
-      // 
-      let impact = this.pong.ball.pos.y - y - this.pong.playerSize.y / 2;
-      let ratio = 100 / (this.pong.playerSize.y / 2);
-      this.pong.ball.speed.y = Math.round(impact * ratio / 20);
-      if (this.pong.ball.speed.y > this.pong.ball.maxSpeed) {
-        this.pong.ball.speed.y = this.pong.ball.maxSpeed;
-      } else if (this.pong.ball.speed.y < -this.pong.ball.maxSpeed) {
-        this.pong.ball.speed.y = -this.pong.ball.maxSpeed;
-      }
+    if (pong.ball.pos.x < pong.playerSize.x) {
+      collide(pong, pong.playerLeft.y, schedulerRegistry);
+    } else if (pong.ball.pos.x > pong.boardSize.x - pong.playerSize.x) {
+      collide(pong, pong.playerRight.y, schedulerRegistry);
     }
   }
-  */
 
   start() {
-    while (true) {
-      setTimeout(() => {
-        //this.ballMove();
-        //this.pong.server.volatile.emit('ballMove', this.pong.ball.pos);
-      }, 1000 / this.pong.fps);
-    }
+    this.pong.server.to(this.pong.playerLeft.id).emit('start', true);
+    this.pong.server.to(this.pong.playerRight.id).emit('start', false);
+    console.log('starting game !');
+    const interval = setInterval(this.ballMove, 1000 / this.pong.fps, this.pong, this.schedulerRegistry);
+    this.schedulerRegistry.addInterval('ballMove', interval);
   }
 }
-

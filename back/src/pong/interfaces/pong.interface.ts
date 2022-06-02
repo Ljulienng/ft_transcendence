@@ -20,7 +20,6 @@ export interface Player {
   y: number;
   score: number;
   state: PlayerState;
-  canvas: HTMLCanvasElement;
 }
 
 export interface Ball {
@@ -40,4 +39,3 @@ export interface Pong {
   ball: Ball;
   boardSize: Point;
 }
-

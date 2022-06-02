@@ -109,14 +109,15 @@ export default defineComponent({
           y = y / 100 * this.pong.canvas.height;
           await this.$nextTick();
           if (this.pong.isLeftSide) {
-            this.pong.playerLeft.y = y;
-          } else {
             this.pong.playerRight.y = y;
+          } else {
+            this.pong.playerLeft.y = y;
           }
         });
 
         this.socket.on('ballMove', (pos: PointI) => {
-          this.pong.ball.pos = pos;
+          this.pong.ball.pos.x = pos.x / 100 * this.pong.canvas.width;
+          this.pong.ball.pos.y = pos.y / 66 * this.pong.canvas.height;
         });
 
         // TODO: scores event
@@ -159,12 +160,16 @@ export default defineComponent({
       //this.pong.context.fillText(this.pong.playerRight.score.toString(), this.pong.canvas.width, this.pong.canvas.height);
       //this.pong.context.fillText(this.pong.playerLeft.score.toString(), this.pong.canvas.width - 100, 100);
 
+      // Draw playerLeft
+      this.pong.context.fillStyle = 'lightgrey';
+      this.pong.context.fillRect(0, this.pong.playerLeft.y, this.pong.playerSize.x, this.pong.playerSize.y);
+      this.pong.context.fillStyle = 'green';
+      this.pong.context.fillRect(0, this.pong.playerLeft.y, this.pong.playerSize.x, 5);
       // Draw playerRight
       this.pong.context.fillStyle = 'lightgrey';
-      this.pong.context.fillRect(0, this.pong.playerRight.y, this.pong.playerSize.x, this.pong.playerSize.y);
-
-      // Draw playerLeft
-      this.pong.context.fillRect(this.pong.canvas.width - this.pong.playerSize.x, this.pong.playerLeft.y, this.pong.playerSize.x, this.pong.playerSize.y);
+      this.pong.context.fillRect(this.pong.canvas.width - this.pong.playerSize.x, this.pong.playerRight.y, this.pong.playerSize.x, this.pong.playerSize.y);
+      this.pong.context.fillStyle = 'green';
+      this.pong.context.fillRect(this.pong.canvas.width - this.pong.playerSize.x, this.pong.playerRight.y, this.pong.playerSize.x, 5);
 
       // Draw ball
       this.pong.context.beginPath();
@@ -175,7 +180,7 @@ export default defineComponent({
     playerMove(e: Event) {
       if (this.state != State.PLAY)
         return;
-      const playerToMove = this.pong.isLeftSide ? this.pong.playerRight : this.pong.playerLeft; // TODO: ?? why is this reverted ?!
+      const playerToMove = this.pong.isLeftSide ? this.pong.playerLeft : this.pong.playerRight;
       if (e.type == 'mousemove') {
         let rect = this.pong.canvas.getBoundingClientRect();
         let mouseLocation = ((e as MouseEvent).clientY - rect.top) / (rect.bottom - rect.top) * this.pong.canvas.height;
@@ -196,7 +201,7 @@ export default defineComponent({
         }
       }
       this.draw();
-      this.socket.emit('playerMove', {x: playerToMove.y, y: this.pong.canvas.height} );
+      this.socket.emit('playerMove', { x: playerToMove.y, y: this.pong.canvas.height });
     },
     /*
     ballMove() {
@@ -271,6 +276,7 @@ export default defineComponent({
       await this.$nextTick();
       this.pong.playerSize.x = this.pong.canvas.width / 100;
       this.pong.playerSize.y = this.pong.canvas.height / 3.3;
+      this.pong.ball.radius = this.pong.canvas.width / 100;
       await this.$nextTick();
       this.draw();
     }
@@ -297,5 +303,6 @@ export default defineComponent({
 #canvas {
   font-family: 'Orbitron', sans-serif;
   font-weight: 900;
+  border: 1px solid rgb(255, 246, 107);
 }
 </style>

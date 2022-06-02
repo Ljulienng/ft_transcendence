@@ -13,9 +13,11 @@ import { MessageModule } from './message/message.module';
 import { PongModule } from './pong/pong.module';
 import { ChatModule } from './chat/chat.module';
 import { ChannelMemberModule } from './channelMember/channelMember.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({isGlobal: true}),
     TypeOrmModule.forRoot({ // for PostGres 
       type: 'postgres',
