@@ -3,6 +3,7 @@
     <button class="logout" @click="logout">Logout</button>
     <UploadAvatar />
     <TwoFactorModal />
+    <UsernameModal />
   </div>
 </template>
 
@@ -10,11 +11,14 @@
 import { defineComponent } from "@vue/runtime-core";
 import http from "../http-common";
 import TwoFactorModal from "../components/auth/TwoFactorModal.vue";
+// import UsernameModal from "../components/user/UsernameModal.vue";
 import store from "../store";
+import UsernameModal from "../components/user/UsernameModal.vue";
 
 export default defineComponent({
   components: {
     TwoFactorModal,
+    UsernameModal,
   },
 
   methods: {

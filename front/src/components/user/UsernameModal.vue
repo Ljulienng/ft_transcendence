@@ -1,16 +1,15 @@
 <template>
   <!-- universal modal -->
   <div>
-    <MyModal
-      v-if="getUserProfile.username === ''"
-      v-model="isShow"
-      :close="closeModal"
-      :options="options"
-    >
-      <div class="modal">
-        <p>Please enter a</p>
+    <br />
+    <button class="btn-primary rounded" @click="showModal">
+      Change username
+    </button>
+    <MyModal v-model="isShow" :close="closeModal" :options="options">
+      <div class="usernameModal">
+        <p class="text-light">Please enter a new username</p>
         <form v-on:submit.prevent="sendForm">
-          <p>
+          <p class="text-light">
             <label for="username">Username</label>
             <input
               id="username"
@@ -19,6 +18,7 @@
               username="username"
             />
           </p>
+
           <p>
             <input
               type="submit"
@@ -27,7 +27,8 @@
             />
           </p>
         </form>
-        <button @click="closeModal">close</button>
+        <p v-if="errorMsg !== ''" style="color: red">{{ errorMsg }}</p>
+        <button @click="closeModal" class="btn-danger">close</button>
       </div>
     </MyModal>
   </div>
@@ -61,7 +62,8 @@ export default defineComponent({
         .then((response) => {
           console.log(response);
           this.errorMsg = "";
-          this.$router.push("/home");
+          this.closeModal();
+          window.location.reload();
         })
         .catch((error) => {
           console.log(
@@ -70,8 +72,8 @@ export default defineComponent({
             "full error = ",
             error
           ),
-            (this.errorMsg = error.response.data.error),
-            this.$router.push("/home");
+            (this.errorMsg = error.response.data.message);
+          // this.$router.push("/home");
         });
     },
   },

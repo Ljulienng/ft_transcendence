@@ -2,7 +2,7 @@
   <div class="channelBox">
     <p>{{ channel }}</p>
     <div class="messageList">
-      <p v-for="msg in messageList" :key="msg">
+      <p v-for="msg in messageList.slice().reverse()" :key="msg">
         {{ msg.user.username }}: {{ msg.content }}
       </p>
     </div>
