@@ -107,7 +107,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const channel = await this.channelService.findChannelById(channelId);
         const messages = await this.channelService.findChannelMessagesByChannelName(channel.name)
 
-        const index = await this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
+        const index = this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
         console.log(this.socketList[index].user.username ,'wants the msgs');
 
         this.server.emit('getChannelMessages' + this.socketList[index].user.id, messages)
@@ -116,7 +116,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@UseGuards(SocketGuard)
     @SubscribeMessage('createChannel')
     async createChannel(client: Socket, createChannel: CreateChannelDto) {
-        const user = await this.socketList.find(socket => socket.socketId === client.id).user
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
 
         await this.channelService.createChannel(createChannel, user.id);
         this.server.emit("updateChannel", await this.channelService.findAll());
@@ -126,33 +126,32 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@UseGuards(SocketGuard)
     @SubscribeMessage('deleteChannel')
     async deleteChannel(client: Socket, channelId: number) {
-        const user = await this.socketList.find(socket => socket.socketId === client.id).user
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
 
         await this.channelService.deleteChannel(user.id, channelId);
         this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
+        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
     }
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('joinChannel')
     async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
-        const userId = this.socketList.find(socket => socket.socketId === client.id).user.id
-        // const channel = await this.channelService.findChannelById(joinChannel.id);
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
 
-        await this.channelService.addUserToChannel(joinChannel, userId);
-        // client.join(channel.name);
-        // this.server.to(channel.name).emit('channelJoined', "Hello you join the channe");
-        // const messages = await this.channelService.findChannelMessagesByChannelName(channel.name);
-        // this.server.to(client.id).emit('channelMessages', messages); 
+        await this.channelService.addUserToChannel(joinChannel, user.id);
+        this.server.emit("updateChannel", await this.channelService.findAll());
+        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
     } 
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)
     @UseGuards(SocketGuard)
     @SubscribeMessage('leaveChannel') 
     async leaveChannel(client: Socket, channelId: number) {
-        const userId = this.socketList.find(socket => socket.socketId === client.id).user.id
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
 
-        await this.channelService.deleteChannelMember(channelId, userId);
+        await this.channelService.deleteChannelMember(channelId, user.id);
+        this.server.emit("updateChannel", await this.channelService.findAll());
+        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
     }
 
      /*

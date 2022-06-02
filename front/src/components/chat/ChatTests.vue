@@ -90,7 +90,7 @@
         aria-labelledby="nav-channel-tab"
       >
         <!-- CHANNEL LIST -->
-        <div class="channelList">
+        <div class="channelListWithoutPrivate">
           <ul>
               <li v-for="channel in channelListWithoutPrivate" :key="channel">
               <!-- <div v-if="this.joinedChannelList.includes(channel.id) === false"> -->
@@ -249,15 +249,20 @@ export default defineComponent({
       }
     },
 
-    async getChannelList() {
-      try {
-        const response = await http.get("/channel");
-        this.channelList = response.data;
+    updateChannelListWithoutPrivate() {
+      this.channelListWithoutPrivate = [];
         for (var channel of this.channelList) {
           if (channel.type != "private") {
             this.channelListWithoutPrivate.push(channel);
           }
         }
+    },
+
+    async getChannelList() {
+      try {
+        const response = await http.get("/channel");
+        this.channelList = response.data;
+        this.updateChannelListWithoutPrivate();
       } catch (error) {
         console.log(error);
       }
@@ -328,12 +333,11 @@ export default defineComponent({
         type: channelType,
         password: this.password,
       };
-      console.log("join channel : ", channelToJoin);
       this.socket.emit("joinChannel", channelToJoin);
+      this.password = "";
     },
 
     leaveChannel(channelId: number) {
-      console.log("leave channel : ", channelId);
       this.socket.emit("leaveChannel", channelId);
     },
  
@@ -346,11 +350,13 @@ export default defineComponent({
 
     this.socket.on("updateChannel", (data: ChannelI[]) => {
       this.channelList = data;
+      this.updateChannelListWithoutPrivate();
     });
 
     this.socket.on("updateJoinedChannel", (data: ChannelI[]) => {
       this.joinedChannelList = data;
     });
+
     // this.socket.on('sendMessageToClient', (data) => {
     //     console.log(data);
     // // })
