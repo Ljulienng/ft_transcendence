@@ -2,12 +2,13 @@
   <div class="channelBox">
     <div>
       <!-- find a way to allow invitations only by owner -->
-      <button v-if="channelType == 'private'" @click="invite()">Invite user : </button>
+      <button v-if="channelType == 'private'" @click="invite()">Invite : </button>
       <input
           type="text"
           maxlength="30"
           v-model="invitation.guest"
           class="inputMessage"
+          placeholder="username"
         />
       </div>
     <p>{{ channel }}</p>
@@ -53,7 +54,6 @@ export default defineComponent({
     return {
       // test: io('http://localhost:3000/channel', {  withCredentials: true}),
       currentUser: store.getters["auth/getUserProfile"],
-      // usernameToInvite: "",
       invitation: {
         channelId: this.channel,
         guest: "",
@@ -95,7 +95,6 @@ export default defineComponent({
     invite() {
       console.log("Invite/add friend to a private channel : ", this.invitation);
       this.socket.emit("inviteInPrivateChannel", this.invitation);
-      // this.usernameToInvite = "";
       this.invitation.guest = "";
     },
 
@@ -115,7 +114,8 @@ export default defineComponent({
         this.messageList = data;
       }
     );
-  },
+
+},
 
   // unmounted() {
   // 	this.test.close;

@@ -149,7 +149,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('inviteInPrivateChannel')
     async inviteUserInChannel(client: Socket, invitation: channelInvitationDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
-        await this.channelService.inviteUserInChannel(user, invitation);
+        const guest = await this.channelService.inviteUserInChannel(user, invitation);
+        this.server.emit("updateJoinedChannel", await this.userService.joinedChannel(guest));
     }
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)

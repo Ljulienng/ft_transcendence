@@ -151,7 +151,6 @@ export class ChannelService {
        await this.channelRepository.save(newChannel);
        await this.channelMemberService.createMember(user1, newChannel, true, true);
        await this.channelMemberService.createMember(user2, newChannel, false, true);
-       console.log('new DM channel created : ', newChannel);
     }
 
     /* check if the password sent is the right one */
@@ -195,26 +194,26 @@ export class ChannelService {
    **       - the guest is not already in the channel
    */
    async inviteUserInChannel(user: User, invitation: channelInvitationDto) {
-    console.log("SERVICE INVITE USER : ", user, invitation);    
-    const channel = await this.findChannelById(invitation.channelId);
-    console.log("SERVICE INVITE USER : ", invitation);    
+        const channel = await this.findChannelById(invitation.channelId);
+        const guest = await this.userRepository.findOne({username: invitation.guest});
 
-    if (channel.owner.id !== user.id) {
-            console.log("owner : ", channel.owner.id, "  - user : ", user.id);
+        if (channel.owner.id !== user.id) {
             throw new UnauthorizedException('you are not allowed to invite someone to join this channel');
         }
-        
-        const guest = await this.userRepository.findOne({username: invitation.guest});
         if (!guest) {
             throw new UnauthorizedException('the guest you want to invite does not exist');
         }
-
         if (await this.channelMemberService.findOne(guest, channel)) {
             throw new UnauthorizedException('the guest is already in the channel');
         }
 
-        await this.addUserToChannel({id: invitation.channelId, type: "private", password: ""}, guest.id);
-   }
+        await this.addUserToChannel({
+            id: invitation.channelId,
+            type: "private",
+            password: "" }, guest.id);
+        
+        return guest;
+    }
 
     /*
    ** the user wants to leave a channel
