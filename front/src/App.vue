@@ -85,6 +85,7 @@ export default defineComponent({
 <style lang="scss">
 
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+@import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
 
 :root {
   --primary: #fff774;

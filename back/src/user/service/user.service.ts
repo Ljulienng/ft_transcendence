@@ -14,6 +14,8 @@ import { MessageUser } from 'src/messageUser/models/messageUser.entity';
 import { MessageUserService } from 'src/messageUser/service/messageUser.service';
 import { CreateMessageUserDto } from 'src/messageUser/models/messageUser.dto';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
+import { PongService } from 'src/pong/pong.service';
+import { Pong } from 'src/pong/interfaces/pong.interface';
 
 
 @Injectable()
@@ -29,6 +31,8 @@ export class UserService {
 		private messageUserService: MessageUserService,
 		@Inject(ChannelMemberService)
 		private channelMemberService: ChannelMemberService,
+		@Inject(PongService)
+		private pongService: PongService,
 	) {}
 
 	async onModuleInit(): Promise<void> {
@@ -400,5 +404,8 @@ export class UserService {
 			return false
 	}
 
-
+	// ================ GAME ===================
+	async getGameList(user: User) {
+		return await this.pongService.getGames(user)
+	}
 }

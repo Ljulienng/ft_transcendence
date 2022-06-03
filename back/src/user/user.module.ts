@@ -12,6 +12,7 @@ import { JwtModule } from "@nestjs/jwt"
 import { MessageUser } from 'src/messageUser/models/messageUser.entity';
 import { UserGateway } from './user.gateway';
 import { ChannelMemberModule } from 'src/channelMember/channelMember.module';
+import { PongModule } from 'src/pong/pong.module';
 
 
 @Module({
@@ -23,6 +24,7 @@ import { ChannelMemberModule } from 'src/channelMember/channelMember.module';
     forwardRef(() => MessageUserModule),
     forwardRef(() => MessageModule),
     forwardRef(() => ChannelMemberModule),
+    forwardRef(() => PongModule),
     // TypeOrmModule.forFeature([UserRepository]),
   ],
   controllers: [UserController],
