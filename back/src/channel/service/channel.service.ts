@@ -2,7 +2,7 @@ import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, Not
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Channel} from '../models/channel.entity'
-import { CreateChannelDto, UpdateChannelDto } from '../models/channel.dto';
+import { channelInvitationDto, CreateChannelDto, UpdateChannelDto } from '../models/channel.dto';
 import { MessageService } from 'src/message/service/message.service';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/models/user.entity';
@@ -24,6 +24,7 @@ export class ChannelService {
         private channelMemberService: ChannelMemberService,
         @Inject(MessageService)
         private messageService: MessageService,
+
     ) {}
 
     /* 
@@ -185,6 +186,34 @@ export class ChannelService {
 
         await this.channelRepository.save(welcomingChannel);
         await this.channelMemberService.createMember(user, welcomingChannel, false, false);    
+   }
+
+   /*
+   ** the user wants to invite another user in a private channel
+   ** need to check if :
+   **       - the user is the owner of the channel
+   **       - the guest is not already in the channel
+   */
+   async inviteUserInChannel(user: User, invitation: channelInvitationDto) {
+    console.log("SERVICE INVITE USER : ", user, invitation);    
+    const channel = await this.findChannelById(invitation.channelId);
+    console.log("SERVICE INVITE USER : ", invitation);    
+
+    if (channel.owner.id !== user.id) {
+            console.log("owner : ", channel.owner.id, "  - user : ", user.id);
+            throw new UnauthorizedException('you are not allowed to invite someone to join this channel');
+        }
+        
+        const guest = await this.userRepository.findOne({username: invitation.guest});
+        if (!guest) {
+            throw new UnauthorizedException('the guest you want to invite does not exist');
+        }
+
+        if (await this.channelMemberService.findOne(guest, channel)) {
+            throw new UnauthorizedException('the guest is already in the channel');
+        }
+
+        await this.addUserToChannel({id: invitation.channelId, type: "private", password: ""}, guest.id);
    }
 
     /*

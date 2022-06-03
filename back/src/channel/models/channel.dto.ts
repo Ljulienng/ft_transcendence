@@ -24,7 +24,6 @@ export class UpdateChannelDto extends PartialType(CreateChannelDto) {}
 
 export class JoinChannelDto {
     @IsNotEmpty()
-    @IsString()
     id: number;
 
     @IsOptional()
@@ -34,4 +33,13 @@ export class JoinChannelDto {
     @IsOptional()
     @IsString()
     password: string;
+}
+
+export class channelInvitationDto {
+    @IsNotEmpty()
+    channelId: number;
+
+    @IsNotEmpty()
+    @IsString()
+    guest: string;
 }

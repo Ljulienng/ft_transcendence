@@ -12,7 +12,7 @@ import { UserService } from "./service/user.service";
 import { Channel } from "src/channel/models/channel.entity"
 import { CreateMessageDto } from "src/message/models/message.dto";
 import { CreateMessageUserDto } from "src/messageUser/models/messageUser.dto";
-import { JoinChannelDto } from "src/channel/models/channel.dto";
+import { channelInvitationDto, JoinChannelDto } from "src/channel/models/channel.dto";
 import { SocketUserI } from "src/chat/chat.gateway";
 import { ChannelService } from "src/channel/service/channel.service";
 import { SocketGuard } from "src/auth/guards/socket.guard";
@@ -144,6 +144,13 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
     } 
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('inviteInPrivateChannel')
+    async inviteUserInChannel(client: Socket, invitation: channelInvitationDto) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.inviteUserInChannel(user, invitation);
+    }
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)
     @UseGuards(SocketGuard)
