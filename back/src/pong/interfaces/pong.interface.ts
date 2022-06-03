@@ -1,14 +1,19 @@
-import { Server } from 'socket.io';
-import { SocketUserI } from 'src/chat/chat.gateway';
+import { Socket, Server } from 'socket.io';
+import { User } from 'src/user/models/user.entity';
 
-export enum PlayerState {
-  DISCONNECTED,
-  CONNECTED
-}
+// export enum PlayerState {
+//   DISCONNECTED,
+//   CONNECTED
+// }
 
-export enum PongState {
-  OFF,
-  ON
+// export enum PongState {
+//   OFF,
+//   ON
+// }
+
+export interface SocketPlayer {
+  socket: Socket;
+  user: User;
 }
 
 export interface Point {
@@ -17,10 +22,11 @@ export interface Point {
 }
 
 export interface Player {
-  socket: SocketUserI;
+  socket: Socket;
+  user: User;
   y: number;
   score: number;
-  state: PlayerState;
+  // state: PlayerState;
 }
 
 export interface Ball {
@@ -32,13 +38,13 @@ export interface Ball {
 
 export interface Pong {
   server: Server;
-  state: PongState;
+  // state: PongState;
+  interval: NodeJS.Timer;
   fps: number;
   playerSize: Point;
+  boardSize: Point;
+  winScore: number;
   playerLeft: Player;
   playerRight: Player;
   ball: Ball;
-  boardSize: Point;
-  winScore: number;
-  interval: NodeJS.Timer;
 }

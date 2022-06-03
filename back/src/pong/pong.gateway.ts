@@ -7,9 +7,8 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { SocketUserI } from 'src/chat/chat.gateway';
 import { UserService } from 'src/user/service/user.service';
-import { Point } from './interfaces/pong.interface';
+import { Point, SocketPlayer } from './interfaces/pong.interface';
 import { PongService } from './pong.service';
 
 // TODO: create rooms for games
@@ -21,26 +20,34 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   ) { }
 
   @WebSocketServer() server: Server;
-  socketList: SocketUserI[] = []; // Socket connected linked to their users entities list
+  waitingList: SocketPlayer[] = []; // Socket connected linked to their users entities list
 
   afterInit(server: Server) {
     this.pongService.initServer(server);
   }
 
   async handleConnection(client: Socket) {
-    // TODO: check client count to create rooms
-    const newSocket: SocketUserI = {
-      socketId: client.id,
+    if (this.waitingList.find(e => e.socket.id == client.id)) {
+      return;
+    }
+    const newSocket: SocketPlayer = {
+      socket: client,
       user: await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1])
     };
+    this.waitingList.push(newSocket);
 
-    // TODO: push only if not already in list
-    this.socketList.push(newSocket);
-    this.pongService.registerPlayer(newSocket);
+    const players: [SocketPlayer, SocketPlayer] = this.pongService.matchmake(this.waitingList);
+    if (!players[0] || !players[1]) {
+      return;
+    }
+
+    this.pongService.start(players[0], players[1], 3); // TODO: retrieve winScore instead of fixing it here
+
+    //this.pongService.registerPlayer(newSocket);
   }
 
   handleDisconnect(client: Socket) {
-    this.pongService.disconnectPlayer(this.socketList.find(e => e.socketId == client.id));
+    this.pongService.disconnectPlayer(this.waitingList.find(e => e.socket.id == client.id));
   }
 
   @SubscribeMessage('playerMove')
@@ -48,8 +55,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.pongService.movePlayer(client.id, data.x, data.y);
   }
 
-  @SubscribeMessage('playerReady')
-  playerReady(client: Socket) {
-    this.pongService.playerReady(client.id);
-  }
+  //@SubscribeMessage('playerReady')
+  //playerReady(client: Socket) {
+  //  this.pongService.playerReady(client.id);
+  //}
 }

@@ -88,6 +88,10 @@ export default defineComponent({
       this.pong.context.fillText('Waiting for opponent...', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
       this.state = State.PAUSE;
 
+    if (this.socket.connected == false) {
+      this.socket = io('localhost:3000/play', { withCredentials: true });
+    }
+
       this.socket.on('pause', () => {
         this.state = State.PAUSE;
         this.pause();
@@ -122,7 +126,7 @@ export default defineComponent({
         await this.$nextTick();
         this.play();
       });
-      this.socket.emit('playerReady');
+      // this.socket.emit('playerReady');
     },
     pause() {
       this.pong.context.fillStyle = 'black';
@@ -164,8 +168,6 @@ export default defineComponent({
       // Draw playerRight
       this.pong.context.fillStyle = 'lightgrey';
       this.pong.context.fillRect(this.pong.canvas.width - this.pong.playerSize.x, this.pong.playerRight.y, this.pong.playerSize.x, this.pong.playerSize.y);
-      this.pong.context.fillStyle = 'green';
-      this.pong.context.fillRect(this.pong.canvas.width - this.pong.playerSize.x, this.pong.playerRight.y, this.pong.playerSize.x, 5);
 
       // Draw ball
       this.pong.context.beginPath();
@@ -222,9 +224,6 @@ export default defineComponent({
   },
   async mounted() {
     this.initPong();
-    if (this.socket.connected == false) {
-      this.socket = io('localhost:3000/play', { withCredentials: true });
-    }
     window.addEventListener("resize", this.resizeCanvas);
     await this.resizeCanvas();
     this.start();
