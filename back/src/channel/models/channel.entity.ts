@@ -4,11 +4,11 @@ import { MessageChannel } from "src/message/models/messageChannel.entity";
 import { User } from "src/user/models/user.entity";
 import { ChannelMember } from "src/channelMember/models/channelMember.entity";
 
-export enum ChannelType {
-	private,
-	protected,
-	public,
-}
+// export enum ChannelType {
+// 	private,
+// 	protected,
+// 	public,
+// }
 
 @Entity('channels') 
 export class Channel {
@@ -19,8 +19,8 @@ export class Channel {
 	@Column()
 	name: string;
 
-    @Column({ nullable: false, default: ChannelType.private })
-    type: ChannelType;
+    @Column({ nullable: false, default: "public" })
+    type: string;
 
     @Column({ nullable: true, default: null }) 
 	password: string;

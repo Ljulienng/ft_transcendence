@@ -5,19 +5,19 @@
       Name <input type="text" maxlength="20" v-model="name" />
       <div>
         <div class="one_elem">
-          <input type="radio" value="public" v-model="privacy" />
+          <input type="radio" value="public" v-model="type" />
           <label for="public">Public</label>
         </div>
         <div>
-          <input type="radio" value="protected" v-model="privacy" />
+          <input type="radio" value="protected" v-model="type" />
           <label for="protected">Protected</label>
         </div>
         <div>
-          <input type="radio" value="private" v-model="privacy" />
+          <input type="radio" value="private" v-model="type" />
           <label for="private">Private</label>
         </div>
       </div>
-      <div v-if="privacy == 'protected'">
+      <div v-if="type == 'protected'">
         <input type="password" v-model="password" required />
         <p>Minimun 8 characters</p>
       </div>
@@ -90,18 +90,13 @@
         aria-labelledby="nav-channel-tab"
       >
         <!-- CHANNEL LIST -->
-        <div class="channelList">
+        <div class="channelListWithoutPrivate">
           <ul>
-            <li v-for="channel in channelList" :key="channel">
+              <li v-for="channel in channelListWithoutPrivate" :key="channel">
               <!-- <div v-if="this.joinedChannelList.includes(channel.id) === false"> -->
-              {{ channel.id }} - "{{ channel.name }}" : created by
-              {{ channel.owner.username }}
-              <button @click="joinChannel(channel.id, channel.type)">
-                join channel
-              </button>
-
-              <!-- </div> -->
-              <!-- {{channel.message}} -->
+                {{ channel.id }} [{{ channel.type }}] : channel "{{ channel.name }}" : created by {{ channel.owner.username }}
+                <button  @click="joinChannel(channel.id, channel.type)">join channel</button>
+                <input v-if="channel.type == 'protected'" type="password" maxlength="20" v-model="password" placeholder="password" />
             </li>
           </ul>
           <div v-if="showBox === true">
@@ -142,10 +137,9 @@
         <div class="joinedChannelList">
           <ul>
             <li v-for="channel in joinedChannelList" :key="channel">
-              {{ channel.id }} - "{{ channel.name }}" : created by
-              {{ channel.owner.username }}
+              {{ channel.id }} [{{ channel.type }}] - "{{ channel.name }}" : created by {{ channel.owner.username }}
               <button @click="showChannel(channel.id)">show channel</button>
-              <!-- {{channel.messages}} -->
+              <button @click="leaveChannel(channel.id)">leave channel</button>
             </li>
           </ul>
           <div v-if="showBox === true">
@@ -180,6 +174,7 @@ export default defineComponent({
     return {
       socket: store.getters["auth/getUserSocket"],
       channelList: [] as any[],
+      channelListWithoutPrivate: [] as any[],
       joinedChannelList: [] as any[],
       friendList: [],
       message: {
@@ -195,7 +190,8 @@ export default defineComponent({
       messageList: [] as MessageI[],
       name: "",
       password: "",
-      privacy: "",
+      passwordJoinChannel: "",
+      type: "public",
       channelId: 0,
       selectedChannel: 0,
       selectedUser: 0,
@@ -251,10 +247,20 @@ export default defineComponent({
       }
     },
 
+    updateChannelListWithoutPrivate() {
+      this.channelListWithoutPrivate = [];
+        for (var channel of this.channelList) {
+          if (channel.type != "private") {
+            this.channelListWithoutPrivate.push(channel);
+          }
+        }
+    },
+
     async getChannelList() {
       try {
         const response = await http.get("/channel");
         this.channelList = response.data;
+        this.updateChannelListWithoutPrivate();
       } catch (error) {
         console.log(error);
       }
@@ -294,20 +300,20 @@ export default defineComponent({
       console.log(
         "chat created : name=",
         this.name,
-        " privacy=",
-        this.privacy,
+        " type=",
+        this.type,
         " password=",
         this.password
       );
       let channel = {
         name: this.name,
-        privacy: this.privacy,
+        type: this.type,
         password: this.password,
       };
       // http.post("/channel/createChannel", channel, { withCredentials: true });
       this.socket.emit("createChannel", channel);
       this.name = "";
-      this.privacy = "";
+      this.type = "public";
       this.password = "";
     },
 
@@ -323,13 +329,16 @@ export default defineComponent({
       const channelToJoin = {
         id: channelId,
         type: channelType,
-        password: "",
-        // userId: 0,
+        password: this.password,
       };
-
-      console.log("join channel : ", channelToJoin);
       this.socket.emit("joinChannel", channelToJoin);
+      this.password = "";
     },
+
+    leaveChannel(channelId: number) {
+      this.socket.emit("leaveChannel", channelId);
+    },
+ 
   },
 
   mounted() {
@@ -339,11 +348,13 @@ export default defineComponent({
 
     this.socket.on("updateChannel", (data: ChannelI[]) => {
       this.channelList = data;
+      this.updateChannelListWithoutPrivate();
     });
 
     this.socket.on("updateJoinedChannel", (data: ChannelI[]) => {
       this.joinedChannelList = data;
     });
+
     // this.socket.on('sendMessageToClient', (data) => {
     //     console.log(data);
     // // })

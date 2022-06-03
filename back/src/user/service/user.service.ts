@@ -17,7 +17,6 @@ import { ChannelMemberService } from 'src/channelMember/service/channelMember.se
 import { PongService } from 'src/pong/pong.service';
 import { Pong } from 'src/pong/interfaces/pong.interface';
 
-
 @Injectable()
 export class UserService {
 
@@ -202,7 +201,7 @@ export class UserService {
 		if (!friend) {
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
 		}
-		const tmp = user.friends.find(el => el === String(friend.id))
+		const tmp = user.friends?.find(el => el === String(friend.id))
 		if (tmp) {
 			// console.log("friend id deleted= ", String(friend.id))
 			const index = user.friends.indexOf(tmp, 0);

@@ -85,7 +85,6 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             if(await this.userService.checkIfFriend(user.id, socket.user.id))                
                 this.server.to(socket.socketId).emit("friendConnected");
         })
-        
 	}
 
 	@SubscribeMessage('disconnectUser')
@@ -135,30 +134,28 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
         await this.channelService.deleteChannel(user.id, channelId);
         this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
+        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
     }
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('joinChannel')
     async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
-        await this.channelService.addUserToChannel(joinChannel, user.id);
         
-        const room = await this.channelService.findChannelById(joinChannel.id);
-        client.join(room.name);
-        console.log("Channel user = ", await this.channelService.findMembers(room.id))
-        this.server.to(room.name).emit('channelJoined', "Hello you join the channel");
-        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
-        const messages = await this.channelService.findChannelMessagesByChannelName(room.name);
-        this.server.to(client.id).emit('channelMessages', messages); 
+        await this.channelService.addUserToChannel(joinChannel, user.id);
+        this.server.emit("updateChannel", await this.channelService.findAll());
+        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
     } 
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)
     @UseGuards(SocketGuard)
     @SubscribeMessage('leaveChannel') 
     async leaveChannel(client: Socket, channelId: number) {
-        await this.channelService.deleteChannelMember(channelId, client.data.user.id);
-        // this.server.to
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+
+        await this.channelService.deleteChannelMember(channelId, user.id);
+        this.server.emit("updateChannel", await this.channelService.findAll());
+        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
     }
 
      /*

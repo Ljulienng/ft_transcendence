@@ -5,19 +5,19 @@
       Name <input type="text" maxlength="20" v-model="name" />
       <div>
         <div class="one_elem">
-          <input type="radio" value="public" v-model="privacy" />
+          <input type="radio" value="public" v-model="type" />
           <label for="public">Public</label>
         </div>
         <div>
-          <input type="radio" value="protected" v-model="privacy" />
+          <input type="radio" value="protected" v-model="type" />
           <label for="protected">Protected</label>
         </div>
         <div>
-          <input type="radio" value="private" v-model="privacy" />
+          <input type="radio" value="private" v-model="type" />
           <label for="private">Private</label>
         </div>
       </div>
-      <div v-if="privacy == 'protected'">
+      <div v-if="type == 'protected'">
         <input type="password" v-model="password" required />
         <p>Minimun 8 characters</p>
       </div>
@@ -103,7 +103,7 @@ export default defineComponent({
       messageList: [] as MessageI[],
       name: "",
       password: "",
-      privacy: "",
+      type: "",
       channelId: 0,
       selectedChannel: 0,
       showBox: false,
@@ -163,20 +163,20 @@ export default defineComponent({
       console.log(
         "chat created : name=",
         this.name,
-        " privacy=",
-        this.privacy,
+        " type=",
+        this.type,
         " password=",
         this.password
       );
       let channel = {
         name: this.name,
-        privacy: this.privacy,
+        type: this.type,
         password: this.password,
       };
       http.post("/channel/createChannel", channel, { withCredentials: true });
       this.getChannelList();
       this.name = "";
-      this.privacy = "";
+      this.type = "";
       this.password = "";
     },
 
