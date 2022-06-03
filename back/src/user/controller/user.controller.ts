@@ -126,12 +126,19 @@ export class UserController {
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Post('/setusername')
-	async userInfo(@Req() req, @Body() userName) {
+	async userInfo(@Res({passthrough: true}) res, @Req() req, @Body() userName) {
 	  try {
 		const user = req.user;
   
-		this.userService.setUsername(user.id, userName.username);
-	  }
+		await this.userService.setUsername(user, userName.username);
+		const payload = { username: (await this.userService.findOne({id: user.id})).username, auth: false };
+		const accessToken = await this.jwtService.signAsync(payload);
+		if (req.user.status === 'Offline')
+			req.user.status = 'Online';
+		res.clearCookie('jwt');
+		res.cookie('jwt', accessToken, {httpOnly: true})
+		// res.redirect('http://localhost:3001/home');
+	}
 	  catch (e) {
 		throw e;
 	  }
@@ -141,7 +148,6 @@ export class UserController {
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@UseInterceptors(FileInterceptor('image', storage))
 	uploadFile(@UploadedFile() file, @Req() req): Observable<Object> {
-		// console.log("filename = ", file.filename)
 		const user: User = req.user;
 
 		return this.userService.updateOne(user.id, {profileImage: file.filename}).pipe(

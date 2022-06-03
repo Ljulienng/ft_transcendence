@@ -140,8 +140,6 @@
               {{ channel.id }} [{{ channel.type }}] - "{{ channel.name }}" : created by {{ channel.owner.username }}
               <button @click="showChannel(channel.id)">show channel</button>
               <button @click="leaveChannel(channel.id)">leave channel</button>
-
-              <!-- {{channel.messages}} -->
             </li>
           </ul>
           <div v-if="showBox === true">

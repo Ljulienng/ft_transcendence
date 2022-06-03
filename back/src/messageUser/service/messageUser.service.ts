@@ -51,7 +51,6 @@ export class MessageUserService {
  }
 
  async getMessages(sender: User, receiver: User) {
-    console.log("userMessage ");
      const messages = await this.messageUserRepository.find({
          where: [ // OR STATEMENT: searching for message where the user is the sender and also the receiver
             {
@@ -64,8 +63,6 @@ export class MessageUserService {
             }
         ]
     })
-
-    //  console.log("userMessage = ", messages);
 
      return messages
  }

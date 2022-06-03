@@ -4,7 +4,9 @@
     <ul>
       <li v-for="blocked in blockedList" :key="blocked">
         {{ blocked.username }}
-        <button v-on:click="unblockUser(blocked.id)" class="btn btn-danger">BLOCK</button>
+        <button v-on:click="unblockUser(blocked.id)" class="btn btn-danger">
+          UNBLOCK
+        </button>
       </li>
     </ul>
   </div>
@@ -16,7 +18,6 @@ import http from "../../http-common";
 import store from "../../store";
 
 export default defineComponent({
-
   data() {
     return {
       blockedList: [],
@@ -29,14 +30,13 @@ export default defineComponent({
     async getBlockedList() {
       const response = await http.get("/users/getblocked");
 
-      this.blockedList = response.data
+      this.blockedList = response.data;
       console.log("blockedList after get = ", this.blockedList);
     },
 
     unblockUser(userToUnblock: number) {
       this.socket.emit("unblockUser", userToUnblock);
     },
-
   },
 
   mounted() {

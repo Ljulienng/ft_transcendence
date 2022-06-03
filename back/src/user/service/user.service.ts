@@ -84,20 +84,21 @@ export class UserService {
 		)
 	}
 
-	async setUsername(userId: number, userName: string) {
-		const currentUser = await this.userRepository.findOne({id: userId});
-		const tmp = await this.userRepository.findOne({username: userName})
+	async setUsername(currentUser: User, newUsername: string) {
+		// const currentUser = await this.userRepository.findOne({id: userId});
+		const tmp = await this.userRepository.findOne({username: newUsername})
 		const regex = /^[a-zA-Z0-9_]+$/
-
-		if (tmp)
-			throw new HttpException('Username already taken', HttpStatus.FORBIDDEN);
-		else if ((await currentUser).username === userName)
+		console.log('wnet there', tmp);
+		
+		// console.log("currentUser.username = ",currentUser.username , 'newUsername', newUsername )
+		if (currentUser.username === newUsername)
 			throw new HttpException('You already took this username', HttpStatus.FORBIDDEN);
-		else if (regex.test(userName) === false)
+		else if (tmp)
+			throw new HttpException('Username already taken', HttpStatus.FORBIDDEN);
+		else if (regex.test(newUsername) === false)
 			throw new HttpException('Wrong format for username only underscore are allowed.', HttpStatus.FORBIDDEN);
-		currentUser.username = userName;
+		currentUser.username = newUsername;
 		await this.userRepository.save(currentUser);
-		// await this.userRepository.save({})
 	}
 
 	findAll(): any {
@@ -126,8 +127,8 @@ export class UserService {
 		return await this.userRepository.findOne({username: name});
 	}
 
-	async findOne(id: any): Promise<User> {
-		return await this.userRepository.findOne(id);
+	async findOne(object: any): Promise<User> {
+		return await this.userRepository.findOne(object);
 	}
 
 	async validateStudent(user: Student): Promise<User> {
@@ -167,18 +168,20 @@ export class UserService {
 
 		if (await this.checkIfBlocked(user, friend.id))
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user you are trying to add is blocked.')
-		if (tmp) {
+		if (tmp)
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user is already in your friendlist.')
-		}
+		else if (friend.id === user.id)
+		throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'You are trying to add yourself, make some friends.')
 		else { 
 			user.friends.push(String(friend.id))
 		}
 		await this.userRepository.save(user);
 	}
 
-	async checkIfFriend(user: User, userId: string) {
-		const tmp = user.friends?.find((friend) => {
-			if (friend === userId)
+	async checkIfFriend(userId: number, otherUserId: number) {
+		const user = await this.userRepository.findOne({id: userId});
+		const tmp = user.friends.find((friend) => {
+			if (friend === String(otherUserId))
 				return friend
 		})
 
@@ -340,8 +343,7 @@ export class UserService {
 		if (user.blocked === null)
 			user.blocked = [];
 
-			if (await this.checkIfFriend(user, String(userId))){
-			
+		if (await this.checkIfFriend(user.id, userId)) {
 			await this.deleteFriend(user, (await this.userRepository.findOne({id: userId})).username)
 		}
 
@@ -368,26 +370,30 @@ export class UserService {
 		await this.userRepository.save(user);
 	}
 
-	async checkIfBlocked(user: User, userId: number) {
+	// async checkIfBlocked(user: User, userId: number) {
+
+	// 	const tmp =  user.blocked.find(el => el === String(userId));
+	// 	if (tmp)
+	// 		return true;
+	// 	else
+	// 		return false
+	// }
+
+	async checkIfBlocked(user: User, otherUserId: number) {
 		if (user.blocked === null)
 			user.blocked = [];
-		const tmp =  user.blocked?.find(el => el === String(userId));
-		if (tmp) {
-			console.log("tmp = ", tmp)
-			
-			return true;
-		}
-		else
-			return false
-	}
 
-	async checkIfInOtherBlocked(user: User, userId: number) {
-		const otherUser = await this.userRepository.findOne({id: userId});
-		const tmp = await otherUser.blocked.find(el => el === String(user.id));
+		const otherUser = await this.userRepository.findOne({id: otherUserId});
+		const ifOtherIsBlocked = user.blocked.find(el => el === String(otherUserId));
+		let ifUserHasBeenBlocked: string;
+		if (otherUser.blocked !== null)
+			ifUserHasBeenBlocked = otherUser.blocked.find(el => el === String(user.id));
+
+		console.log("User and other", ifOtherIsBlocked, ifUserHasBeenBlocked);
 
 		if (!otherUser)
-			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'User doesn\'t exist.');
-		if (tmp)
+			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'Other user doesn\'t exist.');
+		if (ifOtherIsBlocked || ifUserHasBeenBlocked)
 			return true;
 		else
 			return false

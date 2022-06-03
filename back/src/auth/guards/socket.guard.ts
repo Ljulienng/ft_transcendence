@@ -19,7 +19,7 @@ export class SocketGuard implements CanActivate {
 		const payload = this.jwtService.decode(jwtToken);
 		const username = payload["username"];
 
-		console.log("token = ", this.jwtService.decode(jwtToken))
+		// console.log("token = ", this.jwtService.decode(jwtToken))
 
 		
 		const user = await this.userService.findByUsername(username);
@@ -28,8 +28,6 @@ export class SocketGuard implements CanActivate {
 			throw new ForbiddenException('User doesn\'t exist')
 		if (payload['auth'] === false && user.twoFAEnabled === true)
 			throw new ForbiddenException('User need to authenticate')
-
-			console.log("valid socket")
 	// const decode = this.jwtService.decode(req.cookies.jwt)
 	// // console.log("DECODED JWT = ", decode)
 		return true;
