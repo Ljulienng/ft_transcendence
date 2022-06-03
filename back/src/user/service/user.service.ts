@@ -184,6 +184,8 @@ export class UserService {
 
 	async checkIfFriend(userId: number, otherUserId: number) {
 		const user = await this.userRepository.findOne({id: userId});
+		if (user.friends === null)
+			user.friends = []
 		const tmp = user.friends.find((friend) => {
 			if (friend === String(otherUserId))
 				return friend

@@ -76,6 +76,9 @@ export class User {
 	@Column({default: 0})
 	gameLost: number;
 
-	@Column()
+	@Column({default: 0})
 	ranking: number;
+
+	@Column({default: 0})
+	points: number;
 }

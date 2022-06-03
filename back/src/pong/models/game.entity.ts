@@ -25,9 +25,9 @@ export class Game {
 	playerTwoScore: number;
 
 
-	@Column({default: null})
-	winner: User;
+	@Column({default: ""})
+	winner: string;
 
-	@Column({default: null})
-	loser: User;
+	@Column({default: ""})
+	loser: string;
 }
