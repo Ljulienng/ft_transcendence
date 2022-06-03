@@ -16,9 +16,6 @@ import io from 'socket.io-client'
 import PointI from '../types/interfaces/point.interface'
 import PongI from '../types/interfaces/pong.interface'
 
-// DONE: determine wich playerRight am i
-// TODO: => Why left i playing right side ?!
-
 // TODO: ball
 // TODO: updateBall func to convert datas receive from back
 
@@ -90,10 +87,6 @@ export default defineComponent({
       this.pong.context.font = '40px Orbitron';
       this.pong.context.fillText('Waiting for opponent...', this.pong.canvas.width / 2, this.pong.canvas.height / 2);
       this.state = State.PAUSE;
-
-      if (this.socket.connected == false) {
-        this.socket = io('localhost:3000/play', { withCredentials: true });
-      }
 
       this.socket.on('pause', () => {
         this.state = State.PAUSE;
@@ -283,6 +276,9 @@ export default defineComponent({
   },
   async mounted() {
     this.initPong();
+    if (this.socket.connected == false) {
+      this.socket = io('localhost:3000/play', { withCredentials: true });
+    }
     window.addEventListener("resize", this.resizeCanvas);
     await this.resizeCanvas();
     this.start();

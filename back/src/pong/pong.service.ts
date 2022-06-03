@@ -1,22 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { PlayerState, Pong, PongState } from './interfaces/pong.interface';
-import { Server } from 'socket.io';
-import { Repository } from 'typeorm';
-import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
-import { User } from 'src/user/models/user.entity';
-import { Game } from './models/game.entity';
+import { SchedulerRegistry } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Server } from 'socket.io';
+import { Game } from './models/game.entity';
+import { User } from 'src/user/models/user.entity';
+import { SocketUserI } from 'src/chat/chat.gateway';
+import { PlayerState, Pong, PongState } from './interfaces/pong.interface';
 
 @Injectable()
 export class PongService {
-  public pong: Pong;
+  private pong: Pong;
 
   constructor(
-    private schedulerRegistry: SchedulerRegistry,
-		@InjectRepository(Game)
-		protected gameRepository: Repository<Game>,
+    @InjectRepository(Game)
+    protected gameRepository: Repository<Game>,
+    private schedulerRegistry: SchedulerRegistry
+  ) {
+    this.resetPong();
+  }
 
-    ) {
+  resetPong() {
     this.pong = {
       server: undefined,
       state: PongState.OFF,
@@ -26,13 +30,13 @@ export class PongService {
         y: 66 / 3.3   // boardSize.y / 3.3 = 20
       },
       playerLeft: {
-        id: null,
+        socket: null,
         y: 33,
         score: 0,
         state: PlayerState.DISCONNECTED
       },
       playerRight: {
-        id: null,
+        socket: null,
         y: 33,
         score: 0,
         state: PlayerState.DISCONNECTED
@@ -57,93 +61,60 @@ export class PongService {
   }
 
   initServer(server: Server) {
-    this.pong = {
-      server: undefined,
-      state: PongState.OFF,
-      fps: 60,
-      playerSize: {
-        x: 100 / 100, // boardSize.x / 100 = 1
-        y: 66 / 3.3   // boardSize.y / 3.3 = 20
-      },
-      playerLeft: {
-        id: null,
-        y: 33,
-        score: 0,
-        state: PlayerState.DISCONNECTED
-      },
-      playerRight: {
-        id: null,
-        y: 33,
-        score: 0,
-        state: PlayerState.DISCONNECTED
-      },
-      ball: {
-        pos: {
-          x: 50,
-          y: 33
-        },
-        radius: 2,
-        speed: {
-          x: 1,
-          y: 1
-        },
-        maxSpeed: 25
-      },
-      boardSize: {
-        x: 100,
-        y: 66
-      }
-    };
+    this.resetPong();
     this.pong.server = server;
     this.pong.state = PongState.ON;
     console.log('init pong');
   }
 
-  registerPlayer(playerID: string) {
-    if (this.pong.playerLeft.id == null) {
-      this.pong.playerLeft.id = playerID;
-    } else if (this.pong.playerRight.id == null) {
-      this.pong.playerRight.id = playerID;
+  registerPlayer(socketUser: SocketUserI) {
+    // TODO: should be handled by rooms
+    if (this.pong.playerLeft.socket == null) {
+      this.pong.playerLeft.socket = socketUser;
+    } else if (this.pong.playerRight.socket == null) {
+      this.pong.playerRight.socket = socketUser;
     } else {
-      console.error('Too many player for this game.');
+      console.error('PONG: Too many player for this game.');
     }
-    console.log(`player ${playerID} joined the game.`);
+    console.log(`PONG: player ${socketUser.user.username} joined the game.`);
   }
 
-  playerReady(playerID: string) {
-    if (this.pong.playerLeft.id == playerID) {
+  playerReady(id: string) {
+    if (this.pong.playerLeft.socket && this.pong.playerLeft.socket.socketId == id) {
       this.pong.playerLeft.state = PlayerState.CONNECTED;
-      console.log(`Player left: ${playerID} READY !`);
-    } else if (this.pong.playerRight.id == playerID) {
+      console.log(`PONG: Player left: ${this.pong.playerLeft.socket.user.username} READY !`);
+    } else if (this.pong.playerRight.socket && this.pong.playerRight.socket.socketId == id) {
       this.pong.playerRight.state = PlayerState.CONNECTED;
-      console.log(`Player right: ${playerID} READY !`);
+      console.log(`PONG: Player right: ${this.pong.playerRight.socket.user.username} READY !`);
     }
-    if (this.pong.playerLeft.state == PlayerState.CONNECTED
-        && this.pong.playerRight.state == PlayerState.CONNECTED) {
+    if (this.pong.playerLeft.state == PlayerState.CONNECTED && this.pong.playerRight.state == PlayerState.CONNECTED) {
       this.start();
     }
   }
 
-  disconnectPlayer(playerID: string) {
-    console.log(`player ${playerID} left the game.`);
-    if (this.pong.playerLeft.id == playerID) {
-      this.pong.playerLeft.id = null;
+  disconnectPlayer(socketUser: SocketUserI) {
+    console.log(`PONG: player ${socketUser.user.username} left the game.`);
+
+    // TODO: if game is over disconnect else pause game
+
+    if (this.pong.playerLeft.socket && this.pong.playerLeft.socket.socketId == socketUser.socketId) {
+      this.pong.playerLeft.socket = null;
       this.pong.playerLeft.state = PlayerState.DISCONNECTED;
-    } else if (this.pong.playerRight.id == playerID) {
-      this.pong.playerRight.id = null;
+    } else if (this.pong.playerRight.socket && this.pong.playerRight.socket.socketId == socketUser.socketId) {
+      this.pong.playerRight.socket = null;
       this.pong.playerRight.state = PlayerState.DISCONNECTED;
     }
     this.pong.server.emit('pause');
   }
 
-  movePlayer(playerID: string, y: number, canvasHeight: number) {
+  movePlayer(id: string, y: number, canvasHeight: number) {
     y = y / canvasHeight * 66;
-    if (this.pong.playerLeft.id == playerID) {
+    if (this.pong.playerLeft.socket.socketId == id) {
       this.pong.playerLeft.y = y;
-      this.pong.server.to(this.pong.playerRight.id).volatile.emit('opponentMove', y);
-    } else if (this.pong.playerRight.id == playerID) {
+      this.pong.server.to(this.pong.playerRight.socket.socketId).volatile.emit('opponentMove', y);
+    } else if (this.pong.playerRight.socket.socketId == id) {
       this.pong.playerRight.y = y;
-      this.pong.server.to(this.pong.playerLeft.id).volatile.emit('opponentMove', y);
+      this.pong.server.to(this.pong.playerLeft.socket.socketId).volatile.emit('opponentMove', y);
     }
   }
 
@@ -151,6 +122,12 @@ export class PongService {
     const collide = (pong: Pong, y: number, schedulerRegistry: SchedulerRegistry) => {
       if (pong.ball.pos.y < y || pong.ball.pos.y > y + pong.playerSize.y) { // player does not hit the ball
         schedulerRegistry.deleteInterval('ballMove');
+
+        if (pong.ball.pos.y < y) {
+          console.log('PONG: left player (' + pong.playerLeft.socket.user.username + ') missed the ball !');
+        } else if (pong.ball.pos.y > y + pong.playerSize.y) {
+          console.log('PONG: right player (' + pong.playerRight.socket.user.username + ') missed the ball !');
+        }
 
         // TODO: Increment scores
         //if (pong.ball.pos.x < pong.boardSize.x / 2) {
@@ -209,9 +186,9 @@ export class PongService {
   }
 
   start() {
-    this.pong.server.to(this.pong.playerLeft.id).emit('start', true);
-    this.pong.server.to(this.pong.playerRight.id).emit('start', false);
-    console.log('starting game !');
+    this.pong.server.to(this.pong.playerLeft.socket.socketId).emit('start', true);
+    this.pong.server.to(this.pong.playerRight.socket.socketId).emit('start', false);
+    console.log('PONG: Game is starting !');
     const interval = setInterval(this.ballMove, 1000 / this.pong.fps, this.pong, this.schedulerRegistry);
     this.schedulerRegistry.addInterval('ballMove', interval);
   }
@@ -226,6 +203,6 @@ export class PongService {
           playerTwo: user
         }
       ]
-    })
+    });
   }
 }

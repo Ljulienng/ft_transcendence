@@ -1,4 +1,5 @@
 import { Server } from 'socket.io';
+import { SocketUserI } from 'src/chat/chat.gateway';
 
 export enum PlayerState {
   DISCONNECTED,
@@ -16,7 +17,7 @@ export interface Point {
 }
 
 export interface Player {
-  id: string;
+  socket: SocketUserI;
   y: number;
   score: number;
   state: PlayerState;
