@@ -56,7 +56,9 @@ export class PongService {
       boardSize: {
         x: 100,
         y: 66
-      }
+      },
+      winScore: 3,
+      interval: null
     };
   }
 
@@ -117,71 +119,137 @@ export class PongService {
       this.pong.server.to(this.pong.playerLeft.socket.socketId).volatile.emit('opponentMove', y);
     }
   }
-
-  ballMove(pong: Pong, schedulerRegistry: SchedulerRegistry) {
-    const collide = (pong: Pong, y: number, schedulerRegistry: SchedulerRegistry) => {
-      if (pong.ball.pos.y < y || pong.ball.pos.y > y + pong.playerSize.y) { // player does not hit the ball
-        schedulerRegistry.deleteInterval('ballMove');
-
-        if (pong.ball.pos.y < y) {
-          console.log('PONG: left player (' + pong.playerLeft.socket.user.username + ') missed the ball !');
-        } else if (pong.ball.pos.y > y + pong.playerSize.y) {
-          console.log('PONG: right player (' + pong.playerRight.socket.user.username + ') missed the ball !');
+  /*
+    ballMove(pong: Pong, schedulerRegistry: SchedulerRegistry) {
+      const collide = (pong: Pong, y: number, schedulerRegistry: SchedulerRegistry) => {
+        if (pong.ball.pos.y < y || pong.ball.pos.y > y + pong.playerSize.y) { // player does not hit the ball
+          schedulerRegistry.deleteInterval('ballMove');
+          pong.playerLeft.state = PlayerState.DISCONNECTED;
+          pong.playerRight.state = PlayerState.DISCONNECTED;
+  
+          if (pong.ball.pos.x < pong.boardSize.x / 2) {
+            console.log('PONG: left player (' + pong.playerLeft.socket.user.username + ') missed the ball !');
+            pong.playerRight.score += 1;
+            if (pong.playerRight.score == pong.winScore) {
+              console.log('PONG: right player (' + pong.playerRight.socket.user.username + ') won the game !');
+              // TODO: stop game because it's over
+            }
+          } else if (pong.ball.pos.x >= pong.boardSize.x / 2) {
+            console.log('PONG: right player (' + pong.playerRight.socket.user.username + ') missed the ball !');
+            pong.playerLeft.score += 1;
+            if (pong.playerLeft.score == pong.winScore) {
+              console.log('PONG: left player (' + pong.playerLeft.socket.user.username + ') won the game !');
+              // TODO: stop game because it's over
+            }
+          }
+  
+          // Scores
+          pong.server.emit('updateScore', {x: pong.playerLeft.score, y: pong.playerRight.score});
+  
+          // Reset ball pos and speed
+          pong.ball.pos.x = pong.boardSize.x / 2;
+          pong.ball.pos.y = pong.boardSize.y / 2;
+          pong.ball.speed.x = 1;
+          pong.ball.speed.y = 1;
+  
+          // Reset players pos
+          //pong.playerRight.y = pong.boardSize.y / 2 - pong.playerSize.y / 2;
+          //pong.playerLeft.y = pong.boardSize.y / 2 - pong.playerSize.y / 2;
+  
+        } else { // Player hit the ball
+          // Increase speed and change direction
+          pong.ball.speed.x *= -1.1;
+          if (pong.ball.speed.x > pong.ball.maxSpeed) {
+            pong.ball.speed.x = pong.ball.maxSpeed;
+          } else if (pong.ball.speed.x < -pong.ball.maxSpeed) {
+            pong.ball.speed.x = -pong.ball.maxSpeed;
+          }
+  
+          // TODO: Add a ratio to increment ball speed depending on the paddle impact position
+          //const impact = pong.ball.pos.y - y - pong.playerSize.y / 2;
+          //const ratio = 100 / (pong.playerSize.y / 2);
+          //pong.ball.speed.y = Math.round(impact * ratio / 200);
+          //if (pong.ball.speed.y > pong.ball.maxSpeed) {
+          //  pong.ball.speed.y = pong.ball.maxSpeed;
+          //} else if (pong.ball.speed.y < -pong.ball.maxSpeed) {
+          //  pong.ball.speed.y = -pong.ball.maxSpeed;
+          //}
         }
-
-        // TODO: Increment scores
-        //if (pong.ball.pos.x < pong.boardSize.x / 2) {
-        //  pong.playerLeft.score += 1;
-        //  console.log('Left player missed the ball !');
-        //} else if (pong.ball.pos.x >= pong.boardSize.x / 2) {
-        //  pong.playerRight.score += 1;
-        //  console.log('Right player missed the ball !');
-        //}
-
-        // TODO: Reset ball pos and speed
-        //pong.ball.pos.x = pong.boardSize.x / 2;
-        //pong.ball.pos.y = pong.boardSize.y / 2;
-        // pong.ball.speed.x = 1;
-
-        // Reset players pos
-        //pong.playerRight.y = pong.boardSize.y / 2 - pong.playerSize.y / 2;
-        //pong.playerLeft.y = pong.boardSize.y / 2 - pong.playerSize.y / 2;
-
-      } else { // Player hit the ball
-        // Increase speed and change direction
-        pong.ball.speed.x *= -1.1;
-        if (pong.ball.speed.x > pong.ball.maxSpeed) {
-          pong.ball.speed.x = pong.ball.maxSpeed;
-        } else if (pong.ball.speed.x < -pong.ball.maxSpeed) {
-          pong.ball.speed.x = -pong.ball.maxSpeed;
-        }
-
-        // TODO: Add a ratio to increment ball speed depending on the paddle impact position
-        //const impact = pong.ball.pos.y - y - pong.playerSize.y / 2;
-        //const ratio = 100 / (pong.playerSize.y / 2);
-        //pong.ball.speed.y = Math.round(impact * ratio / 200);
-        //if (pong.ball.speed.y > pong.ball.maxSpeed) {
-        //  pong.ball.speed.y = pong.ball.maxSpeed;
-        //} else if (pong.ball.speed.y < -pong.ball.maxSpeed) {
-        //  pong.ball.speed.y = -pong.ball.maxSpeed;
-        //}
+      };
+  
+      // Rebounds on top and bottom
+      if (pong.ball.pos.y > pong.boardSize.y || pong.ball.pos.y < 0) {
+        pong.ball.speed.y *= -1;
       }
-    };
-
-    // Rebounds on top and bottom
-    if (pong.ball.pos.y > pong.boardSize.y || pong.ball.pos.y < 0) {
-      pong.ball.speed.y *= -1;
+      // Update ball pos
+      pong.ball.pos.x += pong.ball.speed.x;
+      pong.ball.pos.y += pong.ball.speed.y;
+      pong.server.emit('ballMove', pong.ball.pos);
+  
+      // Check collisions with players
+      if (pong.ball.pos.x < pong.playerSize.x) {
+        collide(pong, pong.playerLeft.y, schedulerRegistry);
+      } else if (pong.ball.pos.x > pong.boardSize.x - pong.playerSize.x) {
+        collide(pong, pong.playerRight.y, schedulerRegistry);
+      }
     }
-    // Update ball pos
-    pong.ball.pos.x += pong.ball.speed.x;
-    pong.ball.pos.y += pong.ball.speed.y;
-    pong.server.emit('ballMove', pong.ball.pos);
+    */
 
-    // Check collisions with players
-    if (pong.ball.pos.x < pong.playerSize.x) {
-      collide(pong, pong.playerLeft.y, schedulerRegistry);
-    } else if (pong.ball.pos.x > pong.boardSize.x - pong.playerSize.x) {
-      collide(pong, pong.playerRight.y, schedulerRegistry);
+  collide(y: number) {
+    if (this.pong.ball.pos.y < y || this.pong.ball.pos.y > y + this.pong.playerSize.y) { // player does not hit the ball
+      // clearInterval(this.pong.interval);
+      this.pong.playerLeft.state = PlayerState.DISCONNECTED;
+      this.pong.playerRight.state = PlayerState.DISCONNECTED;
+
+      if (this.pong.ball.pos.x < this.pong.boardSize.x / 2) {
+        console.log('PONG: left player (' + this.pong.playerLeft.socket.user.username + ') missed the ball !');
+        this.pong.playerRight.score += 1;
+        if (this.pong.playerRight.score == this.pong.winScore) {
+          console.log('PONG: right player (' + this.pong.playerRight.socket.user.username + ') won the game !');
+          clearInterval(this.pong.interval);
+          // TODO: stop game because it's over
+        }
+      } else if (this.pong.ball.pos.x >= this.pong.boardSize.x / 2) {
+        console.log('PONG: right player (' + this.pong.playerRight.socket.user.username + ') missed the ball !');
+        this.pong.playerLeft.score += 1;
+        if (this.pong.playerLeft.score == this.pong.winScore) {
+          console.log('PONG: left player (' + this.pong.playerLeft.socket.user.username + ') won the game !');
+          clearInterval(this.pong.interval);
+          // TODO: stop game because it's over
+        }
+      }
+
+      // Scores
+      this.pong.server.emit('updateScore', { x: this.pong.playerLeft.score, y: this.pong.playerRight.score });
+
+      // Reset ball pos and speed
+      this.pong.ball.pos.x = this.pong.boardSize.x / 2;
+      this.pong.ball.pos.y = this.pong.boardSize.y / 2;
+      this.pong.ball.speed.x = 1;
+      this.pong.ball.speed.y = 1;
+
+      // Reset players pos
+      //this.pong.playerRight.y = this.pong.boardSize.y / 2 - this.pong.playerSize.y / 2;
+      //this.pong.playerLeft.y = this.pong.boardSize.y / 2 - this.pong.playerSize.y / 2;
+
+    } else { // Player hit the ball
+      // Increase speed and change direction
+      this.pong.ball.speed.x *= -1.1;
+      if (this.pong.ball.speed.x > this.pong.ball.maxSpeed) {
+        this.pong.ball.speed.x = this.pong.ball.maxSpeed;
+      } else if (this.pong.ball.speed.x < -this.pong.ball.maxSpeed) {
+        this.pong.ball.speed.x = -this.pong.ball.maxSpeed;
+      }
+
+      // TODO: Add a ratio to increment ball speed depending on the paddle impact position
+      //const impact = this.pong.ball.pos.y - y - this.pong.playerSize.y / 2;
+      //const ratio = 100 / (this.pong.playerSize.y / 2);
+      //this.pong.ball.speed.y = Math.round(impact * ratio / 200);
+      //if (this.pong.ball.speed.y > this.pong.ball.maxSpeed) {
+      //  this.pong.ball.speed.y = this.pong.ball.maxSpeed;
+      //} else if (this.pong.ball.speed.y < -this.pong.ball.maxSpeed) {
+      //  this.pong.ball.speed.y = -this.pong.ball.maxSpeed;
+      //}
     }
   }
 
@@ -189,8 +257,24 @@ export class PongService {
     this.pong.server.to(this.pong.playerLeft.socket.socketId).emit('start', true);
     this.pong.server.to(this.pong.playerRight.socket.socketId).emit('start', false);
     console.log('PONG: Game is starting !');
-    const interval = setInterval(this.ballMove, 1000 / this.pong.fps, this.pong, this.schedulerRegistry);
-    this.schedulerRegistry.addInterval('ballMove', interval);
+    this.pong.interval = setInterval(() => {
+      // Rebounds on top and bottom
+      if (this.pong.ball.pos.y > this.pong.boardSize.y || this.pong.ball.pos.y < 0) {
+        this.pong.ball.speed.y *= -1;
+      }
+      // Update ball pos
+      this.pong.ball.pos.x += this.pong.ball.speed.x;
+      this.pong.ball.pos.y += this.pong.ball.speed.y;
+      this.pong.server.emit('ballMove', this.pong.ball.pos);
+
+      // Check collisions with players
+      if (this.pong.ball.pos.x < this.pong.playerSize.x) {
+        this.collide(this.pong.playerLeft.y);
+      } else if (this.pong.ball.pos.x > this.pong.boardSize.x - this.pong.playerSize.x) {
+        this.collide(this.pong.playerRight.y);
+      }
+    }, 1000 / this.pong.fps);
+    // this.schedulerRegistry.addInterval('ballMove', interval);
   }
 
   async getGames(user: User) {

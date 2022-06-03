@@ -77,7 +77,7 @@ export default defineComponent({
       this.pong.context.fillStyle = 'lightgrey';
       this.pong.context.font = '64px Orbitron';
       this.pong.context.textAlign = 'center';
-      this.pong.context.fillText('CLICK TO START', this.pong.canvas.width / 2, this.pong.canvas.height / 2);
+      this.pong.context.fillText('CLICK TO START', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
     },
     waitingForplayerLeft() {
       this.pong.context.fillStyle = 'black';
@@ -85,7 +85,7 @@ export default defineComponent({
       this.pong.context.fillStyle = 'lightgrey';
       this.pong.context.textAlign = 'center';
       this.pong.context.font = '40px Orbitron';
-      this.pong.context.fillText('Waiting for opponent...', this.pong.canvas.width / 2, this.pong.canvas.height / 2);
+      this.pong.context.fillText('Waiting for opponent...', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
       this.state = State.PAUSE;
 
       this.socket.on('pause', () => {
@@ -99,7 +99,7 @@ export default defineComponent({
         this.state = State.PLAY;
 
         this.socket.on('opponentMove', async (y: number) => {
-          y = y / 100 * this.pong.canvas.height;
+          y = y / 66 * this.pong.canvas.height;
           await this.$nextTick();
           if (this.pong.isLeftSide) {
             this.pong.playerRight.y = y;
@@ -113,7 +113,12 @@ export default defineComponent({
           this.pong.ball.pos.y = pos.y / 66 * this.pong.canvas.height;
         });
 
-        // TODO: scores event
+        this.socket.on('updateScore', (score: PointI) => {
+          console.log('new score ', score);
+          this.pong.playerLeft.score = score.x;
+          this.pong.playerRight.score = score.y;
+        });
+        
         await this.$nextTick();
         this.play();
       });
@@ -125,7 +130,7 @@ export default defineComponent({
       this.pong.context.fillStyle = 'lightgrey';
       this.pong.context.textAlign = 'center';
       this.pong.context.font = '40px Orbitron';
-      this.pong.context.fillText('Waiting for opponent...', this.pong.canvas.width / 2, this.pong.canvas.height / 2);
+      this.pong.context.fillText('Waiting for opponent...', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
     },
     draw() {
       if (this.state == State.NONE) {
@@ -147,17 +152,15 @@ export default defineComponent({
       this.pong.context.stroke();
 
       // Draw scores
-      //this.pong.context.fillStyle = 'lightgrey';
-      //this.pong.context.font = '64px Orbitron';
-      //this.pong.context.textAlign = 'center';
-      //this.pong.context.fillText(this.pong.playerRight.score.toString(), this.pong.canvas.width, this.pong.canvas.height);
-      //this.pong.context.fillText(this.pong.playerLeft.score.toString(), this.pong.canvas.width - 100, 100);
+      this.pong.context.fillStyle = 'lightgrey';
+      this.pong.context.font = '32px Orbitron';
+      this.pong.context.textAlign = 'center';
+      this.pong.context.fillText(this.pong.playerLeft.score.toString(), this.pong.canvas.width / 4, 32, this.pong.canvas.width);
+      this.pong.context.fillText(this.pong.playerRight.score.toString(), (this.pong.canvas.width / 4) * 3, 32, this.pong.canvas.width);
 
       // Draw playerLeft
       this.pong.context.fillStyle = 'lightgrey';
       this.pong.context.fillRect(0, this.pong.playerLeft.y, this.pong.playerSize.x, this.pong.playerSize.y);
-      this.pong.context.fillStyle = 'green';
-      this.pong.context.fillRect(0, this.pong.playerLeft.y, this.pong.playerSize.x, 5);
       // Draw playerRight
       this.pong.context.fillStyle = 'lightgrey';
       this.pong.context.fillRect(this.pong.canvas.width - this.pong.playerSize.x, this.pong.playerRight.y, this.pong.playerSize.x, this.pong.playerSize.y);
@@ -196,63 +199,6 @@ export default defineComponent({
       this.draw();
       this.socket.emit('playerMove', { x: playerToMove.y, y: this.pong.canvas.height });
     },
-    /*
-    ballMove() {
-      // Rebounds on top and bottom
-      if (this.pong.ball.pos.y > this.pong.canvas.height || this.pong.ball.pos.y < 0)
-        this.pong.ball.speed.y *= -1;
-      // Update ball pos
-      this.pong.ball.pos.x += this.pong.ball.speed.x;
-      this.pong.ball.pos.y += this.pong.ball.speed.y;
-      // Check collisions with players
-      if (this.pong.ball.pos.x > this.pong.canvas.width - this.pong.playerSize.x) {
-        this.collide(this.pong.playerLeft.y);
-      } else if (this.pong.ball.pos.x < this.pong.playerSize.x) {
-        this.collide(this.pong.playerRight.y);
-      }
-      this.draw();
-    },
-    collide(y: number) {
-      // The playerRight does not hit the ball
-      if (this.pong.ball.pos.y < y || this.pong.ball.pos.y > y + this.pong.playerSize.y) {
-        // Increment scores
-        if (this.pong.ball.pos.x < this.pong.canvas.width / 2) {
-          this.pong.playerLeft.score += 1;
-        } else if (this.pong.ball.pos.x >= this.pong.canvas.width / 2) {
-          this.pong.playerRight.score += 1;
-        }
-
-        // Reset ball pos
-        this.pong.ball.pos.x = this.pong.canvas.width / 2;
-        this.pong.ball.pos.y = this.pong.canvas.height / 2;
-
-        // Reset players pos
-        this.pong.playerRight.y = this.pong.canvas.height / 2 - this.pong.playerSize.y / 2;
-        this.pong.playerLeft.y = this.pong.canvas.height / 2 - this.pong.playerSize.y / 2;
-
-        // Reset speed
-        this.pong.ball.speed.x = 2;
-      } else {
-        // Increase speed and change direction
-        this.pong.ball.speed.x *= -1.2;
-        if (this.pong.ball.speed.x > this.pong.ball.max_speed) {
-          this.pong.ball.speed.x = this.pong.ball.max_speed;
-        } else if (this.pong.ball.speed.x < -this.pong.ball.max_speed) {
-          this.pong.ball.speed.x = -this.pong.ball.max_speed;
-        }
-
-        // 
-        let impact = this.pong.ball.pos.y - y - this.pong.playerSize.y / 2;
-        let ratio = 100 / (this.pong.playerSize.y / 2);
-        this.pong.ball.speed.y = Math.round(impact * ratio / 20);
-        if (this.pong.ball.speed.y > this.pong.ball.max_speed) {
-          this.pong.ball.speed.y = this.pong.ball.max_speed;
-        } else if (this.pong.ball.speed.y < -this.pong.ball.max_speed) {
-          this.pong.ball.speed.y = -this.pong.ball.max_speed;
-        }
-      }
-    },
-    */
     play() {
       this.draw();
       requestAnimationFrame(this.play);

@@ -39,4 +39,6 @@ export interface Pong {
   playerRight: Player;
   ball: Ball;
   boardSize: Point;
+  winScore: number;
+  interval: NodeJS.Timer;
 }
