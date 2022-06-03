@@ -32,7 +32,9 @@ import PongI from '../types/interfaces/pong.interface'
 const State = {
   NONE: 0,
   PLAY: 1,
-  PAUSE: 2
+  PAUSE: 2,
+  WIN: 3,
+  LOST: 4
 };
 
 export default defineComponent({
@@ -79,6 +81,24 @@ export default defineComponent({
       this.pong.context.textAlign = 'center';
       this.pong.context.fillText('CLICK TO START', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
     },
+    lost() {
+      this.pong.context.fillStyle = 'black';
+      this.pong.context.fillRect(0, 0, this.pong.canvas.width, this.pong.canvas.height);
+      this.pong.context.fillStyle = 'red';
+      this.pong.context.font = '64px Orbitron';
+      this.pong.context.textAlign = 'center';
+      this.pong.context.fillText('YOU LOST', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
+      this.state = State.LOST;
+    },
+    win() {
+      this.pong.context.fillStyle = 'black';
+      this.pong.context.fillRect(0, 0, this.pong.canvas.width, this.pong.canvas.height);
+      this.pong.context.fillStyle = 'green';
+      this.pong.context.font = '64px Orbitron';
+      this.pong.context.textAlign = 'center';
+      this.pong.context.fillText('YOU WIN', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
+      this.state = State.WIN;
+    },
     waitingForplayerLeft() {
       this.pong.context.fillStyle = 'black';
       this.pong.context.fillRect(0, 0, this.pong.canvas.width, this.pong.canvas.height);
@@ -98,7 +118,6 @@ export default defineComponent({
       });
 
       this.socket.on('start', async (isLeftSide: boolean) => {
-        console.log(this.socket.id + ': isLeftSide ? ' + isLeftSide);
         this.pong.isLeftSide = isLeftSide;
         this.state = State.PLAY;
 
@@ -118,9 +137,15 @@ export default defineComponent({
         });
 
         this.socket.on('updateScore', (score: PointI) => {
-          console.log('new score ', score);
           this.pong.playerLeft.score = score.x;
           this.pong.playerRight.score = score.y;
+        });
+        
+        this.socket.on('youWin', () => {
+          this.win();
+        });
+        this.socket.on('youLost', () => {
+          this.lost();
         });
         
         await this.$nextTick();
@@ -137,12 +162,14 @@ export default defineComponent({
       this.pong.context.fillText('Waiting for opponent...', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
     },
     draw() {
-      if (this.state == State.NONE) {
-        this.start();
-        return;
+      if (this.state == State.NONE) { // TODO: switch 
+        return this.start();
       } else if (this.state == State.PAUSE) {
-        this.pause();
-        return;
+        return this.pause();
+      } else if (this.state == State.WIN) {
+        return this.win();
+      } else if (this.state == State.LOST) {
+        return this.lost();
       }
       // Draw fields
       this.pong.context.fillStyle = 'black';

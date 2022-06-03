@@ -103,18 +103,19 @@ export class PongService {
   }
 
   disconnectPlayer(socketPlayer: SocketPlayer) {
-    console.log(`PONG: player ${socketPlayer.user.username} left the game.`);
+    // if (socketPlayer.user)
+      // console.log(`PONG: player ${socketPlayer.user.username} left the game.`);
     // TODO: if game is over disconnect else pause game
-    if (this.pong.playerLeft.socket && this.pong.playerLeft.socket.id == socketPlayer.socket.id) {
-      this.pong.playerLeft.socket = null;
-      this.pong.playerLeft.user = null;
-      // this.pong.playerLeft.state = PlayerState.DISCONNECTED;
-    } else if (this.pong.playerRight.socket && this.pong.playerRight.socket.id == socketPlayer.socket.id) {
-      this.pong.playerRight.socket = null;
-      this.pong.playerRight.user = null;
-      // this.pong.playerRight.state = PlayerState.DISCONNECTED;
-    }
-    this.pong.server.emit('pause');
+    //if (this.pong.playerLeft.socket && this.pong.playerLeft.socket.id == socketPlayer.socket.id) {
+    //  this.pong.playerLeft.socket = null;
+    //  this.pong.playerLeft.user = null;
+    //  // this.pong.playerLeft.state = PlayerState.DISCONNECTED;
+    //} else if (this.pong.playerRight.socket && this.pong.playerRight.socket.id == socketPlayer.socket.id) {
+    //  this.pong.playerRight.socket = null;
+    //  this.pong.playerRight.user = null;
+    //  // this.pong.playerRight.state = PlayerState.DISCONNECTED;
+    //}
+    //this.pong.server.emit('pause');
   }
 
   movePlayer(id: string, y: number, canvasHeight: number) {
@@ -137,17 +138,23 @@ export class PongService {
         console.log('PONG: left player (' + this.pong.playerLeft.user.username + ') missed the ball !');
         this.pong.playerRight.score += 1;
         if (this.pong.playerRight.score >= this.pong.winScore) {
-          console.log('PONG: right player (' + this.pong.playerRight.user.username + ') won the game !');
           clearInterval(this.pong.interval);
-          // TODO: stop game because it's over
+          console.log('PONG: right player (' + this.pong.playerRight.user.username + ') won the game !');
+          this.pong.server.to(this.pong.playerRight.socket.id).emit('youWin');
+          this.pong.server.to(this.pong.playerLeft.socket.id).emit('youLost');
+          // TODO: leave room
+          return this.initServer(this.pong.server);
         }
       } else if (this.pong.ball.pos.x >= this.pong.boardSize.x / 2) {
         console.log('PONG: right player (' + this.pong.playerRight.user.username + ') missed the ball !');
         this.pong.playerLeft.score += 1;
         if (this.pong.playerLeft.score >= this.pong.winScore) {
-          console.log('PONG: left player (' + this.pong.playerLeft.user.username + ') won the game !');
           clearInterval(this.pong.interval);
-          // TODO: stop game because it's over
+          console.log('PONG: left player (' + this.pong.playerLeft.user.username + ') won the game !');
+          this.pong.server.to(this.pong.playerLeft.socket.id).emit('youWin');
+          this.pong.server.to(this.pong.playerRight.socket.id).emit('youLost');
+          // TODO: leave room
+          return this.initServer(this.pong.server);
         }
       }
 
