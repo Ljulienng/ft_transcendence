@@ -165,7 +165,7 @@ export class PongService {
       this.pong.ball.pos.x = this.pong.boardSize.x / 2;
       this.pong.ball.pos.y = this.pong.boardSize.y / 2;
       this.pong.ball.speed.x = 1;
-      this.pong.ball.speed.y = 1;
+      // this.pong.ball.speed.y = 1;
 
       // Reset players pos
       //this.pong.playerRight.y = this.pong.boardSize.y / 2 - this.pong.playerSize.y / 2;
@@ -181,14 +181,14 @@ export class PongService {
       }
 
       // TODO: Add a ratio to increment ball speed depending on the paddle impact position
-      //const impact = this.pong.ball.pos.y - y - this.pong.playerSize.y / 2;
-      //const ratio = 100 / (this.pong.playerSize.y / 2);
-      //this.pong.ball.speed.y = Math.round(impact * ratio / 200);
-      //if (this.pong.ball.speed.y > this.pong.ball.maxSpeed) {
-      //  this.pong.ball.speed.y = this.pong.ball.maxSpeed;
-      //} else if (this.pong.ball.speed.y < -this.pong.ball.maxSpeed) {
-      //  this.pong.ball.speed.y = -this.pong.ball.maxSpeed;
-      //}
+      const impact = this.pong.ball.pos.y - y - this.pong.playerSize.y / 2;
+      const ratio = 100 / (this.pong.playerSize.y / 2);
+      this.pong.ball.speed.y = Math.round(impact * ratio / 50);
+      if (this.pong.ball.speed.y > this.pong.ball.maxSpeed) {
+        this.pong.ball.speed.y = this.pong.ball.maxSpeed;
+      } else if (this.pong.ball.speed.y < -this.pong.ball.maxSpeed) {
+        this.pong.ball.speed.y = -this.pong.ball.maxSpeed;
+      }
     }
   }
 

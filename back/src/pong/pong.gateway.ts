@@ -20,7 +20,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   ) { }
 
   @WebSocketServer() server: Server;
-  waitingList: SocketPlayer[] = []; // Socket connected linked to their users entities list
+  waitingList: SocketPlayer[] = [];
+  // playingList: [] = []; // TODO: list of online games with a possibility to spectate game
 
   afterInit(server: Server) {
     this.pongService.initServer(server);
