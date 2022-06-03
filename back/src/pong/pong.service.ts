@@ -28,7 +28,7 @@ export class PongService {
         x: 100,
         y: 66
       },
-      winScore: 3,
+      winScore: 5,
       playerLeft: {
         socket: null,
         user: null,
@@ -104,7 +104,7 @@ export class PongService {
 
   disconnectPlayer(socketPlayer: SocketPlayer) {
     // if (socketPlayer.user)
-      // console.log(`PONG: player ${socketPlayer.user.username} left the game.`);
+    // console.log(`PONG: player ${socketPlayer.user.username} left the game.`);
     // TODO: if game is over disconnect else pause game
     //if (this.pong.playerLeft.socket && this.pong.playerLeft.socket.id == socketPlayer.socket.id) {
     //  this.pong.playerLeft.socket = null;
@@ -127,6 +127,11 @@ export class PongService {
       this.pong.playerRight.y = y;
       this.pong.server.to(this.pong.playerLeft.socket.id).volatile.emit('opponentMove', y);
     }
+  }
+
+  randomBallDirection() {
+    this.pong.ball.speed.x = (Math.random() * (100 - 45) + 45) / 100 * (Math.round(Math.random()) ? 1 : -1);
+    this.pong.ball.speed.y = (Math.random() * (100 - 45) + 45) / 100 * (Math.round(Math.random()) ? 1 : -1);
   }
 
   collide(y: number) {
@@ -164,8 +169,7 @@ export class PongService {
       // Reset ball pos and speed
       this.pong.ball.pos.x = this.pong.boardSize.x / 2;
       this.pong.ball.pos.y = this.pong.boardSize.y / 2;
-      this.pong.ball.speed.x = 1;
-      // this.pong.ball.speed.y = 1;
+      this.randomBallDirection();
 
       // Reset players pos
       //this.pong.playerRight.y = this.pong.boardSize.y / 2 - this.pong.playerSize.y / 2;
@@ -203,7 +207,7 @@ export class PongService {
     this.pong.server.to(this.pong.playerRight.socket.id).emit('start', false);
 
     console.log('PONG: Game \'game' + playerLeft.socket.id.substring(0, 5) + playerRight.socket.id.substring(0, 5) + '\' is starting !');
-
+    this.randomBallDirection();
     this.pong.interval = setInterval(() => {
       // Rebounds on top and bottom
       if (this.pong.ball.pos.y > this.pong.boardSize.y || this.pong.ball.pos.y < 0) {

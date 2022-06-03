@@ -42,7 +42,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       return;
     }
 
-    this.pongService.start(players[0], players[1], 3); // TODO: retrieve winScore instead of fixing it here
+    this.pongService.start(players[0], players[1], 5); // TODO: retrieve winScore instead of fixing it here
 
     //this.pongService.registerPlayer(newSocket);
   }
