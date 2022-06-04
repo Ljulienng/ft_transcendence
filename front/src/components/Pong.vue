@@ -19,7 +19,6 @@ import PongI from '../types/interfaces/pong.interface'
 // TODO: fix paddle collision with canvas border (mouse/keyboard)
 // TODO: waiting for opponent animation
 // TODO: pause menu
-// TODO: player/game STATE
 // TODO: Countdown before game start
 // TODO: implement pause menu
 // TODO: timeout event for 'oppenent gave up due to misconnexion'

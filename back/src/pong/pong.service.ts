@@ -5,7 +5,6 @@ import { Server } from 'socket.io';
 import { Game } from './models/game.entity';
 import { User } from 'src/user/models/user.entity';
 import { PlayerState, Pong, PongState, SocketPlayer } from './interfaces/pong.interface';
-import e from 'express';
 
 @Injectable()
 export class PongService {
@@ -129,20 +128,22 @@ export class PongService {
   }
 
   disconnectPlayer(socketPlayer: SocketPlayer) {
-    // if (socketPlayer.user)
-    // console.log(`PONG: player ${socketPlayer.user.username} left the game.`);
-    // TODO: if game is over disconnect else pause game
-    // TODO: state PAUSE
-    //if (this.pong.playerLeft.socket && this.pong.playerLeft.socket.id == socketPlayer.socket.id) {
-    //  this.pong.playerLeft.socket = null;
-    //  this.pong.playerLeft.user = null;
-    //  // this.pong.playerLeft.state = PlayerState.DISCONNECTED;
-    //} else if (this.pong.playerRight.socket && this.pong.playerRight.socket.id == socketPlayer.socket.id) {
-    //  this.pong.playerRight.socket = null;
-    //  this.pong.playerRight.user = null;
-    //  // this.pong.playerRight.state = PlayerState.DISCONNECTED;
-    //}
-    //this.pong.server.to(this.pong.name).emit('pause');
+     if (socketPlayer.user) {
+       console.log(`PONG: player ${socketPlayer.user.username} left the game.`);
+     }
+    if (this.pong.playerLeft.user && this.pong.playerLeft.user.username == socketPlayer.user.username) {
+      this.pong.playerLeft.socket = null;
+      this.pong.playerLeft.user = null;
+      this.pong.playerLeft.state = PlayerState.DISCONNECTED;
+    } else if (this.pong.playerRight.user && this.pong.playerRight.user.username == socketPlayer.user.username) {
+      this.pong.playerRight.socket = null;
+      this.pong.playerRight.user = null;
+      this.pong.playerRight.state = PlayerState.DISCONNECTED;
+    }
+    if (this.pong.state == PongState.PLAY) {
+      this.pong.state = PongState.PAUSE
+    }
+    this.pong.server.to(this.pong.name).emit('pause');
   }
 
   movePlayer(id: string, y: number, canvasHeight: number) {

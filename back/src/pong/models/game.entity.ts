@@ -24,7 +24,6 @@ export class Game {
   @Column({ default: 0 })
   playerTwoScore: number;
 
-
   @Column({ default: "" })
   winner: string;
 

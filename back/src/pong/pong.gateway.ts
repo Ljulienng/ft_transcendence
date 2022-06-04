@@ -47,8 +47,12 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     //this.pongService.registerPlayer(newSocket);
   }
 
-  handleDisconnect(client: Socket) {
-    this.pongService.disconnectPlayer(this.waitingList.find(e => e.socket.id == client.id));
+  async handleDisconnect(client: Socket) {
+    const newSocket: SocketPlayer = {
+      socket: client,
+      user: await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1])
+    };
+    this.pongService.disconnectPlayer(newSocket);
   }
 
   @SubscribeMessage('playerMove')
