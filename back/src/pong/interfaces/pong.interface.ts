@@ -1,15 +1,17 @@
 import { Socket, Server } from 'socket.io';
 import { User } from 'src/user/models/user.entity';
 
-// export enum PlayerState {
-//   DISCONNECTED,
-//   CONNECTED
-// }
+export enum PlayerState {
+  DISCONNECTED,
+  CONNECTED
+}
 
-// export enum PongState {
-//   OFF,
-//   ON
-// }
+export enum PongState {
+  INIT,
+  PLAY,
+  PAUSE,
+  OVER
+}
 
 export interface SocketPlayer {
   socket: Socket;
@@ -26,7 +28,7 @@ export interface Player {
   user: User;
   y: number;
   score: number;
-  // state: PlayerState;
+  state: PlayerState;
 }
 
 export interface Ball {
@@ -37,8 +39,9 @@ export interface Ball {
 }
 
 export interface Pong {
+  name: string;
   server: Server;
-  // state: PongState;
+  state: PongState;
   interval: NodeJS.Timer;
   fps: number;
   playerSize: Point;

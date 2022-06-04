@@ -16,16 +16,11 @@ import io from 'socket.io-client'
 import PointI from '../types/interfaces/point.interface'
 import PongI from '../types/interfaces/pong.interface'
 
-// TODO: ball
-// TODO: updateBall func to convert datas receive from back
-
-// TODO: fix init ball direction
 // TODO: fix paddle collision with canvas border (mouse/keyboard)
 // TODO: waiting for opponent animation
 // TODO: pause menu
 // TODO: player/game STATE
 // TODO: Countdown before game start
-// TODO: mirror game in option?
 // TODO: implement pause menu
 // TODO: timeout event for 'oppenent gave up due to misconnexion'
 
@@ -53,7 +48,10 @@ export default defineComponent({
     initPong() {
       this.pong.canvas = document.getElementById('canvas') as HTMLCanvasElement;
       this.pong.context = this.pong.canvas.getContext('2d') as CanvasRenderingContext2D;
-      this.pong.playerSize = { x: this.pong.canvas.width / 128, y: this.pong.canvas.height / 8 };
+      this.pong.playerSize = {
+        x: this.pong.canvas.width / 128,
+        y: this.pong.canvas.height / 8
+      };
       this.pong.playerRight = {
         y: this.pong.canvas.height / 2 - this.pong.playerSize.y / 2,
         score: 0
@@ -68,10 +66,8 @@ export default defineComponent({
           y: this.pong.canvas.width / 2
         },
         radius: 5
-        // speed: { x: 2, y: 2 },
-        // max_speed: 25
-      },
-        this.pong.isLeftSide = false;
+      };
+      this.pong.isLeftSide = false;
     },
     start() {
       this.pong.context.fillStyle = 'black';
@@ -108,20 +104,24 @@ export default defineComponent({
       this.pong.context.fillText('Waiting for opponent...', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
       this.state = State.PAUSE;
 
-    if (this.socket.connected == false) {
-      this.socket = io('localhost:3000/play', { withCredentials: true });
-    }
+      if (this.socket.connected == false) {
+        this.socket = io('localhost:3000/play', { withCredentials: true });
+      }
 
       this.socket.on('pause', () => {
         this.state = State.PAUSE;
         this.pause();
       });
 
-      this.socket.on('start', async (isLeftSide: boolean) => {
-        this.pong.isLeftSide = isLeftSide;
+      this.socket.on('start', async (isLeftSide: boolean, callback) => {
+        callback('ok');
         this.state = State.PLAY;
+        this.pong.playerLeft.y = this.pong.canvas.height / 2 - this.pong.playerSize.y / 2;
+        this.pong.playerRight.y = this.pong.canvas.height / 2 - this.pong.playerSize.y / 2;
+        this.pong.isLeftSide = isLeftSide;
 
-        this.socket.on('opponentMove', async (y: number) => {
+        this.socket.on('opponentMove', async (y: number, callback) => {
+          callback('ok');
           y = y / 66 * this.pong.canvas.height;
           await this.$nextTick();
           if (this.pong.isLeftSide) {
@@ -131,27 +131,34 @@ export default defineComponent({
           }
         });
 
-        this.socket.on('ballMove', (pos: PointI) => {
+        this.socket.on('ballMove', (pos: PointI, callback) => {
+          callback('ok');
           this.pong.ball.pos.x = pos.x / 100 * this.pong.canvas.width;
           this.pong.ball.pos.y = pos.y / 66 * this.pong.canvas.height;
         });
 
-        this.socket.on('updateScore', (score: PointI) => {
+        this.socket.on('updateScore', (score: PointI, callback) => {
+          callback('ok');
           this.pong.playerLeft.score = score.x;
           this.pong.playerRight.score = score.y;
         });
-        
+
         this.socket.on('youWin', () => {
+          this.pong.playerLeft.score = 0;
+          this.pong.playerRight.score = 0;
           this.win();
         });
         this.socket.on('youLost', () => {
+          this.pong.playerLeft.score = 0;
+          this.pong.playerRight.score = 0;
           this.lost();
         });
-        
+
         await this.$nextTick();
         this.play();
       });
-      // this.socket.emit('playerReady');
+      this.socket.emit('playerReady');
+      // TODO: countdown before game start
     },
     pause() {
       this.pong.context.fillStyle = 'black';
