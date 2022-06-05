@@ -8,6 +8,7 @@ import { PlayerState, Pong, PongState, SocketPlayer } from './interfaces/pong.in
 
 @Injectable()
 export class PongService {
+
   private pong: Pong;
   private playingList: SocketPlayer[];
 
@@ -71,18 +72,6 @@ export class PongService {
     console.log('init pong');
   }
 
-  // registerPlayer(socketUser: SocketPlayer) {
-  //   // TODO: should be handled by rooms
-  //   if (this.pong.playerLeft.socket == null) {
-  //     this.pong.playerLeft.socket = socketUser;
-  //   } else if (this.pong.playerRight.socket == null) {
-  //     this.pong.playerRight.socket = socketUser;
-  //   } else {
-  //     console.error('PONG: Too many player for this game.');
-  //   }
-  //   console.log(`PONG: player ${socketUser.user.username} joined the game.`);
-  // }
-
   playerReady(socketPlayer: SocketPlayer) {
     if (this.pong.playerLeft.user && this.pong.playerLeft.user.username == socketPlayer.user.username) {
       this.pong.playerLeft.socket = socketPlayer.socket;
@@ -115,7 +104,7 @@ export class PongService {
     if (waitingList.length < 2) {
       return (players);
     }
- 
+
     players[0] = waitingList.shift();
     this.playingList.push(players[0]);
 
@@ -128,9 +117,10 @@ export class PongService {
   }
 
   disconnectPlayer(socketPlayer: SocketPlayer) {
-     if (socketPlayer.user) {
-       console.log(`PONG: player ${socketPlayer.user.username} left the game.`);
-     }
+    // TODO: remove from playing/searching list
+    if (socketPlayer.user) {
+      console.log(`PONG: player ${socketPlayer.user.username} left the game.`);
+    }
     if (this.pong.playerLeft.user && this.pong.playerLeft.user.username == socketPlayer.user.username) {
       this.pong.playerLeft.socket = null;
       this.pong.playerLeft.user = null;
@@ -147,7 +137,7 @@ export class PongService {
   }
 
   movePlayer(id: string, y: number, canvasHeight: number) {
-    y = y / canvasHeight * 66;
+    y = y / canvasHeight * this.pong.boardSize.y;
     if (this.pong.playerLeft.socket.id == id) {
       this.pong.playerLeft.y = y;
       this.pong.server.timeout(1000).to(this.pong.playerRight.socket.id).emit('opponentMove', y, (err: Error, response: string) => {
@@ -194,7 +184,7 @@ export class PongService {
           this.playingList = this.playingList.filter(e => e.user.username != this.pong.playerLeft.user.username && e.user.username != this.pong.playerRight.user.username);
           console.log(`PONG: Game '${this.pong.name}' is over !\n`);
           this.pong.state = PongState.OVER;
-          return ;
+          return;
           // return this.initServer(this.pong.server); // TODO: ?
         }
       } else if (this.pong.ball.pos.x >= this.pong.boardSize.x / 2) { // PLayerRight missed the ball
@@ -210,7 +200,7 @@ export class PongService {
           this.playingList = this.playingList.filter(e => e.user.username != this.pong.playerLeft.user.username && e.user.username != this.pong.playerRight.user.username);
           console.log(`PONG: Game '${this.pong.name}' is over !\n`);
           this.pong.state = PongState.OVER;
-          return ;
+          return;
           // return this.initServer(this.pong.server); // TODO: ?
         }
       }
@@ -252,10 +242,13 @@ export class PongService {
         this.pong.ball.speed.x = -this.pong.ball.maxSpeed;
       }
 
+      // TODO: review
       // Add a ratio to increment ball speed depending on the paddle impact position
-      const impact = this.pong.ball.pos.y - y - this.pong.playerSize.y / 2;
+      const distanceFromPaddleMiddle = this.pong.ball.pos.y - y - this.pong.playerSize.y / 2;
       const ratio = 100 / (this.pong.playerSize.y / 2);
-      this.pong.ball.speed.y = Math.round(impact * ratio / 50);
+      this.pong.ball.speed.y = Math.round(distanceFromPaddleMiddle * ratio / 50);
+
+      // Ball speed should not exeed maxSpeed
       if (this.pong.ball.speed.y > this.pong.ball.maxSpeed) {
         this.pong.ball.speed.y = this.pong.ball.maxSpeed;
       } else if (this.pong.ball.speed.y < -this.pong.ball.maxSpeed) {
@@ -263,46 +256,46 @@ export class PongService {
       }
     }
   }
-  
+
   sendStart(id: string, isLeftPlayer: boolean): Promise<string> {
     return new Promise(resolve => this.pong.server.timeout(1000).to(id).emit('start', isLeftPlayer, (err: Error, response: string) => {
-        if (err || response != 'ok') {
-          console.log('pause when sending start', id, this.pong.playerLeft.socket.id, this.pong.playerRight.socket.id);
-          if (this.pong.playerLeft.socket.id == id) {
-            this.pong.playerLeft.state = PlayerState.DISCONNECTED;
-          } else if (this.pong.playerRight.socket.id == id) {
-            this.pong.playerRight.state = PlayerState.DISCONNECTED;
-          } else {
-            console.log('I do not know who has just disconnect..');
-          }
-          console.log('pause when sending start', id, this.pong.playerLeft.socket.id, this.pong.playerRight.socket.id);
-          this.pong.state = PongState.PAUSE;
-          console.log(`GAME: state is`, this.pong.state, this.pong.playerLeft.state, this.pong.playerRight.state);
+      if (err || response != 'ok') {
+        console.log('pause when sending start', id, this.pong.playerLeft.socket.id, this.pong.playerRight.socket.id);
+        if (this.pong.playerLeft.socket.id == id) {
+          this.pong.playerLeft.state = PlayerState.DISCONNECTED;
+        } else if (this.pong.playerRight.socket.id == id) {
+          this.pong.playerRight.state = PlayerState.DISCONNECTED;
+        } else {
+          console.log('I do not know who has just disconnect..');
         }
-        resolve(response);
+        console.log('pause when sending start', id, this.pong.playerLeft.socket.id, this.pong.playerRight.socket.id);
+        this.pong.state = PongState.PAUSE;
+        console.log(`GAME: state is`, this.pong.state, this.pong.playerLeft.state, this.pong.playerRight.state);
+      }
+      resolve(response);
     }));
   }
 
   sendBallMove(id: string): Promise<string> {
     return new Promise(resolve => this.pong.server.timeout(1000).to(id).emit('ballMove', this.pong.ball.pos, (err: Error, response: string) => {
-        if (err || response != 'ok') {
-          console.log('pause when sending ballPos', id, this.pong.playerLeft.socket.id, this.pong.playerRight.socket.id);
-          if (this.pong.playerLeft.socket.id == id) {
-            console.log('disconnecting player LEFT');
-            this.pong.playerLeft.state = PlayerState.DISCONNECTED;
-          } else if (this.pong.playerRight.socket.id == id) {
-            console.log('disconnecting player RIGHT');
-            this.pong.playerRight.state = PlayerState.DISCONNECTED;
-          } else {
-            console.log('I do not know who has just disconnect..');
-          }
-          console.log('pause when sending ballPos', id, this.pong.playerLeft.socket.id, this.pong.playerRight.socket.id);
-          this.pong.state = PongState.PAUSE;
-          console.log(`GAME: state is`, this.pong.state, this.pong.playerLeft.state, this.pong.playerRight.state);
+      if (err || response != 'ok') {
+        console.log('pause when sending ballPos', id, this.pong.playerLeft.socket.id, this.pong.playerRight.socket.id);
+        if (this.pong.playerLeft.socket.id == id) {
+          console.log('disconnecting player LEFT');
+          this.pong.playerLeft.state = PlayerState.DISCONNECTED;
+        } else if (this.pong.playerRight.socket.id == id) {
+          console.log('disconnecting player RIGHT');
+          this.pong.playerRight.state = PlayerState.DISCONNECTED;
+        } else {
+          console.log('I do not know who has just disconnect..');
         }
-        resolve(response);
+        console.log('pause when sending ballPos', id, this.pong.playerLeft.socket.id, this.pong.playerRight.socket.id);
+        this.pong.state = PongState.PAUSE;
+        console.log(`GAME: state is`, this.pong.state, this.pong.playerLeft.state, this.pong.playerRight.state);
+      }
+      resolve(response);
     }));
-      // TODO: emit ballMove to everyone else in room but do not pause game for them
+    // TODO: emit ballMove to everyone else in room but do not pause game for them
   }
 
   async start(playerLeft: SocketPlayer, playerRight: SocketPlayer, winScore: number) {
@@ -323,7 +316,7 @@ export class PongService {
     if (this.pong.state != PongState.PLAY) {
       this.pong.server.to(this.pong.name).emit('pause');
       console.log('cannot start because pause');
-      return ;
+      return;
     }
 
     console.log(`\nPONG: Game '${this.pong.name}' is starting !`);
@@ -334,7 +327,7 @@ export class PongService {
         this.pong.server.to(this.pong.name).emit('pause');
         console.log('cannot loop because ' + this.pong.state);
         clearInterval(this.pong.interval);
-        return ;
+        return;
       }
       // Rebounds on top and bottom
       if (this.pong.ball.pos.y > this.pong.boardSize.y || this.pong.ball.pos.y < 0) {
@@ -364,13 +357,13 @@ export class PongService {
       if (this.pong.state != PongState.PLAY) {
         this.pong.server.to(this.pong.name).emit('pause');
         clearInterval(this.pong.interval);
-        return ;
+        return;
       }
       await this.sendBallMove(this.pong.playerRight.socket.id);
       if (this.pong.state != PongState.PLAY) {
         this.pong.server.to(this.pong.name).emit('pause');
         clearInterval(this.pong.interval);
-        return ;
+        return;
       }
 
       // Check collisions with players
