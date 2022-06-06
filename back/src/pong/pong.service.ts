@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 import { Repository } from 'typeorm';
 import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { User } from 'src/user/models/user.entity';
-import { Game } from './models/game.entity';
+import { Match } from './models/match.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
@@ -13,8 +13,8 @@ export class PongService {
 
   constructor(
     private schedulerRegistry: SchedulerRegistry,
-		@InjectRepository(Game)
-		protected gameRepository: Repository<Game>,
+		@InjectRepository(Match)
+		protected matchRepository: Repository<Match>,
 
     ) {
     this.pong = {
@@ -216,8 +216,8 @@ export class PongService {
     this.schedulerRegistry.addInterval('ballMove', interval);
   }
 
-  async getGames(user: User) {
-    return await this.gameRepository.find({
+  async getMatchHistory(user: User) {
+    return await this.matchRepository.find({
       where: [
         {
           playerOne: user
