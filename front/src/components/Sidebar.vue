@@ -40,6 +40,10 @@
 				<span class="material-icons">videogame_asset</span>
 				<span class="text">Play</span>
 			</router-link>
+			<router-link to="/leaderboard" class="button">
+				<span class="material-icons">emoji_events</span>
+				<span class="text">Play</span>
+			</router-link>
 		</div>
 
 		<div class="flex"></div>
