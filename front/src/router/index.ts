@@ -11,7 +11,7 @@ import Home from '@/views/Home.vue'
 import Test from '@/views/Test.vue'
 // import http from '../http-common'
 import Chat from '@/views/Chat.vue'
-// import Chat from '@/views/frontChat.vue'
+import Leaderboard from '@/views/Leaderboard.vue'
 
 const routes = [
 	// {
@@ -91,6 +91,12 @@ const routes = [
 		name: 'UserProfile',
 		path: '/userprofile',
 		component: UserProfile,
+		meta: {requiredAuth: true}
+	},
+	{
+		name: 'Leaderboard',
+		path: '/leaderboard',
+		component: Leaderboard,
 		meta: {requiredAuth: true}
 	},
 ];
