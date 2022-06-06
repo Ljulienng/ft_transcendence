@@ -13,7 +13,6 @@
           <div class="col align-middle">lastname</div>
           <div class="col align-middle">status</div>
           <p class="invisible">del</p>
-          <p class="invisible">block</p>
         </li>
       <li 
         v-for="blocked in blockedList"
