@@ -30,6 +30,7 @@ import { receiveMessageOnPort } from "worker_threads";
 
 export interface SocketUserI {
     socketId: string;
+    socket: Socket;
     user: User;
 }
 
@@ -62,6 +63,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async handleConnection(client: Socket, room: string) {
         let newSocket: SocketUserI = {
             socketId: '',
+            socket: client,
             user: null
         }
         // Link client socket to his user entity

@@ -122,7 +122,8 @@ export class ChannelService {
 
        await this.channelRepository.save(newChannel);
        await this.channelMemberService.createMember(user, newChannel, true, true);
-       console.log('new channel created : ', newChannel);
+       console.log("channel id : ", newChannel.id );
+       return newChannel.id;
     }
 
     /*
