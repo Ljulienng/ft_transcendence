@@ -228,7 +228,6 @@ export class UserController {
 	getUserStats(@Req() req) {
 		try {
 			const user = req.user;
-			console.log("user = ", user)
 			const stats = {
 				gameWon: user.gameWon,
 				gameLost: user.gameLost,
