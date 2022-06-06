@@ -171,7 +171,17 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async isOwner(client: Socket, channelId: number) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         const owner = await this.channelService.findOwner(channelId);
-        this.server.to(client.id).emit("isOwner", (user.id == owner.user.id));
+        this.server.to(client.id).emit("isOwner", (user.id === owner.user.id));
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('isAdmin') 
+    async isAdmin(client: Socket, channelId: number) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        const admins = await this.channelService.findAdmins(channelId);
+        const member = admins.find(u => u.user.id === user.id);
+        const isAdmin = (member == undefined) ? false : true;
+        this.server.to(client.id).emit("isAdmin", isAdmin);
     }
 
      /*

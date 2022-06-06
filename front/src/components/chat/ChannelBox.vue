@@ -1,6 +1,6 @@
 <template>
   <div class="channelBox">
-    <div v-if="isOwner == true"> <!-- invitations only by owner -->
+    <div v-if="isAdmin == true"> <!-- invitations only by admins -->
       <button v-if="channelType == 'private'" @click="invite()">Invite : </button>
       <input
           type="text"
@@ -54,6 +54,7 @@ export default defineComponent({
       // test: io('http://localhost:3000/channel', {  withCredentials: true}),
       currentUser: store.getters["auth/getUserProfile"],
       isOwner: false,
+      isAdmin: false,
       invitation: {
         channelId: this.channel,
         guest: "",
@@ -117,6 +118,10 @@ export default defineComponent({
     this.socket.on(
       "isOwner", (data: boolean) => { this.isOwner = data; }
     );
+
+    this.socket.on(
+      "isAdmin", (data: boolean) => { this.isAdmin = data; console.log("Admin:", data);}
+    );
 },
 
   // unmounted() {
@@ -128,6 +133,7 @@ export default defineComponent({
     // console.log("Channelbox created");
     this.getMessages();
     this.socket.emit("isOwner", this.channel);
+    this.socket.emit("isAdmin", this.channel);
   },
   // setup() {
   // },
