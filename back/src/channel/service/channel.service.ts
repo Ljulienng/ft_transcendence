@@ -55,19 +55,21 @@ export class ChannelService {
     }
 
     /* get channel members */
-    async findMembers(channelId: number) {
+    async findMembers(channelId: number): Promise<ChannelMember[]> {
         const channel = await this.findChannelById(channelId);
         return await this.channelMemberService.findMembers(channel);
     }
 
     /* get the channel owner */
-    async   findOwner(channelId: number) {
+    async   findOwner(channelId: number): Promise<ChannelMember> {
         const channel = await this.findChannelById(channelId);
+        console.log("channelid : ", channelId);
+        console.log("channel : ", channel);
         return await this.channelMemberService.findOwner(channel);
     }
 
     /* get channel admins */
-    async   findAdmins(channelId: number) {
+    async   findAdmins(channelId: number): Promise<ChannelMember[]> {
         const channel = await this.findChannelById(channelId);
         return await this.channelMemberService.findAdmins(channel);
     }

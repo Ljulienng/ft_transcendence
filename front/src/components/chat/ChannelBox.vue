@@ -1,7 +1,6 @@
 <template>
   <div class="channelBox">
-    <div>
-      <!-- find a way to allow invitations only by owner -->
+    <div v-if="isOwner == true"> <!-- invitations only by owner -->
       <button v-if="channelType == 'private'" @click="invite()">Invite : </button>
       <input
           type="text"
@@ -10,7 +9,7 @@
           class="inputMessage"
           placeholder="username"
         />
-      </div>
+    </div>
     <p>{{ channel }}</p>
     <div class="messageList">
       <p v-for="msg in messageList.slice().reverse()" :key="msg">
@@ -54,6 +53,7 @@ export default defineComponent({
     return {
       // test: io('http://localhost:3000/channel', {  withCredentials: true}),
       currentUser: store.getters["auth/getUserProfile"],
+      isOwner: false,
       invitation: {
         channelId: this.channel,
         guest: "",
@@ -85,7 +85,7 @@ export default defineComponent({
     },
 
     async getMessages() {
-      console.log("heho");
+      // console.log("heho");
       this.socket.emit("getChannelMsg", this.channel);
       this.socket.on("getChannelMessages", (data: MessageI[]) => {
         this.messageList = data;
@@ -114,7 +114,9 @@ export default defineComponent({
         this.messageList = data;
       }
     );
-
+    this.socket.on(
+      "isOwner", (data: boolean) => { this.isOwner = data; }
+    );
 },
 
   // unmounted() {
@@ -123,9 +125,9 @@ export default defineComponent({
 
   created() {
     console.log("socket = ", this.socket);
-
-    console.log("Channelbox created");
+    // console.log("Channelbox created");
     this.getMessages();
+    this.socket.emit("isOwner", this.channel);
   },
   // setup() {
   // },

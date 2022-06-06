@@ -164,6 +164,14 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
     }
 
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('isOwner') 
+    async isOwner(client: Socket, channelId: number) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        const owner = await this.channelService.findOwner(channelId);
+        this.server.to(client.id).emit("isOwner", (user.id == owner.user.id));
+    }
+
      /*
      ** add a new message
      */
