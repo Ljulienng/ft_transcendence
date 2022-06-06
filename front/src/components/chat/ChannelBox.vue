@@ -1,5 +1,15 @@
 <template>
   <div class="channelBox">
+    <div v-if="isOwner == true"> <!-- invitations only by owner -->
+      <button v-if="channelType == 'private'" @click="invite()">Invite : </button>
+      <input
+          type="text"
+          maxlength="30"
+          v-model="invitation.guest"
+          class="inputMessage"
+          placeholder="username"
+        />
+    </div>
     <p>{{ channel }}</p>
     <div class="messageList">
       <p v-for="msg in messageList.slice().reverse()" :key="msg">
@@ -31,6 +41,9 @@ export default defineComponent({
     channel: {
       type: Number,
     },
+    channelType: {
+      type: String,
+    },
     socketChannel: {
       type: Socket,
     },
@@ -40,6 +53,11 @@ export default defineComponent({
     return {
       // test: io('http://localhost:3000/channel', {  withCredentials: true}),
       currentUser: store.getters["auth/getUserProfile"],
+      isOwner: false,
+      invitation: {
+        channelId: this.channel,
+        guest: "",
+      },
       message: {
         userId: 0,
         username: "",
@@ -67,12 +85,19 @@ export default defineComponent({
     },
 
     async getMessages() {
-      console.log("heho");
+      // console.log("heho");
       this.socket.emit("getChannelMsg", this.channel);
       this.socket.on("getChannelMessages", (data: MessageI[]) => {
         this.messageList = data;
       });
     },
+
+    invite() {
+      console.log("Invite/add friend to a private channel : ", this.invitation);
+      this.socket.emit("inviteInPrivateChannel", this.invitation);
+      this.invitation.guest = "";
+    },
+
   },
 
   mounted() {
@@ -89,7 +114,10 @@ export default defineComponent({
         this.messageList = data;
       }
     );
-  },
+    this.socket.on(
+      "isOwner", (data: boolean) => { this.isOwner = data; }
+    );
+},
 
   // unmounted() {
   // 	this.test.close;
@@ -97,9 +125,9 @@ export default defineComponent({
 
   created() {
     console.log("socket = ", this.socket);
-
-    console.log("Channelbox created");
+    // console.log("Channelbox created");
     this.getMessages();
+    this.socket.emit("isOwner", this.channel);
   },
   // setup() {
   // },
