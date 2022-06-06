@@ -58,7 +58,12 @@ export default defineComponent({
 
     blockUser(userToBlock: number) {
       this.socket.emit("blockUser", userToBlock);
+      console.log("blockUser", userToBlock);
+      const x: any = this.friendList.find(d => d["id"] === userToBlock)
+      console.log("FRIENDLIST", x.username);
+      this.deleteFriend(x.username);
       this.getFriendList();
+      this.$forceUpdate();
     },
 
     async deleteFriend(friendUsername: string) {

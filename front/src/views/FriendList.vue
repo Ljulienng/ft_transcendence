@@ -82,7 +82,7 @@
      </div>
 
     <div class="container-fluid widebox">
-      <BlockedUser :key="updateComp" />
+      <BlockedUser :key="updateComp"/>
     </div>
    
 
@@ -149,7 +149,6 @@ export default defineComponent({
 
     blockUser(userToBlock: number) {
       this.socket.emit("blockUser", userToBlock);
-      this.getFriendList();
     },
   },
 
