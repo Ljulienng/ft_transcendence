@@ -1,6 +1,7 @@
 <template>
-  <!-- <div id="friend"> -->
-  <div id="friend" class="pl-6" style="padding-right: 20px">
+
+<div>
+
     <!-- Button trigger modal -->
     <div class="d-flex align-items-center mt-4">
       <h3>friends</h3>
@@ -10,6 +11,7 @@
     </div>
 
     <!-- Modal -->
+
     <div
       class="modal fade"
       id="addFriendModal"
@@ -20,6 +22,7 @@
       <div class="modal-dialog">
 
         <div class="modal-content">
+
           <div class="modal-header">
             <h5 class="modal-title" id="addFriendModalLabel">Add friend</h5>
             <button
@@ -30,13 +33,16 @@
               aria-label="Close"
             ></button>
           </div>
+
           <div class="modal-body">
+
             <form
               class="needs-validation"
               novalidate
               v-on:submit.prevent="addFriend"
             >
               <div class="row align-items-center justify-content-between">
+                
                 <div class="col">
                   <div class="position-relative">
                     <input
@@ -49,6 +55,7 @@
                       required
                     />
                   </div>
+
                   <div
                     id="idHelp"
                     class="form-text"
@@ -57,7 +64,9 @@
                   >
                     {{ errorMsg }}
                   </div>
+
                 </div>
+
                 <div class="col-auto">
                   <div class="mb-4 mt-4 text-center">
                     <button type="submit">
@@ -65,63 +74,45 @@
                     </button>
                   </div>
                 </div>
+
               </div>
+
             </form>
+
           </div>
         </div>
 
       </div>
     </div>
 
-    <div class="container-fluid widebox">
-      <FriendsList :key="updateComp" />
-    </div>
+</div>
 
-    <div class="d-flex align-items-center mt-4">
-      <h3>blocked users</h3>
-     </div>
-
-    <div class="container-fluid widebox">
-      <BlockedUser :key="updateComp"/>
-    </div>
-   
-
-  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import http from "../http-common";
-import BlockedUser from "../components/user/BlockedUser.vue";
-import FriendsList from "../components/user/FriendsList.vue";
-import store from "../store";
+import http from "../../http-common";
+import store from "../../store";
 
 export default defineComponent({
-  components: {
-    BlockedUser,
-    FriendsList,
-  },
 
   data() {
+
     return {
       socket: store.getters["auth/getUserSocket"],
-      userStatus: "",
       errorMsg: "",
       friendList: [],
       friendToAdd: {
         friendUsername: "",
       },
-      userToBlock: 0,
-      updateComp: 0,
     };
   },
 
   methods: {
-    async getFriendList() {
+      async getFriendList() {
       try {
         const response = await http.get("/users/friendlist");
         this.friendList = response.data;
-        this.updateComp++;
       } catch (e) {
         console.log(e);
       }
@@ -135,6 +126,7 @@ export default defineComponent({
           this.getFriendList();
           this.errorMsg = "";
           (document.getElementById("closeModalButton") as any).click();
+          this.$forceUpdate();
         })
         .catch((error) => {
           console.log(
@@ -146,25 +138,16 @@ export default defineComponent({
             (this.errorMsg = error.response.data.error);
         });
     },
-
-    blockUser(userToBlock: number) {
-      this.socket.emit("blockUser", userToBlock);
-    },
   },
 
   mounted() {
-    this.socket.on("friendConnected", () => {
-      this.getFriendList();
-    });
-
-    this.socket.on("friendDisconnected", () => {
-      this.getFriendList();
-    });
+     
   },
 
   created() {
-    this.getFriendList();
+    
   },
+
 });
 </script>
 

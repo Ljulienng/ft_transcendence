@@ -24,22 +24,20 @@ import { defineComponent } from "@vue/runtime-core";
 export default defineComponent({
   methods: {
     ftAuth() {
-      return "http://localhost:3000/auth/42";
+      return ('http://localhost:3000/auth/42');
     },
-
     norminetAuth() {
-      http
-        .get("/norminet")
-        .then((res) => {
-          console.log(res);
-          this.$router.push("http://localhost:3001/home");
-        })
-        .catch((err) => {
-          console.log("err norminet = ", err);
-        });
-    },
-  },
-});
+      http.get('/norminet')
+      .then(res => {
+        console.log(res);
+        this.$router.push("http://localhost:3001/home")
+      })
+      .catch(err => {
+        console.log("err norminet = ", err)
+      })
+    }
+  }
+})
 </script>
 
 <style scoped scss lang="scss">

@@ -4,6 +4,8 @@
     <UploadAvatar />
     <TwoFactorModal />
     <UsernameModal />
+    <GameHistory v-bind:currentUser="currentUser" />
+    <UserStats />
   </div>
 </template>
 
@@ -14,12 +16,20 @@ import TwoFactorModal from "../components/auth/TwoFactorModal.vue";
 // import UsernameModal from "../components/user/UsernameModal.vue";
 import store from "../store";
 import UsernameModal from "../components/user/UsernameModal.vue";
+import GameHistory from "../components/user/GameHistory.vue";
+import UserStats from "../components/user/UserStats.vue";
 
 export default defineComponent({
   components: {
     TwoFactorModal,
     UsernameModal,
+    GameHistory,
+    UserStats,
   },
+
+  // data() {
+  //   return {};
+  // },
 
   methods: {
     setStatus() {

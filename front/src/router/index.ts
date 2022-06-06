@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import store from '../store'
 import HelloWorld from '@/components/HelloWorld.vue'
 import ShowUsers from '@/components/ShowUsers.vue'
+import Pong from '@/components/Pong.vue'
 import AuthModal from '@/components/auth/AuthModal.vue'
 import TwoFaAuth from '@/components/auth/TwoFaAuth.vue'
 import FriendList from '@/views/FriendList.vue'
@@ -32,6 +33,7 @@ const routes = [
 	{
 		name: 'Home',
 		path: '/home',
+		alias: ['/'],
 		component: Home,
 		meta: {requiredAuth: true}
 	},
@@ -44,6 +46,11 @@ const routes = [
 		name: 'ShowUsers',
 		path: '/showusers',
 		component: ShowUsers
+	},
+	{
+		name: 'Play',
+		path: '/play',
+		component: Pong
 	},
 	{
 		name: 'AuthModal',
@@ -86,12 +93,6 @@ const routes = [
 		component: UserProfile,
 		meta: {requiredAuth: true}
 	},
-	// {
-	// 	name: 'Chat',
-	// 	path: '/chat',
-	// 	component: Chat,
-	// 	meta: {requiredAuth: false}
-	// }
 ];
 
 const router = createRouter({
