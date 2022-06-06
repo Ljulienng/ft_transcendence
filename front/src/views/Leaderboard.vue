@@ -1,6 +1,8 @@
 <template>
 
-    <div id="leaderboard" class="container-fluid px-6 mx-5">
+    <div id="leaderboard"
+        class="container-fluid"
+        style="padding-left: 100px; padding-right: 20px">
         <div class="container-fluid">
             <UsersList/>
         </div>
