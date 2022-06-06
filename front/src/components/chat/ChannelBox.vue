@@ -1,13 +1,30 @@
 <template>
   <div class="channelBox">
-    <div v-if="isAdmin == true"> <!-- invitations only by admins -->
-      <button v-if="channelType == 'private'" @click="invite()">Invite : </button>
+    <div v-if="isAdmin == true && channelType == 'private'"> <!-- invitations only by admins -->
+        <button  @click="invite()">Invite : </button>
+        <input
+            type="text"
+            maxlength="30"
+            v-model="invitation.guest"
+            class="inputMessage"
+            placeholder="username"
+          />
+    </div>
+    <div v-if="isOwner == true && channelType == 'protected'"> <!-- change password only by owner -->
+      <button @click="changePassword()">Change password : </button>
       <input
-          type="text"
-          maxlength="30"
-          v-model="invitation.guest"
+          type="password"
+          maxlength="100"
+          v-model="passwordI.old"
           class="inputMessage"
-          placeholder="username"
+          placeholder="old password"
+        />
+            <input
+          type="password"
+          maxlength="100"
+          v-model="passwordI.new"
+          class="inputMessage"
+          placeholder="new password"
         />
     </div>
     <p>{{ channel }}</p>
@@ -59,6 +76,11 @@ export default defineComponent({
         channelId: this.channel,
         guest: "",
       },
+      passwordI : {
+        old: "",
+        new: "",
+        channelId: this.channel,
+      },
       message: {
         userId: 0,
         username: "",
@@ -99,6 +121,12 @@ export default defineComponent({
       this.invitation.guest = "";
     },
 
+    changePassword() {
+      this.socket.emit("changePassword", this.passwordI);
+      this.passwordI.old = "";
+      this.passwordI.new = "";
+    },
+
   },
 
   mounted() {
@@ -120,7 +148,11 @@ export default defineComponent({
     );
 
     this.socket.on(
-      "isAdmin", (data: boolean) => { this.isAdmin = data; console.log("Admin:", data);}
+      "isAdmin", (data: boolean) => { this.isAdmin = data; }
+    );
+
+    this.socket.on(
+      "passwordChanged", (data: string) => { console.log("passwordChanged:", data);}
     );
 },
 

@@ -20,6 +20,7 @@ import { UseGuards } from "@nestjs/common";
 import { CreateChannelDto } from "src/channel/models/channel.dto";
 import { Observable } from 'rxjs'
 import { User } from "./models/user.entity";
+import { PasswordI } from "src/channel/models/password.interface";
 
 
 
@@ -182,6 +183,15 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const member = admins.find(u => u.user.id === user.id);
         const isAdmin = (member == undefined) ? false : true;
         this.server.to(client.id).emit("isAdmin", isAdmin);
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('changePassword') 
+    async changePassword(client: Socket, passwordI: PasswordI) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.changePassword(user.id, passwordI);
+        // need to inform members of the channel of this change !
+        this.server.to(client.id).emit("passwordChanged", "password is changed");
     }
 
      /*
