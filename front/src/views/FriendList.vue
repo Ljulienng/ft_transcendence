@@ -77,7 +77,7 @@
       <FriendsList :key="updateComp" />
     </div>
 
-    <div class="container pt-4">
+    <div class="d-flex align-items-center mt-4">
       <h3>blocked users</h3>
      </div>
 
