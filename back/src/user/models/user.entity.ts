@@ -47,7 +47,7 @@ export class User {
 	readonly createdTime: Date;
 
 	@OneToMany(() => MessageChannel, message => message.channel)
-	messages: MessageChannel[]; 
+	messages: MessageChannel[];
 
 	// only where user is owner
 	@OneToMany(() => Channel, channel => channel.owner)
@@ -69,4 +69,16 @@ export class User {
 
 	@Column({nullable: true})
 	profileImage: string;
+
+	@Column({default: 0})
+	gameWon: number;
+
+	@Column({default: 0})
+	gameLost: number;
+
+	@Column({default: 0})
+	ranking: number;
+
+	@Column({default: 0})
+	points: number;
 }

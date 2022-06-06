@@ -207,6 +207,37 @@ export class UserController {
 		} catch(e) {
 			console.log(e);
 		}
+	}
 
+	// =========== MATCH PART =============
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get("/matchhistory")
+	async getMatchHistory(@Req() req) {
+		try {
+			const user = req.user;
+
+			return this.userService.getMatchHistory(user);
+		} catch(e) {
+			console.log(e);
+		}
+	}
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get("/stats")
+	getUserStats(@Req() req) {
+		try {
+			const user = req.user;
+			const stats = {
+				gameWon: user.gameWon,
+				gameLost: user.gameLost,
+				ranking: user.ranking,
+				points: user.points,
+			}
+
+			return stats;
+		} catch(e) {
+
+		}
 	}
 }
