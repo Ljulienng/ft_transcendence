@@ -1,5 +1,5 @@
 <template>
-  <div class="body">
+  <div class="body" style="padding-left: 100px; padding-right: 20px">
     <div class="welcome">
       Welcome, {{ getUserProfile.userName }} you are {{ getUserProfile.status }}
     </div>

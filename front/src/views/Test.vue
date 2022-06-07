@@ -1,5 +1,5 @@
 <template>
-  <div id="test">
+  <div id="test" style="padding-left: 100px; padding-right: 20px">
     <!-- <h2>
       Vue.js Notification
       <br />

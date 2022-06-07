@@ -68,14 +68,14 @@ export class ChannelController {
     }
 
     // test : curl -v -X POST -d '{"oldPassword":"oldpass", "newPassword":"newpass"}' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/changePass
-    @UseGuards(JwtAuthGuard)
-    @Post(':channelId/changePass')
-    async changePassword(
-        @Param('channelId') channelId: number,
-        @Req() request,
-        @Body() passwords: PasswordI) {
-        return await this.channelService.changePassword(channelId, request.user.id, passwords);
-    }
+    // @UseGuards(JwtAuthGuard)
+    // @Post(':channelId/changePass') 
+    // async changePassword(
+    //     @Param('channelId') channelId: number,
+    //     @Req() request,
+    //     @Body() passwords: PasswordI) {
+    //     return await this.channelService.changePassword(channelId, request.user.id, passwords);
+    // }
 
     // test : curl -v  -X POST -d '{"muted": true }' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/{userId}
     @UseGuards(JwtAuthGuard)

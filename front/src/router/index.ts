@@ -1,7 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '../store'
-import HelloWorld from '@/components/HelloWorld.vue'
-import ShowUsers from '@/components/ShowUsers.vue'
 import Pong from '@/components/Pong.vue'
 import AuthModal from '@/components/auth/AuthModal.vue'
 import TwoFaAuth from '@/components/auth/TwoFaAuth.vue'
@@ -36,16 +34,6 @@ const routes = [
 		alias: ['/'],
 		component: Home,
 		meta: {requiredAuth: true}
-	},
-	{
-		name: 'Hello',
-		path: '/hello',
-		component: HelloWorld
-	},
-	{
-		name: 'ShowUsers',
-		path: '/showusers',
-		component: ShowUsers
 	},
 	{
 		name: 'Play',

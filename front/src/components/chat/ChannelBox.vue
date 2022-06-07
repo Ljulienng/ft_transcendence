@@ -1,13 +1,30 @@
 <template>
   <div class="channelBox">
-    <div v-if="isOwner == true"> <!-- invitations only by owner -->
-      <button v-if="channelType == 'private'" @click="invite()">Invite : </button>
+    <div v-if="isAdmin == true && channelType == 'private'"> <!-- invitations only by admins -->
+        <button  @click="invite()">Invite : </button>
+        <input
+            type="text"
+            maxlength="30"
+            v-model="invitation.guest"
+            class="inputMessage"
+            placeholder="username"
+          />
+    </div>
+    <div v-if="isOwner == true && channelType == 'protected'"> <!-- change password only by owner -->
+      <button @click="changePassword()">Change password : </button>
       <input
-          type="text"
-          maxlength="30"
-          v-model="invitation.guest"
+          type="password"
+          maxlength="100"
+          v-model="passwordI.old"
           class="inputMessage"
-          placeholder="username"
+          placeholder="old password"
+        />
+            <input
+          type="password"
+          maxlength="100"
+          v-model="passwordI.new"
+          class="inputMessage"
+          placeholder="new password"
         />
     </div>
     <p>{{ channel }}</p>
@@ -54,9 +71,15 @@ export default defineComponent({
       // test: io('http://localhost:3000/channel', {  withCredentials: true}),
       currentUser: store.getters["auth/getUserProfile"],
       isOwner: false,
+      isAdmin: false,
       invitation: {
         channelId: this.channel,
         guest: "",
+      },
+      passwordI : {
+        old: "",
+        new: "",
+        channelId: this.channel,
       },
       message: {
         userId: 0,
@@ -98,6 +121,12 @@ export default defineComponent({
       this.invitation.guest = "";
     },
 
+    changePassword() {
+      this.socket.emit("changePassword", this.passwordI);
+      this.passwordI.old = "";
+      this.passwordI.new = "";
+    },
+
   },
 
   mounted() {
@@ -117,6 +146,14 @@ export default defineComponent({
     this.socket.on(
       "isOwner", (data: boolean) => { this.isOwner = data; }
     );
+
+    this.socket.on(
+      "isAdmin", (data: boolean) => { this.isAdmin = data; }
+    );
+
+    this.socket.on(
+      "passwordChanged", (data: string) => { console.log("passwordChanged:", data);}
+    );
 },
 
   // unmounted() {
@@ -128,6 +165,7 @@ export default defineComponent({
     // console.log("Channelbox created");
     this.getMessages();
     this.socket.emit("isOwner", this.channel);
+    this.socket.emit("isAdmin", this.channel);
   },
   // setup() {
   // },
