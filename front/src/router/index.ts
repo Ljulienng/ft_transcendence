@@ -10,6 +10,7 @@ import Test from '@/views/Test.vue'
 // import http from '../http-common'
 import Chat from '@/views/Chat.vue'
 import Leaderboard from '@/views/Leaderboard.vue'
+import PublicUserProfile from '@/views/PublicUserProfile.vue'
 
 const routes = [
 	// {
@@ -79,6 +80,12 @@ const routes = [
 		name: 'UserProfile',
 		path: '/userprofile',
 		component: UserProfile,
+		meta: {requiredAuth: true}
+	},
+	{
+		name: 'PublicProfile',
+		path: '/public/:username',
+		component: PublicUserProfile,
 		meta: {requiredAuth: true}
 	},
 	{

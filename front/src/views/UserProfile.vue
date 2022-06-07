@@ -1,6 +1,9 @@
 <template>
   <div class="userProfile" style="padding-left: 100px; padding-right: 20px">
     <button class="logout" @click="logout">Logout</button>
+    <router-link :to="'/public/' + this.userProfile.username" class="button">
+      check public profile
+    </router-link>
     <UploadAvatar />
     <TwoFactorModal />
     <UsernameModal />
@@ -27,9 +30,11 @@ export default defineComponent({
     UserStats,
   },
 
-  // data() {
-  //   return {};
-  // },
+  data() {
+    return {
+      userProfile: store.getters["auth/getUserProfile"]
+    };
+  },
 
   methods: {
     setStatus() {

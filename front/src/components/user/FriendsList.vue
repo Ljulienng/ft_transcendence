@@ -15,7 +15,11 @@
           :key="friend"
           class="list-group-item bg-transparent border-0 text-white d-flex justify-content-between"
         >
-          <div class="col">{{ friend.username }}</div>
+          <div class="col">
+            <router-link :to="'/public/' + friend.username" class="button">
+            {{ friend.username }}
+            </router-link>
+          </div>
           <div class="col align-middle">{{ friend.firstname }}</div>
           <div class="col align-middle">{{ friend.lastname }}</div>
           <div class="col align-middle">{{ friend.status }}</div>

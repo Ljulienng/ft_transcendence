@@ -167,6 +167,19 @@ export class UserController {
 	}
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get('/avatar/:username')
+	async findPublicProfileImage(@Param('username') username: string, @Req() req, @Res() res) {
+		const otherUser = await this.userService.findOne({username: username});
+
+		if (!otherUser)
+			throw new UnauthorizedException("User doesn't exist");
+		if (otherUser.profileImage)
+			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + otherUser.profileImage)))
+		else
+			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + 'default/default.jpg')))
+	}
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get('/status')
 	async getUserStatus(@Req() req): Promise<string> {
 		try {
@@ -177,6 +190,36 @@ export class UserController {
 			console.log(e);
 		}
 
+	}
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get('/public/:username')
+	async getPublicProfile(@Param('username') username: string, @Req() req) {
+		try {
+			const user = req.user;
+			const otherUser = await this.userService.findOne({username: username});
+
+			// console.log("first user = ", user.username, "other = ", otherUser.username)
+			if (!otherUser)
+				throw new UnauthorizedException("User doesn't exist");
+			if (await this.userService.checkIfBlocked(user, otherUser.id))
+				throw new UnauthorizedException("Either you or the other user has been blocked");
+
+			const userInfo = {
+				username: username,
+				total: otherUser.gameLost + otherUser.gameWon,
+				gameWon: otherUser.gameWon,
+				gameLost: otherUser.gameLost,
+				ranking: otherUser.ranking,
+				points: otherUser.points,
+				matchHistory: await this.userService.getMatchHistory(otherUser)
+			}
+			// console.log('user info = ', userInfo)
+			return userInfo
+
+			} catch(e) {
+				console.log(e);
+			}
 	}
 
 	// =========== PRIVATE CHAT PART =============
@@ -203,7 +246,7 @@ export class UserController {
 		try {
 			const user = req.user;
 
-			return this.userService.getBlockedUser(user);
+			return await this.userService.getBlockedUser(user);
 		} catch(e) {
 			console.log(e);
 		}

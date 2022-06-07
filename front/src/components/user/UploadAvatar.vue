@@ -32,11 +32,10 @@ export default defineComponent({
   },
 
   methods: {
-    onFileSelected(): void {
+    onFileSelected() {
       try {
         // eslint-disable-next-line
         this.selectedFile = (this.$refs.file as any).files[0];
-        console.log("selectedFIle = ", this.selectedFile);
       } catch (e) {
         console.log("error: ", e);
       }
@@ -62,10 +61,8 @@ export default defineComponent({
         .get("/users/avatar", { responseType: "blob" })
         .then((response) => {
           const blob = response.data;
-          console.log("res = ", response.data);
-          console.log("blob - ", blob);
+
           this.image = URL.createObjectURL(blob);
-          console.log("img = ", this.image);
         })
         .catch((error) => {
           console.log(error);
