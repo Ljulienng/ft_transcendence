@@ -39,6 +39,7 @@
                     const response  = await http.get('/users/stats');
                     this.stats = response.data;
                     // const x: any = this.stats.find(d => d["user_id"] === this.user.id)
+                    // eslint-disable-next-line 
                     const user_stats: any = this.stats.find(d => d["id"] === this.user.id)
                     console.log("user stats = ", user_stats)
                     this.userStats.gameWon = user_stats.gameWon;

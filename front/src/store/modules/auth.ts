@@ -68,7 +68,7 @@ const actions = {
 		.then ( res => {
 			return res.data
 		})
-		.catch( err => {
+		.catch( (err: Error) => {
 			console.log("SetTwoFAauth = ", err)
 		})
 
