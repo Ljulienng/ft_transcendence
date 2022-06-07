@@ -8,7 +8,7 @@ RUN npm install @vue/cli-service
 # RUN npm install --location=global @vue/cli
 RUN npm install --location=global npm@8.5.5
 RUN npm install
-RUN npm audit fix --force
+# RUN npm audit fix --force
 
 
 COPY front/ .

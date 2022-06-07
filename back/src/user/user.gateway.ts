@@ -246,7 +246,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @UseGuards(SocketGuard)
     @SubscribeMessage('blockUser') 
     async blockUser(client: Socket, userId: number) {
-        const user :User = await this.socketList.find(socket => socket.socketId === client.id).user;
+        const user :User = this.socketList.find(socket => socket.socketId === client.id).user;
         
         await this.userService.blockUser(user, userId);
         this.server.emit('updateBlocked/' + user.id);

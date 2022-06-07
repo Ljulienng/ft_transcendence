@@ -44,6 +44,8 @@ export default defineComponent({
   data() {
     return {
         socket: store.getters["auth/getUserSocket"],
+        currentUser: store.getters["auth/getUserProfile"],
+
         userStatus: "",
         errorMsg: "",
         friendList: [],
@@ -62,13 +64,13 @@ export default defineComponent({
 
     blockUser(userToBlock: number) {
       this.socket.emit("blockUser", userToBlock);
-      console.log("blockUser", userToBlock);
+      // console.log("blockUser", userToBlock);
       // eslint-disable-next-line 
-      const x: any = this.friendList.find(d => d["id"] === userToBlock)
-      console.log("FRIENDLIST", x.username);
-      this.deleteFriend(x.username);
+      // const x: any = this.friendList.find(d => d["id"] === userToBlock)
+      // console.log("FRIENDLIST", x.username);
+      // this.deleteFriend(x.username);
       this.getFriendList();
-      this.$forceUpdate();
+      // this.$forceUpdate();
     },
 
     async deleteFriend(friendUsername: string) {
@@ -93,6 +95,10 @@ export default defineComponent({
     });
 
     this.socket.on("friendDisconnected", () => {
+      this.getFriendList();
+    });
+
+    this.socket.on("updateBlocked/" + this.currentUser.id, () => {
       this.getFriendList();
     });
   },
