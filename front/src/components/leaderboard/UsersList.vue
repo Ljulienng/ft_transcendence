@@ -14,7 +14,7 @@
                 </th>
               </tr>
             </thead>
-            <tbody v-for="user in users" :key="user.username">
+            <tbody v-for="user in users" :key="user">
               <Stats :user="user"/>
             </tbody>
           </table>
