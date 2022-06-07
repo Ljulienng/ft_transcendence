@@ -33,14 +33,13 @@ export default defineComponent({
 
   methods: {
     setStatus() {
-      http
-        .post("/users/setstatus", { newStatus: "Offline" })
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      http.post("/users/setstatus", { newStatus: "Offline" });
+      // .then((res) => {
+      //   console.log(res);
+      // })
+      // .catch((err) => {
+      //   console.log(err);
+      // });
     },
 
     logout() {

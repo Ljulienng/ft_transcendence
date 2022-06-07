@@ -61,7 +61,7 @@ export class UserService {
 		user.lastname = uniqueNamesGenerator({dictionaries: [names]})
 		user.status = "Offline"
 
-		return from(this.userRepository.save(user));
+ 		return from(this.userRepository.save(user));
 	}
 
 	addStudent(user: Student): any {

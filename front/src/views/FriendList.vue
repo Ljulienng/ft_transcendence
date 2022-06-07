@@ -134,6 +134,7 @@ export default defineComponent({
           console.log("/users/addfriend success", response);
           this.getFriendList();
           this.errorMsg = "";
+          // eslint-disable-next-line 
           (document.getElementById("closeModalButton") as any).click();
         })
         .catch((error) => {
