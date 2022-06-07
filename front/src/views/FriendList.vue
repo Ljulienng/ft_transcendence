@@ -4,7 +4,11 @@
     <!-- Button trigger modal -->
     <div class="d-flex align-items-center mt-4">
       <h3>friends</h3>
-      <button class="btn" data-bs-toggle="modal" data-bs-target="#addFriendModal">
+      <button
+        class="btn"
+        data-bs-toggle="modal"
+        data-bs-target="#addFriendModal"
+      >
         <i style="color: #fff774" class="material-icons">person_add_alt_1</i>
       </button>
     </div>
@@ -18,7 +22,6 @@
       aria-hidden="true"
     >
       <div class="modal-dialog">
-
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="addFriendModalLabel">Add friend</h5>
@@ -69,7 +72,6 @@
             </form>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -79,13 +81,11 @@
 
     <div class="d-flex align-items-center mt-4">
       <h3>blocked users</h3>
-     </div>
+    </div>
 
     <div class="container-fluid widebox">
-      <BlockedUser :key="updateComp"/>
+      <BlockedUser :key="updateComp" />
     </div>
-   
-
   </div>
 </template>
 
@@ -128,24 +128,7 @@ export default defineComponent({
     },
 
     async addFriend() {
-      await http
-        .post("/users/addfriend", this.friendToAdd)
-        .then((response) => {
-          console.log("/users/addfriend success", response);
-          this.getFriendList();
-          this.errorMsg = "";
-          // eslint-disable-next-line 
-          (document.getElementById("closeModalButton") as any).click();
-        })
-        .catch((error) => {
-          console.log(
-            " /users/addfriend msg = ",
-            error.response.data.error,
-            "full error = ",
-            error
-          ),
-            (this.errorMsg = error.response.data.error);
-        });
+      this.socket.emit("addFriend", this.friendToAdd);
     },
 
     blockUser(userToBlock: number) {
@@ -154,6 +137,10 @@ export default defineComponent({
   },
 
   mounted() {
+    this.socket.on("friendAdded", () => {
+      this.getFriendList();
+    });
+
     this.socket.on("friendConnected", () => {
       this.getFriendList();
     });
@@ -169,5 +156,4 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

@@ -95,7 +95,6 @@ export class UserService {
 		// const currentUser = await this.userRepository.findOne({id: userId});
 		const tmp = await this.userRepository.findOne({username: newUsername})
 		const regex = /^[a-zA-Z0-9_]+$/
-		console.log('wnet there', tmp);
 		
 		// console.log("currentUser.username = ",currentUser.username , 'newUsername', newUsername )
 		if (currentUser.username === newUsername)
@@ -165,6 +164,7 @@ export class UserService {
 
 	async addFriend(user: User, friendToAdd: any) {
 		const friend = await this.userRepository.findOne({username: friendToAdd.friendUsername});
+
 		if (user.friends === null)
 			user.friends = []
 		if (!friend) {
@@ -203,6 +203,8 @@ export class UserService {
 	async deleteFriend(user: User, friendToDelete: string) {
 		const friend = await this.userRepository.findOne({username: friendToDelete});
 
+
+		console.log("deletefRiend username = ", user.friends ,friendToDelete)
 		if (!friend) {
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
 		}
@@ -223,7 +225,6 @@ export class UserService {
 		if (isNaN(+friendId))
 			return friendInfo;
 		friendInfo = await this.userRepository.findOne({id: +friendId});
-		console.log()
 		
 		if (friendInfo !== undefined) {
 
@@ -244,7 +245,6 @@ export class UserService {
 			return friend;
 		}
 		else {
-			console.log("User doesn't exist")
 			return friendInfo
 		}
 	}
@@ -370,9 +370,6 @@ export class UserService {
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user isn\'t blocked.');
 		else {
 			const index = user.blocked.indexOf(tmp, 0);
-
-
-			console.log("unblocked list = ", user.blocked, index)
 
 			user.blocked.splice(index, 1);
 		}
