@@ -1,5 +1,5 @@
 <template>
-  <div class="userProfile">
+  <div class="userProfile" style="padding-left: 100px; padding-right: 20px">
     <button class="logout" @click="logout">Logout</button>
     <UploadAvatar />
     <TwoFactorModal />
