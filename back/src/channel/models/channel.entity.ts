@@ -1,5 +1,4 @@
 import { Column, CreateDateColumn, Entity, OneToMany, ManyToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable, JoinColumn } from "typeorm";
-import { IsOptional } from 'class-validator';
 import { MessageChannel } from "src/message/models/messageChannel.entity";
 import { User } from "src/user/models/user.entity";
 import { ChannelMember } from "src/channelMember/models/channelMember.entity";

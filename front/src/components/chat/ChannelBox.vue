@@ -1,38 +1,13 @@
 <template>
   <div class="channelBox">
     <ChannelSettings
-      v-bind:channelId="channel"
       v-bind:currentUser="currentUser"
+      v-bind:channelId="channel"
+      v-bind:channelType="channelType"
+      v-bind:socket="socketChannel"
+      @close="$emit('close')"
     />
-    <div v-if="isAdmin == true && channelType == 'private'">
-      <!-- invitations only by admins -->
-      <button @click="invite()">Invite :</button>
-      <input
-        type="text"
-        maxlength="30"
-        v-model="invitation.guest"
-        class="inputMessage"
-        placeholder="username"
-      />
-    </div>
-    <div v-if="isOwner == true && channelType == 'protected'">
-      <!-- change password only by owner -->
-      <button @click="changePassword()">Change password :</button>
-      <input
-        type="password"
-        maxlength="100"
-        v-model="passwordI.old"
-        class="inputMessage"
-        placeholder="old password"
-      />
-      <input
-        type="password"
-        maxlength="100"
-        v-model="passwordI.new"
-        class="inputMessage"
-        placeholder="new password"
-      />
-    </div>
+    <div v-if="isOwner == true"></div>
     <p>{{ channel }}</p>
     <div class="messageList">
       <p v-for="msg in messageList.slice().reverse()" :key="msg">
@@ -83,15 +58,6 @@ export default defineComponent({
       currentUser: store.getters["auth/getUserProfile"],
       isOwner: false,
       isAdmin: false,
-      invitation: {
-        channelId: this.channel,
-        guest: "",
-      },
-      passwordI: {
-        old: "",
-        new: "",
-        channelId: this.channel,
-      },
       message: {
         userId: 0,
         username: "",
@@ -125,24 +91,9 @@ export default defineComponent({
         this.messageList = data;
       });
     },
-
-    invite() {
-      console.log("Invite/add friend to a private channel : ", this.invitation);
-      this.socket.emit("inviteInPrivateChannel", this.invitation);
-      this.invitation.guest = "";
-    },
-
-    changePassword() {
-      this.socket.emit("changePassword", this.passwordI);
-      this.passwordI.old = "";
-      this.passwordI.new = "";
-    },
   },
 
   mounted() {
-    if (this.socket === undefined) {
-      this.socket = store.getters["auth/getUserSocket"];
-    }
     this.socket.on("messageSent", () => {
       this.socket.emit("getChannelMsg", this.channel);
       // console.log("data");
@@ -159,10 +110,6 @@ export default defineComponent({
 
     this.socket.on("isAdmin", (data: boolean) => {
       this.isAdmin = data;
-    });
-
-    this.socket.on("passwordChanged", (data: string) => {
-      console.log("passwordChanged:", data);
     });
   },
 

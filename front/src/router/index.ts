@@ -6,6 +6,7 @@ import TwoFaAuth from '@/components/auth/TwoFaAuth.vue'
 import FriendList from '@/views/FriendList.vue'
 import UserProfile from '@/views/UserProfile.vue'
 import Home from '@/views/Home.vue'
+import NotFound from '@/views/NotFound.vue'
 // import http from '../http-common'
 import Chat from '@/views/Chat.vue'
 import Leaderboard from '@/views/Leaderboard.vue'
@@ -16,7 +17,12 @@ const routes = [
 	// 	name: 'Base',
 	// 	path: '/',
 	// 	meta: {requiredAuth: true}
-	// },
+	// }, 
+	{
+		path: "/:catchAll(.*)",
+		name: "NotFound",
+		component: NotFound,
+	},
 	{
 		name: 'Root',
 		path: '/',
