@@ -5,6 +5,19 @@
         <button @click="deleteChannel()">Delete channel </button>
       </div>
       <div>
+        <button @click="changeChannelName()">Change channel name : </button>
+        <input type="text" maxlength="50" v-model="newChannelName" placeholder="new channel name"/>
+      </div>
+      <div>
+        <button @click="changeChannelType()">Change channel type : </button>
+        <input type="radio" value="public" v-model="newChannelType" />
+        <label for="public">Public</label>
+        <input type="radio" value="protected" v-model="newChannelType" />
+        <label for="protected">Protected</label>
+        <input type="radio" value="private" v-model="newChannelType" />
+        <label for="private">Private</label>
+      </div>
+      <div>
         <button @click="setMemberAsAdmin()">Set member as admin : </button>
         <input
             type="text"
@@ -87,6 +100,8 @@ export default defineComponent({
       currentUser: store.getters["auth/getUserProfile"],
       isOwner: false,
       isAdmin: false,
+      newChannelName: "",
+      newChannelType: "",
       upgradeMember: {
         channelId: this.channel,
         username: "",
@@ -154,6 +169,24 @@ export default defineComponent({
     deleteChannel() {
       console.log("delete channel");
       this.socket.emit("deleteChannel", this.channel);
+    },
+
+    changeChannelName() {
+      const changeChannelName = {
+        channelId: this.channel,
+        name: this.newChannelName,
+      };
+      this.socket.emit("changeChannelName", changeChannelName);
+      this.newChannelName = "";
+    },
+
+    changeChannelType() {
+      const changeChannelType = {
+        channelId: this.channel,
+        type: this.newChannelType,
+      };
+      this.socket.emit("changeChannelType", changeChannelType);
+      this.newChannelType = "";
     },
 
   },

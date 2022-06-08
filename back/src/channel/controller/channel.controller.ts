@@ -2,9 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res, UseGuards 
 import { ChannelService } from '../service/channel.service';
 import { CreateChannelDto } from '../models/channel.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { PasswordI } from '../models/password.interface';
 import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
-import { Channel } from '../models/channel.entity';
 
 @Controller('channel')
 export class ChannelController {
@@ -89,13 +87,13 @@ export class ChannelController {
     }
 
     // test : curl -v -X DELETE http://localhost:3000/channel/{channelId}
-    @UseGuards(JwtAuthGuard)
-    @Delete(':channelId')
-    async deleteChannel( 
-        @Req() request,
-        @Param('channelId') channelId: number) {
-        return await this.channelService.deleteChannel(request.user.id, channelId);
-    }
+    // @UseGuards(JwtAuthGuard)
+    // @Delete(':channelId')
+    // async deleteChannel( 
+    //     @Req() request,
+    //     @Param('channelId') channelId: number) {
+    //     return await this.channelService.deleteChannel(request.user.id, channelId);
+    // }
 
     // test : curl -v -X DELETE http://localhost:3000/channel/{channelId}/{userId}
     @Delete(':channelId/:userId')

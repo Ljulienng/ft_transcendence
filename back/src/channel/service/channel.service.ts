@@ -2,12 +2,11 @@ import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, Not
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Channel} from '../models/channel.entity'
-import { channelInvitationDto, CreateChannelDto, upgradeMemberDto } from '../models/channel.dto';
+import { changePasswordDto, channelInvitationDto, CreateChannelDto, updateChannelDto, upgradeMemberDto } from '../models/channel.dto';
 import { MessageService } from 'src/message/service/message.service';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/models/user.entity';
 import { JoinChannelDto } from '../models/channel.dto';
-import { PasswordI } from '../models/password.interface';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
 import { CreateMessageDto } from 'src/message/models/message.dto';
@@ -88,16 +87,16 @@ export class ChannelService {
    async createChannel(createChannel: CreateChannelDto, userId: number) {
         const user = await this.userRepository.findOne({id: userId});
         if (!user) {
-            throw new UnauthorizedException('user does not exist');
+            throw new HttpException('user does not exist', HttpStatus.FORBIDDEN);
         }
 
         if (!createChannel.name) {
-            throw new UnauthorizedException('channel name cannot be null');
+            throw new HttpException('channel name cannot be null', HttpStatus.FORBIDDEN);
         }
 
         const isSameChatName = await this.channelRepository.findOne({name: createChannel.name});
         if (isSameChatName) {
-            throw new UnauthorizedException('this name is already used');  
+            throw new HttpException('this name is already used', HttpStatus.FORBIDDEN);
         }
         
         const newChannel = this.channelRepository.create({
@@ -251,7 +250,7 @@ export class ChannelService {
    **       - the new password is not too short (could increase the constraints...)
    **       - security check : old channel password == old password sent by owner
    */
-   async changePassword(/*channelId: number, */userId: number, passwordI: PasswordI)
+   async changePassword(/*channelId: number, */userId: number, passwordI: changePasswordDto)
    {
         // console.log('user:', userId, ' changes password of channel:', channelId, ' [new pass:', passwords.newPassword,']');
         const user = await this.userRepository.findOne({id: userId});
@@ -271,6 +270,43 @@ export class ChannelService {
         const saltOrRounds = await bcrypt.genSalt();
         const password = await bcrypt.hash(passwordI.new, saltOrRounds);
         this.channelRepository.update(channel.id, { password });
+   }
+
+   async changeChannelName(owner: User, updates: updateChannelDto) {
+    const channel = await this.findChannelById(updates.channelId);
+    const member = await this.channelMemberService.findOne(owner, channel);
+
+    if (!member.owner) {
+        throw new HttpException('only owner can update the channel', HttpStatus.FORBIDDEN);
+    }
+    if (!updates.name) {
+        throw new HttpException('channel name cannot be null', HttpStatus.FORBIDDEN);
+    }
+    const isSameChatName = await this.channelRepository.findOne({name: updates.name});
+    if (isSameChatName) {
+        throw new HttpException('this name is already used', HttpStatus.FORBIDDEN);
+    }
+
+    channel.name = updates.name;
+    await this.channelRepository.save(channel);
+   }
+
+   async changeChannelType(owner: User, updates: updateChannelDto) {
+    const channel = await this.findChannelById(updates.channelId);
+    const member = await this.channelMemberService.findOne(owner, channel);
+
+    if (!member.owner) {
+        throw new HttpException('only owner can update the channel', HttpStatus.FORBIDDEN);
+    }
+    if (!updates.type) {
+        throw new HttpException('channel type cannot be null', HttpStatus.FORBIDDEN);
+    }
+
+    if (updates.type === channel.type) {
+        throw new HttpException('this channel is already ' + updates.type, HttpStatus.FORBIDDEN);
+    }
+
+    await this.channelRepository.save(channel);
    }
 
     /* 

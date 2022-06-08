@@ -12,7 +12,7 @@ import { UserService } from "./service/user.service";
 import { Channel } from "src/channel/models/channel.entity"
 import { CreateMessageDto } from "src/message/models/message.dto";
 import { CreateMessageUserDto } from "src/messageUser/models/messageUser.dto";
-import { channelInvitationDto, JoinChannelDto, upgradeMemberDto } from "src/channel/models/channel.dto";
+import { channelInvitationDto, JoinChannelDto, upgradeMemberDto, changePasswordDto, updateChannelDto } from "src/channel/models/channel.dto";
 import { SocketUserI } from "src/chat/chat.gateway";
 import { ChannelService } from "src/channel/service/channel.service";
 import { SocketGuard } from "src/auth/guards/socket.guard";
@@ -20,8 +20,6 @@ import { UseGuards } from "@nestjs/common";
 import { CreateChannelDto } from "src/channel/models/channel.dto";
 import { Observable } from 'rxjs'
 import { User } from "./models/user.entity";
-import { PasswordI } from "src/channel/models/password.interface";
-
 
 
 // export type UserSocket = {
@@ -124,7 +122,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async createChannel(client: Socket, createChannel: CreateChannelDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
 
-        const channelId = await this.channelService.createChannel(createChannel, user.id);
+        await this.channelService.createChannel(createChannel, user.id);
         this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
     }
@@ -198,11 +196,31 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('changePassword') 
-    async changePassword(client: Socket, passwordI: PasswordI) {
+    async changePassword(client: Socket, passwordI: changePasswordDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.changePassword(user.id, passwordI);
         // need to inform members of the channel of this change !
         this.server.to(client.id).emit("passwordChanged", "password is changed");
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('changeChannelName')
+    async changeChannelName(client: Socket, updates: updateChannelDto) {
+        const owner = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.changeChannelName(owner, updates);
+        
+        this.server.emit("updateChannel", await this.channelService.findAll());
+        this.server.emit("updateJoinedChannel", await this.userService.joinedChannel(owner));
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('changeChannelType')
+    async changeChannelType(client: Socket, updates: updateChannelDto) {
+        const owner = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.changeChannelType(owner, updates);
+        
+        this.server.emit("updateChannel", await this.channelService.findAll());
+        this.server.emit("updateJoinedChannel", await this.userService.joinedChannel(owner));
     }
 
      /*

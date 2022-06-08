@@ -1,4 +1,4 @@
-import { IsOptional, IsNotEmpty, IsString, IsEnum } from 'class-validator';
+import { IsOptional, IsNotEmpty, IsString, IsEnum, IsIn } from 'class-validator';
 
 export class CreateChannelDto {
 
@@ -26,6 +26,23 @@ export class JoinChannelDto {
     @IsOptional()
     @IsString()
     password: string;
+}
+
+export class changePasswordDto {
+    old: string;
+    new: string;
+    channelId: number;
+}
+
+export class updateChannelDto {
+    @IsOptional()
+    name: string;
+
+    @IsOptional()
+    @IsIn(["public", "protected", "private"])
+    type: string;
+    
+    channelId: number;
 }
 
 export class channelInvitationDto {

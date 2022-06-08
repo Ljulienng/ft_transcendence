@@ -1,16 +1,14 @@
 <template>
   <div id="chat">
     <div class="createChat">
-      new channel : Name <input type="text" maxlength="20" v-model="name" />
+      new channel <input type="text" maxlength="50" v-model="name" placeholder="name" />
       <div>
-        <div class="one_elem">
           <input type="radio" value="public" v-model="type" />
           <label for="public">Public</label>
           <input type="radio" value="protected" v-model="type" />
           <label for="protected">Protected</label>
           <input type="radio" value="private" v-model="type" />
           <label for="private">Private</label>
-        </div>
       </div>
       <div v-if="type == 'protected'">
         <input type="password" v-model="password" placeholder="password" required />
