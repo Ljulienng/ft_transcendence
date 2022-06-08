@@ -18,12 +18,6 @@
     </div>
     <br />
 
-    <!-- <div>
-      <button @click="deleteChat">delete channel with id</button>
-      <input type="number" v-model="channelId" />
-    </div>
-    <br /> -->
-
     <!-- <div class="channelTabs">
                 <button @click="showChannel(channel.id)">show channel </button>
                 <button @click="showChannel(channel.id)">show channel</button>
@@ -344,13 +338,6 @@ export default defineComponent({
       this.joinedChannelList = data;
     });
 
-    // this.socket.on('sendMessageToClient', (data) => {
-    //     console.log(data);
-    // // })
-
-    // this.socket.on('channelJoined', (data) => {
-    //     console.log(data);
-    // })
   },
 
   // beforeMount() {

@@ -213,19 +213,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.emit("updateJoinedChannel", await this.userService.joinedChannel(owner));
     }
 
-    @UseGuards(SocketGuard)
-    @SubscribeMessage('changeChannelType')
-    async changeChannelType(client: Socket, updates: updateChannelDto) {
-        const owner = this.socketList.find(socket => socket.socketId === client.id).user
-        await this.channelService.changeChannelType(owner, updates);
-        
-        this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.emit("updateJoinedChannel", await this.userService.joinedChannel(owner));
-    }
 
-     /*
-     ** add a new message
-     */
     @UseGuards(SocketGuard)
     @SubscribeMessage('sendMessageToServer') 
     async sendMessage(client: Socket, createMessageDto: CreateMessageDto /*message: string, channelId: number*/) {

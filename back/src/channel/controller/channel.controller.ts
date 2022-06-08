@@ -47,23 +47,23 @@ export class ChannelController {
     }
     
     // test : curl -v  -X POST -d '{"name":"room42", "type": 1,  "password":"supersecuremdp"}' -H "Content-Type: application/json" http://localhost:3000/channel/createChannel
-    @UseGuards(JwtAuthGuard) // user has to be connected
-    @Post('/createChannel')
-    async createChannel(
-        @Req() request,
-        @Body() channelDto: CreateChannelDto) {
-            await this.channelService.createChannel(channelDto, request.user.id);
-    }
+    // @UseGuards(JwtAuthGuard) // user has to be connected
+    // @Post('/createChannel')
+    // async createChannel(
+    //     @Req() request,
+    //     @Body() channelDto: CreateChannelDto) {
+    //         await this.channelService.createChannel(channelDto, request.user.id);
+    // }
 
     // test : curl -v  -X POST -d '{"secondUserId": "2", { "name":"room42", "type": 1,  "password":"supersecuremdp" }}' -H "Content-Type: application/json" http://localhost:3000/channel/
-    @UseGuards(JwtAuthGuard)
-    @Post('/createDmChannel')
-    async createDmChannel(
-        @Req() request,
-        @Body() secondUserId: number,
-        @Body() channelDto: CreateChannelDto) {
-        await this.channelService.createDmChannel(channelDto, request.user.id, secondUserId);
-    }
+    // @UseGuards(JwtAuthGuard)
+    // @Post('/createDmChannel')
+    // async createDmChannel(
+    //     @Req() request,
+    //     @Body() secondUserId: number,
+    //     @Body() channelDto: CreateChannelDto) {
+    //     await this.channelService.createDmChannel(channelDto, request.user.id, secondUserId);
+    // }
 
     // test : curl -v -X POST -d '{"oldPassword":"oldpass", "newPassword":"newpass"}' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/changePass
     // @UseGuards(JwtAuthGuard)
@@ -76,15 +76,15 @@ export class ChannelController {
     // }
 
     // test : curl -v  -X POST -d '{"muted": true }' -H "Content-Type: application/json" http://localhost:3000/channel/{channelId}/{userId}
-    @UseGuards(JwtAuthGuard)
-    @Post(':channelId/:userId')
-    async updateMemberChannel(
-        @Req() request,
-        @Param('userId') memberId: number,
-        @Param('channelId') channelId: number,
-        @Body() updates: UpdateMemberChannelDto) {
-        return await this.channelService.updateChannelMember(request.user.id, memberId, channelId, updates);
-    }
+    // @UseGuards(JwtAuthGuard)
+    // @Post(':channelId/:userId')
+    // async updateMemberChannel(
+    //     @Req() request,
+    //     @Param('userId') memberId: number,
+    //     @Param('channelId') channelId: number,
+    //     @Body() updates: UpdateMemberChannelDto) {
+    //     return await this.channelService.updateChannelMember(request.user.id, memberId, channelId, updates);
+    // }
 
     // test : curl -v -X DELETE http://localhost:3000/channel/{channelId}
     // @UseGuards(JwtAuthGuard)
@@ -96,11 +96,11 @@ export class ChannelController {
     // }
 
     // test : curl -v -X DELETE http://localhost:3000/channel/{channelId}/{userId}
-    @Delete(':channelId/:userId')
-    async deleteChannelMember(
-        @Param('userId') memberId: number,
-        @Param('channelId') channelId: number) {
-        return await this.channelService.deleteChannelMember(channelId, memberId);
-    }
+    // @Delete(':channelId/:userId')
+    // async deleteChannelMember(
+    //     @Param('userId') memberId: number,
+    //     @Param('channelId') channelId: number) {
+    //     return await this.channelService.deleteChannelMember(channelId, memberId);
+    // }
 
 }
