@@ -13,6 +13,7 @@ import { map } from 'rxjs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { TwoFAAuth } from 'src/auth/guards/twoFA.guard';
+import { ClassSerializerInterceptor } from '@nestjs/common';
 // import { UserI } from '../models/user.interface';
 
 export const storage = {

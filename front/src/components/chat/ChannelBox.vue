@@ -1,31 +1,37 @@
 <template>
   <div class="channelBox">
-    <div v-if="isAdmin == true && channelType == 'private'"> <!-- invitations only by admins -->
-        <button  @click="invite()">Invite : </button>
-        <input
-            type="text"
-            maxlength="30"
-            v-model="invitation.guest"
-            class="inputMessage"
-            placeholder="username"
-          />
-    </div>
-    <div v-if="isOwner == true && channelType == 'protected'"> <!-- change password only by owner -->
-      <button @click="changePassword()">Change password : </button>
+    <ChannelSettings
+      v-bind:channelId="channel"
+      v-bind:currentUser="currentUser"
+    />
+    <div v-if="isAdmin == true && channelType == 'private'">
+      <!-- invitations only by admins -->
+      <button @click="invite()">Invite :</button>
       <input
-          type="password"
-          maxlength="100"
-          v-model="passwordI.old"
-          class="inputMessage"
-          placeholder="old password"
-        />
-            <input
-          type="password"
-          maxlength="100"
-          v-model="passwordI.new"
-          class="inputMessage"
-          placeholder="new password"
-        />
+        type="text"
+        maxlength="30"
+        v-model="invitation.guest"
+        class="inputMessage"
+        placeholder="username"
+      />
+    </div>
+    <div v-if="isOwner == true && channelType == 'protected'">
+      <!-- change password only by owner -->
+      <button @click="changePassword()">Change password :</button>
+      <input
+        type="password"
+        maxlength="100"
+        v-model="passwordI.old"
+        class="inputMessage"
+        placeholder="old password"
+      />
+      <input
+        type="password"
+        maxlength="100"
+        v-model="passwordI.new"
+        class="inputMessage"
+        placeholder="new password"
+      />
     </div>
     <p>{{ channel }}</p>
     <div class="messageList">
@@ -50,10 +56,15 @@
 import MessageI from "../../types/interfaces/message.interface";
 import { Socket } from "socket.io-client";
 // import http from "../http-common";
+import ChannelSettings from "./ChannelSettings.vue";
 import { defineComponent } from "@vue/runtime-core";
 import store from "../../store";
 
 export default defineComponent({
+  components: {
+    ChannelSettings,
+  },
+
   props: {
     channel: {
       type: Number,
@@ -76,7 +87,7 @@ export default defineComponent({
         channelId: this.channel,
         guest: "",
       },
-      passwordI : {
+      passwordI: {
         old: "",
         new: "",
         channelId: this.channel,
@@ -126,7 +137,6 @@ export default defineComponent({
       this.passwordI.old = "";
       this.passwordI.new = "";
     },
-
   },
 
   mounted() {
@@ -143,26 +153,24 @@ export default defineComponent({
         this.messageList = data;
       }
     );
-    this.socket.on(
-      "isOwner", (data: boolean) => { this.isOwner = data; }
-    );
+    this.socket.on("isOwner", (data: boolean) => {
+      this.isOwner = data;
+    });
 
-    this.socket.on(
-      "isAdmin", (data: boolean) => { this.isAdmin = data; }
-    );
+    this.socket.on("isAdmin", (data: boolean) => {
+      this.isAdmin = data;
+    });
 
-    this.socket.on(
-      "passwordChanged", (data: string) => { console.log("passwordChanged:", data);}
-    );
-},
+    this.socket.on("passwordChanged", (data: string) => {
+      console.log("passwordChanged:", data);
+    });
+  },
 
   // unmounted() {
   // 	this.test.close;
   // },
 
   created() {
-    console.log("socket = ", this.socket);
-    // console.log("Channelbox created");
     this.getMessages();
     this.socket.emit("isOwner", this.channel);
     this.socket.emit("isAdmin", this.channel);
