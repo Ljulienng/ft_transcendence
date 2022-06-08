@@ -9,15 +9,6 @@
         <input type="text" maxlength="50" v-model="newChannelName" placeholder="new channel name"/>
       </div>
       <div>
-        <button @click="changeChannelType()">Change channel type : </button>
-        <input type="radio" value="public" v-model="newChannelType" />
-        <label for="public">Public</label>
-        <input type="radio" value="protected" v-model="newChannelType" />
-        <label for="protected">Protected</label>
-        <input type="radio" value="private" v-model="newChannelType" />
-        <label for="private">Private</label>
-      </div>
-      <div>
         <button @click="setMemberAsAdmin()">Set member as admin : </button>
         <input
             type="text"
@@ -101,7 +92,6 @@ export default defineComponent({
       isOwner: false,
       isAdmin: false,
       newChannelName: "",
-      newChannelType: "",
       upgradeMember: {
         channelId: this.channel,
         username: "",
@@ -178,15 +168,6 @@ export default defineComponent({
       };
       this.socket.emit("changeChannelName", changeChannelName);
       this.newChannelName = "";
-    },
-
-    changeChannelType() {
-      const changeChannelType = {
-        channelId: this.channel,
-        type: this.newChannelType,
-      };
-      this.socket.emit("changeChannelType", changeChannelType);
-      this.newChannelType = "";
     },
 
   },

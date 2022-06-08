@@ -291,24 +291,6 @@ export class ChannelService {
     await this.channelRepository.save(channel);
    }
 
-   async changeChannelType(owner: User, updates: updateChannelDto) {
-    const channel = await this.findChannelById(updates.channelId);
-    const member = await this.channelMemberService.findOne(owner, channel);
-
-    if (!member.owner) {
-        throw new HttpException('only owner can update the channel', HttpStatus.FORBIDDEN);
-    }
-    if (!updates.type) {
-        throw new HttpException('channel type cannot be null', HttpStatus.FORBIDDEN);
-    }
-
-    if (updates.type === channel.type) {
-        throw new HttpException('this channel is already ' + updates.type, HttpStatus.FORBIDDEN);
-    }
-
-    await this.channelRepository.save(channel);
-   }
-
     /* 
     ** the  user wants to remove a channel
     ** need to check if :
