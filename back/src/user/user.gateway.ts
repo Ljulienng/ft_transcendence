@@ -12,7 +12,7 @@ import { UserService } from "./service/user.service";
 import { Channel } from "src/channel/models/channel.entity"
 import { CreateMessageDto } from "src/message/models/message.dto";
 import { CreateMessageUserDto } from "src/messageUser/models/messageUser.dto";
-import { channelInvitationDto, JoinChannelDto } from "src/channel/models/channel.dto";
+import { channelInvitationDto, JoinChannelDto, upgradeMemberDto } from "src/channel/models/channel.dto";
 import { SocketUserI } from "src/chat/chat.gateway";
 import { ChannelService } from "src/channel/service/channel.service";
 import { SocketGuard } from "src/auth/guards/socket.guard";
@@ -136,7 +136,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
         await this.channelService.deleteChannel(user.id, channelId);
         this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
+        this.server.emit("updateJoinedChannel", await this.userService.joinedChannel(user));
     }
 
     @UseGuards(SocketGuard)
@@ -156,8 +156,15 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const guest = await this.channelService.inviteUserInChannel(user, invitation);
         
         const guestSocket = (this.socketList.find(s => s.user.id === guest.id )).socket;
-        this.server.to(guestSocket.id).emit("addToAChannel", "user add to a channel");
+        this.server.to(guestSocket.id).emit("addToAChannel", "user added to a channel");
         this.server.emit("updateJoinedChannel", await this.userService.joinedChannel(guest));
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('upgradeMember')
+    async setChannelMemberAsAdmin(client: Socket, upgradeMember: upgradeMemberDto) {
+        const owner = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.setMemberAsAdmin(owner, upgradeMember);
     }
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)

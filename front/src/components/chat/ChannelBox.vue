@@ -1,5 +1,36 @@
 <template>
   <div class="channelBox">
+    <div v-if="isOwner == true">
+      <div>
+        <button @click="deleteChannel()">Delete channel </button>
+      </div>
+      <div>
+        <button @click="setMemberAsAdmin()">Set member as admin : </button>
+        <input
+            type="text"
+            maxlength="100"
+            v-model="upgradeMember.username"
+            class="inputMessage"
+            placeholder="username"
+          />
+      </div>
+      <div v-if="channelType == 'protected'"> <!-- change password only by owner -->
+        <button @click="changePassword()">Change password : </button>
+        <input
+            type="password"
+            maxlength="100"
+            v-model="passwordI.old"
+            class="inputMessage"
+            placeholder="old password"
+          />
+              <input
+            type="password"
+            maxlength="100"
+            v-model="passwordI.new"
+            class="inputMessage"
+            placeholder="new password"
+          />
+        </div>
     <div v-if="isAdmin == true && channelType == 'private'"> <!-- invitations only by admins -->
         <button  @click="invite()">Invite : </button>
         <input
@@ -10,22 +41,6 @@
             placeholder="username"
           />
     </div>
-    <div v-if="isOwner == true && channelType == 'protected'"> <!-- change password only by owner -->
-      <button @click="changePassword()">Change password : </button>
-      <input
-          type="password"
-          maxlength="100"
-          v-model="passwordI.old"
-          class="inputMessage"
-          placeholder="old password"
-        />
-            <input
-          type="password"
-          maxlength="100"
-          v-model="passwordI.new"
-          class="inputMessage"
-          placeholder="new password"
-        />
     </div>
     <p>{{ channel }}</p>
     <div class="messageList">
@@ -72,6 +87,10 @@ export default defineComponent({
       currentUser: store.getters["auth/getUserProfile"],
       isOwner: false,
       isAdmin: false,
+      upgradeMember: {
+        channelId: this.channel,
+        username: "",
+      },
       invitation: {
         channelId: this.channel,
         guest: "",
@@ -111,7 +130,7 @@ export default defineComponent({
       // console.log("heho");
       this.socket.emit("getChannelMsg", this.channel);
       this.socket.on("getChannelMessages", (data: MessageI[]) => {
-        this.messageList = data;
+      this.messageList = data;
       });
     },
 
@@ -125,6 +144,16 @@ export default defineComponent({
       this.socket.emit("changePassword", this.passwordI);
       this.passwordI.old = "";
       this.passwordI.new = "";
+    },
+
+    setMemberAsAdmin() {
+      this.socket.emit("upgradeMember", this.upgradeMember);
+      this.upgradeMember.username = "";
+    },
+
+    deleteChannel() {
+      console.log("delete channel");
+      this.socket.emit("deleteChannel", this.channel);
     },
 
   },

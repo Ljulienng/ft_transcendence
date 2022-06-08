@@ -13,22 +13,16 @@
         </div>
       </div>
       <div v-if="type == 'protected'">
-        <input type="password" v-model="password" required />
+        <input type="password" v-model="password" placeholder="password" required />
         <p>Minimun 8 characters</p>
       </div>
       <button @click="createChat">create channel</button>
     </div>
     <br />
 
-    <div>
+    <!-- <div>
       <button @click="deleteChat">delete channel with id</button>
       <input type="number" v-model="channelId" />
-    </div>
-    <br />
-
-    <!-- <div>
-      <button @click="joinChannel">Join channel with id</button>
-      <input type="number" v-model="channelToJoin.id" />
     </div>
     <br /> -->
 
@@ -181,7 +175,6 @@ export default defineComponent({
         id: 0,
         type: "",
         password: "",
-        // userId: 0,
       },
       messageList: [] as MessageI[],
       name: "",
@@ -315,13 +308,13 @@ export default defineComponent({
       this.password = "";
     },
 
-    deleteChat() {
-      console.log("delete channel");
-      this.socket.emit("deleteChannel", this.channelId);
-      // http.delete("/channel/" + this.channelId);
-      // this.getChannelList();
-      this.channelId = 0;
-    },
+    // deleteChat() {
+    //   console.log("delete channel");
+    //   this.socket.emit("deleteChannel", this.channelId);
+    //   // http.delete("/channel/" + this.channelId);
+    //   // this.getChannelList();
+    //   this.channelId = 0;
+    // },
 
     joinChannel(channelId: number, channelType: string) {
       const channelToJoin = {

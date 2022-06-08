@@ -1,6 +1,4 @@
 import { IsOptional, IsNotEmpty, IsString, IsEnum } from 'class-validator';
-// import { ChannelType } from './channel.entity';
-import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateChannelDto {
 
@@ -9,7 +7,6 @@ export class CreateChannelDto {
     name: string;
 
     @IsNotEmpty()
-    // @IsEnum(ChannelType)
     @IsString()
     type: string;
 
@@ -17,10 +14,6 @@ export class CreateChannelDto {
     @IsString()
     password: string;
 }
-
-
-// PartialType() returns a class with all properties of the input class set to optional
-export class UpdateChannelDto extends PartialType(CreateChannelDto) {}
 
 export class JoinChannelDto {
     @IsNotEmpty()
@@ -36,10 +29,11 @@ export class JoinChannelDto {
 }
 
 export class channelInvitationDto {
-    @IsNotEmpty()
     channelId: number;
-
-    @IsNotEmpty()
-    @IsString()
     guest: string;
+}
+
+export class upgradeMemberDto {
+    channelId: number;
+    username: string;
 }
