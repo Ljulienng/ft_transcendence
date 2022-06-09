@@ -29,4 +29,7 @@ export class Match {
 
   @Column({ default: "" })
   loser: string;
+
+  @Column({ default: "" })
+  inProgress: boolean;
 }
