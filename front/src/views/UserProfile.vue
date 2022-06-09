@@ -1,10 +1,13 @@
 <template>
   <div class="userProfile" style="padding-left: 100px; padding-right: 20px">
     <button class="logout" @click="logout">Logout</button>
+    <router-link :to="'/public/' + currentUser.userName" class="button">
+      check public profile
+    </router-link>
     <UploadAvatar />
     <TwoFactorModal />
     <UsernameModal />
-    <GameHistory v-bind:currentUser="currentUser" />
+    <GameHistory />
     <UserStats />
   </div>
 </template>
@@ -14,10 +17,10 @@ import { defineComponent } from "@vue/runtime-core";
 import http from "../http-common";
 import TwoFactorModal from "../components/auth/TwoFactorModal.vue";
 // import UsernameModal from "../components/user/UsernameModal.vue";
-import store from "../store";
 import UsernameModal from "../components/user/UsernameModal.vue";
 import GameHistory from "../components/user/GameHistory.vue";
 import UserStats from "../components/user/UserStats.vue";
+import store from "../store";
 
 export default defineComponent({
   components: {
@@ -27,9 +30,11 @@ export default defineComponent({
     UserStats,
   },
 
-  // data() {
-  //   return {};
-  // },
+  data() {
+    return {
+      currentUser: store.getters["auth/getUserProfile"],
+    };
+  },
 
   methods: {
     setStatus() {
@@ -58,6 +63,14 @@ export default defineComponent({
         });
     },
   },
+
+  // created() {
+  //   console.log("currentUser = ", this.currentUser);
+  // },
+
+  // beforeCreate() {
+  //   console.log("getUserprofile  = ", this.userProfile);
+  // },
 });
 </script>
 

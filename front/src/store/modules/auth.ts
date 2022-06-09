@@ -50,7 +50,7 @@ const actions = {
 	},
 
 	async setUserStatus({commit}: {commit: Commit}, userStatus: string) {
-		console.log('set user status info = ', userStatus)
+		// console.log('set user status info = ', userStatus)
 
 		if (userStatus === 'Online') {
 			await commit('connectUser');
@@ -104,13 +104,13 @@ const mutations = {
 	},
 
 	connectUser(state: State) {
-		console.log('connect user with socket :', state.socket)
+		// console.log('connect user with socket :', state.socket)
 		state.userProfile.status = "Online"
 		state.socket.emit('connectUser', state.userProfile.userName,)
 	},
 
 	disconnectUser(state: State) {
-		console.log('disconnect user with socket')
+		// console.log('disconnect user with socket')
 
 		state.userProfile.status = "Offline";
 		
@@ -131,7 +131,7 @@ const mutations = {
 			twoFAEnabled: data.twoFAEnabled
 		};
 		state.userProfile = userProfile
-		if (!state.socket)
+		if (!state.socket && userProfile.id !== 0 )
 			state.socket = io('http://localhost:3000/user', {  withCredentials: true });
 	}
 };

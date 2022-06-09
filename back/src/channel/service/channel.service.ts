@@ -329,6 +329,13 @@ export class ChannelService {
         return await this.channelMemberService.updateMember(owner, userToUpgrade, channel, updates);
     }
 
+    async unsetMemberAsAdmin(owner: User, downgradeMember: updateMemberDto) {
+        const userToDowngrade = await this.userRepository.findOne({username: downgradeMember.username});
+        const channel = await this.findChannelById(downgradeMember.channelId);
+        const updates: UpdateMemberChannelDto = { admin: false };
+        return await this.channelMemberService.updateMember(owner, userToDowngrade, channel, updates);
+    }
+
     async ban(owner: User, ban: updateMemberDto) {
 
     }
@@ -336,6 +343,7 @@ export class ChannelService {
     async mute(owner: User, mute: updateMemberDto) {
         
     }
+
 
     /*
     ** get all the messages of a channel

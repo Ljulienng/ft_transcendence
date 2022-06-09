@@ -112,7 +112,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const messages = await this.channelService.findChannelMessagesByChannelName(channel.name)
 
         const index = this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
-        console.log(this.socketList[index].user.username ,'wants the msgs');
+        // console.log(this.socketList[index].user.username ,'wants the msgs');
 
         this.server.emit('getChannelMessages' + this.socketList[index].user.id, messages)
     }
@@ -154,6 +154,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         client.join(String(joinChannel.id));
         this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
+        this.server.emit("/userJoined/channel/" + joinChannel.id);
     } 
 
     @UseGuards(SocketGuard)
@@ -172,6 +173,26 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async setChannelMemberAsAdmin(client: Socket, upgradeMember: updateMemberDto) {
         const owner = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.setMemberAsAdmin(owner, upgradeMember);
+        this.server.emit("/adminPromoted/" + upgradeMember.channelId)
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('downgradeMember')
+    async unsetChannelMemberAsAdmin(client: Socket, downgradeMember: upgradeMemberDto) {
+        const owner = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.unsetMemberAsAdmin(owner, downgradeMember);
+        this.server.emit("/adminUnpromoted/" + downgradeMember.channelId)
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('kickMember') 
+    async kickMember(client: Socket, member: updateMemberDto) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        const userToKick = await this.userService.findByUsername(member.username)
+
+        await this.channelService.deleteChannelMember(member.channelId, userToKick.id);
+        this.server.emit("/memberKicked/channel/" + member.channelId);
+        this.server.emit("/userKicked/" + member.username);
     }
 
     @UseGuards(SocketGuard)
@@ -250,7 +271,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @UseGuards(SocketGuard)
     @SubscribeMessage('sendMessageToServer') 
     async sendMessage(client: Socket, createMessageDto: CreateMessageDto /*message: string, channelId: number*/) {
-        console.log('Message sent to the back in channel ', createMessageDto);
+        // console.log('Message sent to the back in channel ', createMessageDto);
         // client.emit('messageSent', message, channelId);
         // this.server.emit('sendMessageToClient', createMessageDto.content);
         await this.channelService.saveMessage(createMessageDto.userId, createMessageDto);
@@ -292,7 +313,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @UseGuards(SocketGuard)
     @SubscribeMessage('blockUser') 
     async blockUser(client: Socket, userId: number) {
-        const user :User = await this.socketList.find(socket => socket.socketId === client.id).user;
+        const user :User = this.socketList.find(socket => socket.socketId === client.id).user;
         
         await this.userService.blockUser(user, userId);
         this.server.emit('updateBlocked/' + user.id);
@@ -313,5 +334,16 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         
     //     await this.userService.blockUser(user, userId);
     // }
+
+    /* ============= FRIEND USER ============*/
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('addFriend') 
+    async addFriend(client: Socket, userId: string) {
+        const user :User = this.socketList.find(socket => socket.socketId === client.id).user;
+        
+        await this.userService.addFriend(user, userId);
+        this.server.to(client.id).emit('friendAdded');
+    }
+
 
 }

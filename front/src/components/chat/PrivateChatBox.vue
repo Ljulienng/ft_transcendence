@@ -1,6 +1,5 @@
 <template>
   <div class="chatBox">
-    <p>{{ channel }}</p>
     <div class="messageList">
       <p v-for="msg in messageList.slice().reverse()" :key="msg">
         {{ msg.sender.username }}: {{ msg.content }}
@@ -32,6 +31,9 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
+    // socket: {
+    //   type: Socket,
+    // },
   },
 
   data() {
@@ -60,7 +62,6 @@ export default defineComponent({
     },
 
     async getMessages() {
-      console.log("heho", this.receiverId);
       this.socket.emit("getUserMsg", this.receiverId);
       this.socket.on(
         "getUserMessages" + this.receiverId,
