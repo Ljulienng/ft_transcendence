@@ -30,6 +30,6 @@ export class Match {
   @Column({ default: "" })
   loser: string;
 
-  @Column({ default: false })
+  @Column({ default: true })
   inProgress: boolean;
 }

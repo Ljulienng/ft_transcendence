@@ -30,24 +30,19 @@ export class PongService {
     }
     const playerRight = this.waitingPlayers.shift();
     const ball = new Ball(event);
-    this.games.push(new Game(event, ball, playerLeft, playerRight, 5)); // TODO: dynamic winScore
+    this.games.push(new Game(this.matchRepository, event, ball, playerLeft, playerRight, 5)); // TODO: dynamic winScore
   }
 
   findGame(username: string): Game {
     return this.games.find(e => (e.playerLeft && e.playerLeft.user.username == username) || (e.playerRight && e.playerRight.user.username == username));
   }
 
-  async getMatchHistory(user: User) {
+  async getMatchHistory(user: User): Promise<Match[]> {
     return await this.matchRepository.find({
       where: [
-        {
-          playerOne: user
-        },
-        {
-          playerTwo: user
-        }
+        { playerOne: user },
+        { playerTwo: user }
       ]
     });
   }
-
 }

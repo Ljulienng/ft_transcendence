@@ -14,10 +14,10 @@ import { PongService } from './pong.service';
 import { Player } from './player';
 import { GameState } from './game';
 
-// TODO: timeout after a player disconnect
-// TODO: stop game if both player are disconnected
+// TODO: stop game if both player are disconnected ?
+// TODO: save stats in db
 
-@WebSocketGateway({ namespace: '/play', cors: { origin: true, credentials: true } })
+@WebSocketGateway({ namespace: 'play', path: '/play', cors: { origin: true, credentials: true } })
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer()
