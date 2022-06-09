@@ -38,7 +38,7 @@
         {{ msg.user.username }}: {{ msg.content }}
       </p>
     </div>
-    <div>
+    <div v-if="!channelMember.muted"> <!-- a muted member can see messages but not send them  -->
       <button @click="sendMessage">Send message</button>
       <input type="text" maxlength="100" v-model="message.content" class="inputMessage"/>
     </div>
@@ -48,7 +48,6 @@
 
 <script lang="ts">
 import MessageI from "../../types/interfaces/message.interface";
-import ChannelMemberI from "../../types/interfaces/channelMember.interface";
 import { Socket } from "socket.io-client";
 // import http from "../http-common";
 import { defineComponent } from "@vue/runtime-core";
@@ -71,7 +70,7 @@ export default defineComponent({
     return {
       // test: io('http://localhost:3000/channel', {  withCredentials: true}),
       currentUser: store.getters["auth/getUserProfile"],
-      channelMember: {} as ChannelMemberI,
+      channelMember: {} as any,
       newChannelName: "",
       muteUser: "",
       banUser: "",
@@ -193,7 +192,7 @@ export default defineComponent({
     );
 
     this.socket.on(
-      "channelMemberInfo", (data: ChannelMemberI) => {
+      "channelMemberInfo", (data: any) => {
           this.channelMember = data;
         }
     );
