@@ -122,7 +122,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async createChannel(client: Socket, createChannel: CreateChannelDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
 
-        await this.channelService.createChannel(createChannel, user.id);
+        const channelId = await this.channelService.createChannel(createChannel, user.id);
+        client.join(String(channelId));
         this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
     }
@@ -134,7 +135,15 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
         await this.channelService.deleteChannel(user.id, channelId);
         this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.emit("updateJoinedChannel", await this.userService.joinedChannel(user));
+        this.server.to(String(channelId)).emit("updateMembersJoinedChannels", "test");
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('updateJoinedChannels')
+    async updateJoinedChannels(client: Socket) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
+
     }
 
     @UseGuards(SocketGuard)
@@ -143,6 +152,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         
         await this.channelService.addUserToChannel(joinChannel, user.id);
+        client.join(String(joinChannel.id));
         this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
     } 
@@ -154,8 +164,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const guest = await this.channelService.inviteUserInChannel(user, invitation);
         
         const guestSocket = (this.socketList.find(s => s.user.id === guest.id )).socket;
-        this.server.to(guestSocket.id).emit("addToAChannel", "user added to a channel");
-        this.server.emit("updateJoinedChannel", await this.userService.joinedChannel(guest));
+        guestSocket.join(String(invitation.channelId));
+        this.server.to(guestSocket.id).emit("updateJoinedChannel", await this.userService.joinedChannel(guest));
     }
 
     @UseGuards(SocketGuard)
@@ -172,26 +182,36 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const user = this.socketList.find(socket => socket.socketId === client.id).user
 
         await this.channelService.deleteChannelMember(channelId, user.id);
+        client.leave(String(channelId));
         this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
     }
 
-    @UseGuards(SocketGuard)
-    @SubscribeMessage('isOwner') 
-    async isOwner(client: Socket, channelId: number) {
-        const user = this.socketList.find(socket => socket.socketId === client.id).user
-        const owner = await this.channelService.findOwner(channelId);
-        this.server.to(client.id).emit("isOwner", (user.id === owner.user.id));
-    }
+    // @UseGuards(SocketGuard)
+    // @SubscribeMessage('isOwner') 
+    // async isOwner(client: Socket, channelId: number) {
+    //     const user = this.socketList.find(socket => socket.socketId === client.id).user
+    //     const owner = await this.channelService.findOwner(channelId);
+    //     this.server.to(client.id).emit("isOwner", (user.id === owner.user.id));
+    // }
+
+    // @UseGuards(SocketGuard)
+    // @SubscribeMessage('isAdmin') 
+    // async isAdmin(client: Socket, channelId: number) {
+    //     const user = this.socketList.find(socket => socket.socketId === client.id).user
+    //     const admins = await this.channelService.findAdmins(channelId);
+    //     const member = admins.find(u => u.user.id === user.id);
+    //     const isAdmin = (member == undefined) ? false : true;
+    //     this.server.to(client.id).emit("isAdmin", isAdmin);
+    // }
 
     @UseGuards(SocketGuard)
-    @SubscribeMessage('isAdmin') 
-    async isAdmin(client: Socket, channelId: number) {
+    @SubscribeMessage('getChannelMemberInfo') 
+    async getChannelMemberInfo(client: Socket, channelId: number) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
-        const admins = await this.channelService.findAdmins(channelId);
-        const member = admins.find(u => u.user.id === user.id);
-        const isAdmin = (member == undefined) ? false : true;
-        this.server.to(client.id).emit("isAdmin", isAdmin);
+        const members = await this.channelService.findMembers(channelId);
+        const member = members.find(u => u.user.id === user.id);
+        this.server.to(client.id).emit("channelMemberInfo", member);
     }
 
     @UseGuards(SocketGuard)
@@ -210,7 +230,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this.channelService.changeChannelName(owner, updates);
         
         this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.emit("updateJoinedChannel", await this.userService.joinedChannel(owner));
+        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(owner));
     }
 
 

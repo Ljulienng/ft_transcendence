@@ -338,6 +338,10 @@ export default defineComponent({
       this.joinedChannelList = data;
     });
 
+    this.socket.on("updateMembersJoinedChannels", () => {
+      this.socket.emit("updateJoinedChannels");
+    });
+
   },
 
   // beforeMount() {

@@ -22,7 +22,7 @@ export class Channel {
     type: string;
 
     @Column({ nullable: true, default: null }) 
-	password: string; //test
+	password: string;
 
 	@CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
 	readonly createdTime: Date

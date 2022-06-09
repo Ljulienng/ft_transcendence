@@ -1,6 +1,6 @@
 <template>
   <div class="channelBox">
-    <div v-if="isOwner == true">
+    <div v-if="channelMember.owner == true">
       <div>
         <button @click="deleteChannel()">Delete channel </button>
       </div>
@@ -35,7 +35,7 @@
             placeholder="new password"
           />
         </div>
-    <div v-if="isAdmin == true && channelType == 'private'"> <!-- invitations only by admins -->
+    <div v-if="channelMember.admin == true && channelType == 'private'"> <!-- invitations only by admins -->
         <button  @click="invite()">Invite : </button>
         <input
             type="text"
@@ -67,6 +67,7 @@
 
 <script lang="ts">
 import MessageI from "../../types/interfaces/message.interface";
+import ChannelMemberI from "../../types/interfaces/channelMember.interface";
 import { Socket } from "socket.io-client";
 // import http from "../http-common";
 import { defineComponent } from "@vue/runtime-core";
@@ -89,8 +90,7 @@ export default defineComponent({
     return {
       // test: io('http://localhost:3000/channel', {  withCredentials: true}),
       currentUser: store.getters["auth/getUserProfile"],
-      isOwner: false,
-      isAdmin: false,
+      channelMember: {} as ChannelMemberI,
       newChannelName: "",
       upgradeMember: {
         channelId: this.channel,
@@ -186,16 +186,15 @@ export default defineComponent({
         this.messageList = data;
       }
     );
-    this.socket.on(
-      "isOwner", (data: boolean) => { this.isOwner = data; }
-    );
-
-    this.socket.on(
-      "isAdmin", (data: boolean) => { this.isAdmin = data; }
-    );
 
     this.socket.on(
       "passwordChanged", (data: string) => { console.log("passwordChanged:", data);}
+    );
+
+    this.socket.on(
+      "channelMemberInfo", (data: ChannelMemberI) => {
+          this.channelMember = data;
+        }
     );
 },
 
@@ -207,8 +206,9 @@ export default defineComponent({
     console.log("socket = ", this.socket);
     // console.log("Channelbox created");
     this.getMessages();
-    this.socket.emit("isOwner", this.channel);
-    this.socket.emit("isAdmin", this.channel);
+    // this.socket.emit("isOwner", this.channel);
+    // this.socket.emit("isAdmin", this.channel);
+    this.socket.emit("getChannelMemberInfo", this.channel);
   },
   // setup() {
   // },
