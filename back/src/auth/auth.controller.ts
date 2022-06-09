@@ -22,13 +22,41 @@ export class AuthController {
 
   // @UseGuards(FortyTwoAuthGuard)
   @Get('/norminet')
-  async Norminet(@Req() req, @Res({passthrough: true}) res) {
+  async norminet(
+    @Req() req,
+    @Res({passthrough: true}) res,
+    ) {
     const payload = { username: 'norminet', auth: false };
 		const accessToken = await this.jwtService.signAsync(payload);
 		res.cookie('jwt', accessToken, {httpOnly: true})
 		// res.redirect('http://localhost:3001/home');
   }
 
+  @Post('/testsignin')
+  async testSignIn(
+  @Req() req,
+  @Res({passthrough: true}) res,
+  @Body() newUsername
+  ) {
+    const tmp = newUsername.newUsername
+    const user = await this.userService.findOne({username: tmp})
+
+    if (!user) {
+      const newUser: any = {
+        username: tmp,
+        email: tmp + "@randomstudent.fr"
+      }
+
+      this.userService.add(newUser)
+    }
+    const test = await this.userService.findByUsername(tmp)
+
+    // console.log("new user = ", test, tmp)
+
+    const payload = { username: tmp, auth: false };
+		const accessToken = await this.jwtService.signAsync(payload);
+		res.cookie('jwt', accessToken, {httpOnly: true})
+  }
 
   @UseGuards(FortyTwoAuthGuard)
   @Get('/auth/42/callback')

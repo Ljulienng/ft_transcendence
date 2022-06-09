@@ -1,18 +1,13 @@
 <template>
   <div id="chat">
     <div class="createChat">
-      <h3>Create new channel</h3>
-      Name <input type="text" maxlength="20" v-model="name" />
+      new channel : Name <input type="text" maxlength="20" v-model="name" />
       <div>
         <div class="one_elem">
           <input type="radio" value="public" v-model="type" />
           <label for="public">Public</label>
-        </div>
-        <div>
           <input type="radio" value="protected" v-model="type" />
           <label for="protected">Protected</label>
-        </div>
-        <div>
           <input type="radio" value="private" v-model="type" />
           <label for="private">Private</label>
         </div>
@@ -31,11 +26,11 @@
     </div>
     <br />
 
-    <div>
+    <!-- <div>
       <button @click="joinChannel">Join channel with id</button>
       <input type="number" v-model="channelToJoin.id" />
     </div>
-    <br />
+    <br /> -->
 
     <!-- <div class="channelTabs">
                 <button @click="showChannel(channel.id)">show channel </button>
@@ -138,13 +133,14 @@
           <ul>
             <li v-for="channel in joinedChannelList" :key="channel">
               {{ channel.id }} [{{ channel.type }}] - "{{ channel.name }}" : created by {{ channel.owner.username }}
-              <button @click="showChannel(channel.id)">show channel</button>
+              <button @click="showChannel(channel.id, channel.type)">show channel</button>
               <button @click="leaveChannel(channel.id)">leave channel</button>
             </li>
           </ul>
           <div v-if="showBox === true">
             <ChannelBox
               v-bind:channel="selectedChannel"
+              v-bind:channelType="selectedChannelType"
               v-bind:socketChannel="socket"
             ></ChannelBox>
           </div>
@@ -194,6 +190,7 @@ export default defineComponent({
       type: "public",
       channelId: 0,
       selectedChannel: 0,
+      selectedChannelType: "",
       selectedUser: 0,
       showBox: false,
       showChatBox: false,
@@ -221,7 +218,8 @@ export default defineComponent({
       }
     },
 
-    showChannel(channelId: number) {
+    showChannel(channelId: number, channelType: string) {
+      this.selectedChannelType = channelType;
       if (this.showBox === true && channelId === this.selectedChannel) {
         this.showBox = false;
       } else if (this.showBox === true && channelId !== this.selectedChannel) {
@@ -250,7 +248,7 @@ export default defineComponent({
     updateChannelListWithoutPrivate() {
       this.channelListWithoutPrivate = [];
         for (var channel of this.channelList) {
-          if (channel.type != "private") {
+          if (channel.type !== "private") {
             this.channelListWithoutPrivate.push(channel);
           }
         }
@@ -353,6 +351,7 @@ export default defineComponent({
 
     this.socket.on("updateJoinedChannel", (data: ChannelI[]) => {
       this.joinedChannelList = data;
+      console.log("UPDATE : ", data);
     });
 
     // this.socket.on('sendMessageToClient', (data) => {

@@ -13,6 +13,20 @@
           ><i class="fa fa-google"></i> Sign in with norminet</a
         >
       </div>
+      <form v-on:submit.prevent="testAuth">
+        <p>
+          <label for="twoFA"></label>
+          <input
+            id="TwoFA"
+            v-model="newUsername"
+            type="text"
+            username="TwoFA"
+          />
+        </p>
+        <p>
+          <input type="submit" value="Submit" />
+        </p>
+      </form>
     </div>
   </div>
 </template>
@@ -22,22 +36,40 @@ import http from "../../http-common";
 import { defineComponent } from "@vue/runtime-core";
 
 export default defineComponent({
+  data() {
+    return {
+      newUsername: "",
+    };
+  },
+
   methods: {
     ftAuth() {
-      return ('http://localhost:3000/auth/42');
+      return "http://localhost:3000/auth/42";
     },
     norminetAuth() {
-      http.get('/norminet')
-      .then(res => {
-        console.log(res);
-        this.$router.push("http://localhost:3001/home")
-      })
-      .catch(err => {
-        console.log("err norminet = ", err)
-      })
-    }
-  }
-})
+      http
+        .get("/norminet")
+        .then((res) => {
+          console.log(res);
+          this.$router.push("http://localhost:3001/home");
+        })
+        .catch((err) => {
+          console.log("err norminet = ", err);
+        });
+    },
+    testAuth() {
+      http
+        .post("/testsignin", { newUsername: this.newUsername })
+        .then((res) => {
+          console.log(res);
+          this.$router.push("http://localhost:3001/home");
+        })
+        .catch((err) => {
+          console.log("err testAuth = ", err);
+        });
+    },
+  },
+});
 </script>
 
 <style scoped scss lang="scss">

@@ -8,6 +8,7 @@ import { UserModule } from 'src/user/user.module';
 import { User } from 'src/user/models/user.entity';
 import { MessageChannel } from 'src/message/models/messageChannel.entity';
 import { ChannelMemberModule } from 'src/channelMember/channelMember.module';
+import { UserService } from 'src/user/service/user.service';
 
 @Module({
   imports: [

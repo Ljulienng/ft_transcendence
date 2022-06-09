@@ -2,9 +2,9 @@ import { User } from "src/user/models/user.entity";
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 
 @Entity()
-export class Game {
-  @PrimaryGeneratedColumn()
-  readonly id: number;
+export class Match {
+	@PrimaryGeneratedColumn()
+	readonly id: number;
 
   @ManyToOne(() => User, user => user.id, {
     eager: true,

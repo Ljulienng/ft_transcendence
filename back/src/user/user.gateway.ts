@@ -12,7 +12,7 @@ import { UserService } from "./service/user.service";
 import { Channel } from "src/channel/models/channel.entity"
 import { CreateMessageDto } from "src/message/models/message.dto";
 import { CreateMessageUserDto } from "src/messageUser/models/messageUser.dto";
-import { JoinChannelDto } from "src/channel/models/channel.dto";
+import { channelInvitationDto, JoinChannelDto } from "src/channel/models/channel.dto";
 import { SocketUserI } from "src/chat/chat.gateway";
 import { ChannelService } from "src/channel/service/channel.service";
 import { SocketGuard } from "src/auth/guards/socket.guard";
@@ -147,6 +147,14 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
     } 
 
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('inviteInPrivateChannel')
+    async inviteUserInChannel(client: Socket, invitation: channelInvitationDto) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        const guest = await this.channelService.inviteUserInChannel(user, invitation);
+        this.server.emit("updateJoinedChannel", await this.userService.joinedChannel(guest));
+    }
+
     // @UseGuards(JwtAuthGuard, TwoFAAuth)
     @UseGuards(SocketGuard)
     @SubscribeMessage('leaveChannel') 
@@ -156,6 +164,14 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this.channelService.deleteChannelMember(channelId, user.id);
         this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('isOwner') 
+    async isOwner(client: Socket, channelId: number) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        const owner = await this.channelService.findOwner(channelId);
+        this.server.to(client.id).emit("isOwner", (user.id == owner.user.id));
     }
 
      /*

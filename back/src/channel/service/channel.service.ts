@@ -2,7 +2,7 @@ import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, Not
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Channel} from '../models/channel.entity'
-import { CreateChannelDto, UpdateChannelDto } from '../models/channel.dto';
+import { channelInvitationDto, CreateChannelDto, UpdateChannelDto } from '../models/channel.dto';
 import { MessageService } from 'src/message/service/message.service';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/models/user.entity';
@@ -24,6 +24,7 @@ export class ChannelService {
         private channelMemberService: ChannelMemberService,
         @Inject(MessageService)
         private messageService: MessageService,
+
     ) {}
 
     /* 
@@ -54,19 +55,21 @@ export class ChannelService {
     }
 
     /* get channel members */
-    async findMembers(channelId: number) {
+    async findMembers(channelId: number): Promise<ChannelMember[]> {
         const channel = await this.findChannelById(channelId);
         return await this.channelMemberService.findMembers(channel);
     }
 
     /* get the channel owner */
-    async   findOwner(channelId: number) {
+    async   findOwner(channelId: number): Promise<ChannelMember> {
         const channel = await this.findChannelById(channelId);
+        console.log("channelid : ", channelId);
+        console.log("channel : ", channel);
         return await this.channelMemberService.findOwner(channel);
     }
 
     /* get channel admins */
-    async   findAdmins(channelId: number) {
+    async   findAdmins(channelId: number): Promise<ChannelMember[]> {
         const channel = await this.findChannelById(channelId);
         return await this.channelMemberService.findAdmins(channel);
     }
@@ -150,7 +153,6 @@ export class ChannelService {
        await this.channelRepository.save(newChannel);
        await this.channelMemberService.createMember(user1, newChannel, true, true);
        await this.channelMemberService.createMember(user2, newChannel, false, true);
-       console.log('new DM channel created : ', newChannel);
     }
 
     /* check if the password sent is the right one */
@@ -186,6 +188,34 @@ export class ChannelService {
         await this.channelRepository.save(welcomingChannel);
         await this.channelMemberService.createMember(user, welcomingChannel, false, false);    
    }
+
+   /*
+   ** the user wants to invite another user in a private channel
+   ** need to check if :
+   **       - the user is the owner of the channel
+   **       - the guest is not already in the channel
+   */
+   async inviteUserInChannel(user: User, invitation: channelInvitationDto) {
+        const channel = await this.findChannelById(invitation.channelId);
+        const guest = await this.userRepository.findOne({username: invitation.guest});
+
+        if (channel.owner.id !== user.id) {
+            throw new UnauthorizedException('you are not allowed to invite someone to join this channel');
+        }
+        if (!guest) {
+            throw new UnauthorizedException('the guest you want to invite does not exist');
+        }
+        if (await this.channelMemberService.findOne(guest, channel)) {
+            throw new UnauthorizedException('the guest is already in the channel');
+        }
+
+        await this.addUserToChannel({
+            id: invitation.channelId,
+            type: "private",
+            password: "" }, guest.id);
+        
+        return guest;
+    }
 
     /*
    ** the user wants to leave a channel
