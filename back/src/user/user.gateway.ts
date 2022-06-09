@@ -178,7 +178,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('downgradeMember')
-    async unsetChannelMemberAsAdmin(client: Socket, downgradeMember: upgradeMemberDto) {
+    async unsetChannelMemberAsAdmin(client: Socket, downgradeMember: updateMemberDto) {
         const owner = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.unsetMemberAsAdmin(owner, downgradeMember);
         this.server.emit("/adminUnpromoted/" + downgradeMember.channelId)
@@ -198,15 +198,29 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @UseGuards(SocketGuard)
     @SubscribeMessage('ban')
     async ban(client: Socket, ban: updateMemberDto) {
-        const owner = this.socketList.find(socket => socket.socketId === client.id).user
-        await this.channelService.ban(owner, ban);
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.ban(user, ban);
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('unban')
+    async unban(client: Socket, unban: updateMemberDto) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.unban(user, unban);
     }
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('mute')
     async mute(client: Socket, mute: updateMemberDto) {
-        const owner = this.socketList.find(socket => socket.socketId === client.id).user
-        await this.channelService.mute(owner, mute);
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.mute(user, mute);
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('unmute')
+    async unmute(client: Socket, unmute: updateMemberDto) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.unmute(user, unmute);
     }
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)

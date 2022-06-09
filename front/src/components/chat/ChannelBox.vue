@@ -1,55 +1,24 @@
 <template>
   <div class="channelBox">
-    <!-- <div v-if="channelMember.owner == true">
-      <div>
-        <button @click="deleteChannel()">Delete channel </button>
-      </div>
-      <div>
-        <button @click="changeChannelName()">Change channel name : </button>
-        <input type="text" maxlength="50" v-model="newChannelName" placeholder="new channel name"/>
-      </div>
-      <div>
-        <button @click="setMemberAsAdmin()">Set member as admin : </button>
-        <input type="text" maxlength="100" v-model="upgradeMember.username" class="inputMessage" placeholder="username"/>
-      </div>
-      <div v-if="channelType == 'protected'"> // change password only by owner
-        <button @click="changePassword()">Change password : </button>
-        <input type="password" maxlength="100" v-model="passwordI.old" class="inputMessage" placeholder="old password"/>
-        <input type="password" maxlength="100" v-model="passwordI.new" class="inputMessage" placeholder="new password" />
-      </div>
-    <div v-if="channelMember.admin == true">
-      <div v-if="channelType == 'private'"> // invitations only by admins
-        <button  @click="invite()">Invite : </button>
-        <input type="text" maxlength="30" v-model="invitation.guest" class="inputMessage" placeholder="username"/>
-      </div>
-      <div>
-        <button  @click="mute()">Mute : </button>
-        <input type="text" maxlength="30" v-model="muteUser" class="inputMessage" placeholder="username"/>
-      </div>
-      <div>
-        <button  @click="ban()">Ban : </button>
-        <input type="text" maxlength="30" v-model="banUser" class="inputMessage" placeholder="username"/>
-      </div>
-    </div>
-    </div>  -->
     <ChannelSettings
       v-bind:currentUser="currentUser"
       v-bind:channelId="channel"
       v-bind:channelType="channelType"
       v-bind:socket="socketChannel"
+      v-bind:channelMember="channelMember"
       @close="$emit('close')"
     />
-    <div v-if="isOwner == true"></div>
+    <div v-if="channelMember.owner"></div>
     <p>{{ channel }}</p>
     <div class="messageList">
       <p v-for="msg in messageList.slice().reverse()" :key="msg">
         {{ msg.user.username }}: {{ msg.content }}
       </p>
     </div>
-    <!-- <div v-if="!channelMember.muted"> // a muted member can see messages but not send them -->
-      <button @click="sendMessage">Send message</button>
+    <div v-if="!channelMember.muted"> <!-- a muted member can see messages but not send them -->
+      <button  @click="sendMessage" class="btn-primary">Send message</button>
       <input type="text" maxlength="100" v-model="message.content" class="inputMessage"/>
-    <!-- </div> -->
+    </div>
     <br />
   </div>
 </template>
@@ -83,28 +52,7 @@ export default defineComponent({
     return {
       // test: io('http://localhost:3000/channel', {  withCredentials: true}),
       currentUser: store.getters["auth/getUserProfile"],
-<<<<<<< HEAD
       channelMember: {} as any,
-      newChannelName: "",
-      muteUser: "",
-      banUser: "",
-      upgradeMember: {
-        channelId: this.channel,
-        username: "",
-      },
-      invitation: {
-        channelId: this.channel,
-        guest: "",
-      },
-      passwordI : {
-        old: "",
-        new: "",
-        channelId: this.channel,
-      },
-=======
-      isOwner: false,
-      isAdmin: false,
->>>>>>> jnguyen
       message: {
         userId: 0,
         username: "",
@@ -138,59 +86,7 @@ export default defineComponent({
         this.messageList = data;
       });
     },
-<<<<<<< HEAD
 
-    invite() {
-      console.log("Invite/add friend to a private channel : ", this.invitation);
-      this.socket.emit("inviteInPrivateChannel", this.invitation);
-      this.invitation.guest = "";
-    },
-
-    changePassword() {
-      this.socket.emit("changePassword", this.passwordI);
-      this.passwordI.old = "";
-      this.passwordI.new = "";
-    },
-
-    setMemberAsAdmin() {
-      this.socket.emit("upgradeMember", this.upgradeMember);
-      this.upgradeMember.username = "";
-    },
-
-    deleteChannel() {
-      console.log("delete channel");
-      this.socket.emit("deleteChannel", this.channel);
-    },
-
-    changeChannelName() {
-      const changeChannelName = {
-        channelId: this.channel,
-        name: this.newChannelName,
-      };
-      this.socket.emit("changeChannelName", changeChannelName);
-      this.newChannelName = "";
-    },
-
-    ban() {
-      const ban = {
-        channelId: this.channel,
-        username: this.banUser,
-      };
-      this.socket.emit("ban", ban);
-      this.banUser = "";
-    },
-
-    mute() {
-      const mute = {
-        channelId: this.channel,
-        username: this.muteUser,
-      };
-      this.socket.emit("mute", mute);
-      this.muteUser = "";
-    },
-
-=======
->>>>>>> jnguyen
   },
 
   mounted() {
@@ -204,28 +100,20 @@ export default defineComponent({
         this.messageList = data;
       }
     );
-<<<<<<< HEAD
-
-    this.socket.on(
-      "passwordChanged", (data: string) => { console.log("passwordChanged:", data);}
-    );
 
     this.socket.on(
       "channelMemberInfo", (data: any) => {
           this.channelMember = data;
         }
-    );
-},
-=======
-    this.socket.on("isOwner", (data: boolean) => {
-      this.isOwner = data;
-    });
+    )
+  //   this.socket.on("isOwner", (data: boolean) => {
+  //     this.isOwner = data;
+  //   });
 
-    this.socket.on("isAdmin", (data: boolean) => {
-      this.isAdmin = data;
-    });
+  //   this.socket.on("isAdmin", (data: boolean) => {
+  //     this.isAdmin = data;
+  //   });
   },
->>>>>>> jnguyen
 
   // unmounted() {
   // 	this.test.close;

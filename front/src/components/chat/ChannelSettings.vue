@@ -2,12 +2,12 @@
   <div>
     <!--=========================== ADMIN SETTINGS ===========================-->
 
-    <div v-if="isAdmin === true">
+    <div v-if="channelMember.admin">
       <div>
         <button
           @click="deleteChannel()"
           class="btn-danger"
-          v-if="isOwner === true"
+          v-if="channelMember.owner"
         >
           Delete channel
         </button>
@@ -24,7 +24,7 @@
         </div>
         <div v-if="channelType == 'protected'">
           <!-- change password only by owner -->
-          <button @click="changePassword()">Change password :</button>
+          <button @click="changePassword()" class="btn-primary">Change password :</button>
           <input
             type="password"
             maxlength="100"
@@ -40,7 +40,7 @@
             placeholder="new password"
           />
         </div>
-        <div v-if="isAdmin == true && channelType == 'private'">
+        <div v-if="channelMember.admin && channelType == 'private'">
           <!-- invitations only by admins -->
           <button @click="invite()">Invite :</button>
           <input
@@ -61,7 +61,7 @@
         <!-- <div>{{ member.user.username }}</div> -->
         <template v-if="member.owner">OWNER = </template>
         {{ member.user.username }}
-        <template v-if="isOwner">
+        <template v-if="channelMember.owner">
           <button
             @click="setMemberAsAdmin(member.user.username)"
             class="btn-primary"
@@ -77,7 +77,7 @@
             DEMOTE
           </button>
         </template>
-        <template v-if="isAdmin">
+        <template v-if="channelMember.admin">
           <button
             @click="kickMember(member.user.username)"
             class="btn-danger"
@@ -88,13 +88,44 @@
           <button
             @click="kickMember(member.user.username)"
             class="btn-danger"
-            v-if="member.admin && !member.owner && isOwner"
+            v-if="member.admin && !member.owner && channelMember.owner"
           >
             Kick
           </button>
         </template>
+        <template v-if="channelMember.admin">
+          <button
+            @click="mute(member.user.username)"
+            class="btn-secondary"
+            v-if="!member.admin && !member.muted"
+          >
+            Mute
+          </button>
+          <button
+            @click="unmute(member.user.username)"
+            class="btn-secondary"
+            v-if="!member.admin && member.muted"
+          >
+            Unmute
+          </button>
+          <button
+            @click="ban(member.user.username)"
+            class="btn-secondary"
+            v-if="!member.admin && !member.banned"
+          >
+            Ban
+          </button>
+          <button
+            @click="unban(member.user.username)"
+            class="btn-secondary"
+            v-if="!member.admin && member.banned"
+          >
+            Unban
+          </button>
+        </template>
         <template v-if="member.admin">(admin)</template>
         <template v-if="member.muted">(muted)</template>
+        <template v-if="member.banned">(banned)</template>
       </li>
     </ul>
   </div>
@@ -121,6 +152,10 @@ export default defineComponent({
       type: Socket,
       required: true
     },
+    channelMember: {
+      type: Object,
+      required: true
+    },
   },
 
   data() {
@@ -129,10 +164,6 @@ export default defineComponent({
       isAdmin: false,
       isOwner: false,
       newChannelName: "",
-      // upgradeMember: {
-      //   channelId: this.channelId,
-      //   username: "",
-      // },
       invitation: {
         channelId: this.channelId,
         guest: "",
@@ -215,6 +246,38 @@ export default defineComponent({
       };
       this.socket.emit("kickMember", userToKick);
     },
+
+    ban(username: string) {
+      const ban = {
+        channelId: this.channelId,
+        username: username,
+      };
+      this.socket.emit("ban", ban);
+    },
+
+    unban(username: string) {
+      const unban = {
+        channelId: this.channelId,
+        username: username,
+      };
+      this.socket.emit("unban", unban);
+    },
+
+    mute(username: string) {
+      const mute = {
+        channelId: this.channelId,
+        username: username,
+      };
+      this.socket.emit("mute", mute);
+    },
+
+    unmute(username: string) {
+      const unmute = {
+        channelId: this.channelId,
+        username: username,
+      };
+      this.socket.emit("unmute", unmute);
+    },
   },
 
   mounted() {
@@ -239,6 +302,10 @@ export default defineComponent({
     });
     this.socket.on("/userKicked/" + this.currentUser.userName, () => {
       this.$emit("close");
+    });
+    this.socket.on("updateChannelMembers", () => {
+      console.log("update members");
+      this.getChannelMembers();
     });
   },
 

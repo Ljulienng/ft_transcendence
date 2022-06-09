@@ -336,12 +336,32 @@ export class ChannelService {
         return await this.channelMemberService.updateMember(owner, userToDowngrade, channel, updates);
     }
 
-    async ban(owner: User, ban: updateMemberDto) {
-
+    async ban(user: User, ban: updateMemberDto) {
+        const userToBan = await this.userRepository.findOne({username: ban.username});
+        const channel = await this.findChannelById(ban.channelId);
+        const updates: UpdateMemberChannelDto = { banned: true };
+        return await this.channelMemberService.updateMember(user, userToBan, channel, updates);
     }
 
-    async mute(owner: User, mute: updateMemberDto) {
-        
+    async unban(user: User, unban: updateMemberDto) {
+        const userToUnban = await this.userRepository.findOne({username: unban.username});
+        const channel = await this.findChannelById(unban.channelId);
+        const updates: UpdateMemberChannelDto = { banned: false };
+        return await this.channelMemberService.updateMember(user, userToUnban, channel, updates);
+    }
+
+    async mute(user: User, mute: updateMemberDto) {
+        const userToMute = await this.userRepository.findOne({username: mute.username});
+        const channel = await this.findChannelById(mute.channelId);
+        const updates: UpdateMemberChannelDto = { muted: true };
+        return await this.channelMemberService.updateMember(user, userToMute, channel, updates);
+    }
+
+    async unmute(user: User, unmute: updateMemberDto) {
+        const userToUnmute = await this.userRepository.findOne({username: unmute.username});
+        const channel = await this.findChannelById(unmute.channelId);
+        const updates: UpdateMemberChannelDto = { muted: false };
+        return await this.channelMemberService.updateMember(user, userToUnmute, channel, updates);
     }
 
 
