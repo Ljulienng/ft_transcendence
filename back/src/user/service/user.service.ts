@@ -15,7 +15,6 @@ import { MessageUserService } from 'src/messageUser/service/messageUser.service'
 import { CreateMessageUserDto } from 'src/messageUser/models/messageUser.dto';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 import { PongService } from 'src/pong/pong.service';
-import { Pong } from 'src/pong/interfaces/pong.interface';
 import { Match } from 'src/pong/models/match.entity';
 
 @Injectable()
@@ -424,8 +423,8 @@ export class UserService {
 				playerOneScore: 3,
 				playerTwoScore: 0,
 				winner: user.username,
-				loser: norminet.username
-
+				loser: norminet.username,
+				inProgress: false
 			}
 			this.matchRepository.save(firstMatch);
 		}
