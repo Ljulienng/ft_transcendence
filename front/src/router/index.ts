@@ -1,7 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '../store'
-import HelloWorld from '@/components/HelloWorld.vue'
-import ShowUsers from '@/components/ShowUsers.vue'
 import Pong from '@/components/Pong.vue'
 import AuthModal from '@/components/auth/AuthModal.vue'
 import TwoFaAuth from '@/components/auth/TwoFaAuth.vue'
@@ -9,11 +7,17 @@ import FriendList from '@/views/FriendList.vue'
 import UserProfile from '@/views/UserProfile.vue'
 import Home from '@/views/Home.vue'
 import Test from '@/views/Test.vue'
+import NotFound from '@/views/NotFound.vue'
 // import http from '../http-common'
 import Chat from '@/views/Chat.vue'
 import Leaderboard from '@/views/Leaderboard.vue'
 
 const routes = [
+  {
+    path: "/:catchAll(.*)",
+    name: "NotFound",
+    component: NotFound,
+  },
   {
     name: 'Test',
     path: '/test',
@@ -25,16 +29,6 @@ const routes = [
     alias: ['/home'],
     component: Home,
     meta: { requiredAuth: true }
-  },
-  {
-    name: 'Hello',
-    path: '/hello',
-    component: HelloWorld
-  },
-  {
-    name: 'ShowUsers',
-    path: '/showusers',
-    component: ShowUsers
   },
   {
     name: 'Play',

@@ -20,6 +20,7 @@ import { UseGuards } from "@nestjs/common";
 import { CreateChannelDto } from "src/channel/models/channel.dto";
 import { Observable } from 'rxjs'
 import { User } from "./models/user.entity";
+import { PasswordI } from "src/channel/models/password.interface";
 
 
 
@@ -54,6 +55,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	async handleConnection(client: Socket) {
         let newSocket: SocketUserI = {
             socketId: '',
+            socket: client,
             user: null
         }
         // Link client socket to his user entity
@@ -122,7 +124,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async createChannel(client: Socket, createChannel: CreateChannelDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
 
-        await this.channelService.createChannel(createChannel, user.id);
+        const channelId = await this.channelService.createChannel(createChannel, user.id);
         this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
     }
@@ -152,6 +154,9 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async inviteUserInChannel(client: Socket, invitation: channelInvitationDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         const guest = await this.channelService.inviteUserInChannel(user, invitation);
+        
+        const guestSocket = (this.socketList.find(s => s.user.id === guest.id )).socket;
+        this.server.to(guestSocket.id).emit("addToAChannel", "user add to a channel");
         this.server.emit("updateJoinedChannel", await this.userService.joinedChannel(guest));
     }
 
@@ -171,7 +176,26 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async isOwner(client: Socket, channelId: number) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         const owner = await this.channelService.findOwner(channelId);
-        this.server.to(client.id).emit("isOwner", (user.id == owner.user.id));
+        this.server.to(client.id).emit("isOwner", (user.id === owner.user.id));
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('isAdmin') 
+    async isAdmin(client: Socket, channelId: number) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        const admins = await this.channelService.findAdmins(channelId);
+        const member = admins.find(u => u.user.id === user.id);
+        const isAdmin = (member == undefined) ? false : true;
+        this.server.to(client.id).emit("isAdmin", isAdmin);
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('changePassword') 
+    async changePassword(client: Socket, passwordI: PasswordI) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.changePassword(user.id, passwordI);
+        // need to inform members of the channel of this change !
+        this.server.to(client.id).emit("passwordChanged", "password is changed");
     }
 
      /*

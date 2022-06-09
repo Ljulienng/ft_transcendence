@@ -1,5 +1,6 @@
 export interface PasswordI {
-    oldPassword: string;
-    newPassword: string;
+    old: string;
+    new: string;
+    channelId: number,
   }
   

@@ -130,5 +130,11 @@ button {
 
 $primary: #fff774;
 @import "bootstrap";
+
+h1 {
+    color: #fff774;
+    font-size: 125px;
+    font-family: 'Inter';
+}
 }
 </style>

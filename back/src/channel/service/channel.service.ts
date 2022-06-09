@@ -122,7 +122,8 @@ export class ChannelService {
 
        await this.channelRepository.save(newChannel);
        await this.channelMemberService.createMember(user, newChannel, true, true);
-       console.log('new channel created : ', newChannel);
+       console.log("channel id : ", newChannel.id );
+       return newChannel.id;
     }
 
     /*
@@ -250,24 +251,25 @@ export class ChannelService {
    **       - the new password is not too short (could increase the constraints...)
    **       - security check : old channel password == old password sent by owner
    */
-   async changePassword(channelId: number, userId: number, passwords: PasswordI)
+   async changePassword(/*channelId: number, */userId: number, passwordI: PasswordI)
    {
         // console.log('user:', userId, ' changes password of channel:', channelId, ' [new pass:', passwords.newPassword,']');
         const user = await this.userRepository.findOne({id: userId});
-        const channel = await this.findChannelById(channelId);
+        const channel = await this.findChannelById(passwordI.channelId);
         const channelMember = await this.channelMemberService.findOne(user, channel);
 
         if (!channelMember.owner) {
             throw new HttpException('you are not authorized to change the password', HttpStatus.FORBIDDEN);
         }
-        if (passwords.newPassword.length < 8) {
-            throw new HttpException('password too short', HttpStatus.FORBIDDEN);
+        if (!( await this.checkPasswordMatch(passwordI.old, channel.password))) {
+            throw new HttpException('old password does not match', HttpStatus.FORBIDDEN);
         }
-        if (!( await this.checkPasswordMatch(passwords.oldPassword, channel.password))) {
-            throw new HttpException('current password does not match', HttpStatus.FORBIDDEN);
+        if (passwordI.new.length < 8) {
+            throw new HttpException('new password too short', HttpStatus.FORBIDDEN);
         }
+
         const saltOrRounds = await bcrypt.genSalt();
-        const password = await bcrypt.hash(passwords.newPassword, saltOrRounds);
+        const password = await bcrypt.hash(passwordI.new, saltOrRounds);
         this.channelRepository.update(channel.id, { password });
    }
 

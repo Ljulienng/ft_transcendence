@@ -351,7 +351,6 @@ export default defineComponent({
 
     this.socket.on("updateJoinedChannel", (data: ChannelI[]) => {
       this.joinedChannelList = data;
-      console.log("UPDATE : ", data);
     });
 
     // this.socket.on('sendMessageToClient', (data) => {

@@ -16,14 +16,6 @@
 				<span class="material-icons">home</span>
 				<span class="text">Home</span>
 			</router-link>
-			<router-link to="/hello" class="button">
-				<span class="material-icons">waving_hand</span>
-				<span class="text">Hello</span>
-			</router-link>
-			<router-link to="/showusers" class="button">
-				<span class="material-icons">group_add</span>
-				<span class="text">Show users</span>
-			</router-link>
 			<router-link to="/friendlist" class="button">
 				<span class="material-icons">group</span>
 				<span class="text">Show users</span>
