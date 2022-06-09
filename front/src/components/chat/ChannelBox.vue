@@ -10,40 +10,26 @@
       </div>
       <div>
         <button @click="setMemberAsAdmin()">Set member as admin : </button>
-        <input
-            type="text"
-            maxlength="100"
-            v-model="upgradeMember.username"
-            class="inputMessage"
-            placeholder="username"
-          />
+        <input type="text" maxlength="100" v-model="upgradeMember.username" class="inputMessage" placeholder="username"/>
       </div>
       <div v-if="channelType == 'protected'"> <!-- change password only by owner -->
         <button @click="changePassword()">Change password : </button>
-        <input
-            type="password"
-            maxlength="100"
-            v-model="passwordI.old"
-            class="inputMessage"
-            placeholder="old password"
-          />
-              <input
-            type="password"
-            maxlength="100"
-            v-model="passwordI.new"
-            class="inputMessage"
-            placeholder="new password"
-          />
-        </div>
-    <div v-if="channelMember.admin == true && channelType == 'private'"> <!-- invitations only by admins -->
+        <input type="password" maxlength="100" v-model="passwordI.old" class="inputMessage" placeholder="old password"/>
+        <input type="password" maxlength="100" v-model="passwordI.new" class="inputMessage" placeholder="new password" />
+      </div>
+    <div v-if="channelMember.admin == true">
+      <div v-if="channelType == 'private'"> <!-- invitations only by admins -->
         <button  @click="invite()">Invite : </button>
-        <input
-            type="text"
-            maxlength="30"
-            v-model="invitation.guest"
-            class="inputMessage"
-            placeholder="username"
-          />
+        <input type="text" maxlength="30" v-model="invitation.guest" class="inputMessage" placeholder="username"/>
+      </div>
+      <div>
+        <button  @click="mute()">Mute : </button>
+        <input type="text" maxlength="30" v-model="muteUser" class="inputMessage" placeholder="username"/>
+      </div>
+      <div>
+        <button  @click="ban()">Ban : </button>
+        <input type="text" maxlength="30" v-model="banUser" class="inputMessage" placeholder="username"/>
+      </div>
     </div>
     </div>
     <p>{{ channel }}</p>
@@ -54,12 +40,7 @@
     </div>
     <div>
       <button @click="sendMessage">Send message</button>
-      <input
-        type="text"
-        maxlength="100"
-        v-model="message.content"
-        class="inputMessage"
-      />
+      <input type="text" maxlength="100" v-model="message.content" class="inputMessage"/>
     </div>
     <br />
   </div>
@@ -92,6 +73,8 @@ export default defineComponent({
       currentUser: store.getters["auth/getUserProfile"],
       channelMember: {} as ChannelMemberI,
       newChannelName: "",
+      muteUser: "",
+      banUser: "",
       upgradeMember: {
         channelId: this.channel,
         username: "",
@@ -168,6 +151,24 @@ export default defineComponent({
       };
       this.socket.emit("changeChannelName", changeChannelName);
       this.newChannelName = "";
+    },
+
+    ban() {
+      const ban = {
+        channelId: this.channel,
+        username: this.banUser,
+      };
+      this.socket.emit("ban", ban);
+      this.banUser = "";
+    },
+
+    mute() {
+      const mute = {
+        channelId: this.channel,
+        username: this.muteUser,
+      };
+      this.socket.emit("mute", mute);
+      this.muteUser = "";
     },
 
   },

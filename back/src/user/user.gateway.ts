@@ -12,7 +12,7 @@ import { UserService } from "./service/user.service";
 import { Channel } from "src/channel/models/channel.entity"
 import { CreateMessageDto } from "src/message/models/message.dto";
 import { CreateMessageUserDto } from "src/messageUser/models/messageUser.dto";
-import { channelInvitationDto, JoinChannelDto, upgradeMemberDto, changePasswordDto, updateChannelDto } from "src/channel/models/channel.dto";
+import { channelInvitationDto, JoinChannelDto, updateMemberDto, changePasswordDto, updateChannelDto } from "src/channel/models/channel.dto";
 import { SocketUserI } from "src/chat/chat.gateway";
 import { ChannelService } from "src/channel/service/channel.service";
 import { SocketGuard } from "src/auth/guards/socket.guard";
@@ -135,7 +135,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
         await this.channelService.deleteChannel(user.id, channelId);
         this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.to(String(channelId)).emit("updateMembersJoinedChannels", "test");
+        this.server.to(String(channelId)).emit("updateMembersJoinedChannels");
     }
 
     @UseGuards(SocketGuard)
@@ -143,7 +143,6 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async updateJoinedChannels(client: Socket) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
-
     }
 
     @UseGuards(SocketGuard)
@@ -170,9 +169,23 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('upgradeMember')
-    async setChannelMemberAsAdmin(client: Socket, upgradeMember: upgradeMemberDto) {
+    async setChannelMemberAsAdmin(client: Socket, upgradeMember: updateMemberDto) {
         const owner = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.setMemberAsAdmin(owner, upgradeMember);
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('ban')
+    async ban(client: Socket, ban: updateMemberDto) {
+        const owner = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.ban(owner, ban);
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('mute')
+    async mute(client: Socket, mute: updateMemberDto) {
+        const owner = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.mute(owner, mute);
     }
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)

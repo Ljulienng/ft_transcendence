@@ -2,7 +2,7 @@ import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, Not
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Channel} from '../models/channel.entity'
-import { changePasswordDto, channelInvitationDto, CreateChannelDto, updateChannelDto, upgradeMemberDto } from '../models/channel.dto';
+import { changePasswordDto, channelInvitationDto, CreateChannelDto, updateChannelDto, updateMemberDto } from '../models/channel.dto';
 import { MessageService } from 'src/message/service/message.service';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/models/user.entity';
@@ -322,11 +322,19 @@ export class ChannelService {
         return await this.channelMemberService.updateMember(userWhoUpdate, userToUpdate, channel, updates);
     }
 
-    async setMemberAsAdmin(owner: User, upgradeMember: upgradeMemberDto) {
+    async setMemberAsAdmin(owner: User, upgradeMember: updateMemberDto) {
         const userToUpgrade = await this.userRepository.findOne({username: upgradeMember.username});
         const channel = await this.findChannelById(upgradeMember.channelId);
         const updates: UpdateMemberChannelDto = { admin: true };
         return await this.channelMemberService.updateMember(owner, userToUpgrade, channel, updates);
+    }
+
+    async ban(owner: User, ban: updateMemberDto) {
+
+    }
+
+    async mute(owner: User, mute: updateMemberDto) {
+        
     }
 
     /*
