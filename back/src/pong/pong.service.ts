@@ -11,7 +11,7 @@ import { Ball } from './ball';
 @Injectable()
 export class PongService {
 
-  private games: Game[];
+  public games: Game[];
   public waitingPlayers: Player[];
 
   constructor(
@@ -36,8 +36,6 @@ export class PongService {
   findGame(username: string): Game {
     return this.games.find(e => (e.playerLeft && e.playerLeft.user.username == username) || (e.playerRight && e.playerRight.user.username == username));
   }
-
-  // TODO: findPlayerInWaitingList
 
   async getMatchHistory(user: User) {
     return await this.matchRepository.find({

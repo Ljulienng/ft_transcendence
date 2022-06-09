@@ -48,7 +48,7 @@ export class Player {
     }
   }
 
-  connect(socket: Socket) {
+  reconnect(socket: Socket) {
     this.socket = socket;
     this.state = PlayerState.CONNECTED;
   }
