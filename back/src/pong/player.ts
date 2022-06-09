@@ -17,6 +17,7 @@ export class Player {
   public y: number;
   public score: number;
   public state: PlayerState;
+  public disconnectedAt: Date;
 
   constructor(
     private event: Event,
@@ -26,13 +27,14 @@ export class Player {
     this.y = HEIGHT / 2 - Player.size.y / 2;  // TODO: + or - ?
     this.score = 0;
     this.state = PlayerState.CONNECTED;
+    this.disconnectedAt = null;
   }
 
   async move(opponent: Player, y: number, canvasHeight: number): Promise<GameState> {
     y = y / canvasHeight * HEIGHT;
     this.y = y;
     if (await this.event.emitOpponentMove(opponent.socket.id, y) != 'ok') {
-      opponent.state = PlayerState.DISCONNECTED;
+      opponent.disconnect();
       return GameState.PAUSE;
     }
     else {
@@ -51,10 +53,18 @@ export class Player {
   reconnect(socket: Socket) {
     this.socket = socket;
     this.state = PlayerState.CONNECTED;
+    this.disconnectedAt = null;
   }
 
-  disconnect(gameId: string) {
+  disconnect() {
     this.state = PlayerState.DISCONNECTED;
+    if (this.disconnectedAt == null) {
+      this.disconnectedAt = new Date();
+    }
+  }
+
+  disconnectAndPause(gameId: string) {
+    this.disconnect();
     this.event.emitPause(gameId);
   }
 

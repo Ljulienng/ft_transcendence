@@ -19,14 +19,14 @@ import PongI from '../types/interfaces/pong.interface'
 // TODO: fix paddle collision with canvas border (mouse/keyboard)
 // TODO: waiting for opponent animation
 // TODO: Countdown before game start
-// TODO: timeout event for 'oppenent gave up due to misconnexion'
+// TODO: menu for 'win by forfait'
 
 const State = {
   INIT: 0,
   PAUSE: 1,
   PLAY: 2,
   WIN: 3,
-  LOST: 4
+  LOSE: 4
 };
 
 export default defineComponent({
@@ -77,14 +77,14 @@ export default defineComponent({
       this.pong.context.textAlign = 'center';
       this.pong.context.fillText('CLICK TO START', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
     },
-    lostPage() {
-      this.state = State.LOST;
+    losePage() {
+      this.state = State.LOSE;
       this.pong.context.fillStyle = 'black';
       this.pong.context.fillRect(0, 0, this.pong.canvas.width, this.pong.canvas.height);
       this.pong.context.fillStyle = 'red';
       this.pong.context.font = '64px Orbitron';
       this.pong.context.textAlign = 'center';
-      this.pong.context.fillText('YOU LOST', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
+      this.pong.context.fillText('YOU LOSE', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
     },
     winPage() {
       this.state = State.WIN;
@@ -112,8 +112,8 @@ export default defineComponent({
           return this.pausePage();
         case State.WIN:
           return this.winPage();
-        case State.LOST:
-          return this.lostPage();
+        case State.LOSE:
+          return this.losePage();
       }
 
       // Draw fields
@@ -181,7 +181,7 @@ export default defineComponent({
 
       this.socket.on('pause', () => { this.pausePage(); });
       this.socket.on('youWin', () => { this.winPage(); });
-      this.socket.on('youLost', () => { this.lostPage(); });
+      this.socket.on('youLose', () => { this.losePage(); });
 
       this.socket.on('start', async (isLeftSide: boolean, callback) => {
         callback('ok');

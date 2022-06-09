@@ -57,7 +57,7 @@ export class Event {
     this.server.to(id).emit('youWin');
   }
 
-  emitYouLost(id: string) {
-    this.server.to(id).emit('youLost');
+  emitYouLose(id: string) {
+    this.server.to(id).emit('youLose');
   }
 }

@@ -4,12 +4,12 @@ import { Ball } from './ball';
 import { Player, PlayerState } from './player';
 import { Event } from './event';
 
-export const FPS = 60;
 export const WIDTH = 100;
 export const HEIGHT = 66;
+const FPS = 60;
+const FORFAIT_TIMEOUT = 30;
 
 export enum GameState {
-  INIT,
   PLAY,
   PAUSE,
   OVER
@@ -55,14 +55,24 @@ export class Game {
     this.sendScore();
     this.ball.randomDirection();
     const interval = setInterval(async () => {
-      if (this.state != GameState.PLAY) {
-        this.event.emitPause(this.name);
+      if (this.state == GameState.PAUSE) {
+        if (this.playerLeft.state == PlayerState.DISCONNECTED
+          && new Date().getTime() - this.playerLeft.disconnectedAt.getTime() >= FORFAIT_TIMEOUT * 1000
+          && (this.playerRight.state != PlayerState.DISCONNECTED
+            || this.playerRight.disconnectedAt > this.playerLeft.disconnectedAt)) {
+          this.gameOver(this.playerRight);
+        } else if (this.playerRight.state == PlayerState.DISCONNECTED
+          && new Date().getTime() - this.playerRight.disconnectedAt.getTime() >= FORFAIT_TIMEOUT * 1000
+          && (this.playerLeft.state != PlayerState.DISCONNECTED
+            || this.playerLeft.disconnectedAt > this.playerRight.disconnectedAt)) {
+          this.gameOver(this.playerLeft);
+        }
+      }
+      if (this.state == GameState.OVER) {
         clearInterval(interval);
         return;
       }
       if (await this.ball.move(this.playerLeft, this.playerRight) == GameState.PAUSE) {
-        this.event.emitPause(this.name);
-        clearInterval(interval);
         return;
       }
       this.ball.checkCollisions(this, this.playerLeft, this.playerRight);
@@ -70,23 +80,23 @@ export class Game {
   }
 
   gameOver(winner: Player) {
+    // TODO: 
     const opponent: Player = this.findOpponent(winner.user.username);
     this.event.emitYouWin(winner.socket.id);
-    this.event.emitYouLost(opponent.socket.id);
+    this.event.emitYouLose(opponent.socket.id);
     winner.socket.leave(this.name);
     opponent.socket.leave(this.name);
     this.setState(GameState.OVER);
     console.log(`PONG: GAME OVER ! ${winner.user.username} won the game !\n`);
-    // TODO: remove from Games in pong.service.ts
   }
 
   async sendStart() {
     if (await this.event.emitStart(this.playerLeft.socket.id, true) != 'ok') {
-      this.playerLeft.state = PlayerState.DISCONNECTED;
+      this.playerLeft.disconnect()
       this.setState(GameState.PAUSE);
     }
     if (await this.event.emitStart(this.playerRight.socket.id, false) != 'ok') {
-      this.playerRight.state = PlayerState.DISCONNECTED;
+      this.playerRight.disconnect()
       this.setState(GameState.PAUSE);
     }
     if (this.state == GameState.PAUSE) {
@@ -98,15 +108,15 @@ export class Game {
 
   async sendScore() {
     if (await this.event.emitUpdateScore(this.playerLeft.socket.id, { x: this.playerLeft.score, y: this.playerRight.score }) != 'ok') {
-      this.playerLeft.state = PlayerState.DISCONNECTED;
+      this.playerLeft.disconnect();
       this.setState(GameState.PAUSE);
     }
     if (await this.event.emitUpdateScore(this.playerRight.socket.id, { x: this.playerLeft.score, y: this.playerRight.score }) != 'ok') {
-      this.playerRight.state = PlayerState.DISCONNECTED;
+      this.playerRight.disconnect();
       this.setState(GameState.PAUSE);
     }
   }
-  
+
   reconnectPlayer(username: string, socket: Socket) {
     const player = this.findPlayer(username);
     player.reconnect(socket);
@@ -119,13 +129,13 @@ export class Game {
   disconnectPlayer(username: string) {
     // TODO: stop game if both are disconnected ?
     const player = this.findPlayer(username);
-    player.disconnect(this.name);
+    player.disconnectAndPause(this.name);
     this.setState(GameState.PAUSE);
   }
-  
+
   setState(state: GameState) {
     if (this.state == GameState.OVER) {
-      return ;
+      return;
     }
     this.state = state;
   }

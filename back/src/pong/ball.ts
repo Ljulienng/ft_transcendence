@@ -48,11 +48,11 @@ export class Ball {
     this.pos.y += this.speed.y;
     // Send start event
     if (await this.event.emitBallMove(playerLeft.socket.id, this.pos) != 'ok') {
-      playerLeft.state = PlayerState.DISCONNECTED;
+      playerLeft.disconnect()
       return GameState.PAUSE;
     }
     if (await this.event.emitBallMove(playerRight.socket.id, this.pos) != 'ok') {
-      playerRight.state = PlayerState.DISCONNECTED;
+      playerRight.disconnect()
       return GameState.PAUSE;
     }
     return GameState.PLAY;
