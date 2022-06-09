@@ -6,6 +6,7 @@
 		:speed="500"
 	/> -->
     <Sidebar />
+    <FirstTimeModal v-if="getUserProfile.firstTime === true"/>
     <router-view />
     <!-- <teleport :to="someVar" v-if="someVar"> -->
     <div id="my-modals"/>
@@ -18,16 +19,21 @@ import { defineComponent } from "@vue/runtime-core";
 import http from "./http-common";
 import store from "./store";
 import router from "./router";
+import FirstTimeModal from "./components/auth/FirstTimeModal.vue"
 
 import { mapGetters } from "vuex";
 
 export default defineComponent({
+  
   computed: {
     ...mapGetters("auth", {
       getUserProfile: "getUserProfile",
     }),
   },
 
+  components: {
+    FirstTimeModal
+  },
   methods: {
     async checkUserstatus() {
       let userProfile = store.getters["auth/getUserProfile"];
