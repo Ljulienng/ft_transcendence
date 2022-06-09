@@ -3,8 +3,8 @@ import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 
 @Entity()
 export class Match {
-	@PrimaryGeneratedColumn()
-	readonly id: number;
+  @PrimaryGeneratedColumn()
+  readonly id: number;
 
   @ManyToOne(() => User, user => user.id, {
     eager: true,
@@ -29,4 +29,7 @@ export class Match {
 
   @Column({ default: "" })
   loser: string;
+
+  @Column({ default: false })
+  inProgress: boolean;
 }

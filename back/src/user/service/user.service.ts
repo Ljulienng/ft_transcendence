@@ -423,8 +423,8 @@ export class UserService {
 				playerOneScore: 3,
 				playerTwoScore: 0,
 				winner: user.username,
-				loser: norminet.username
-
+				loser: norminet.username,
+				inProgress: false
 			}
 			this.matchRepository.save(firstMatch);
 		}
