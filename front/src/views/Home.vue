@@ -88,6 +88,10 @@ export default defineComponent({
           console.log(err);
         });
     },
+
+  },
+
+  mounted() {
   },
 
   created() {

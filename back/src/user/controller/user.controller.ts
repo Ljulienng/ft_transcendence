@@ -72,12 +72,16 @@ export class UserController {
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Post('/firsttime')
-	async firstTimeAuth(@Req() req, @Body() userInfo) {
+	async firstTimeAuth(@Res({passthrough: true}) res, @Req() req, @Body() userInfo) {
 		try {
 			const user = await this.userService.findByUsername(req.user.username);
 			console.log("firstime info - ", userInfo)
 
-			this.userService.firstUpdate(user, userInfo)
+			await this.userService.firstUpdate(user, userInfo)
+			const payload = { username: (await this.userService.findOne({id: user.id})).username, auth: false };
+			const accessToken = await this.jwtService.signAsync(payload);
+			// res.clearCookie('jwt');
+			res.cookie('jwt', accessToken, {httpOnly: true})
 		} catch(e) {
 			throw e;
 		}

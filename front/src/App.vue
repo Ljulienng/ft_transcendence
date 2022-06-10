@@ -6,7 +6,7 @@
 		:speed="500"
 	/> -->
     <Sidebar />
-    <FirstTimeModal v-if="getUserProfile.firstTime === true"/>
+    <FirstTimeModal v-if="getUserProfile.firstTime === true" v-bind:currentUser="getUserProfile"/>
     <router-view />
     <!-- <teleport :to="someVar" v-if="someVar"> -->
     <div id="my-modals"/>
