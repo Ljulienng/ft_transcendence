@@ -242,6 +242,15 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // }
 
     @UseGuards(SocketGuard)
+    @SubscribeMessage('isBanned') 
+    async isBanned(client: Socket, channelId: number) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        const members = await this.channelService.findMembers(channelId);
+        const member = members.find(u => u.user.id === user.id);
+        this.server.to(client.id).emit("channelMemberInfo", member.banned);
+    }
+
+    @UseGuards(SocketGuard)
     @SubscribeMessage('getChannelMemberInfo') 
     async getChannelMemberInfo(client: Socket, channelId: number) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user

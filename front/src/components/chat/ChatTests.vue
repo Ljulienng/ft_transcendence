@@ -296,6 +296,7 @@ export default defineComponent({
     leaveChannel(channelId: number) {
       this.socket.emit("leaveChannel", channelId);
     },
+
   },
 
   mounted() {

@@ -1,23 +1,28 @@
 <template>
   <div class="channelBox">
-    <ChannelSettings
-      v-bind:currentUser="currentUser"
-      v-bind:channelId="channel"
-      v-bind:channelType="channelType"
-      v-bind:socket="socketChannel"
-      v-bind:channelMember="channelMember"
-      @close="$emit('close')"
-    />
-    <div v-if="channelMember.owner"></div>
-    <p>{{ channel }}</p>
-    <div class="messageList">
-      <p v-for="msg in messageList.slice().reverse()" :key="msg">
-        {{ msg.user.username }}: {{ msg.content }}
-      </p>
+    <div v-if="channelMember.banned">
+      You can't access to the channel [banned] ... but you can beg admins if you want to go back ...
     </div>
-    <div v-if="!channelMember.muted"> <!-- a muted member can see messages but not send them -->
-      <button  @click="sendMessage" class="btn-primary">Send message</button>
-      <input type="text" maxlength="100" v-model="message.content" class="inputMessage"/>
+    <div v-if="!channelMember.banned">
+      <ChannelSettings
+        v-bind:currentUser="currentUser"
+        v-bind:channelId="channel"
+        v-bind:channelType="channelType"
+        v-bind:socket="socketChannel"
+        v-bind:channelMember="channelMember"
+        @close="$emit('close')"
+      />
+      <div v-if="channelMember.owner"></div>
+      <p>{{ channel }}</p>
+      <div class="messageList">
+        <p v-for="msg in messageList.slice().reverse()" :key="msg">
+          {{ msg.user.username }}: {{ msg.content }}
+        </p>
+      </div>
+      <div v-if="!channelMember.muted"> <!-- a muted member can see messages but not send them -->
+        <button  @click="sendMessage" class="btn-primary">Send message</button>
+        <input type="text" maxlength="100" v-model="message.content" class="inputMessage"/>
+      </div>
     </div>
     <br />
   </div>

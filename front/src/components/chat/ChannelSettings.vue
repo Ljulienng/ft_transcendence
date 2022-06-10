@@ -231,7 +231,6 @@ export default defineComponent({
       this.socket.emit("kickMember", userToKick);
     },
 
-      // UPDATE A MEMBER 
     setMemberAsAdmin(username: string) {
       const upgradeMember = {
         channelId: this.channelId,
@@ -294,9 +293,10 @@ export default defineComponent({
       console.log("passwordChanged:", data);
     });
     this.socket.on("/adminPromoted/" + this.channelId, () => {
-      this.getChannelMembers().then(() => {
+      this.getChannelMembers();
+      // this.getChannelMembers().then(() => {
         // this.checkIfAdmin();
-      });
+      // });
     });
     this.socket.on("/adminUnpromoted/" + this.channelId, () => {
       this.getChannelMembers();
@@ -323,11 +323,10 @@ export default defineComponent({
   },
 
   created() {
-    this.getChannelMembers().then(() => {
+    this.getChannelMembers();
+    // this.getChannelMembers().then(() => {
       // this.checkIfAdmin();
-    });
-    // console.log("data = ", this.memberList());
-    // this.checkIfAdmin();
+    // });
   },
 });
 </script>
