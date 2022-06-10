@@ -136,6 +136,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this.channelService.deleteChannel(user.id, channelId);
         this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(String(channelId)).emit("updateMembersJoinedChannels");
+        this.server.emit("/userLeft/channel/" + channelId);
     }
 
     @UseGuards(SocketGuard)
@@ -222,7 +223,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async mute(client: Socket, mute: updateMemberDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.mute(user, mute);
-        this.server.emit("updateChannelMembers", await this.channelService.findMembers(mute.channelId));
+        this.server.to(String(mute.channelId)).emit("updateChannelMembers", await this.channelService.findMembers(mute.channelId));
         const userToMute = await this.userService.findByUsername(mute.username);
         const userToMuteSocket = (this.socketList.find(s => s.user.id === userToMute.id )).socket;
         const channel = await this.channelService.findChannelById(mute.channelId);
@@ -247,9 +248,10 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const user = this.socketList.find(socket => socket.socketId === client.id).user
 
         await this.channelService.deleteChannelMember(channelId, user.id);
-        client.leave(String(channelId));
         this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
+        this.server.to(String(channelId)).emit("updateMembersJoinedChannels");
+        client.leave(String(channelId));
+        this.server.emit("/userLeft/channel/" + channelId);
     }
 
     // @UseGuards(SocketGuard)
@@ -295,7 +297,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this.channelService.changeChannelName(owner, updates);
         
         this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(owner));
+        this.server.to(String(updates.channelId)).emit("updateMembersJoinedChannels");
     }
 
 

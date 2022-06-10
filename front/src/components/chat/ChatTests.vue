@@ -194,7 +194,6 @@ export default defineComponent({
         type: "",
         password: "",
       },
-      messageList: [] as MessageI[],
       name: "",
       password: "",
       passwordJoinChannel: "",
@@ -272,34 +271,7 @@ export default defineComponent({
       }
     },
 
-    async getMessageList() {
-      try {
-        const response = await http.get(
-          "/channel/" + this.channelId + "/messages"
-        );
-        // console.log(data);
-
-        this.messageList = response.data;
-        // console.log(
-        //   "get messageList of channel ",
-        //   this.channelId,
-        //   " : ",
-        //   response.data
-        // );
-      } catch (error) {
-        console.log(error);
-      }
-    },
-
     createChat() {
-      // console.log(
-      //   "chat created : name=",
-      //   this.name,
-      //   " type=",
-      //   this.type,
-      //   " password=",
-      //   this.password
-      // );
       let channel = {
         name: this.name,
         type: this.type,
@@ -346,10 +318,12 @@ export default defineComponent({
     });
 
     this.socket.on("updateJoinedChannel", (data: ChannelI[]) => {
-      this.joinedChannelList = data;
+      console.log("updateJoinedChannel");
+      this.joinedChannelList = data; 
     });
 
     this.socket.on("updateMembersJoinedChannels", () => {
+      console.log("updateMembersJoinedChannels");
       this.socket.emit("updateJoinedChannels");
     });
 

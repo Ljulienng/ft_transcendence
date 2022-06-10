@@ -301,10 +301,15 @@ export default defineComponent({
       console.log("user Joined");
       this.getChannelMembers();
     });
+    this.socket.on("/userLeft/channel/" + this.channelId, () => {
+      console.log("user Left");
+      this.getChannelMembers();
+    });
     this.socket.on("/userKicked/" + this.currentUser.userName, () => {
       this.$emit("close");
     });
     this.socket.on("updateChannelMembers", (data: any) => {
+      console.log("updateChannelMembers");
       this.memberList = data;
     });
   },
