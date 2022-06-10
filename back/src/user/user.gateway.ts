@@ -20,6 +20,7 @@ import { UseGuards } from "@nestjs/common";
 import { CreateChannelDto } from "src/channel/models/channel.dto";
 import { Observable } from 'rxjs'
 import { User } from "./models/user.entity";
+import { UpdateMemberChannelDto } from "src/channelMember/models/channelMember.dto";
 
 
 // export type UserSocket = {
@@ -197,48 +198,16 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @UseGuards(SocketGuard)
-    @SubscribeMessage('ban')
-    async ban(client: Socket, ban: updateMemberDto) {
+    @SubscribeMessage('muteban')
+    async muteOrBan(client: Socket, update: UpdateMemberChannelDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
-        await this.channelService.ban(user, ban);
-        const userToBan = await this.userService.findByUsername(ban.username);
-        const userToBanSocket = (this.socketList.find(s => s.user.id === userToBan.id )).socket;
-        const channel = await this.channelService.findChannelById(ban.channelId);
-        this.server.to(userToBanSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToBan, channel));
-    }
-
-    @UseGuards(SocketGuard)
-    @SubscribeMessage('unban')
-    async unban(client: Socket, unban: updateMemberDto) {
-        const user = this.socketList.find(socket => socket.socketId === client.id).user
-        await this.channelService.unban(user, unban);
-        const userToUnban = await this.userService.findByUsername(unban.username);
-        const userToUnbanSocket = (this.socketList.find(s => s.user.id === userToUnban.id )).socket;
-        const channel = await this.channelService.findChannelById(unban.channelId);
-        this.server.to(userToUnbanSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToUnban, channel));
-    }
-
-    @UseGuards(SocketGuard)
-    @SubscribeMessage('mute')
-    async mute(client: Socket, mute: updateMemberDto) {
-        const user = this.socketList.find(socket => socket.socketId === client.id).user
-        await this.channelService.mute(user, mute);
-        this.server.to(String(mute.channelId)).emit("updateChannelMembers", await this.channelService.findMembers(mute.channelId));
-        const userToMute = await this.userService.findByUsername(mute.username);
-        const userToMuteSocket = (this.socketList.find(s => s.user.id === userToMute.id )).socket;
-        const channel = await this.channelService.findChannelById(mute.channelId);
-        this.server.to(userToMuteSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToMute, channel));
-    }
-
-    @UseGuards(SocketGuard)
-    @SubscribeMessage('unmute')
-    async unmute(client: Socket, unmute: updateMemberDto) {
-        const user = this.socketList.find(socket => socket.socketId === client.id).user
-        await this.channelService.unmute(user, unmute);
-        const userToUnmute = await this.userService.findByUsername(unmute.username);
-        const userToUnmuteSocket = (this.socketList.find(s => s.user.id === userToUnmute.id )).socket;
-        const channel = await this.channelService.findChannelById(unmute.channelId);
-        this.server.to(userToUnmuteSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToUnmute, channel));
+        await this.channelService.updateMember(user, update);
+        this.server.to(String(update.channelId)).emit("updateChannelMembers", await this.channelService.findMembers(update.channelId));
+        const userToUpdate = await this.userService.findByUsername(update.username);
+        const userToUpdateSocket = (this.socketList.find(s => s.user.id === userToUpdate.id )).socket;
+        const channel = await this.channelService.findChannelById(update.channelId);
+        this.server.to(userToUpdateSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToUpdate, channel));
+        this.server.emit('messageSent');
     }
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)
@@ -308,7 +277,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         // client.emit('messageSent', message, channelId);
         // this.server.emit('sendMessageToClient', createMessageDto.content);
         await this.channelService.saveMessage(createMessageDto.userId, createMessageDto);
-        this.server.emit('messageSent', createMessageDto.content);
+        this.server.emit('messageSent');
     }
 
     /* ============= USER CHAT PART ============*/

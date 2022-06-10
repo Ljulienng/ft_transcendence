@@ -62,8 +62,6 @@ export class ChannelService {
     /* get the channel owner */
     async   findOwner(channelId: number): Promise<ChannelMember> {
         const channel = await this.findChannelById(channelId);
-        console.log("channelid : ", channelId);
-        console.log("channel : ", channel);
         return await this.channelMemberService.findOwner(channel);
     }
 
@@ -75,7 +73,6 @@ export class ChannelService {
 
     /* get channels where user = owner */
     async   findChannelsWhereUserIsOwner(user: User) {
-        console.log("find owner");
         return await this.channelRepository.find({
             where: {
                 owner: user,
@@ -121,7 +118,7 @@ export class ChannelService {
 
        await this.channelRepository.save(newChannel);
        await this.channelMemberService.createMember(user, newChannel, true, true);
-       console.log("channel id : ", newChannel.id );
+
        return newChannel.id;
     }
 
@@ -319,11 +316,17 @@ export class ChannelService {
     /*
     ** the  user wants to update element(s) of a channel member (ban, mute)
     */
-    async updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto) {
-        const userWhoUpdate = await this.userRepository.findOne({id: userId});
-        const userToUpdate = await this.userRepository.findOne({id: memberId});
-        const channel = await this.findChannelById(channelId);
-        return await this.channelMemberService.updateMember(userWhoUpdate, userToUpdate, channel, updates);
+    // async updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto) {
+    //     const userWhoUpdate = await this.userRepository.findOne({id: userId});
+    //     const userToUpdate = await this.userRepository.findOne({id: memberId});
+    //     const channel = await this.findChannelById(channelId);
+    //     return await this.channelMemberService.updateMember(userWhoUpdate, userToUpdate, channel, updates);
+    // }
+
+    async updateMember(owner: User, update: UpdateMemberChannelDto) {
+        const userToUpdate = await this.userRepository.findOne({username: update.username});
+        const channel = await this.findChannelById(update.channelId);
+        return await this.channelMemberService.updateMember(owner, userToUpdate, channel, update);
     }
 
     async setMemberAsAdmin(owner: User, upgradeMember: updateMemberDto) {
@@ -339,35 +342,6 @@ export class ChannelService {
         const updates: UpdateMemberChannelDto = { admin: false };
         return await this.channelMemberService.updateMember(owner, userToDowngrade, channel, updates);
     }
-
-    async ban(user: User, ban: updateMemberDto) {
-        const userToBan = await this.userRepository.findOne({username: ban.username});
-        const channel = await this.findChannelById(ban.channelId);
-        const updates: UpdateMemberChannelDto = { banned: true };
-        return await this.channelMemberService.updateMember(user, userToBan, channel, updates);
-    }
-
-    async unban(user: User, unban: updateMemberDto) {
-        const userToUnban = await this.userRepository.findOne({username: unban.username});
-        const channel = await this.findChannelById(unban.channelId);
-        const updates: UpdateMemberChannelDto = { banned: false };
-        return await this.channelMemberService.updateMember(user, userToUnban, channel, updates);
-    }
-
-    async mute(user: User, mute: updateMemberDto) {
-        const userToMute = await this.userRepository.findOne({username: mute.username});
-        const channel = await this.findChannelById(mute.channelId);
-        const updates: UpdateMemberChannelDto = { muted: true };
-        return await this.channelMemberService.updateMember(user, userToMute, channel, updates);
-    }
-
-    async unmute(user: User, unmute: updateMemberDto) {
-        const userToUnmute = await this.userRepository.findOne({username: unmute.username});
-        const channel = await this.findChannelById(unmute.channelId);
-        const updates: UpdateMemberChannelDto = { muted: false };
-        return await this.channelMemberService.updateMember(user, userToUnmute, channel, updates);
-    }
-
 
     /*
     ** get all the messages of a channel

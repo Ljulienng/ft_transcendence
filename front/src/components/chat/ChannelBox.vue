@@ -90,13 +90,15 @@ export default defineComponent({
   },
 
   mounted() {
-    this.socket.on("messageSent", () => {
+    this.socket.on("messageUpdate", () => {
+      console.log("messageUpdate");
       this.socket.emit("getChannelMsg", this.channel);
       // console.log("data");
     });
     this.socket.on(
       "getChannelMessages" + this.currentUser.id,
       (data: MessageI[]) => {
+        console.log("getChannelMessages");
         this.messageList = data;
       }
     );

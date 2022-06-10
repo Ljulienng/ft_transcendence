@@ -248,36 +248,43 @@ export default defineComponent({
     },
 
     ban(username: string) {
-      const ban = {
+      const update = {
         channelId: this.channelId,
         username: username,
+        banned: true,
       };
-      this.socket.emit("ban", ban);
+      this.socket.emit("muteban", update);
+      this.getChannelMembers();
     },
 
     unban(username: string) {
-      const unban = {
+      const update = {
         channelId: this.channelId,
         username: username,
+        banned: false,
       };
-      this.socket.emit("unban", unban);
+      this.socket.emit("muteban", update);
+      this.getChannelMembers();
     },
 
     mute(username: string) {
-      const mute = {
+      const update = {
         channelId: this.channelId,
         username: username,
+        muted: true,
       };
-      this.socket.emit("mute", mute);
+      this.socket.emit("muteban", update);
       this.getChannelMembers();
     },
 
     unmute(username: string) {
-      const unmute = {
+      const update = {
         channelId: this.channelId,
         username: username,
+        muted: false,
       };
-      this.socket.emit("unmute", unmute);
+      this.socket.emit("muteban", update);
+      this.getChannelMembers();
     },
   },
 

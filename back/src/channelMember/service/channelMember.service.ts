@@ -91,7 +91,6 @@ export class ChannelMemberService {
         const memberWhoUpdate = await this.findOne(userWhoUpdate, channel);
         const memberToUpdate = await this.findOne(userToUpdate, channel);
         // const muteOrBanTime = 1000 * 60;  // arbitrary time [1000 = 1 second]
-        console.log(updates);
         // console.log('mute or ban time = ', muteOrBanTime / 1000 / 60, ' minutes');
         
         if (!this.updateAllowed(memberWhoUpdate, memberToUpdate, channel, updates)) {
