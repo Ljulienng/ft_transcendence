@@ -277,20 +277,11 @@ export default defineComponent({
         type: this.type,
         password: this.password,
       };
-      // http.post("/channel/createChannel", channel, { withCredentials: true });
       this.socket.emit("createChannel", channel);
       this.name = "";
       this.type = "public";
       this.password = "";
     },
-
-    // deleteChat() {
-    //   console.log("delete channel");
-    //   this.socket.emit("deleteChannel", this.channelId);
-    //   // http.delete("/channel/" + this.channelId);
-    //   // this.getChannelList();
-    //   this.channelId = 0;
-    // },
 
     joinChannel(channelId: number, channelType: string) {
       const channelToJoin = {

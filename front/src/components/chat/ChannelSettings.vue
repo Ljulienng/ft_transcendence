@@ -59,73 +59,73 @@
     <ul>
       <li v-for="member in memberList" :key="member">
         <!-- <div>{{ member.user.username }}</div> -->
-        <template v-if="member.owner">OWNER = </template>
-        {{ member.user.username }}
-        <template v-if="channelMember.owner">
-          <button
-            @click="setMemberAsAdmin(member.user.username)"
-            class="btn-primary"
-            v-if="member.admin === false"
-          >
-            PROMOTE
-          </button>
-          <button
-            @click="unsetMemberAsAdmin(member.user.username)"
-            class="btn-primary"
-            v-if="member.admin === true && !member.owner"
-          >
-            DEMOTE
-          </button>
-        </template>
-        <template v-if="channelMember.admin">
-          <button
-            @click="kickMember(member.user.username)"
-            class="btn-danger"
-            v-if="member.admin === false"
-          >
-            Kick
-          </button>
-          <button
-            @click="kickMember(member.user.username)"
-            class="btn-danger"
-            v-if="member.admin && !member.owner && channelMember.owner"
-          >
-            Kick
-          </button>
-        </template>
-        <template v-if="channelMember.admin">
-          <button
-            @click="mute(member.user.username)"
-            class="btn-secondary"
-            v-if="!member.admin && !member.muted"
-          >
-            Mute
-          </button>
-          <button
-            @click="unmute(member.user.username)"
-            class="btn-secondary"
-            v-if="!member.admin && member.muted"
-          >
-            Unmute
-          </button>
-          <button
-            @click="ban(member.user.username)"
-            class="btn-secondary"
-            v-if="!member.admin && !member.banned"
-          >
-            Ban
-          </button>
-          <button
-            @click="unban(member.user.username)"
-            class="btn-secondary"
-            v-if="!member.admin && member.banned"
-          >
-            Unban
-          </button>
-        </template>
-        <template v-if="member.admin">(admin)</template>
-        <template v-if="member.muted">(muted)</template>
-        <template v-if="member.banned">(banned)</template>
+          <template v-if="member.owner">OWNER = </template>
+          {{ member.user.username }}
+          <template v-if="channelMember.owner">
+            <button
+              @click="setMemberAsAdmin(member.user.username)"
+              class="btn-primary"
+              v-if="member.admin === false"
+            >
+              PROMOTE
+            </button>
+            <button
+              @click="unsetMemberAsAdmin(member.user.username)"
+              class="btn-primary"
+              v-if="member.admin === true && !member.owner"
+            >
+              DEMOTE
+            </button>
+          </template>
+          <template v-if="channelMember.admin">
+            <button
+              @click="kickMember(member.user.username)"
+              class="btn-danger"
+              v-if="member.admin === false"
+            >
+              Kick
+            </button>
+            <button
+              @click="kickMember(member.user.username)"
+              class="btn-danger"
+              v-if="member.admin && !member.owner && channelMember.owner"
+            >
+              Kick
+            </button>
+          </template>
+          <template v-if="channelMember.admin">
+            <button
+              @click="mute(member.user.username)"
+              class="btn-secondary"
+              v-if="!member.admin && !member.muted"
+            >
+              Mute
+            </button>
+            <button
+              @click="unmute(member.user.username)"
+              class="btn-secondary"
+              v-if="!member.admin && member.muted"
+            >
+              Unmute
+            </button>
+            <button
+              @click="ban(member.user.username)"
+              class="btn-secondary"
+              v-if="!member.admin && !member.banned"
+            >
+              Ban
+            </button>
+            <button
+              @click="unban(member.user.username)"
+              class="btn-secondary"
+              v-if="!member.admin && member.banned"
+            >
+              Unban
+            </button>
+          </template>
+          <template v-if="member.admin">(admin)</template>
+          <template v-if="member.muted">(muted)</template>
+          <template v-if="member.banned">(banned)</template>
       </li>
     </ul>
   </div>
@@ -161,8 +161,8 @@ export default defineComponent({
   data() {
     return {
       memberList: [],
-      isAdmin: false,
-      isOwner: false,
+      // isAdmin: false,
+      // isOwner: false,
       newChannelName: "",
       invitation: {
         channelId: this.channelId,
@@ -188,15 +188,15 @@ export default defineComponent({
         });
     },
 
-    async checkIfAdmin() {
-      const user: any= await this.memberList.find(
-        (member: any) => this.currentUser.userName === member.user.username
-      );
-      if (user === undefined) return
-      if (user.admin) this.isAdmin = true;
-      if (user.owner) this.isOwner = true;
-      console.log("memberList = ", this.memberList, this.isAdmin, this.isOwner);
-    },
+    // async checkIfAdmin() {
+    //   const user: any= await this.memberList.find(
+    //     (member: any) => this.currentUser.userName === member.user.username
+    //   );
+    //   if (user === undefined) return
+    //   if (user.admin) this.isAdmin = true;
+    //   if (user.owner) this.isOwner = true;
+    //   console.log("memberList = ", this.memberList, this.isAdmin, this.isOwner);
+    // },
 
     deleteChannel() {
       this.socket.emit("deleteChannel", this.channelId);
@@ -209,22 +209,6 @@ export default defineComponent({
       };
       this.socket.emit("changeChannelName", changeChannelName);
       this.newChannelName = "";
-    },
-
-    setMemberAsAdmin(username: string) {
-      const upgradeMember = {
-        channelId: this.channelId,
-        username: username,
-      };
-      this.socket.emit("upgradeMember", upgradeMember);
-    },
-
-    unsetMemberAsAdmin(username: string) {
-      const downgradeMember = {
-        channelId: this.channelId,
-        username: username,
-      };
-      this.socket.emit("downgradeMember", downgradeMember);
     },
 
     invite() {
@@ -245,6 +229,23 @@ export default defineComponent({
         username: username,
       };
       this.socket.emit("kickMember", userToKick);
+    },
+
+      // UPDATE A MEMBER 
+    setMemberAsAdmin(username: string) {
+      const upgradeMember = {
+        channelId: this.channelId,
+        username: username,
+      };
+      this.socket.emit("upgradeMember", upgradeMember);
+    },
+
+    unsetMemberAsAdmin(username: string) {
+      const downgradeMember = {
+        channelId: this.channelId,
+        username: username,
+      };
+      this.socket.emit("downgradeMember", downgradeMember);
     },
 
     ban(username: string) {
@@ -294,12 +295,12 @@ export default defineComponent({
     });
     this.socket.on("/adminPromoted/" + this.channelId, () => {
       this.getChannelMembers().then(() => {
-        this.checkIfAdmin();
+        // this.checkIfAdmin();
       });
     });
     this.socket.on("/adminUnpromoted/" + this.channelId, () => {
       this.getChannelMembers();
-      if (!this.isOwner) this.isAdmin = false;
+      // if (!this.isOwner) this.isAdmin = false;
     });
     this.socket.on("/memberKicked/channel/" + this.channelId, () => {
       this.getChannelMembers();
@@ -323,7 +324,7 @@ export default defineComponent({
 
   created() {
     this.getChannelMembers().then(() => {
-      this.checkIfAdmin();
+      // this.checkIfAdmin();
     });
     // console.log("data = ", this.memberList());
     // this.checkIfAdmin();

@@ -207,7 +207,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const userToUpdateSocket = (this.socketList.find(s => s.user.id === userToUpdate.id )).socket;
         const channel = await this.channelService.findChannelById(update.channelId);
         this.server.to(userToUpdateSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToUpdate, channel));
-        this.server.emit('messageSent');
+        this.server.emit('messageUpdate');
     }
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)
@@ -274,10 +274,10 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('sendMessageToServer') 
     async sendMessage(client: Socket, createMessageDto: CreateMessageDto /*message: string, channelId: number*/) {
         // console.log('Message sent to the back in channel ', createMessageDto);
-        // client.emit('messageSent', message, channelId);
+        // client.emit('messageUpdate', message, channelId);
         // this.server.emit('sendMessageToClient', createMessageDto.content);
         await this.channelService.saveMessage(createMessageDto.userId, createMessageDto);
-        this.server.emit('messageSent');
+        this.server.to(String(createMessageDto.channelId)).emit('messageUpdate');
     }
 
     /* ============= USER CHAT PART ============*/
