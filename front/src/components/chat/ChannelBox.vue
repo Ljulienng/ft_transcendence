@@ -103,16 +103,11 @@ export default defineComponent({
 
     this.socket.on(
       "channelMemberInfo", (data: any) => {
+          console.log("update member : ", this.channelMember)
           this.channelMember = data;
         }
     )
-  //   this.socket.on("isOwner", (data: boolean) => {
-  //     this.isOwner = data;
-  //   });
 
-  //   this.socket.on("isAdmin", (data: boolean) => {
-  //     this.isAdmin = data;
-  //   });
   },
 
   // unmounted() {

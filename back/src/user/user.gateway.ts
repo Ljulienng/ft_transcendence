@@ -200,6 +200,10 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async ban(client: Socket, ban: updateMemberDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.ban(user, ban);
+        const userToBan = await this.userService.findByUsername(ban.username);
+        const userToBanSocket = (this.socketList.find(s => s.user.id === userToBan.id )).socket;
+        const channel = await this.channelService.findChannelById(ban.channelId);
+        this.server.to(userToBanSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToBan, channel));
     }
 
     @UseGuards(SocketGuard)
@@ -207,6 +211,10 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async unban(client: Socket, unban: updateMemberDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.unban(user, unban);
+        const userToUnban = await this.userService.findByUsername(unban.username);
+        const userToUnbanSocket = (this.socketList.find(s => s.user.id === userToUnban.id )).socket;
+        const channel = await this.channelService.findChannelById(unban.channelId);
+        this.server.to(userToUnbanSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToUnban, channel));
     }
 
     @UseGuards(SocketGuard)
@@ -214,6 +222,11 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async mute(client: Socket, mute: updateMemberDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.mute(user, mute);
+        this.server.emit("updateChannelMembers", await this.channelService.findMembers(mute.channelId));
+        const userToMute = await this.userService.findByUsername(mute.username);
+        const userToMuteSocket = (this.socketList.find(s => s.user.id === userToMute.id )).socket;
+        const channel = await this.channelService.findChannelById(mute.channelId);
+        this.server.to(userToMuteSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToMute, channel));
     }
 
     @UseGuards(SocketGuard)
@@ -221,6 +234,10 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async unmute(client: Socket, unmute: updateMemberDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.unmute(user, unmute);
+        const userToUnmute = await this.userService.findByUsername(unmute.username);
+        const userToUnmuteSocket = (this.socketList.find(s => s.user.id === userToUnmute.id )).socket;
+        const channel = await this.channelService.findChannelById(unmute.channelId);
+        this.server.to(userToUnmuteSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToUnmute, channel));
     }
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)

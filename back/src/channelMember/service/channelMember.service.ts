@@ -77,10 +77,7 @@ export class ChannelMemberService {
         if (!member || !memberToUpdate) {
             return false;
         }
-        if (member.admin == false) {
-            return false;
-        }
-        if (updates.admin && !member.owner) {
+        if (!member.admin) {
             return false;
         }
         return true;
@@ -93,9 +90,9 @@ export class ChannelMemberService {
     async updateMember(userWhoUpdate: User, userToUpdate: User, channel: Channel, updates: UpdateMemberChannelDto) {
         const memberWhoUpdate = await this.findOne(userWhoUpdate, channel);
         const memberToUpdate = await this.findOne(userToUpdate, channel);
-        const muteOrBanTime = 1000 * 60;  // arbitrary time [1000 = 1 second]
+        // const muteOrBanTime = 1000 * 60;  // arbitrary time [1000 = 1 second]
         console.log(updates);
-        console.log('mute or ban time = ', muteOrBanTime / 1000 / 60, ' minutes');
+        // console.log('mute or ban time = ', muteOrBanTime / 1000 / 60, ' minutes');
         
         if (!this.updateAllowed(memberWhoUpdate, memberToUpdate, channel, updates)) {
             throw new HttpException('you can\'t update this channel member', HttpStatus.FORBIDDEN);
@@ -110,10 +107,10 @@ export class ChannelMemberService {
             if (memberToUpdate.banned == false)
                 memberToUpdate.bannedEnd = null;
             
-            if (updates.muted == true)
-                memberToUpdate.mutedEnd = new Date(Date.now() + muteOrBanTime);
-            if (updates.banned == true)
-                memberToUpdate.bannedEnd = new Date(Date.now() + muteOrBanTime);
+            // if (updates.muted == true)
+            //     memberToUpdate.mutedEnd = new Date(Date.now() + muteOrBanTime);
+            // if (updates.banned == true)
+            //     memberToUpdate.bannedEnd = new Date(Date.now() + muteOrBanTime);
             
             await this.channelMemberRepository.save(memberToUpdate);
         }

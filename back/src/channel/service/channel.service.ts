@@ -312,6 +312,10 @@ export class ChannelService {
         return await this.channelRepository.remove(channel);
     }
 
+    async findMember(user: User, channel: Channel) {
+        return await this.channelMemberService.findOne(user, channel);
+    }
+
     /*
     ** the  user wants to update element(s) of a channel member (ban, mute)
     */
@@ -392,7 +396,7 @@ export class ChannelService {
         if (!channelMember) {
             throw new HttpException('this user is not a channel member', HttpStatus.FORBIDDEN);
         }
-        return await this.messageService.saveMessage(user, channel, createMessageDto);
+        return await this.messageService.saveMessage(user, channel, channelMember, createMessageDto);
       }
     
 }

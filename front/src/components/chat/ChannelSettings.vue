@@ -269,6 +269,7 @@ export default defineComponent({
         username: username,
       };
       this.socket.emit("mute", mute);
+      this.getChannelMembers();
     },
 
     unmute(username: string) {
@@ -303,9 +304,8 @@ export default defineComponent({
     this.socket.on("/userKicked/" + this.currentUser.userName, () => {
       this.$emit("close");
     });
-    this.socket.on("updateChannelMembers", () => {
-      console.log("update members");
-      this.getChannelMembers();
+    this.socket.on("updateChannelMembers", (data: any) => {
+      this.memberList = data;
     });
   },
 
