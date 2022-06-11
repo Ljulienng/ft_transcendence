@@ -101,16 +101,26 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable */
 import { defineComponent } from "@vue/runtime-core";
 import { Socket } from "socket.io-client";
 import http from "../../http-common";
 
 export default defineComponent({
   props: {
-    currentUser: Object,
-    channelId: Number,
+    currentUser: {
+      type: Object,
+      required: true
+    },
+    channelId: {
+      type: Number,
+      required: true
+    },
     channelType: String,
-    socket: Socket,
+    socket: {
+      type: Socket,
+      required: true
+    },
   },
 
   data() {
@@ -148,9 +158,10 @@ export default defineComponent({
     },
 
     async checkIfAdmin() {
-      const user = this.memberList.find(
-        (member) => this.currentUser.userName === member.user.username
+      const user: any= await this.memberList.find(
+        (member: any) => this.currentUser.userName === member.user.username
       );
+      if (user === undefined) return
       if (user.admin) this.isAdmin = true;
       if (user.owner) this.isOwner = true;
       console.log("memberList = ", this.memberList, this.isAdmin, this.isOwner);

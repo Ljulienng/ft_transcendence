@@ -12,7 +12,8 @@ export interface State {
 		userName: string,
 		email: string,
 		status: string,
-		twoFAEnabled: boolean
+		twoFAEnabled: boolean,
+		firstTime: boolean
 	}
 }
 
@@ -87,7 +88,7 @@ const actions = {
 		});
 
 		if(response && response.data){
-			console.log(response.data)
+			console.log("userinfo =", response.data)
 			commit("setUserProfile", response.data)
 		}
 	}
@@ -128,7 +129,8 @@ const mutations = {
 			userName: data.username,
 			email: data.email,
 			status: data.status,
-			twoFAEnabled: data.twoFAEnabled
+			twoFAEnabled: data.twoFAEnabled,
+			firstTime: data.firstTime
 		};
 		state.userProfile = userProfile
 		if (!state.socket && userProfile.id !== 0 )

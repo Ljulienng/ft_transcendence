@@ -49,7 +49,8 @@ export default defineComponent({
         .post("/users/uploadavatar", file)
         .then((res) => {
           console.log(res), (this.success = true);
-          window.location.reload();
+          this.getAvatar();
+
         })
         .catch((error) => {
           console.log("error on upload = ", error);

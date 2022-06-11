@@ -24,7 +24,6 @@ import MessageUserI from "../../types/interfaces/message.interface";
 // import http from "../http-common";
 import { defineComponent } from "@vue/runtime-core";
 import store from "../../store";
-import { Socket } from "socket.io-client";
 
 export default defineComponent({
   props: {

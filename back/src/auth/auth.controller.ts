@@ -1,4 +1,4 @@
-import { Controller, Get, Body, UseGuards, Req, Res, UnauthorizedException, Delete ,ConsoleLogger, Param, Post, HttpCode } from '@nestjs/common';
+import { Controller, Get, Body, UseGuards, Req, Res, UnauthorizedException, Delete ,UseInterceptors, Param, Post, HttpCode } from '@nestjs/common';
 import { FortyTwoService } from './fortytwo.service';
 import { AuthGuard } from '@nestjs/passport'
 import { get } from 'http';
@@ -10,6 +10,7 @@ import { TwoFactorAuthenticationService } from './twofactorauth.service'
 import { JwtService } from "@nestjs/jwt"
 import { TwoFAAuth } from './guards/twoFA.guard';
 import { UserService } from 'src/user/service/user.service';
+import { ClassSerializerInterceptor } from '@nestjs/common';
 
 @Controller()
 export class AuthController {
@@ -69,15 +70,16 @@ export class AuthController {
 		res.redirect('http://localhost:3001/home');
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
   @Get('userinfo')
   async userinfo(@Req() req) {
     try {
-    const user = req.user;
+    const user = await this.userService.findByUsername(req.user.username);
 
 		return user;
 	  } catch (e) {
-		throw new UnauthorizedException("wtf");
+		  throw new UnauthorizedException(e);
 	  }
   }
 
