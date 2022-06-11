@@ -1,6 +1,6 @@
 <template>
   <div id="chat">
-    <div class="createChat">
+    <!-- <div class="createChat">
       new channel
       <input type="text" maxlength="50" v-model="name" placeholder="name" />
       <div>
@@ -21,7 +21,7 @@
         <p>Minimun 8 characters</p>
       </div>
       <button @click="createChat">create channel</button>
-    </div>
+    </div> -->
     <br />
 
     <!-- <div class="channelTabs">
@@ -291,26 +291,26 @@ export default defineComponent({
       }
     },
 
-    createChat() {
-      // console.log(
-      //   "chat created : name=",
-      //   this.name,
-      //   " type=",
-      //   this.type,
-      //   " password=",
-      //   this.password
-      // );
-      let channel = {
-        name: this.name,
-        type: this.type,
-        password: this.password,
-      };
-      // http.post("/channel/createChannel", channel, { withCredentials: true });
-      this.socket.emit("createChannel", channel);
-      this.name = "";
-      this.type = "public";
-      this.password = "";
-    },
+    // createChat() {
+    //   // console.log(
+    //   //   "chat created : name=",
+    //   //   this.name,
+    //   //   " type=",
+    //   //   this.type,
+    //   //   " password=",
+    //   //   this.password
+    //   // );
+    //   let channel = {
+    //     name: this.name,
+    //     type: this.type,
+    //     password: this.password,
+    //   };
+    //   // http.post("/channel/createChannel", channel, { withCredentials: true });
+    //   this.socket.emit("createChannel", channel);
+    //   this.name = "";
+    //   this.type = "public";
+    //   this.password = "";
+    // },
 
     // deleteChat() {
     //   console.log("delete channel");
