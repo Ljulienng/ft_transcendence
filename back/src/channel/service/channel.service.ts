@@ -2,7 +2,7 @@ import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, Not
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Channel} from '../models/channel.entity'
-import { changePasswordDto, channelInvitationDto, CreateChannelDto, updateChannelDto, upgradeMemberDto } from '../models/channel.dto';
+import { changePasswordDto, channelInvitationDto, CreateChannelDto, updateChannelDto, updateMemberDto } from '../models/channel.dto';
 import { MessageService } from 'src/message/service/message.service';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/models/user.entity';
@@ -62,8 +62,6 @@ export class ChannelService {
     /* get the channel owner */
     async   findOwner(channelId: number): Promise<ChannelMember> {
         const channel = await this.findChannelById(channelId);
-        console.log("channelid : ", channelId);
-        console.log("channel : ", channel);
         return await this.channelMemberService.findOwner(channel);
     }
 
@@ -75,7 +73,6 @@ export class ChannelService {
 
     /* get channels where user = owner */
     async   findChannelsWhereUserIsOwner(user: User) {
-        console.log("find owner");
         return await this.channelRepository.find({
             where: {
                 owner: user,
@@ -121,7 +118,7 @@ export class ChannelService {
 
        await this.channelRepository.save(newChannel);
        await this.channelMemberService.createMember(user, newChannel, true, true);
-       console.log("channel id : ", newChannel.id );
+
        return newChannel.id;
     }
 
@@ -312,30 +309,40 @@ export class ChannelService {
         return await this.channelRepository.remove(channel);
     }
 
+    async findMember(user: User, channel: Channel) {
+        return await this.channelMemberService.findOne(user, channel);
+    }
+
     /*
     ** the  user wants to update element(s) of a channel member (ban, mute)
     */
-    async updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto) {
-        const userWhoUpdate = await this.userRepository.findOne({id: userId});
-        const userToUpdate = await this.userRepository.findOne({id: memberId});
-        const channel = await this.findChannelById(channelId);
-        return await this.channelMemberService.updateMember(userWhoUpdate, userToUpdate, channel, updates);
+    // async updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto) {
+    //     const userWhoUpdate = await this.userRepository.findOne({id: userId});
+    //     const userToUpdate = await this.userRepository.findOne({id: memberId});
+    //     const channel = await this.findChannelById(channelId);
+    //     return await this.channelMemberService.updateMember(userWhoUpdate, userToUpdate, channel, updates);
+    // }
+
+    async updateMember(owner: User, update: UpdateMemberChannelDto) {
+        const userToUpdate = await this.userRepository.findOne({username: update.username});
+        const channel = await this.findChannelById(update.channelId);
+        return await this.channelMemberService.updateMember(owner, userToUpdate, channel, update);
     }
 
-    async setMemberAsAdmin(owner: User, upgradeMember: upgradeMemberDto) {
+    async setMemberAsAdmin(owner: User, upgradeMember: updateMemberDto) {
         const userToUpgrade = await this.userRepository.findOne({username: upgradeMember.username});
         const channel = await this.findChannelById(upgradeMember.channelId);
         const updates: UpdateMemberChannelDto = { admin: true };
         return await this.channelMemberService.updateMember(owner, userToUpgrade, channel, updates);
     }
 
-
-    async unsetMemberAsAdmin(owner: User, downgradeMember: upgradeMemberDto) {
+    async unsetMemberAsAdmin(owner: User, downgradeMember: updateMemberDto) {
         const userToDowngrade = await this.userRepository.findOne({username: downgradeMember.username});
         const channel = await this.findChannelById(downgradeMember.channelId);
         const updates: UpdateMemberChannelDto = { admin: false };
         return await this.channelMemberService.updateMember(owner, userToDowngrade, channel, updates);
     }
+
     /*
     ** get all the messages of a channel
     ** returns most recent last
@@ -363,7 +370,7 @@ export class ChannelService {
         if (!channelMember) {
             throw new HttpException('this user is not a channel member', HttpStatus.FORBIDDEN);
         }
-        return await this.messageService.saveMessage(user, channel, createMessageDto);
+        return await this.messageService.saveMessage(user, channel, channelMember, createMessageDto);
       }
     
 }

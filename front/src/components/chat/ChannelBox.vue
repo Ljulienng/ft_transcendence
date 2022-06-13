@@ -1,27 +1,28 @@
 <template>
   <div class="channelBox">
-    <ChannelSettings
-      v-bind:currentUser="currentUser"
-      v-bind:channelId="channel"
-      v-bind:channelType="channelType"
-      v-bind:socket="socketChannel"
-      @close="$emit('close')"
-    />
-    <div v-if="isOwner == true"></div>
-    <p>{{ channel }}</p>
-    <div class="messageList">
-      <p v-for="msg in messageList.slice().reverse()" :key="msg">
-        {{ msg.user.username }}: {{ msg.content }}
-      </p>
+    <div v-if="channelMember.banned">
+      You can't access to the channel [banned] ... but you can beg admins if you want to go back ...
     </div>
-    <div>
-      <button @click="sendMessage">Send message</button>
-      <input
-        type="text"
-        maxlength="100"
-        v-model="message.content"
-        class="inputMessage"
+    <div v-if="!channelMember.banned">
+      <ChannelSettings
+        v-bind:currentUser="currentUser"
+        v-bind:channelId="channel"
+        v-bind:channelType="channelType"
+        v-bind:socket="socketChannel"
+        v-bind:channelMember="channelMember"
+        @close="$emit('close')"
       />
+      <div v-if="channelMember.owner"></div>
+      <p>{{ channel }}</p>
+      <div class="messageList">
+        <p v-for="msg in messageList.slice().reverse()" :key="msg">
+          {{ msg.user.username }}: {{ msg.content }}
+        </p>
+      </div>
+      <div v-if="!channelMember.muted"> <!-- a muted member can see messages but not send them -->
+        <button  @click="sendMessage" class="btn-primary">Send message</button>
+        <input type="text" maxlength="100" v-model="message.content" class="inputMessage"/>
+      </div>
     </div>
     <br />
   </div>
@@ -53,11 +54,11 @@ export default defineComponent({
   },
 
   data() {
+    /* eslint-disable */
     return {
       // test: io('http://localhost:3000/channel', {  withCredentials: true}),
       currentUser: store.getters["auth/getUserProfile"],
-      isOwner: false,
-      isAdmin: false,
+      channelMember: {} as any,
       message: {
         userId: 0,
         username: "",
@@ -80,37 +81,38 @@ export default defineComponent({
         this.message.content
       );
       this.socket.emit("sendMessageToServer", this.message);
-      // this.socket.emit('sendMessageToServer', this.message);
-      // this.getMessageList();
     },
 
     async getMessages() {
-      // console.log("heho");
       this.socket.emit("getChannelMsg", this.channel);
       this.socket.on("getChannelMessages", (data: MessageI[]) => {
         this.messageList = data;
       });
     },
+
   },
 
   mounted() {
-    this.socket.on("messageSent", () => {
+    this.socket.on("messageUpdate", () => {
+      console.log("messageUpdate");
       this.socket.emit("getChannelMsg", this.channel);
-      // console.log("data");
     });
+
     this.socket.on(
       "getChannelMessages" + this.currentUser.id,
       (data: MessageI[]) => {
+        console.log("getChannelMessages");
         this.messageList = data;
       }
     );
-    this.socket.on("isOwner", (data: boolean) => {
-      this.isOwner = data;
-    });
 
-    this.socket.on("isAdmin", (data: boolean) => {
-      this.isAdmin = data;
-    });
+    this.socket.on(
+      "channelMemberInfo", (data: any) => {
+          console.log("update channelMemberInfo : ", this.channelMember)
+          this.channelMember = data;
+        }
+    )
+
   },
 
   // unmounted() {
@@ -119,8 +121,7 @@ export default defineComponent({
 
   created() {
     this.getMessages();
-    this.socket.emit("isOwner", this.channel);
-    this.socket.emit("isAdmin", this.channel);
+    this.socket.emit("getChannelMemberInfo", this.channel);
   },
   // setup() {
   // },

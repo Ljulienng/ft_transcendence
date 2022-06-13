@@ -13,12 +13,8 @@ import Leaderboard from '@/views/Leaderboard.vue'
 import PublicUserProfile from '@/views/PublicUserProfile.vue'
 
 const routes = [
-	// {
-	// 	name: 'Base',
-	// 	path: '/',
-	// 	meta: {requiredAuth: true}
-	// }, 
-	{
+
+  {
 		path: "/:catchAll(.*)",
 		name: "NotFound",
 		component: NotFound,
@@ -113,8 +109,6 @@ router.beforeEach(async (to, from, next) => {
       else {
         if (userProfile.twoFAEnabled === true) {
           let TwoFAauth = store.getters["auth/getTwoFAauth"];
-
-		  console.log('user twofa = ', TwoFAauth)
 
           if (TwoFAauth === false || undefined) {
             await store.dispatch('auth/setTwoFAauth')

@@ -50,7 +50,7 @@ export class channelInvitationDto {
     guest: string;
 }
 
-export class upgradeMemberDto {
+export class updateMemberDto {
     channelId: number;
     username: string;
 }
