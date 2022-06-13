@@ -181,3 +181,60 @@ text {
 .toggle_switch{
     margin: 5%;
 }
+
+.profile_avatar_public {
+    vertical-align: middle;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border:3px solid #fff774;
+}
+
+.profile_avatar_private {
+    vertical-align: middle;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border:3px solid #fff774;
+}
+
+
+
+.modify_avatar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    visibility: hidden;
+    // opacity: 0.1;
+    // transition: .5s ease;
+    background-color: rgb(255, 247, 116, 0.1);
+}
+
+.modify_avatar_icon {
+    color: white;
+    font-size: 36px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+.img-container {
+    position: relative;
+    width: 50%;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+  }
+  
+  .img-container:hover .modify_avatar {
+      visibility: visible;
+  }
+  
