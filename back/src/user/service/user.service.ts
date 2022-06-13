@@ -15,7 +15,6 @@ import { MessageUserService } from 'src/messageUser/service/messageUser.service'
 import { CreateMessageUserDto } from 'src/messageUser/models/messageUser.dto';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 import { PongService } from 'src/pong/pong.service';
-import { Pong } from 'src/pong/interfaces/pong.interface';
 import { Match } from 'src/pong/models/match.entity';
 
 @Injectable()
@@ -424,23 +423,6 @@ export class UserService {
 	async getMatchHistory(user: User) {
 		const matchList =  await this.pongService.getMatchHistory(user);
 		
-		if (matchList.length === 0 && user.id !== 1) { // To delete
-			const norminet: User = await this.userRepository.findOne({id: 1})
-			if (!norminet)
-				return
-			const firstMatch: Match = {
-				id: 1,
-				playerOne: user,
-				playerTwo: norminet,
-				playerOneScore: 3,
-				playerTwoScore: 0,
-				winner: user.username,
-				loser: norminet.username
-
-			}
-			this.matchRepository.save(firstMatch);
-		}
-
 		return await this.pongService.getMatchHistory(user)
 	}
 }

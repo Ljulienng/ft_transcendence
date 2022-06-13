@@ -1,14 +1,19 @@
 <template>
-  <div class="userProfile" style="padding-left: 100px; padding-right: 20px">
+  <div class="userProfile mx-auto p-4">
     <button class="logout" @click="logout">Logout</button>
-    <router-link :to="'/public/' + currentUser.userName" class="button">
-      check public profile
-    </router-link>
-    <UploadAvatar />
     <TwoFactorModal />
-    <UsernameModal />
-    <GameHistory />
-    <UserStats />
+    <div class="d-flex mx-auto justify-content-evenly" style="width:70%">
+      <div class="d-block">
+        <UploadAvatar />
+        <UsernameModal />
+        <router-link :to="'/public/' + currentUser.userName" class="button text-decoration-none">
+          <small> public profile </small> 
+        </router-link>
+
+      </div>
+      <UserStats v-bind:username="currentUser.userName"/>
+    </div>
+    <GameHistory v-bind:username="currentUser.userName"/>
   </div>
 </template>
 

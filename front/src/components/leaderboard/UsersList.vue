@@ -25,43 +25,43 @@
 
 <script lang="ts">
 
-    import { defineComponent } from "@vue/runtime-core";
-    import http from "../../http-common"
-    import Stats from "./Stats.vue";
+  import { defineComponent } from "@vue/runtime-core";
+  import http from "../../http-common"
+  import Stats from "./Stats.vue";
 
 
-    export default defineComponent({
+  export default defineComponent({
 
-        components: {
-            Stats,
-        },
+      components: {
+          Stats,
+      },
 
-        data () {
-            return {
-              users: [],
-              title: 'leaderboard',
-              columns: ['username', 'games played', 'victories', 'defeats', 'ranking', 'points'],
-            }
-        },
+      data () {
+          return {
+            users: [],
+            title: 'leaderboard',
+            columns: ['username', 'games played', 'victories', 'defeats', 'ranking', 'points'],
+          }
+      },
 
-        methods: {
-            async getUsers() {
-                try {
-                    const response  = await http.get('/users');
+      methods: {
+          async getUsers() {
+              try {
+                  const response  = await http.get('/users');
 
-                    this.users = response.data;
-                    console.log("user list = ", this.users)
-                } catch (error) {
-                    console.log(error);
-                }
-            },
-        },
-        
-        created () {
-            this.getUsers();
-        },
+                  this.users = response.data;
+                  console.log("user list = ", this.users)
+              } catch (error) {
+                  console.log(error);
+              }
+          },
+      },
+      
+      created () {
+          this.getUsers();
+      },
 
-    })
+  })
 </script>
 
 <style lang="scss">
