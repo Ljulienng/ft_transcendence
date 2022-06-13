@@ -160,6 +160,20 @@ export class UserService {
 
 	}
 
+	async firstUpdate(currentUser: User, infoToUpdate: any) {
+		currentUser.firstTime = false;
+		if (infoToUpdate.username !== "")
+			currentUser.username = infoToUpdate.username;
+		if (infoToUpdate.firstName !== "")
+			currentUser.firstname = infoToUpdate.firstName;
+		if (infoToUpdate.lastName !== "")
+			currentUser.lastname = infoToUpdate.lastName;
+		if (infoToUpdate.email !== "")
+			currentUser.email = infoToUpdate.email;
+		await this.userRepository.save(currentUser);
+	
+	}
+
 	// ================ FRIENDS ===================
 
 	async addFriend(user: User, friendToAdd: any) {

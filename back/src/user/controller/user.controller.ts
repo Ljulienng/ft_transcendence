@@ -50,6 +50,7 @@ export class UserController {
 		return this.userService.findAll();
 	}
 
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get('/info/:userId')
 	findUserById(@Param('userId') userId: number): Observable<User> {
 		// console.log("went in userId");
@@ -70,31 +71,22 @@ export class UserController {
 	}
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
-	@Get('/ownedchannel')
-	async getOwnedChannel(@Req() req) {
+	@Post('/firsttime')
+	async firstTimeAuth(@Res({passthrough: true}) res, @Req() req, @Body() userInfo) {
 		try {
-			const user = req.user;
+			const user = await this.userService.findByUsername(req.user.username);
+			console.log("firstime info - ", userInfo)
 
-			return await this.userService.ownedChannel(user);
+			await this.userService.firstUpdate(user, userInfo)
+			const payload = { username: (await this.userService.findOne({id: user.id})).username, auth: false };
+			const accessToken = await this.jwtService.signAsync(payload);
+			// res.clearCookie('jwt');
+			res.cookie('jwt', accessToken, {httpOnly: true})
 		} catch(e) {
-			throw new UnauthorizedException("Error: getJoinedChannel");
-		
+			throw e;
 		}
 	}
-
-	@UseGuards(JwtAuthGuard, TwoFAAuth)
-	@Get('/joinedchannel')
-	async getJoinedChannel(@Req() req) {
-		try {
-			const user = req.user;
-
-			return await this.userService.joinedChannel(user);
-		} catch(e) {
-			throw new UnauthorizedException("Error: getJoinedChannel");
-		
-		}
-	}
-
+	
 	// =========== FRIENDS =============
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
@@ -150,7 +142,7 @@ export class UserController {
 	@UseInterceptors(FileInterceptor('image', storage))
 	uploadFile(@UploadedFile() file, @Req() req): Observable<Object> {
 		const user: User = req.user;
-
+		
 		return this.userService.updateOne(user.id, {profileImage: file.filename}).pipe(
 			tap((user: User) => console.log(user)),
 			map((user: User) => ({profileImage: user.profileImage}))
@@ -164,7 +156,7 @@ export class UserController {
 		if (req.user.profileImage)
 			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + req.user.profileImage)))
 		else
-			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + 'default/default.jpg')))
+		return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + 'default/default.jpg')))
 	}
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
@@ -174,25 +166,25 @@ export class UserController {
 
 		if (!otherUser)
 			throw new UnauthorizedException("User doesn't exist");
-		if (otherUser.profileImage)
+			if (otherUser.profileImage)
 			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + otherUser.profileImage)))
 		else
 			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + 'default/default.jpg')))
-	}
+		}
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get('/status')
 	async getUserStatus(@Req() req): Promise<string> {
 		try {
 			const user = await this.userService.findOne({username: req.user.username});
-
+			
 			return user.status
 		} catch(e) {
 			console.log(e);
 		}
 
 	}
-
+	
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get('/public/:username')
 	async getPublicProfile(@Param('username') username: string, @Req() req) {
@@ -205,8 +197,8 @@ export class UserController {
 				throw new UnauthorizedException("User doesn't exist");
 			if (await this.userService.checkIfBlocked(user, otherUser.id))
 				throw new UnauthorizedException("Either you or the other user has been blocked");
-
-			const userInfo = {
+				
+				const userInfo = {
 				username: username,
 				total: otherUser.gameLost + otherUser.gameWon,
 				gameWon: otherUser.gameWon,
@@ -236,6 +228,34 @@ export class UserController {
 			return messages;
 		} catch(e) {
 			console.log("/message/:friendUsername", e)
+		}
+	}
+	// =========== CHANNEL CHAT PART =============
+
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get('/ownedchannel')
+	async getOwnedChannel(@Req() req) {
+		try {
+			const user = req.user;
+
+			return await this.userService.ownedChannel(user);
+		} catch(e) {
+			throw new UnauthorizedException("Error: getJoinedChannel");
+		
+		}
+	}
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get('/joinedchannel')
+	async getJoinedChannel(@Req() req) {
+		try {
+			const user = req.user;
+
+			return await this.userService.joinedChannel(user);
+		} catch(e) {
+			throw new UnauthorizedException("Error: getJoinedChannel");
+		
 		}
 	}
 

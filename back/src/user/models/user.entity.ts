@@ -39,11 +39,13 @@ export class User {
 	@Column({ default: false,})
 	banned: boolean;
 
+	@Column({ default: true,})
+	firstTime: boolean;
+
 	@Exclude()
 	@Column({ nullable: true, default: null,})
 	twoFASecret?: string;
 
-	@Exclude()
 	@Column({ nullable: true, default: false,})
 	twoFAEnabled: boolean;
 
@@ -61,6 +63,7 @@ export class User {
 		cascade: true,
 	})
 	channelMembers: ChannelMember[];
+
 
 	@Column("simple-array", {nullable: true})
 	friends: string[];

@@ -1,6 +1,6 @@
 <template>
   <div id="chat">
-    <div class="createChat">
+    <!-- <div class="createChat">
       new channel
       <input type="text" maxlength="50" v-model="name" placeholder="name" />
       <div>
@@ -21,7 +21,7 @@
         <p>Minimun 8 characters</p>
       </div>
       <button @click="createChat">create channel</button>
-    </div>
+    </div> -->
     <br />
 
     <!-- <div class="channelTabs">
@@ -194,6 +194,7 @@ export default defineComponent({
         type: "",
         password: "",
       },
+      // messageList: [] as MessageI[],
       name: "",
       password: "",
       passwordJoinChannel: "",
@@ -271,17 +272,24 @@ export default defineComponent({
       }
     },
 
-    createChat() {
-      let channel = {
-        name: this.name,
-        type: this.type,
-        password: this.password,
-      };
-      this.socket.emit("createChannel", channel);
-      this.name = "";
-      this.type = "public";
-      this.password = "";
-    },
+    // async getMessageList() {
+    //   try {
+    //     const response = await http.get(
+    //       "/channel/" + this.channelId + "/messages"
+    //     );
+    //     // console.log(data);
+
+    //     this.messageList = response.data;
+    //     // console.log(
+    //     //   "get messageList of channel ",
+    //     //   this.channelId,
+    //     //   " : ",
+    //     //   response.data
+    //     // );
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // },
 
     joinChannel(channelId: number, channelType: string) {
       const channelToJoin = {
