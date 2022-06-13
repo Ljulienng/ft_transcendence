@@ -88,11 +88,10 @@ export default defineComponent({
           console.log(err);
         });
     },
-
   },
 
-  mounted() {
-  },
+  // mounted() {
+  // },
 
   created() {
     this.setUser();
