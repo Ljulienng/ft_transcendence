@@ -101,6 +101,14 @@
             >
               Mute
             </button>
+            <!-- TEST -->
+            <!-- <button
+              @click="muteForLimitedTime(member.user.username, 1)"
+              class="btn-secondary"
+              v-if="!member.admin && !member.muted"
+            >
+              Mute for 1 minute
+            </button> -->
             <button
               @click="unmute(member.user.username)"
               class="btn-secondary"
@@ -235,11 +243,12 @@ export default defineComponent({
       this.socket.emit("downgradeMember", downgradeMember);
     },
 
-    ban(username: string) {
+    ban(username: string, timeToBan: number) {
       const update = {
         channelId: this.channelId,
         username: username,
         banned: true,
+        timeToBan: timeToBan == undefined ? null : timeToBan,
       };
       this.socket.emit("muteban", update);
       this.getChannelMembers();
@@ -255,15 +264,30 @@ export default defineComponent({
       this.getChannelMembers();
     },
 
-    mute(username: string) {
+    mute(username: string, timeToMute: number) {
+      console.log("time to mute : ", timeToMute);
       const update = {
         channelId: this.channelId,
         username: username,
         muted: true,
+        timeToMute: timeToMute == undefined ? null : timeToMute,
       };
       this.socket.emit("muteban", update);
       this.getChannelMembers();
     },
+
+    // muteForLimitedTime(username: string, timeToMute: number) {
+    //   console.log("now : ", Date.now());
+    //   console.log("time to mute : ", timeToMute);
+    //   const update = {
+    //     channelId: this.channelId,
+    //     username: username,
+    //     muted: true,
+    //     mutedEnd: timeToMute == 0 ? null : Date.now() + (timeToMute * 60000),
+    //   };
+    //   this.socket.emit("muteban", update);
+    //   this.getChannelMembers();
+    // },
 
     unmute(username: string) {
       const update = {

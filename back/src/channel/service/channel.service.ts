@@ -323,6 +323,7 @@ export class ChannelService {
     //     return await this.channelMemberService.updateMember(userWhoUpdate, userToUpdate, channel, updates);
     // }
 
+
     async updateMember(owner: User, update: UpdateMemberChannelDto) {
         const userToUpdate = await this.userRepository.findOne({username: update.username});
         const channel = await this.findChannelById(update.channelId);
