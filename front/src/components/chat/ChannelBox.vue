@@ -54,6 +54,7 @@ export default defineComponent({
   },
 
   data() {
+    /* eslint-disable */
     return {
       // test: io('http://localhost:3000/channel', {  withCredentials: true}),
       currentUser: store.getters["auth/getUserProfile"],

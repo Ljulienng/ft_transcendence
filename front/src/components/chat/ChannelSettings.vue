@@ -28,7 +28,7 @@
           <input
             type="password"
             maxlength="100"
-            v-model="passwordI.old"
+            v-model="passwordI.old" 
             class="inputMessage"
             placeholder="old password"
           />
@@ -161,8 +161,6 @@ export default defineComponent({
   data() {
     return {
       memberList: [],
-      // isAdmin: false,
-      // isOwner: false,
       newChannelName: "",
       invitation: {
         channelId: this.channelId,
@@ -187,16 +185,6 @@ export default defineComponent({
           console.log(error);
         });
     },
-
-    // async checkIfAdmin() {
-    //   const user: any= await this.memberList.find(
-    //     (member: any) => this.currentUser.userName === member.user.username
-    //   );
-    //   if (user === undefined) return
-    //   if (user.admin) this.isAdmin = true;
-    //   if (user.owner) this.isOwner = true;
-    //   console.log("memberList = ", this.memberList, this.isAdmin, this.isOwner);
-    // },
 
     deleteChannel() {
       this.socket.emit("deleteChannel", this.channelId);
@@ -294,13 +282,9 @@ export default defineComponent({
     });
     this.socket.on("/adminPromoted/" + this.channelId, () => {
       this.getChannelMembers();
-      // this.getChannelMembers().then(() => {
-        // this.checkIfAdmin();
-      // });
     });
     this.socket.on("/adminUnpromoted/" + this.channelId, () => {
       this.getChannelMembers();
-      // if (!this.isOwner) this.isAdmin = false;
     });
     this.socket.on("/memberKicked/channel/" + this.channelId, () => {
       this.getChannelMembers();
@@ -324,9 +308,6 @@ export default defineComponent({
 
   created() {
     this.getChannelMembers();
-    // this.getChannelMembers().then(() => {
-      // this.checkIfAdmin();
-    // });
   },
 });
 </script>

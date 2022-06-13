@@ -1,34 +1,5 @@
 <template>
   <div id="chat">
-    <!-- <div class="createChat">
-      new channel
-      <input type="text" maxlength="50" v-model="name" placeholder="name" />
-      <div>
-        <input type="radio" value="public" v-model="type" />
-        <label for="public">Public</label>
-        <input type="radio" value="protected" v-model="type" />
-        <label for="protected">Protected</label>
-        <input type="radio" value="private" v-model="type" />
-        <label for="private">Private</label>
-      </div>
-      <div v-if="type == 'protected'">
-        <input
-          type="password"
-          v-model="password"
-          placeholder="password"
-          required
-        />
-        <p>Minimun 8 characters</p>
-      </div>
-      <button @click="createChat">create channel</button>
-    </div> -->
-    <br />
-
-    <!-- <div class="channelTabs">
-                <button @click="showChannel(channel.id)">show channel </button>
-                <button @click="showChannel(channel.id)">show channel</button>
-
-        </div> -->
     <nav>
       <div class="nav nav-tabs" id="nav-tab" role="tablist">
         <button
@@ -165,7 +136,6 @@
 /* eslint-disable */
 import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
-import MessageI from "../../types/interfaces/message.interface";
 import ChannelI from "../../types/interfaces/channel.interface";
 import ChannelBox from "./ChannelBox.vue";
 import PrivateChatBox from "./PrivateChatBox.vue";
@@ -194,11 +164,10 @@ export default defineComponent({
         type: "",
         password: "",
       },
-      // messageList: [] as MessageI[],
       name: "",
       password: "",
       passwordJoinChannel: "",
-      type: "public",
+      // type: "public",
       channelId: 0,
       selectedChannel: 0,
       selectedChannelType: "",
@@ -264,32 +233,12 @@ export default defineComponent({
     async getJoinedChannelList() {
       try {
         const response = await http.get("/users/joinedchannel");
-        // this.channelList = response.data;
         console.log("get joinedchannelList : ", response.data);
         this.joinedChannelList = response.data;
       } catch (error) {
         console.log(error);
       }
     },
-
-    // async getMessageList() {
-    //   try {
-    //     const response = await http.get(
-    //       "/channel/" + this.channelId + "/messages"
-    //     );
-    //     // console.log(data);
-
-    //     this.messageList = response.data;
-    //     // console.log(
-    //     //   "get messageList of channel ",
-    //     //   this.channelId,
-    //     //   " : ",
-    //     //   response.data
-    //     // );
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
 
     joinChannel(channelId: number, channelType: string) {
       const channelToJoin = {

@@ -13,12 +13,8 @@ import Leaderboard from '@/views/Leaderboard.vue'
 import PublicUserProfile from '@/views/PublicUserProfile.vue'
 
 const routes = [
-	// {
-	// 	name: 'Base',
-	// 	path: '/',
-	// 	meta: {requiredAuth: true}
-	// }, 
-	{
+
+  {
 		path: "/:catchAll(.*)",
 		name: "NotFound",
 		component: NotFound,
@@ -97,42 +93,42 @@ const routes = [
 ];
 
 const router = createRouter({
-	history: createWebHistory(),
-	routes,
+  history: createWebHistory(),
+  routes,
 })
 
 router.beforeEach(async (to, from, next) => {
-	if (to.meta.requiredAuth) {
-	let userProfile = store.getters["auth/getUserProfile"];
-		if (userProfile.id === 0) {
-			await store.dispatch("auth/userProfile");
-			userProfile = store.getters["auth/getUserProfile"];
-			if (userProfile.id === 0) {
-				return next({ path: "/authmodal" });
-			} 
-			else {
-				if (userProfile.twoFAEnabled === true) {
-					let TwoFAauth = store.getters["auth/getTwoFAauth"];
+  if (to.meta.requiredAuth) {
+    let userProfile = store.getters["auth/getUserProfile"];
+    if (userProfile.id === 0) {
+      await store.dispatch("auth/userProfile");
+      userProfile = store.getters["auth/getUserProfile"];
+      if (userProfile.id === 0) {
+        return next({ path: "/authmodal" });
+      }
+      else {
+        if (userProfile.twoFAEnabled === true) {
+          let TwoFAauth = store.getters["auth/getTwoFAauth"];
 
-					if (TwoFAauth === false || undefined) {
-						await store.dispatch('auth/setTwoFAauth')
-						TwoFAauth = store.getters["auth/getTwoFAauth"];
+          if (TwoFAauth === false || undefined) {
+            await store.dispatch('auth/setTwoFAauth')
+            TwoFAauth = store.getters["auth/getTwoFAauth"];
 
-						if (TwoFAauth === true)
-							return next();
-						else
-							return next({ path: "/twofaauth" });
-					}
-					else
-						return next();
-				}
-				else {
-					return next();
-				}
-			}
-		}
-	}
-	return next();
+            if (TwoFAauth === true)
+              return next();
+            else
+              return next({ path: "/twofaauth" });
+          }
+          else
+            return next();
+        }
+        else {
+          return next();
+        }
+      }
+    }
+  }
+  return next();
 });
 
 export default router;
