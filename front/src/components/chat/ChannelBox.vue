@@ -1,46 +1,28 @@
 <template>
   <div class="channelBox">
-    <div v-if="isAdmin == true && channelType == 'private'"> <!-- invitations only by admins -->
-        <button  @click="invite()">Invite : </button>
-        <input
-            type="text"
-            maxlength="30"
-            v-model="invitation.guest"
-            class="inputMessage"
-            placeholder="username"
-          />
+    <div v-if="channelMember.banned">
+      You can't access to the channel [banned] ... but you can beg admins if you want to go back ...
     </div>
-    <div v-if="isOwner == true && channelType == 'protected'"> <!-- change password only by owner -->
-      <button @click="changePassword()">Change password : </button>
-      <input
-          type="password"
-          maxlength="100"
-          v-model="passwordI.old"
-          class="inputMessage"
-          placeholder="old password"
-        />
-            <input
-          type="password"
-          maxlength="100"
-          v-model="passwordI.new"
-          class="inputMessage"
-          placeholder="new password"
-        />
-    </div>
-    <p>{{ channel }}</p>
-    <div class="messageList">
-      <p v-for="msg in messageList.slice().reverse()" :key="msg">
-        {{ msg.user.username }}: {{ msg.content }}
-      </p>
-    </div>
-    <div>
-      <button @click="sendMessage">Send message</button>
-      <input
-        type="text"
-        maxlength="100"
-        v-model="message.content"
-        class="inputMessage"
+    <div v-if="!channelMember.banned">
+      <ChannelSettings
+        v-bind:currentUser="currentUser"
+        v-bind:channelId="channel"
+        v-bind:channelType="channelType"
+        v-bind:socket="socketChannel"
+        v-bind:channelMember="channelMember"
+        @close="$emit('close')"
       />
+      <div v-if="channelMember.owner"></div>
+      <p>{{ channel }}</p>
+      <div class="messageList">
+        <p v-for="msg in messageList.slice().reverse()" :key="msg">
+          {{ msg.user.username }}: {{ msg.content }}
+        </p>
+      </div>
+      <div v-if="!channelMember.muted"> <!-- a muted member can see messages but not send them -->
+        <button  @click="sendMessage" class="btn-primary">Send message</button>
+        <input type="text" maxlength="100" v-model="message.content" class="inputMessage"/>
+      </div>
     </div>
     <br />
   </div>
@@ -50,10 +32,15 @@
 import MessageI from "../../types/interfaces/message.interface";
 import { Socket } from "socket.io-client";
 // import http from "../http-common";
+import ChannelSettings from "./ChannelSettings.vue";
 import { defineComponent } from "@vue/runtime-core";
 import store from "../../store";
 
 export default defineComponent({
+  components: {
+    ChannelSettings,
+  },
+
   props: {
     channel: {
       type: Number,
@@ -67,20 +54,11 @@ export default defineComponent({
   },
 
   data() {
+    /* eslint-disable */
     return {
       // test: io('http://localhost:3000/channel', {  withCredentials: true}),
       currentUser: store.getters["auth/getUserProfile"],
-      isOwner: false,
-      isAdmin: false,
-      invitation: {
-        channelId: this.channel,
-        guest: "",
-      },
-      passwordI : {
-        old: "",
-        new: "",
-        channelId: this.channel,
-      },
+      channelMember: {} as any,
       message: {
         userId: 0,
         username: "",
@@ -103,69 +81,47 @@ export default defineComponent({
         this.message.content
       );
       this.socket.emit("sendMessageToServer", this.message);
-      // this.socket.emit('sendMessageToServer', this.message);
-      // this.getMessageList();
     },
 
     async getMessages() {
-      // console.log("heho");
       this.socket.emit("getChannelMsg", this.channel);
       this.socket.on("getChannelMessages", (data: MessageI[]) => {
         this.messageList = data;
       });
     },
 
-    invite() {
-      console.log("Invite/add friend to a private channel : ", this.invitation);
-      this.socket.emit("inviteInPrivateChannel", this.invitation);
-      this.invitation.guest = "";
-    },
-
-    changePassword() {
-      this.socket.emit("changePassword", this.passwordI);
-      this.passwordI.old = "";
-      this.passwordI.new = "";
-    },
-
   },
 
   mounted() {
-    if (this.socket === undefined) {
-      this.socket = store.getters["auth/getUserSocket"];
-    }
-    this.socket.on("messageSent", () => {
+    this.socket.on("messageUpdate", () => {
+      console.log("messageUpdate");
       this.socket.emit("getChannelMsg", this.channel);
-      // console.log("data");
     });
+
     this.socket.on(
       "getChannelMessages" + this.currentUser.id,
       (data: MessageI[]) => {
+        console.log("getChannelMessages");
         this.messageList = data;
       }
     );
-    this.socket.on(
-      "isOwner", (data: boolean) => { this.isOwner = data; }
-    );
 
     this.socket.on(
-      "isAdmin", (data: boolean) => { this.isAdmin = data; }
-    );
+      "channelMemberInfo", (data: any) => {
+          console.log("update channelMemberInfo : ", this.channelMember)
+          this.channelMember = data;
+        }
+    )
 
-    this.socket.on(
-      "passwordChanged", (data: string) => { console.log("passwordChanged:", data);}
-    );
-},
+  },
 
   // unmounted() {
   // 	this.test.close;
   // },
 
   created() {
-    console.log("socket = ", this.socket);
-    // console.log("Channelbox created");
     this.getMessages();
-    this.socket.emit("isOwner", this.channel);
-    this.socket.emit("isAdmin", this.channel);
+    this.socket.emit("getChannelMemberInfo", this.channel);
   },
   // setup() {
   // },

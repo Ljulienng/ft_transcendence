@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinTable, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Channel } from "src/channel/models/channel.entity";
 import { User } from 'src/user/models/user.entity'
+import { ChannelMember } from "src/channelMember/models/channelMember.entity";
 
 @Entity('messageChannel') 
 export class MessageChannel {
@@ -13,6 +14,12 @@ export class MessageChannel {
 
 	@CreateDateColumn({ type: 'timestamp', default: () => 'now()' })
 	readonly createdTime: Date;
+
+    @ManyToOne(() => ChannelMember, cm => cm.messages, { 
+        eager: true,
+        onDelete: 'CASCADE',
+    })
+    member: ChannelMember;
 
     @ManyToOne(() => User, user => user.id, { 
         eager: true,

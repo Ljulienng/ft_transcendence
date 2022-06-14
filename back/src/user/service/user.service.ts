@@ -15,7 +15,6 @@ import { MessageUserService } from 'src/messageUser/service/messageUser.service'
 import { CreateMessageUserDto } from 'src/messageUser/models/messageUser.dto';
 import { ChannelMemberService } from 'src/channelMember/service/channelMember.service';
 import { PongService } from 'src/pong/pong.service';
-import { Pong } from 'src/pong/interfaces/pong.interface';
 import { Match } from 'src/pong/models/match.entity';
 
 @Injectable()
@@ -95,7 +94,6 @@ export class UserService {
 		// const currentUser = await this.userRepository.findOne({id: userId});
 		const tmp = await this.userRepository.findOne({username: newUsername})
 		const regex = /^[a-zA-Z0-9_]+$/
-		console.log('wnet there', tmp);
 		
 		// console.log("currentUser.username = ",currentUser.username , 'newUsername', newUsername )
 		if (currentUser.username === newUsername)
@@ -161,10 +159,25 @@ export class UserService {
 
 	}
 
+	async firstUpdate(currentUser: User, infoToUpdate: any) {
+		currentUser.firstTime = false;
+		if (infoToUpdate.username !== "")
+			currentUser.username = infoToUpdate.username;
+		if (infoToUpdate.firstName !== "")
+			currentUser.firstname = infoToUpdate.firstName;
+		if (infoToUpdate.lastName !== "")
+			currentUser.lastname = infoToUpdate.lastName;
+		if (infoToUpdate.email !== "")
+			currentUser.email = infoToUpdate.email;
+		await this.userRepository.save(currentUser);
+	
+	}
+
 	// ================ FRIENDS ===================
 
 	async addFriend(user: User, friendToAdd: any) {
 		const friend = await this.userRepository.findOne({username: friendToAdd.friendUsername});
+
 		if (user.friends === null)
 			user.friends = []
 		if (!friend) {
@@ -203,6 +216,8 @@ export class UserService {
 	async deleteFriend(user: User, friendToDelete: string) {
 		const friend = await this.userRepository.findOne({username: friendToDelete});
 
+
+		console.log("deletefRiend username = ", user.friends ,friendToDelete)
 		if (!friend) {
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
 		}
@@ -223,7 +238,6 @@ export class UserService {
 		if (isNaN(+friendId))
 			return friendInfo;
 		friendInfo = await this.userRepository.findOne({id: +friendId});
-		console.log()
 		
 		if (friendInfo !== undefined) {
 
@@ -244,7 +258,6 @@ export class UserService {
 			return friend;
 		}
 		else {
-			console.log("User doesn't exist")
 			return friendInfo
 		}
 	}
@@ -371,9 +384,6 @@ export class UserService {
 		else {
 			const index = user.blocked.indexOf(tmp, 0);
 
-
-			console.log("unblocked list = ", user.blocked, index)
-
 			user.blocked.splice(index, 1);
 		}
 		await this.userRepository.save(user);
@@ -413,23 +423,6 @@ export class UserService {
 	async getMatchHistory(user: User) {
 		const matchList =  await this.pongService.getMatchHistory(user);
 		
-		if (matchList.length === 0 && user.id !== 1) { // To delete
-			const norminet: User = await this.userRepository.findOne({id: 1})
-			if (!norminet)
-				return
-			const firstMatch: Match = {
-				id: 1,
-				playerOne: user,
-				playerTwo: norminet,
-				playerOneScore: 3,
-				playerTwoScore: 0,
-				winner: user.username,
-				loser: norminet.username
-
-			}
-			this.matchRepository.save(firstMatch);
-		}
-
 		return await this.pongService.getMatchHistory(user)
 	}
 }

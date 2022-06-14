@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, ManyToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable, JoinColumn } from "typeorm";
 import { User } from "src/user/models/user.entity";
 import { Channel } from "src/channel/models/channel.entity";
+import { MessageChannel } from "src/message/models/messageChannel.entity";
 
 @Entity('channelMembers') 
 export class ChannelMember {
@@ -28,6 +29,9 @@ export class ChannelMember {
 
 	@CreateDateColumn({ nullable: true, default: null })
 	bannedEnd: Date;
+
+    @OneToMany(() => MessageChannel, message => message.member)
+	messages: MessageChannel[];
 
 	@ManyToOne(() => User, user => user.id, {
         eager: true,

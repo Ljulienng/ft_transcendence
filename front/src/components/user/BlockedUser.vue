@@ -7,14 +7,16 @@
         <button v-on:click="unblockUser(blocked.id)" class="btn btn-danger">
           UNBLOCK -->
     <ul class="list-group mb-2 mt-2">
-      <li class="list-group-item bg-transparent border-0 text-grey d-flex justify-content-between">
-          <div class="col">username</div>
-          <div class="col align-middle">firstname</div>
-          <div class="col align-middle">lastname</div>
-          <div class="col align-middle">status</div>
-          <p class="invisible">del</p>
-        </li>
-      <li 
+      <li
+        class="list-group-item bg-transparent border-0 text-grey d-flex justify-content-between"
+      >
+        <div class="col">username</div>
+        <div class="col align-middle">firstname</div>
+        <div class="col align-middle">lastname</div>
+        <div class="col align-middle">status</div>
+        <p class="invisible">del</p>
+      </li>
+      <li
         v-for="blocked in blockedList"
         :key="blocked"
         class="list-group-item bg-transparent border-0 text-white d-flex justify-content-between"
@@ -48,9 +50,7 @@ export default defineComponent({
   methods: {
     async getBlockedList() {
       const response = await http.get("/users/getblocked");
-
       this.blockedList = response.data;
-      console.log("blockedList after get = ", this.blockedList);
     },
 
     unblockUser(userToUnblock: number) {
@@ -70,8 +70,4 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
-// .blockedList {
-// 	w
-// }
-</style>
+<style lang="scss"></style>

@@ -3,6 +3,8 @@ import { MessageChannel } from "src/message/models/messageChannel.entity";
 import { Channel } from "src/channel/models/channel.entity";
 import { colors } from "unique-names-generator";
 import { ChannelMember } from "src/channelMember/models/channelMember.entity";
+import { Exclude } from 'class-transformer';
+
 
 export type Friend = {
 	id: number;
@@ -37,6 +39,10 @@ export class User {
 	@Column({ default: false,})
 	banned: boolean;
 
+	@Column({ default: true,})
+	firstTime: boolean;
+
+	@Exclude()
 	@Column({ nullable: true, default: null,})
 	twoFASecret?: string;
 
@@ -57,6 +63,7 @@ export class User {
 		cascade: true,
 	})
 	channelMembers: ChannelMember[];
+
 
 	@Column("simple-array", {nullable: true})
 	friends: string[];

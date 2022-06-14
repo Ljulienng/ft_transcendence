@@ -46,6 +46,9 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
+    // socket: {
+    //   type: Socket,
+    // },
   },
 
   components: {
@@ -79,7 +82,6 @@ export default defineComponent({
     },
 
     async getMessages() {
-      console.log("heho", this.receiverId);
       this.socket.emit("getUserMsg", this.receiverId);
       this.socket.on(
         "getUserMessages" + this.receiverId,

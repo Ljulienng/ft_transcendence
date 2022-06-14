@@ -1,11 +1,19 @@
 <template>
-  <div class="userProfile" style="padding-left: 100px; padding-right: 20px">
+  <div class="userProfile mx-auto p-4">
     <button class="logout" @click="logout">Logout</button>
-    <UploadAvatar />
     <TwoFactorModal />
-    <UsernameModal />
-    <GameHistory v-bind:currentUser="currentUser" />
-    <UserStats />
+    <div class="d-flex mx-auto justify-content-evenly" style="width:70%">
+      <div class="d-block">
+        <UploadAvatar />
+        <UsernameModal />
+        <router-link :to="'/public/' + currentUser.userName" class="button text-decoration-none">
+          <small> public profile </small> 
+        </router-link>
+
+      </div>
+      <UserStats v-bind:username="currentUser.userName"/>
+    </div>
+    <GameHistory v-bind:username="currentUser.userName"/>
   </div>
 </template>
 
@@ -14,10 +22,10 @@ import { defineComponent } from "@vue/runtime-core";
 import http from "../http-common";
 import TwoFactorModal from "../components/auth/TwoFactorModal.vue";
 // import UsernameModal from "../components/user/UsernameModal.vue";
-import store from "../store";
 import UsernameModal from "../components/user/UsernameModal.vue";
 import GameHistory from "../components/user/GameHistory.vue";
 import UserStats from "../components/user/UserStats.vue";
+import store from "../store";
 
 export default defineComponent({
   components: {
@@ -27,9 +35,11 @@ export default defineComponent({
     UserStats,
   },
 
-  // data() {
-  //   return {};
-  // },
+  data() {
+    return {
+      currentUser: store.getters["auth/getUserProfile"],
+    };
+  },
 
   methods: {
     setStatus() {
@@ -58,6 +68,14 @@ export default defineComponent({
         });
     },
   },
+
+  // created() {
+  //   console.log("currentUser = ", this.currentUser);
+  // },
+
+  // beforeCreate() {
+  //   console.log("getUserprofile  = ", this.userProfile);
+  // },
 });
 </script>
 

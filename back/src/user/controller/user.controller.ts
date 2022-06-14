@@ -13,6 +13,7 @@ import { map } from 'rxjs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { TwoFAAuth } from 'src/auth/guards/twoFA.guard';
+import { ClassSerializerInterceptor } from '@nestjs/common';
 // import { UserI } from '../models/user.interface';
 
 export const storage = {
@@ -49,6 +50,7 @@ export class UserController {
 		return this.userService.findAll();
 	}
 
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get('/info/:userId')
 	findUserById(@Param('userId') userId: number): Observable<User> {
 		// console.log("went in userId");
@@ -69,31 +71,22 @@ export class UserController {
 	}
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
-	@Get('/ownedchannel')
-	async getOwnedChannel(@Req() req) {
+	@Post('/firsttime')
+	async firstTimeAuth(@Res({passthrough: true}) res, @Req() req, @Body() userInfo) {
 		try {
-			const user = req.user;
+			const user = await this.userService.findByUsername(req.user.username);
+			console.log("firstime info - ", userInfo)
 
-			return await this.userService.ownedChannel(user);
+			await this.userService.firstUpdate(user, userInfo)
+			const payload = { username: (await this.userService.findOne({id: user.id})).username, auth: false };
+			const accessToken = await this.jwtService.signAsync(payload);
+			// res.clearCookie('jwt');
+			res.cookie('jwt', accessToken, {httpOnly: true})
 		} catch(e) {
-			throw new UnauthorizedException("Error: getJoinedChannel");
-		
+			throw e;
 		}
 	}
-
-	@UseGuards(JwtAuthGuard, TwoFAAuth)
-	@Get('/joinedchannel')
-	async getJoinedChannel(@Req() req) {
-		try {
-			const user = req.user;
-
-			return await this.userService.joinedChannel(user);
-		} catch(e) {
-			throw new UnauthorizedException("Error: getJoinedChannel");
-		
-		}
-	}
-
+	
 	// =========== FRIENDS =============
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
@@ -149,7 +142,7 @@ export class UserController {
 	@UseInterceptors(FileInterceptor('image', storage))
 	uploadFile(@UploadedFile() file, @Req() req): Observable<Object> {
 		const user: User = req.user;
-
+		
 		return this.userService.updateOne(user.id, {profileImage: file.filename}).pipe(
 			tap((user: User) => console.log(user)),
 			map((user: User) => ({profileImage: user.profileImage}))
@@ -163,20 +156,63 @@ export class UserController {
 		if (req.user.profileImage)
 			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + req.user.profileImage)))
 		else
-			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + 'default/default.jpg')))
+		return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + 'default/default.jpg')))
 	}
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get('/avatar/:username')
+	async findPublicProfileImage(@Param('username') username: string, @Req() req, @Res() res) {
+		const otherUser = await this.userService.findOne({username: username});
+
+		if (!otherUser)
+			throw new UnauthorizedException("User doesn't exist");
+			if (otherUser.profileImage)
+			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + otherUser.profileImage)))
+		else
+			return (res.sendFile(join(process.cwd(), '/uploads/profileimages/' + 'default/default.jpg')))
+		}
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get('/status')
 	async getUserStatus(@Req() req): Promise<string> {
 		try {
 			const user = await this.userService.findOne({username: req.user.username});
-
+			
 			return user.status
 		} catch(e) {
 			console.log(e);
 		}
 
+	}
+	
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get('/public/:username')
+	async getPublicProfile(@Param('username') username: string, @Req() req) {
+		try {
+			const user = req.user;
+			const otherUser = await this.userService.findOne({username: username});
+
+			// console.log("first user = ", user.username, "other = ", otherUser.username)
+			if (!otherUser)
+				throw new UnauthorizedException("User doesn't exist");
+			if (await this.userService.checkIfBlocked(user, otherUser.id))
+				throw new UnauthorizedException("Either you or the other user has been blocked");
+				
+				const userInfo = {
+				username: username,
+				total: otherUser.gameLost + otherUser.gameWon,
+				gameWon: otherUser.gameWon,
+				gameLost: otherUser.gameLost,
+				ranking: otherUser.ranking,
+				points: otherUser.points,
+				matchHistory: await this.userService.getMatchHistory(otherUser)
+			}
+			// console.log('user info = ', userInfo)
+			return userInfo
+
+			} catch(e) {
+				console.log(e);
+			}
 	}
 
 	// =========== PRIVATE CHAT PART =============
@@ -194,6 +230,34 @@ export class UserController {
 			console.log("/message/:friendUsername", e)
 		}
 	}
+	// =========== CHANNEL CHAT PART =============
+
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get('/ownedchannel')
+	async getOwnedChannel(@Req() req) {
+		try {
+			const user = req.user;
+
+			return await this.userService.ownedChannel(user);
+		} catch(e) {
+			throw new UnauthorizedException("Error: getJoinedChannel");
+		
+		}
+	}
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get('/joinedchannel')
+	async getJoinedChannel(@Req() req) {
+		try {
+			const user = req.user;
+
+			return await this.userService.joinedChannel(user);
+		} catch(e) {
+			throw new UnauthorizedException("Error: getJoinedChannel");
+		
+		}
+	}
 
 	// =========== BLOCK PART =============
 
@@ -203,7 +267,7 @@ export class UserController {
 		try {
 			const user = req.user;
 
-			return this.userService.getBlockedUser(user);
+			return await this.userService.getBlockedUser(user);
 		} catch(e) {
 			console.log(e);
 		}
@@ -224,6 +288,18 @@ export class UserController {
 	}
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get("/matchhistory/:username")
+	async getOtherMatchHistory(@Param('username') username: string, @Req() req) {
+		try {
+			const user = await this.userService.findOne({username: username});
+
+			return this.userService.getMatchHistory(user);
+		} catch(e) {
+			console.log(e);
+		}
+	}
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get("/stats")
 	getUserStats(@Req() req) {
 		try {
@@ -233,6 +309,25 @@ export class UserController {
 				gameLost: user.gameLost,
 				ranking: user.ranking,
 				points: user.points,
+			}
+
+			return stats;
+		} catch(e) {
+
+		}
+	}
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get("/stats/:username")
+	async getOtherUserStats(@Param('username') username: string, @Req() req) {
+		try {
+			const otherUser = await this.userService.findOne({username: username});
+
+			const stats = {
+				gameWon: otherUser.gameWon,
+				gameLost: otherUser.gameLost,
+				ranking: otherUser.ranking,
+				points: otherUser.points,
 			}
 
 			return stats;

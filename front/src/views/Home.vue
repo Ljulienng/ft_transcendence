@@ -90,6 +90,9 @@ export default defineComponent({
     },
   },
 
+  // mounted() {
+  // },
+
   created() {
     this.setUser();
     if (this.getUserProfile.status === "Offline") this.connectUser();
