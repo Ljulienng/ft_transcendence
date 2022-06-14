@@ -288,6 +288,18 @@ export class UserController {
 	}
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get("/matchhistory/:username")
+	async getOtherMatchHistory(@Param('username') username: string, @Req() req) {
+		try {
+			const user = await this.userService.findOne({username: username});
+
+			return this.userService.getMatchHistory(user);
+		} catch(e) {
+			console.log(e);
+		}
+	}
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get("/stats")
 	getUserStats(@Req() req) {
 		try {
@@ -297,6 +309,25 @@ export class UserController {
 				gameLost: user.gameLost,
 				ranking: user.ranking,
 				points: user.points,
+			}
+
+			return stats;
+		} catch(e) {
+
+		}
+	}
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@Get("/stats/:username")
+	async getOtherUserStats(@Param('username') username: string, @Req() req) {
+		try {
+			const otherUser = await this.userService.findOne({username: username});
+
+			const stats = {
+				gameWon: otherUser.gameWon,
+				gameLost: otherUser.gameLost,
+				ranking: otherUser.ranking,
+				points: otherUser.points,
 			}
 
 			return stats;

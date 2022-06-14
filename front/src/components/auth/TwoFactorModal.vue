@@ -1,47 +1,70 @@
 <template>
   <div class="twofa">
-    <div class="avatar">
-      <img :src="this.image" class="Image" />
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    <div v-if="getUserProfile.twoFAEnabled === false">
+      Activate TwoFA
     </div>
-    <div class="twoFAModal">
-      <p v-if="errorMsg !== ''" style="color: red; font-size: 12px">
-        {{ errorMsg }}
-      </p>
-      <div v-if="getUserProfile.twoFAEnabled === false">
-        <form v-on:submit.prevent="activateTwoFA">
-          <p>
-            <label for="twoFAcodeActivate">twoFAcodeActivate</label>
-            <input
-              id="twoFAcodeActivate"
-              v-model="twoFA.twoFactorAuthenticationCode"
-              type="text"
-              twoFactorAuthenticationCode="twoFactorAuthenticationCode"
-            />
-          </p>
-          <p>
-            <input type="submit" value="Activate" />
-          </p>
-        </form>
+    <div v-else>
+      Deactivate TwoFA
+    </div>
+  </button>
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+      <div class="modal-header text-center">
+       
+        <h5 class="modal-title"> Double authentication factor</h5>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form
-        v-on:submit.prevent="deactivateTwoFA"
-        v-if="getUserProfile.twoFAEnabled === true"
-      >
-        >
-        <p>
-          <label for="twoFAcodeDeactivate">twoFAcodeDeactivate</label>
-          <input
-            id="twoFAcodeDeactivate"
-            v-model="twoFA.twoFactorAuthenticationCodeTwo"
-            type="text"
-            twoFactorAuthenticationCodeTwo="twoFactorAuthenticationCodeTwo"
-          />
-        </p>
-        <p>
-          <input type="submit" value="Deactivate" />
-        </p>
-      </form>
+        <div class="twoFAModal m-2">
+        <div class="avatar">
+          <img :src="this.image" class="Image" />
+        </div>
+          <div v-if="getUserProfile.twoFAEnabled === false">
+            <form v-on:submit.prevent="activateTwoFA">
+              <p>
+                <label for="twoFAcodeActivate" class="form-label mx-auto text-center">twoFAcodeActivate</label>
+                <br>
+                <input
+                  class="form-control"
+                  id="twoFAcodeActivate"
+                  v-model="twoFA.twoFactorAuthenticationCode"
+                  type="text"
+                  twoFactorAuthenticationCode="twoFactorAuthenticationCode"
+                />
+              </p>
+              <p class="form-text" v-if="errorMsg !== ''" style="color: red; font-size: 12px">
+                {{ errorMsg }}
+              </p>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="submit" class="btn btn-primary m-1" value="Activate" />
+            </form>
+          </div>
+          <form
+            v-on:submit.prevent="deactivateTwoFA"
+            v-if="getUserProfile.twoFAEnabled === true"
+          >
+            <p>
+              <label for="twoFAcodeDeactivate" class="form-label mx-auto text-center">deactivate two factor authentication</label>
+              <br>
+              <input
+                class="form-control"
+                id="twoFAcodeDeactivate"
+                v-model="twoFA.twoFactorAuthenticationCodeTwo"
+                type="text"
+                twoFactorAuthenticationCodeTwo="twoFactorAuthenticationCodeTwo"
+              />
+            </p>
+            <p>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <input type="submit" class="btn btn-primary" value="Deactivate" />
+            </p>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -130,11 +153,9 @@ export default defineComponent({
 img.Image {
   max-width: 100%;
   max-height: 100%;
-}
-
-.avatar {
-  width: 200px;
-  height: 200px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
 .twoFAModal {

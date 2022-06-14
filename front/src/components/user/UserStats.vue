@@ -1,11 +1,20 @@
 <template>
-  <div>
-    <h2>Stats</h2>
-    <p style="color: white">
-      Total: {{ userStats.total }} Game won: {{ userStats.gameWon }} Game lost:
-      {{ userStats.gameLost }} ranking: {{ userStats.ranking }} points:
-      {{ userStats.points }}
-    </p>
+  <div class="d-block">
+    <h4 style="color: white" class="pb-3 fw-bold">
+      <i style="color: #fff774" class="material-icons">sports_tennis</i> {{ userStats.total }} games played 
+    </h4>
+    <h4 style="color: white" class="pb-3 fw-bold">
+      <i style="color: #fff774" class="material-icons">military_tech</i> {{ userStats.gameWon }} games won
+    </h4>
+    <h4 style="color: white" class="pb-3 fw-bold">
+      <i style="color: #fff774" class="material-icons">cancel</i> {{ userStats.gameLost }} games lost
+    </h4>
+    <h4 style="color: white" class="pb-3 fw-bold">
+      <i style="color: #fff774" class="material-icons">leaderboard</i> {{ userStats.ranking }} ranking
+    </h4>
+    <h4 style="color: white" class="fw-bold">
+      <i style="color: #fff774" class="material-icons">stars</i> {{ userStats.points }} points
+    </h4>
   </div>
 </template>
 
@@ -15,6 +24,8 @@ import http from "../../http-common";
 // import store from "../../store";
 
 export default defineComponent({
+  props: ['username'],
+
   data() {
     return {
       userStats: {
@@ -30,7 +41,7 @@ export default defineComponent({
   methods: {
     getUserStats() {
       http
-        .get("/users/stats")
+        .get("/users/stats/" + this.username)
         .then((response) => {
           console.log(response.data);
           this.userStats.gameWon = response.data.gameWon;

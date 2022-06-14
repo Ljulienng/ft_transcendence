@@ -423,23 +423,6 @@ export class UserService {
 	async getMatchHistory(user: User) {
 		const matchList =  await this.pongService.getMatchHistory(user);
 		
-		if (matchList.length === 0 && user.id !== 1) { // To delete
-			const norminet: User = await this.userRepository.findOne({id: 1})
-			if (!norminet)
-				return
-			const firstMatch: Match = {
-				id: 1,
-				playerOne: user,
-				playerTwo: norminet,
-				playerOneScore: 3,
-				playerTwoScore: 0,
-				winner: user.username,
-				loser: norminet.username,
-				inProgress: false
-			}
-			this.matchRepository.save(firstMatch);
-		}
-
 		return await this.pongService.getMatchHistory(user)
 	}
 }

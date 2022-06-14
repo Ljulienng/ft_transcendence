@@ -1,24 +1,43 @@
 <template>
   <div class="uploadAvatar">
-    <div class="avatar">
-      <img :src="this.image" class="Image" />
+    <div class="img-container">
+      <img :src="this.image" class="profile_avatar_private"/>
+      <div class="modify_avatar" type="button" data-bs-toggle="modal" data-bs-target="#twoFaModal">
+        <div class="modify_avatar_icon"><i style="color: #fff774" class="material-icons">edit</i></div>
+      </div>
     </div>
-    <h2>Upload Avatar</h2>
-    <p v-if="success === true">Successfully uploaded</p>
-    <input type="File" id="file" ref="file" @change="onFileSelected" />
-    <button type="submit" @click="onUpload">Upload</button>
+    <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"> -->
+      <!-- Launch demo modal
+    </button> -->
+    <div class="modal fade" id="twoFaModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Upload Avatar</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <img :src="this.image" class="profile_avatar_public mx-auto d-block mb-1" />
+            <p v-if="success === true">Successfully uploaded</p>
+            <input class="form-control" type="File" id="file" ref="file" @change="onFileSelected" />
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+          <button type="submit" class="btn btn-primary" @click="onUpload">Upload</button>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
-
-// interface formData {
-// 	name: "",
-// 	value: "" | Blob,
-// 	fileName?: ""
-// }
+// import store from "../../store"
 
 export default defineComponent({
   data() {
@@ -83,8 +102,5 @@ img.Image {
   max-height: 100%;
 }
 
-.avatar {
-  width: 200px;
-  height: 200px;
-}
+
 </style>

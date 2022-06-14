@@ -71,7 +71,7 @@ export class AuthController {
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
-	@UseGuards(JwtAuthGuard, TwoFAAuth)
+	@UseGuards(JwtAuthGuard)
   @Get('userinfo')
   async userinfo(@Req() req) {
     try {

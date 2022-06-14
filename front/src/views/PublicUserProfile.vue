@@ -1,33 +1,30 @@
 <template>
-  <div>
-    <div class="avatar">
-      <img :src="this.image" class="Image" />
+  <div class="userProfile mx-auto p-4">
+    <!-- <div class="avatar"> -->
+    <div class="d-flex mx-auto justify-content-evenly" style="width:70%">
+      <div class="d-block">
+        <img :src="this.image" class="profile_avatar_public" />
+        <p class="primary text-decoration-none display-5" style="color: #fff774">{{userInfo.username}}</p>
+      </div>
+      <UserStats v-bind:username="userInfo.username"/>
     </div>
-    <p style="color: white">
-      {{ userInfo.username }} | {{ userInfo.total }} | {{ userInfo.gameWon }} |
-      {{ userInfo.gameLost }} | {{ userInfo.ranking }} | {{ userInfo.points }}
-    </p>
-    <h2>Match History</h2>
-    <ul>
-      <li v-for="match in userInfo.matchHistory" :key="match">
-        <p v-if="userInfo.username === match.winner" style="color: green">
-          {{ match.playerOne.username }} | {{ match.playerTwo.username }} |
-          {{ match.playerOneScore }}:{{ match.playerTwoScore }}
-        </p>
-        <p v-else style="color: red">
-          {{ match.playerOne.username }} | {{ match.playerTwo.username }} |
-          {{ match.playerOneScore }}:{{ match.playerTwoScore }}
-        </p>
-      </li>
-    </ul>
+    <GameHistory v-bind:username="userInfo.username"/>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
+import UserStats from "../components/user/UserStats.vue";
+import GameHistory from "../components/user/GameHistory.vue";
 import http from "../http-common";
 
+
 export default defineComponent({
+  components: {
+    UserStats,
+    GameHistory
+  },
+
   data() {
     return {
       userInfo: {
