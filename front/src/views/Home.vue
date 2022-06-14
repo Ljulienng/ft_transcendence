@@ -95,10 +95,8 @@ export default defineComponent({
 
   created() {
     this.setUser();
-    if (this.getUserProfile.status === "Offline") this.connectUser();
-    // this.getId();
+    // if (this.getUserProfile.status === "Offline") this.connectUser();
 
-    // this.setStatus()
   },
 });
 </script>

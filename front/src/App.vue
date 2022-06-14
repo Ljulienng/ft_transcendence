@@ -1,16 +1,11 @@
 <template>
   <div class="app">
-    <!-- <Notifications
-		group="foo-css"
-		position="bottom left"
-		:speed="500"
-	/> -->
     <Sidebar />
-    <Notification />
     <FirstTimeModal
       v-if="getUserProfile.firstTime === true"
       v-bind:currentUser="getUserProfile"
     />
+    <Notification v-if="getUserProfile.id !== 0" v-bind:currentUser="getUserProfile"/>
     <router-view />
     <!-- <teleport :to="someVar" v-if="someVar"> -->
     <div id="my-modals" />
@@ -39,21 +34,8 @@ export default defineComponent({
     FirstTimeModal,
     Notification,
   },
+
   methods: {
-    async checkUserstatus() {
-      let userProfile = store.getters["auth/getUserProfile"];
-
-      if (userProfile.id === 0) {
-        await store.dispatch("auth/userProfile");
-        userProfile = store.getters["auth/getUserProfile"];
-      }
-
-      if (userProfile.id === 0) router.push("http://localhost:3001/authmodal");
-      const userId = store.getters["auth/getUserProfile"].id;
-
-      if (userId) await store.dispatch("auth/setUserStatus", "Online");
-    },
-
     setOffline() {
       const userSocket = store.getters["auth/getUserSocket"].id;
 
@@ -80,13 +62,16 @@ export default defineComponent({
     }
 
     if (userProfile.id === 0) router.push("http://localhost:3001/authmodal");
-    const userId = store.getters["auth/getUserProfile"].id;
+    // const user = store.getters["auth/getUserProfile"];
 
-    if (userId) await store.dispatch("auth/setUserStatus", "Online");
+    // console.log('test = ', user);
+    // if (user.id) await store.dispatch("auth/setUserStatus", "Online");
   },
 
   created() {
     window.addEventListener("beforeunload", this.setOffline);
+    // if (this.getUserProfile.status === "Offline") store.dispatch("auth/setUserStatus", "Online");
+    // console.log('user status', store.getters["auth/getUserProfile"].status)
   },
 });
 </script>
