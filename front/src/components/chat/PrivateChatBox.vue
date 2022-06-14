@@ -1,21 +1,35 @@
 <template>
-  <div class="chatBox">
-    <div class="messageList">
-      <p v-for="msg in messageList.slice().reverse()" :key="msg">
-        {{ msg.sender.username }}: {{ msg.content }}
+  <div class="chatBox h-100">
+
+    <div class="container-fluid" style="height: 90%; overflow-y: scroll;">
+      <p v-for="msg in messageList.slice()" :key="msg">
+        <!-- {{ msg.sender.username }}: {{ msg.content }} -->
+        <Message
+          :sender="msg.sender.username"
+          :content="msg.content"
+          :currentUser="currentUser.userName"
+        />
       </p>
     </div>
-    <div>
-      <button @click="sendMessage">Send message</button>
-      <input
-        type="text"
-        maxlength="100"
-        v-model="message.content"
-        class="inputMessage"
-      />
-      <p v-if="errorMsg !== ''" style="color: red">{{ errorMsg }}</p>
+
+    <div class="row align-items-center justify-content-between mx-2" style="height: 10%;">
+      <div class="col">
+        <input
+          type="text"
+          maxlength="100"
+          v-model="message.content"
+          class="form-control"
+          placeholder="say something (interesting)..." 
+        />
+        <p v-if="errorMsg !== ''" style="color: red">{{ errorMsg }}</p>
+      </div>
+      <div class="col-auto">
+        <button @click="sendMessage">
+          <i style="color: #fff774" class="material-icons">send</i>
+        </button>
+      </div>
     </div>
-    <br />
+
   </div>
 </template>
 
@@ -24,6 +38,7 @@ import MessageUserI from "../../types/interfaces/message.interface";
 // import http from "../http-common";
 import { defineComponent } from "@vue/runtime-core";
 import store from "../../store";
+import Message from "./Message.vue"
 
 export default defineComponent({
   props: {
@@ -34,6 +49,10 @@ export default defineComponent({
     // socket: {
     //   type: Socket,
     // },
+  },
+
+  components: {
+      Message,
   },
 
   data() {
@@ -59,6 +78,7 @@ export default defineComponent({
       this.message.receiverId = this.receiverId;
 
       this.socket.emit("sendMessageToUser", this.message);
+      console.log("sendMessage:", this.message);
     },
 
     async getMessages() {
@@ -103,7 +123,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<!-- <style lang="scss">
 .messageList {
   height: 200px; /* or any height you want */
   overflow-y: auto;
@@ -114,4 +134,4 @@ export default defineComponent({
 .chatBox {
   float: right;
 }
-</style>
+</style> -->
