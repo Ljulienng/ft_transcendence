@@ -178,6 +178,8 @@ export default defineComponent({
   },
 
   methods: {
+
+    
     async getFriendList() {
       try {
         const response = await http.get("/users/friendlist");

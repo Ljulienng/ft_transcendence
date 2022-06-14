@@ -144,6 +144,7 @@
 import { defineComponent } from "@vue/runtime-core";
 import { Socket } from "socket.io-client";
 import http from "../../http-common";
+import VueCrontab from 'vue-crontab'
 
 export default defineComponent({
   props: {

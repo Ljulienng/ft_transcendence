@@ -39,7 +39,24 @@ export class ChannelMemberService {
                 mutedEnd: LessThan(new Date()),
             },
         });
-    } 
+    }
+
+    async findMutedAndBanned(channel: Channel) {
+        return await this.channelMemberRepository.find({
+            where: 
+            [
+                { 
+                    channel: channel,
+                    muted: true
+                },
+                { 
+                    channel: channel,
+                    banned: true 
+                }
+            ]
+        });
+    }
+    
 
     async findMembers(channel: Channel) {
         return await this.channelMemberRepository.find({

@@ -71,6 +71,11 @@ export class ChannelService {
         return await this.channelMemberService.findAdmins(channel);
     }
 
+    async   findMutedAndBanned(channelId: number): Promise<ChannelMember[]> {
+        const channel = await this.findChannelById(channelId);
+        return await this.channelMemberService.findMutedAndBanned(channel);
+    }
+    
     /* get channels where user = owner */
     async   findChannelsWhereUserIsOwner(user: User) {
         return await this.channelRepository.find({
