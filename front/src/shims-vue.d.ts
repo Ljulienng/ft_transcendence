@@ -7,3 +7,4 @@ declare module '*.vue' {
 }
 
 declare module 'vuejs-toggle-switch';
+declare module 'vue-crontab';

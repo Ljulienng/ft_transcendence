@@ -136,6 +136,7 @@
 import { defineComponent } from "@vue/runtime-core";
 import { Socket } from "socket.io-client";
 import http from "../../http-common";
+import VueCrontab from 'vue-crontab'
 
 export default defineComponent({
   props: {
@@ -160,6 +161,7 @@ export default defineComponent({
 
   data() {
     return {
+      muteBanCounter: 0,
       memberList: [],
       newChannelName: "",
       invitation: {
@@ -172,6 +174,14 @@ export default defineComponent({
         channelId: this.channelId,
       },
     };
+  },
+
+  computed: {
+  
+  },
+
+  watch: {
+    
   },
 
   methods: {
@@ -235,14 +245,16 @@ export default defineComponent({
       this.socket.emit("downgradeMember", downgradeMember);
     },
 
-    ban(username: string) {
+    ban(username: string, timeToBan: number) {
+      console.log("test to mute for 1 minutes");
+      timeToBan = 1; // TEST 
       const update = {
         channelId: this.channelId,
         username: username,
         banned: true,
+        timeToBan: timeToBan == undefined ? null : timeToBan,
       };
       this.socket.emit("muteban", update);
-      this.getChannelMembers();
     },
 
     unban(username: string) {
@@ -252,17 +264,18 @@ export default defineComponent({
         banned: false,
       };
       this.socket.emit("muteban", update);
-      this.getChannelMembers();
     },
 
-    mute(username: string) {
+    mute(username: string, timeToMute: number) {
+      console.log("test to mute for 1 minutes");
+      timeToMute = 1; // TEST 
       const update = {
         channelId: this.channelId,
         username: username,
         muted: true,
+        timeToMute: timeToMute == undefined ? null : timeToMute,
       };
       this.socket.emit("muteban", update);
-      this.getChannelMembers();
     },
 
     unmute(username: string) {
@@ -272,7 +285,6 @@ export default defineComponent({
         muted: false,
       };
       this.socket.emit("muteban", update);
-      this.getChannelMembers();
     },
   },
 
@@ -300,10 +312,17 @@ export default defineComponent({
     this.socket.on("/userKicked/" + this.currentUser.userName, () => {
       this.$emit("close");
     });
-    this.socket.on("updateChannelMembers", (data: any) => {
-      console.log("updateChannelMembers");
-      this.memberList = data;
+
+    this.socket.on("/userUpdated/channel/" + this.channelId, () => {
+      console.log("user muted or banned");
+      this.getChannelMembers();
     });
+
+    this.socket.on("/userUpdated/channel/", () => {
+      console.log("user unmuted or unbanned");
+      this.getChannelMembers();
+    });
+
   },
 
   created() {

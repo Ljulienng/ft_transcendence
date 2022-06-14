@@ -25,11 +25,11 @@ export class ChannelController {
         return await this.channelService.findChannelByName(name);
     }
 
-    @Get(':channelId/messages')
-    async findMessagesByChannelId(@Param('channelId') channelId: number) {
-        const channel = await this.channelService.findChannelById(channelId);
-        return this.channelService.findChannelMessagesByChannelId(channel.id);
-    } 
+    // @Get(':channelId/messages')
+    // async findMessagesByChannelId(@Param('channelId') channelId: number) {
+    //     const channel = await this.channelService.findChannelById(channelId);
+    //     return this.channelService.findChannelMessagesByChannelId(channel.id);
+    // } 
 
     @Get(':channelId/members')
     async findChannelMembersByChannelId(@Param('channelId') channelId: number) {
@@ -45,7 +45,7 @@ export class ChannelController {
     async findChannelAdmins(@Param('channelId') channelId: number) {
         return this.channelService.findAdmins(channelId);
     }
-    
+  
     // test : curl -v  -X POST -d '{"name":"room42", "type": 1,  "password":"supersecuremdp"}' -H "Content-Type: application/json" http://localhost:3000/channel/createChannel
     // @UseGuards(JwtAuthGuard) // user has to be connected
     // @Post('/createChannel')

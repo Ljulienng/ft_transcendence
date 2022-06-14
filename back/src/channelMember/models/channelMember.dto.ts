@@ -4,9 +4,9 @@ import { IsBoolean } from "class-validator";
 export class CreateMemberChannelDto {
     admin: boolean;
 	muted: boolean; 
-	mutedEnd: Date;
+	timeToMute: number; // minutes
     banned: boolean;
-	bannedEnd: Date;
+	timeToBan: number; // minutes
 }
 
 export class UpdateMemberChannelDto extends PartialType(CreateMemberChannelDto) {

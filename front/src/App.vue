@@ -104,6 +104,7 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   height: 100vh;
+  overflow: hidden;
 }
 button {
   cursor: pointer;

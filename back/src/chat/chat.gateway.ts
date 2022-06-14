@@ -91,16 +91,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     /* connect user to a channel */
-    @UseGuards(SocketGuard)
-    @SubscribeMessage('getChannelMsg')
-    async getChannelMsg(client: Socket, channelId: number) {
-        const channel = await this.channelService.findChannelById(channelId);
-        const messages = await this.channelService.findChannelMessagesByChannelName(channel.name)
+    // @UseGuards(SocketGuard)
+    // @SubscribeMessage('getChannelMsg')
+    // async getChannelMsg(client: Socket, channelId: number) {
+    //     const channel = await this.channelService.findChannelById(channelId);
+    //     const messages = await this.channelService.findChannelMessagesByChannelName(channel.name)
 
-        // console.log('MESSAGE = ', messages)
+    //     // console.log('MESSAGE = ', messages)
 
-        this.server.to(client.id).emit('getChannelMessages', messages)
-    }
+    //     this.server.to(client.id).emit('getChannelMessages', messages)
+    // }
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('joinChannel')
