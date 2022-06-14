@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex align-items-center">
     <img :src="this.image" class="small_profile_avatar" />
-    <p class="mx-3"> {{ userInfo.username }} </p>
+    <p class="mx-3">{{ userInfo.username }}</p>
   </div>
 </template>
 
@@ -10,19 +10,19 @@ import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 
 export default defineComponent({
-  props: ['username', 'isSelected'],
+  props: ["username", "isSelected"],
 
   data() {
     return {
       userInfo: {
         username: "",
       },
+      // eslint-disable-next-line
       image: null as any,
     };
   },
 
   methods: {
-
     async getuserInfo() {
       await http
         .get("/users/public/" + this.username)
@@ -48,7 +48,6 @@ export default defineComponent({
           console.log(error);
         });
     },
-    
   },
 
   created() {

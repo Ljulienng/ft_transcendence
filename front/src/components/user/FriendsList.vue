@@ -73,17 +73,7 @@ export default defineComponent({
     },
 
     async deleteFriend(friendUsername: string) {
-      console.log("friend to delete =", friendUsername);
-      await http
-        .delete("/users/deletefriend", { data: { username: friendUsername } })
-        .then((response) => {
-          console.log("/users/deletefriend success", response);
-          this.getFriendList();
-          this.errorMsg = "";
-        })
-        .catch((error) => {
-          this.errorMsg = error.response.data.error;
-        });
+      this.socket.emit("deleteFriend", friendUsername);
     },
   },
 
