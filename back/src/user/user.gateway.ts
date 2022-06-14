@@ -223,33 +223,6 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.emit("/userLeft/channel/" + channelId);
     }
 
-    // @UseGuards(SocketGuard)
-    // @SubscribeMessage('isOwner') 
-    // async isOwner(client: Socket, channelId: number) {
-    //     const user = this.socketList.find(socket => socket.socketId === client.id).user
-    //     const owner = await this.channelService.findOwner(channelId);
-    //     this.server.to(client.id).emit("isOwner", (user.id === owner.user.id));
-    // }
-
-    // @UseGuards(SocketGuard)
-    // @SubscribeMessage('isAdmin') 
-    // async isAdmin(client: Socket, channelId: number) {
-    //     const user = this.socketList.find(socket => socket.socketId === client.id).user
-    //     const admins = await this.channelService.findAdmins(channelId);
-    //     const member = admins.find(u => u.user.id === user.id);
-    //     const isAdmin = (member == undefined) ? false : true;
-    //     this.server.to(client.id).emit("isAdmin", isAdmin);
-    // }
-
-    @UseGuards(SocketGuard)
-    @SubscribeMessage('isBanned') 
-    async isBanned(client: Socket, channelId: number) {
-        const user = this.socketList.find(socket => socket.socketId === client.id).user
-        const members = await this.channelService.findMembers(channelId);
-        const member = members.find(u => u.user.id === user.id);
-        this.server.to(client.id).emit("channelMemberInfo", member.banned);
-    }
-
     @UseGuards(SocketGuard)
     @SubscribeMessage('getChannelMemberInfo') 
     async getChannelMemberInfo(client: Socket, channelId: number) {

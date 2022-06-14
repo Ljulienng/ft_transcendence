@@ -3,7 +3,7 @@ import { Interval } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Channel } from "src/channel/models/channel.entity";
 import { User } from "src/user/models/user.entity";
-import { Repository } from "typeorm";
+import { LessThan, Repository } from "typeorm";
 import { UpdateMemberChannelDto } from "../models/channelMember.dto";
 import { ChannelMember } from "../models/channelMember.entity";
 
@@ -23,18 +23,20 @@ export class ChannelMemberService {
         })
     }
 
-    async findAllBannedMembers() {
+    async findAllBannedMembersToUnban() {
         return await this.channelMemberRepository.find({
             where: {
                 banned: true,
+                bannedEnd: LessThan(new Date()),
             },
         });
     }
 
-    async findAllMutedMembers() {
+    async findAllMutedMembersToUnmute() {
         return await this.channelMemberRepository.find({
             where: {
                 muted: true,
+                mutedEnd: LessThan(new Date()),
             },
         });
     } 
@@ -115,45 +117,42 @@ export class ChannelMemberService {
             for (const update in updates) {
                 memberToUpdate[update] = updates[update];
             }
-            
-            if (memberToUpdate.banned || memberToUpdate.muted) {
-                console.log("muted until : ", memberToUpdate.mutedEnd);
-                this.checkBanMuteTime();
-            }
-                      
+   
             if (!memberToUpdate.banned)
                 memberToUpdate.bannedEnd = null;
             if (!memberToUpdate.muted)
                 memberToUpdate.mutedEnd = null;
             
-            if (updates.timeToBan)
+            if (memberToUpdate.banned && updates.timeToBan)
                 memberToUpdate.bannedEnd = new Date(Date.now() + updates.timeToBan * 60000)
-            if (updates.timeToMute)
+            if (memberToUpdate.muted && updates.timeToMute)
                 memberToUpdate.mutedEnd = new Date(Date.now() + updates.timeToMute * 60000)
 
             await this.channelMemberRepository.save(memberToUpdate);
         }
     }
 
-    @Interval(60000)
     async checkBanMuteTime() {
-        // console.log("interval ...");
-        const banMembers= await this.findAllBannedMembers();
-        for(const member of banMembers) {
+        console.log("interval check mute/ban time ...");
+        const banMembers= await this.findAllBannedMembersToUnban();
+        banMembers.forEach(member => {
             if (member.bannedEnd && member.bannedEnd.getTime() < Date.now()) {
-                await this.channelMemberRepository.update(member.id, { banned: false, bannedEnd: null });
+                // console.log("unban : ", member.id, member.banned, member.bannedEnd);
+                member.banned = false;
+                member.bannedEnd = null;
             }
-        };
-        const muteMembers = await this.findAllMutedMembers();
-        for(const member of muteMembers) {
-            // console.log("muted member : ", member.id, member.mutedEnd.getTime(), Date.now());
+        });
+        await this.channelMemberRepository.save(banMembers);
+
+        const muteMembers = await this.findAllMutedMembersToUnmute();
+        muteMembers.forEach(member => {
             if (member.mutedEnd && member.mutedEnd.getTime() < Date.now()) {
-                console.log("unmute : ", member.id, member.muted, member.mutedEnd);
-                await this.channelMemberRepository.update(member.id, { muted: false, mutedEnd: null });
-                console.log("unmute ok : ", member.id, member.muted, member.mutedEnd);
+                // console.log("unmute : ", member.id, member.muted, member.mutedEnd);
+                member.muted = false;
+                member.mutedEnd = null;
             }
-        };
-        
+        });
+        await this.channelMemberRepository.save(muteMembers);
     }
 
     async deleteMember(userToRemove: User, channel: Channel) {

@@ -21,15 +21,13 @@ export class ChannelMember {
     @Column({ default: false })
 	muted: boolean;
 
-    // @CreateDateColumn({ nullable: true, default: null }) 
-	@Column({ type: 'timestamptz', nullable: true, default: null})
+	@Column({ nullable: true, default: null})
     mutedEnd: Date;
 
     @Column({ default: false })
 	banned: boolean;
 
-	// @CreateDateColumn({ nullable: true, default: null })
-    @Column({ type: 'timestamptz', nullable: true, default: null})
+    @Column({ nullable: true, default: null})
 	bannedEnd: Date;
 
     @OneToMany(() => MessageChannel, message => message.member)

@@ -266,6 +266,7 @@ export default defineComponent({
 
     mute(username: string, timeToMute: number) {
       console.log("time to mute : ", timeToMute);
+      timeToMute = 1; // TEST 
       const update = {
         channelId: this.channelId,
         username: username,
