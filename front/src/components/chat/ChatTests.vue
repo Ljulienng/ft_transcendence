@@ -51,7 +51,6 @@
         role="tabpanel"
         aria-labelledby="nav-channel-tab"
       >
-
         <!-- CHANNEL LIST -->
         <div class="channelListWithoutPrivate">
           <ul>
@@ -89,10 +88,19 @@
         aria-labelledby="nav-friends-tab"
       >
         <div class="friendList">
-
-          <div class="btn-group-vertical col-12 mx-auto" role="group" aria-label="Basic example">
-            <button type="button" class="btn" v-for="friend in friendList" :key="friend" @click="showUser(friend.id)">
-              <UserBox :username="friend.username" :is-selected="false"/>
+          <div
+            class="btn-group-vertical col-12 mx-auto"
+            role="group"
+            aria-label="Basic example"
+          >
+            <button
+              type="button"
+              class="btn"
+              v-for="friend in friendList"
+              :key="friend"
+              @click="showUser(friend.id)"
+            >
+              <UserBox :username="friend.username" :is-selected="false" />
             </button>
           </div>
 
@@ -184,8 +192,6 @@ export default defineComponent({
   },
 
   methods: {
-
-    
     async getFriendList() {
       try {
         const response = await http.get("/users/friendlist");
@@ -196,7 +202,7 @@ export default defineComponent({
     },
 
     showUser(userId: number) {
-      this.$emit('conv', userId);
+      this.$emit("conv", userId);
       // if (this.showChatBox === true && userId === this.selectedUser) {
       //   this.showChatBox = false;
       // } else if (this.showChatBox === true && userId !== this.selectedUser) {
@@ -262,7 +268,6 @@ export default defineComponent({
     leaveChannel(channelId: number) {
       this.socket.emit("leaveChannel", channelId);
     },
-
   },
 
   mounted() {
@@ -278,7 +283,7 @@ export default defineComponent({
 
     this.socket.on("updateJoinedChannel", (data: ChannelI[]) => {
       console.log("updateJoinedChannel");
-      this.joinedChannelList = data; 
+      this.joinedChannelList = data;
     });
 
     this.socket.on("updateMembersJoinedChannels", () => {
@@ -289,7 +294,6 @@ export default defineComponent({
     this.socket.on("/userKicked/" + this.currentUser.userName, () => {
       this.getJoinedChannelList();
     });
-    
   },
 
   created() {
