@@ -112,7 +112,6 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         const channel = await this.channelService.findChannelById(channelId);
         const messages = await this.channelService.findChannelMessagesByChannelName(user, channel.name)
-        console.log("users blocked by : ", user.id, " = ", user.blocked);
         const index = this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
         // console.log(this.socketList[index].user.username ,'wants the msgs');
 

@@ -169,11 +169,10 @@ export class ChannelMemberService {
         });
         await this.channelMemberRepository.save(muteMembers);
         
-        console.log(`Unbanned ${banMembers.length} member(s) and Unmuted ${muteMembers.length} member(s)`);
-        
         // emit to the gateway to udate the front
         if (banMembers.length || muteMembers.length) {
             this.eventEmitter.emit('unmutedOrUnbannedMember');
+            console.log(`Unbanned ${banMembers.length} member(s) and Unmuted ${muteMembers.length} member(s)`);
         }
     }
 
