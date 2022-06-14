@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, LessThan, Not, Repository } from 'typeorm';
 import { CreateMessageDto } from '../models/message.dto';
 import { MessageChannel } from '../models/messageChannel.entity';
 import { Channel } from 'src/channel/models/channel.entity';
@@ -41,16 +41,36 @@ export class MessageService {
     });
   }
 
-  async findMessagesByChannel(channel: Channel): Promise<MessageChannel[]> {
-    return await this.messageChannelRepository.find({
-        relations: ['member'],
-        where: {
-            channel: channel,
-            member: {
-                banned: false,
+  /*
+  ** exclude messages from banned members (channel scope)
+  ** exclude messages from users blocked by the requesting user (global scope)
+  */
+  async findMessagesByChannel(user: User, channel: Channel): Promise<MessageChannel[]> {
+    if (!user.blocked) {
+        return await this.messageChannelRepository.find({
+            relations: ['member'],
+            where: {
+                channel: channel,
+                member: {
+                    banned: false,
+                },
             },
-        },
-    });
+        });
+    }
+    else {
+        return await this.messageChannelRepository.find({
+            relations: ['member', 'user'],
+            where: {
+                channel: channel,
+                member: {
+                    banned: false,
+                },
+                user: {
+                    id: Not(In(user.blocked)),
+                },
+            },
+        });
+    }
 }
 
   async saveMessage(user: User, channel: Channel, channelMember: ChannelMember, message: CreateMessageDto) {

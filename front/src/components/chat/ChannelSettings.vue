@@ -247,7 +247,7 @@ export default defineComponent({
 
     ban(username: string, timeToBan: number) {
       console.log("test to mute for 1 minutes");
-      timeToBan = 1;
+      timeToBan = 1; // TEST 
       const update = {
         channelId: this.channelId,
         username: username,

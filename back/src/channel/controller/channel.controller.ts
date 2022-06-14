@@ -25,11 +25,11 @@ export class ChannelController {
         return await this.channelService.findChannelByName(name);
     }
 
-    @Get(':channelId/messages')
-    async findMessagesByChannelId(@Param('channelId') channelId: number) {
-        const channel = await this.channelService.findChannelById(channelId);
-        return this.channelService.findChannelMessagesByChannelId(channel.id);
-    } 
+    // @Get(':channelId/messages')
+    // async findMessagesByChannelId(@Param('channelId') channelId: number) {
+    //     const channel = await this.channelService.findChannelById(channelId);
+    //     return this.channelService.findChannelMessagesByChannelId(channel.id);
+    // } 
 
     @Get(':channelId/members')
     async findChannelMembersByChannelId(@Param('channelId') channelId: number) {

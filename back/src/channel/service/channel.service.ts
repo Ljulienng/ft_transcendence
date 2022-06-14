@@ -344,9 +344,9 @@ export class ChannelService {
     ** get all the messages of a channel
     ** returns most recent last
     */
-    async findChannelMessagesByChannelName(channelName: string) {
+    async findChannelMessagesByChannelName(user: User, channelName: string) {
         const channel = await this.findChannelByName(channelName);
-        const messages = await this.messageService.findMessagesByChannel(channel);
+        const messages = await this.messageService.findMessagesByChannel(user, channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
 
@@ -354,11 +354,11 @@ export class ChannelService {
     ** get all the messages of a channel
     ** returns most recent last
     */
-    async findChannelMessagesByChannelId(channelId: number) {
-        const channel = await this.findChannelById(channelId);
-        const messages = await this.messageService.findMessagesByChannel(channel);
-        return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
-    }
+    // async findChannelMessagesByChannelId(channelId: number) {
+    //     const channel = await this.findChannelById(channelId);
+    //     const messages = await this.messageService.findMessagesByChannel(channel);
+    //     return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
+    // }
 
     async saveMessage(userId: number, createMessageDto: CreateMessageDto) {
         const user = await this.userRepository.findOne({id: userId});
