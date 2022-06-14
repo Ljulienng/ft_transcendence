@@ -26,6 +26,7 @@ export class Game {
   private id: number;
 
   constructor(
+    private userRepository: Repository<User>,
     private matchRepository: Repository<Match>,
     private event: Event,
     private ball: Ball,
@@ -38,6 +39,23 @@ export class Game {
     this.playerLeft.socket.join(this.name);
     this.playerRight.socket.join(this.name);
     this.start()
+  }
+
+  async saveUser(userId: number, status: string, won: boolean, lost: boolean, points: number) {
+    let user = await this.userRepository.findOne({id: this.playerLeft.user.id});
+    if (status) {
+      user.status = status;
+    }
+    if (won) {
+      user.gameWon += 1;
+    }
+    if (lost) {
+      user.gameLost += 1;
+    }
+    if (points) {
+      user.points += points;
+    }
+    this.userRepository.save(user);
   }
 
   async saveMatch(winner: User, loser: User, inProgress: boolean) {
@@ -82,7 +100,9 @@ export class Game {
     }
   }
 
-  start() {
+  async start() {
+    await this.saveUser(this.playerLeft.user.id, 'In Game', null, null, null);
+    await this.saveUser(this.playerRight.user.id, 'In Game', null, null, null);
     this.sendStart();
     this.sendScore();
     this.ball.randomDirection();
@@ -116,6 +136,8 @@ export class Game {
     this.event.emitYouWin(winner.socket.id);
     this.event.emitYouLose(opponent.socket.id);
     await this.saveMatch(winner.user, opponent.user, false);
+    await this.saveUser(winner.user.id, 'Online', true, false, this.winScore);  // TODO: the winner wins this.winScore point
+    await this.saveUser(opponent.user.id, 'Online', false, true, null);
     winner.socket.leave(this.name);
     opponent.socket.leave(this.name);
     this.setState(GameState.OVER);
@@ -123,6 +145,7 @@ export class Game {
   }
 
   async sendStart() {
+    // TODO: update user status
     if (await this.event.emitStart(this.playerLeft.socket.id, true) != 'ok') {
       this.playerLeft.disconnect()
       this.setState(GameState.PAUSE);

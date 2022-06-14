@@ -64,4 +64,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const opponent = game.findOpponent(user.id);
     game.setState(await player.move(opponent, data.x, data.y));
   }
+
+  @SubscribeMessage('playerLeave')
+  async disconnect(client: Socket) {
+    this.handleDisconnect(client);
+  }
 }

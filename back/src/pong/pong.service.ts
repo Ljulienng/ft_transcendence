@@ -15,6 +15,8 @@ export class PongService {
   public waitingPlayers: Player[];
 
   constructor(
+    @InjectRepository(User)
+    protected userRepository: Repository<User>,
     @InjectRepository(Match)
     protected matchRepository: Repository<Match>,
   ) {
@@ -30,7 +32,7 @@ export class PongService {
     }
     const playerRight = this.waitingPlayers.shift();
     const ball = new Ball(event);
-    this.games.push(new Game(this.matchRepository, event, ball, playerLeft, playerRight, 5)); // TODO: dynamic winScore
+    this.games.push(new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, 5)); // TODO: dynamic winScore
   }
 
   findGame(userId: number): Game {

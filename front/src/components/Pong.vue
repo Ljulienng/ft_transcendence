@@ -20,6 +20,7 @@ import PongI from '../types/interfaces/pong.interface'
 // TODO: waiting for opponent animation
 // TODO: Countdown before game start
 // TODO: menu for 'win by forfait'
+// TODO: event beforeUnload should emit disconnect
 
 const State = {
   INIT: 0,
@@ -170,6 +171,12 @@ export default defineComponent({
           }
         }
       }
+      if (playerToMove.y < 0) {
+        playerToMove.y = 0;
+      }
+       if (playerToMove.y > this.pong.canvas.height - this.pong.playerSize.y) {
+        playerToMove.y = this.pong.canvas.height - this.pong.playerSize.y;
+      }
       this.draw();
       this.socket.emit('playerMove', { x: playerToMove.y, y: this.pong.canvas.height });
     },
@@ -239,7 +246,11 @@ export default defineComponent({
   async mounted() {
     await this.init();
     this.startPage();
-  }
+  },
+  beforeUnmount() {
+      this.socket.emit('playerLeave');
+    },
+ 
 });
 </script>
 
