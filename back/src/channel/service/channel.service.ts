@@ -34,7 +34,6 @@ export class ChannelService {
         return (await this.channelRepository.find()).sort((a, b)=> b.createdTime.getTime() - a.createdTime.getTime());
     }
 
-    
     /* get channel by its id */
    async findChannelById(channelId: number): Promise<Channel> {
         return await this.channelRepository.findOne({

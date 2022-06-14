@@ -9,7 +9,6 @@ import {
     WebSocketServer
 } from "@nestjs/websockets";
 import { UserService } from "./service/user.service";
-import { Channel } from "src/channel/models/channel.entity"
 import { CreateMessageDto } from "src/message/models/message.dto";
 import { CreateMessageUserDto } from "src/messageUser/models/messageUser.dto";
 import { channelInvitationDto, JoinChannelDto, updateMemberDto, changePasswordDto, updateChannelDto } from "src/channel/models/channel.dto";
@@ -18,7 +17,6 @@ import { ChannelService } from "src/channel/service/channel.service";
 import { SocketGuard } from "src/auth/guards/socket.guard";
 import { UseGuards } from "@nestjs/common";
 import { CreateChannelDto } from "src/channel/models/channel.dto";
-import { Observable } from 'rxjs'
 import { User } from "./models/user.entity";
 import { UpdateMemberChannelDto } from "src/channelMember/models/channelMember.dto";
 import { OnEvent } from '@nestjs/event-emitter'

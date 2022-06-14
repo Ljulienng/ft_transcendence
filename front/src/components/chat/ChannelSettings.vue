@@ -161,7 +161,6 @@ export default defineComponent({
 
   data() {
     return {
-      muteBanCounter: 0,
       memberList: [],
       newChannelName: "",
       invitation: {
@@ -174,14 +173,6 @@ export default defineComponent({
         channelId: this.channelId,
       },
     };
-  },
-
-  computed: {
-  
-  },
-
-  watch: {
-    
   },
 
   methods: {
