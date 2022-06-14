@@ -63,7 +63,7 @@
                 </div>
                 <div class="col-auto">
                   <div class="mb-4 mt-4 text-center">
-                    <button type="submit">
+                    <button type="submit" data-bs-dismiss="modal" aria-label="Close">
                       <i style="color: #fff774" class="material-icons">send</i>
                     </button>
                   </div>

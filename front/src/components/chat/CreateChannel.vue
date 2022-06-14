@@ -28,7 +28,7 @@
                             data-bs-dismiss="modal"
                             aria-label="Close"
                         ></button>
-                    </div>
+                    </div> <!-- modal-header -->
 
                     <div class="modal-body align-items-center justify-content-between">
 
@@ -78,21 +78,19 @@
                                     <p class="form-text" style="color: grey">Minimun 8 characters</p>
                             </div>
 
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-outline-primary" data-dismiss="modal" aria-label="Close">create channel</button>
-                            </div>
+                            <button type="submit" class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">create channel</button>
                     
-                        </form>
+                        </form> <!-- form -->
 
-                    </div>
+                    </div> <!-- modal-body -->
                 
-                </div>
+                </div> <!-- modal-content -->
 
-            </div>
+            </div> <!-- modal-dialog -->
 
-        </div>
+        </div> <!-- newChatModal -->
         
-    </div>
+    </div> <!-- createChannel -->
 </template>
 
 <script lang="ts">
@@ -121,7 +119,6 @@
                 this.name = "";
                 this.type = "public";
                 this.password = "";
-                // $('#newChatModal').modal('hide');
             },
         },
 

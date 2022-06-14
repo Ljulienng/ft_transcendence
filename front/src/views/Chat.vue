@@ -21,11 +21,13 @@
 
     import { defineComponent } from "@vue/runtime-core"
     import CreateChannel from "../components/chat/CreateChannel.vue"
+    import ChatTests from "../components/chat/ChatTests.vue"
 
     export default defineComponent({
 
         components: {
             CreateChannel,
+            ChatTests,
         },
 
     })
