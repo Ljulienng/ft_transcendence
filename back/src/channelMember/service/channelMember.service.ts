@@ -133,26 +133,23 @@ export class ChannelMemberService {
     }
 
     async checkBanMuteTime() {
-        console.log("interval check mute/ban time ...");
+        // console.log("interval check mute/ban time ...");
         const banMembers= await this.findAllBannedMembersToUnban();
         banMembers.forEach(member => {
-            if (member.bannedEnd && member.bannedEnd.getTime() < Date.now()) {
-                // console.log("unban : ", member.id, member.banned, member.bannedEnd);
-                member.banned = false;
-                member.bannedEnd = null;
-            }
+            // console.log("unban : ", member.id, member.banned, member.bannedEnd);
+            member.banned = false;
+            member.bannedEnd = null;
         });
         await this.channelMemberRepository.save(banMembers);
 
         const muteMembers = await this.findAllMutedMembersToUnmute();
         muteMembers.forEach(member => {
-            if (member.mutedEnd && member.mutedEnd.getTime() < Date.now()) {
-                // console.log("unmute : ", member.id, member.muted, member.mutedEnd);
-                member.muted = false;
-                member.mutedEnd = null;
-            }
+            // console.log("unmute : ", member.id, member.muted, member.mutedEnd);
+            member.muted = false;
+            member.mutedEnd = null;
         });
         await this.channelMemberRepository.save(muteMembers);
+        console.log(`Unbanned ${banMembers.length} member(s) and Unmuted ${muteMembers.length} member(s)`);
     }
 
     async deleteMember(userToRemove: User, channel: Channel) {

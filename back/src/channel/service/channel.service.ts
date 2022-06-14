@@ -302,7 +302,6 @@ export class ChannelService {
         if (!channel) {
             throw new NotFoundException();
         }
-        console.log("member:", channelMember);
         if (!channelMember.owner) {
             throw new HttpException('only the owner can delete channels', HttpStatus.FORBIDDEN);
         }
@@ -316,14 +315,6 @@ export class ChannelService {
     /*
     ** the  user wants to update element(s) of a channel member (ban, mute)
     */
-    // async updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto) {
-    //     const userWhoUpdate = await this.userRepository.findOne({id: userId});
-    //     const userToUpdate = await this.userRepository.findOne({id: memberId});
-    //     const channel = await this.findChannelById(channelId);
-    //     return await this.channelMemberService.updateMember(userWhoUpdate, userToUpdate, channel, updates);
-    // }
-
-
     async updateMember(owner: User, update: UpdateMemberChannelDto) {
         const userToUpdate = await this.userRepository.findOne({username: update.username});
         const channel = await this.findChannelById(update.channelId);

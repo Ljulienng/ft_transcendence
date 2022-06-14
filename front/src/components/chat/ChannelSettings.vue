@@ -244,6 +244,8 @@ export default defineComponent({
     },
 
     ban(username: string, timeToBan: number) {
+      console.log("test to mute for 1 minutes");
+      timeToBan = 1;
       const update = {
         channelId: this.channelId,
         username: username,
@@ -263,7 +265,7 @@ export default defineComponent({
     },
 
     mute(username: string, timeToMute: number) {
-      console.log("time to mute : ", timeToMute);
+      console.log("test to mute for 1 minutes");
       timeToMute = 1; // TEST 
       const update = {
         channelId: this.channelId,

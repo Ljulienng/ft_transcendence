@@ -111,7 +111,7 @@ export default defineComponent({
           console.log("update channelMemberInfo : ", this.channelMember)
           this.channelMember = data;
         }
-    )
+    );
 
   },
 
