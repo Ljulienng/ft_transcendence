@@ -216,10 +216,13 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@UseGuards(SocketGuard)
     @SubscribeMessage('getUserMsg')
     async getUserMsg(client: Socket, userId: number) {
-        const sender :User = await this.socketList.find(socket => socket.socketId === client.id).user
+        console.log("getUserMsg = ", client.id)
+        const sender :User = this.socketList?.find(socket => socket.socketId === client.id).user
         // console.log("getUserMsg = ", userId)
         const receiver :User = await this.userService.findOne({id: userId});
         // console.log(sender.username ,'wants the msgs from ', userId);
+        console.log("sender = ", sender.id)
+        console.log("receiver = ", receiver.id)
         const messages = await this.userService.getMessage(sender.id, receiver.id)
 
         this.server.emit('getUserMessages' + receiver.id, messages)

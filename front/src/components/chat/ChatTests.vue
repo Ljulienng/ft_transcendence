@@ -1,6 +1,6 @@
 <template>
   <div id="chat">
-    <div class="createChat">
+    <!-- <div class="createChat">
       new channel : Name <input type="text" maxlength="20" v-model="name" />
       <div>
         <div class="one_elem">
@@ -18,7 +18,7 @@
       </div>
       <button @click="createChat">create channel</button>
     </div>
-    <br />
+    <br /> -->
 
     <div>
       <button @click="deleteChat">delete channel with id</button>
@@ -84,6 +84,7 @@
         role="tabpanel"
         aria-labelledby="nav-channel-tab"
       >
+
         <!-- CHANNEL LIST -->
         <div class="channelListWithoutPrivate">
           <ul>
@@ -102,6 +103,7 @@
           </div>
         </div>
       </div>
+
       <div
         class="tab-pane fade"
         id="nav-friends"
@@ -109,12 +111,13 @@
         aria-labelledby="nav-friends-tab"
       >
         <div class="friendList">
-          <ul>
-            <li v-for="friend in friendList" :key="friend">
-              {{ friend.username }}
-              <button @click="showUser(friend.id)">show chat</button>
-            </li>
-          </ul>
+
+          <div class="btn-group-vertical col-12 mx-auto" role="group" aria-label="Basic example">
+            <button type="button" class="btn" v-for="friend in friendList" :key="friend" @click="showUser(friend.id)">
+              <UserBox :username="friend.username" :is-selected="false"/>
+            </button>
+          </div>
+
           <div v-if="showChatBox === true">
             <PrivateChatBox
               v-bind:receiverId="selectedUser"
@@ -123,6 +126,7 @@
           </div>
         </div>
       </div>
+
       <div
         class="tab-pane fade"
         id="nav-joinedChannel"
@@ -158,12 +162,14 @@ import MessageI from "../../types/interfaces/message.interface";
 import ChannelI from "../../types/interfaces/channel.interface";
 import ChannelBox from "./ChannelBox.vue";
 import PrivateChatBox from "./PrivateChatBox.vue";
+import UserBox from "./UserBox.vue";
 import store from "../../store";
 
 export default defineComponent({
   components: {
     ChannelBox,
     PrivateChatBox,
+    UserBox,
   },
 
   data() {
@@ -208,14 +214,15 @@ export default defineComponent({
     },
 
     showUser(userId: number) {
-      if (this.showChatBox === true && userId === this.selectedUser) {
-        this.showChatBox = false;
-      } else if (this.showChatBox === true && userId !== this.selectedUser) {
-        this.selectedUser = userId;
-      } else {
-        this.showChatBox = true;
-        this.selectedUser = userId;
-      }
+      this.$emit('conv', userId);
+      // if (this.showChatBox === true && userId === this.selectedUser) {
+      //   this.showChatBox = false;
+      // } else if (this.showChatBox === true && userId !== this.selectedUser) {
+      //   this.selectedUser = userId;
+      // } else {
+      //   this.showChatBox = true;
+      //   this.selectedUser = userId;
+      // }
     },
 
     showChannel(channelId: number, channelType: string) {
