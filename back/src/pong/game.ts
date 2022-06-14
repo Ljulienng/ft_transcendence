@@ -5,6 +5,7 @@ import { Player, PlayerState } from './player';
 import { Event } from './event';
 import { Repository } from 'typeorm';
 import { Match } from './models/match.entity';
+import { User } from 'src/user/models/user.entity';
 
 export const WIDTH = 100;
 export const HEIGHT = 66;
@@ -32,14 +33,14 @@ export class Game {
     public playerRight: Player,
     public winScore: number) {
     this.state = GameState.PLAY;
-    this.name = 'game_' + playerLeft.user.username + '_' + playerRight.user.username;
+    this.name = 'game_' + playerLeft.user.id + '_' + playerRight.user.id;
     this.id = null;
     this.playerLeft.socket.join(this.name);
     this.playerRight.socket.join(this.name);
     this.start()
   }
 
-  async saveMatch(winner: string, loser: string, inProgress: boolean) {
+  async saveMatch(winner: User, loser: User, inProgress: boolean) {
     let match: Match;
     if (this.id) {
       match = await this.matchRepository.findOne({ id: this.id });
@@ -65,19 +66,18 @@ export class Game {
     this.id = match.id;
   }
 
-
-  findPlayer(username: string): Player {
-    if (this.playerLeft.user.username == username) {
+  findPlayer(userId: number): Player {
+    if (this.playerLeft.user.id == userId) {
       return this.playerLeft;
-    } else if (this.playerRight.user.username == username) {
+    } else if (this.playerRight.user.id == userId) {
       return this.playerRight;
     }
   }
 
-  findOpponent(username: string): Player {
-    if (this.playerLeft.user.username == username) {
+  findOpponent(userId: number): Player {
+    if (this.playerLeft.user.id == userId) {
       return this.playerRight;
-    } else if (this.playerRight.user.username == username) {
+    } else if (this.playerRight.user.id == userId) {
       return this.playerLeft;
     }
   }
@@ -112,10 +112,10 @@ export class Game {
   }
 
   async gameOver(winner: Player) {
-    const opponent: Player = this.findOpponent(winner.user.username);
+    const opponent: Player = this.findOpponent(winner.user.id);
     this.event.emitYouWin(winner.socket.id);
     this.event.emitYouLose(opponent.socket.id);
-    await this.saveMatch(winner.user.username, opponent.user.username, false);
+    await this.saveMatch(winner.user, opponent.user, false);
     winner.socket.leave(this.name);
     opponent.socket.leave(this.name);
     this.setState(GameState.OVER);
@@ -150,8 +150,8 @@ export class Game {
     }
   }
 
-  reconnectPlayer(username: string, socket: Socket) {
-    const player = this.findPlayer(username);
+  reconnectPlayer(userId: number, socket: Socket) {
+    const player = this.findPlayer(userId);
     player.reconnect(socket);
     if (this.playerLeft.state == PlayerState.CONNECTED && this.playerRight.state == PlayerState.CONNECTED) {
       this.setState(GameState.PLAY);
@@ -159,9 +159,9 @@ export class Game {
     }
   }
 
-  disconnectPlayer(username: string) {
+  disconnectPlayer(userId: number) {
     // TODO: stop game if both are disconnected ?
-    const player = this.findPlayer(username);
+    const player = this.findPlayer(userId);
     player.disconnectAndPause(this.name);
     this.setState(GameState.PAUSE);
   }

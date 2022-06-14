@@ -35,9 +35,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleConnection(client: Socket) {
     this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
     const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
-    const game = this.pongService.findGame(user.username);
+    const game = this.pongService.findGame(user.id);
     if (game) {
-      game.reconnectPlayer(user.username, client);
+      game.reconnectPlayer(user.id, client);
       return;
     }
 
@@ -48,20 +48,20 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async handleDisconnect(client: Socket) {
     const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
-    const game = this.pongService.findGame(user.username);
+    const game = this.pongService.findGame(user.id);
     if (game) {
-      game.disconnectPlayer(user.username);
+      game.disconnectPlayer(user.id);
     } else {
-      this.pongService.waitingPlayers.filter(e => e.user.username != user.username);
+      this.pongService.waitingPlayers.filter(e => e.user.id != user.id);
     }
   }
 
   @SubscribeMessage('playerMove')
   async movePaddle(client: Socket, data: Point) {
     const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
-    const game = this.pongService.findGame(user.username);
-    const player = game.findPlayer(user.username);
-    const opponent = game.findOpponent(user.username);
+    const game = this.pongService.findGame(user.id);
+    const player = game.findPlayer(user.id);
+    const opponent = game.findOpponent(user.id);
     game.setState(await player.move(opponent, data.x, data.y));
   }
 }

@@ -422,7 +422,6 @@ export class UserService {
 
 	async getMatchHistory(user: User) {
 		const matchList =  await this.pongService.getMatchHistory(user);
-		
 		return await this.pongService.getMatchHistory(user)
 	}
 }

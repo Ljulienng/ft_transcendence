@@ -33,8 +33,8 @@ export class PongService {
     this.games.push(new Game(this.matchRepository, event, ball, playerLeft, playerRight, 5)); // TODO: dynamic winScore
   }
 
-  findGame(username: string): Game {
-    return this.games.find(e => (e.playerLeft && e.playerLeft.user.username == username) || (e.playerRight && e.playerRight.user.username == username));
+  findGame(userId: number): Game {
+    return this.games.find(e => (e.playerLeft && e.playerLeft.user.id == userId) || (e.playerRight && e.playerRight.user.id == userId));
   }
 
   async getMatchHistory(user: User): Promise<Match[]> {
