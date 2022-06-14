@@ -251,7 +251,6 @@ export default defineComponent({
         timeToBan: timeToBan == undefined ? null : timeToBan,
       };
       this.socket.emit("muteban", update);
-      this.getChannelMembers();
     },
 
     unban(username: string) {
@@ -261,7 +260,6 @@ export default defineComponent({
         banned: false,
       };
       this.socket.emit("muteban", update);
-      this.getChannelMembers();
     },
 
     mute(username: string, timeToMute: number) {
@@ -274,21 +272,7 @@ export default defineComponent({
         timeToMute: timeToMute == undefined ? null : timeToMute,
       };
       this.socket.emit("muteban", update);
-      this.getChannelMembers();
     },
-
-    // muteForLimitedTime(username: string, timeToMute: number) {
-    //   console.log("now : ", Date.now());
-    //   console.log("time to mute : ", timeToMute);
-    //   const update = {
-    //     channelId: this.channelId,
-    //     username: username,
-    //     muted: true,
-    //     mutedEnd: timeToMute == 0 ? null : Date.now() + (timeToMute * 60000),
-    //   };
-    //   this.socket.emit("muteban", update);
-    //   this.getChannelMembers();
-    // },
 
     unmute(username: string) {
       const update = {
@@ -297,7 +281,6 @@ export default defineComponent({
         muted: false,
       };
       this.socket.emit("muteban", update);
-      this.getChannelMembers();
     },
   },
 
@@ -325,10 +308,12 @@ export default defineComponent({
     this.socket.on("/userKicked/" + this.currentUser.userName, () => {
       this.$emit("close");
     });
-    this.socket.on("updateChannelMembers", (data: any) => {
-      console.log("updateChannelMembers");
-      this.memberList = data;
+
+    this.socket.on("/userUpdated/channel/" + this.channelId, () => {
+      console.log("user updated");
+      this.getChannelMembers();
     });
+
   },
 
   created() {

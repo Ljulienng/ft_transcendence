@@ -264,6 +264,7 @@ export default defineComponent({
     this.socket.on("updateChannel", (data: ChannelI[]) => {
       this.channelList = data;
       this.updateChannelListWithoutPrivate();
+      this.socket.emit("updateJoinedChannels");
     });
 
     this.socket.on("updateJoinedChannel", (data: ChannelI[]) => {

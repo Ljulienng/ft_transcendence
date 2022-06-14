@@ -202,12 +202,14 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async muteOrBan(client: Socket, update: UpdateMemberChannelDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.updateMember(user, update);
-        this.server.to(String(update.channelId)).emit("updateChannelMembers", await this.channelService.findMembers(update.channelId));
+        // this.server.to(String(update.channelId)).emit("updateChannelMembers", await this.channelService.findMembers(update.channelId));
         const userToUpdate = await this.userService.findByUsername(update.username);
         const userToUpdateSocket = (this.socketList.find(s => s.user.id === userToUpdate.id )).socket;
         const channel = await this.channelService.findChannelById(update.channelId);
         this.server.to(userToUpdateSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToUpdate, channel));
         this.server.emit('messageUpdate');
+        this.server.emit("/userUpdated/channel/" + channel.id);
+
     }
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)
