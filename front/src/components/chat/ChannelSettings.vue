@@ -101,14 +101,6 @@
             >
               Mute
             </button>
-            <!-- TEST -->
-            <!-- <button
-              @click="muteForLimitedTime(member.user.username, 1)"
-              class="btn-secondary"
-              v-if="!member.admin && !member.muted"
-            >
-              Mute for 1 minute
-            </button> -->
             <button
               @click="unmute(member.user.username)"
               class="btn-secondary"
@@ -169,6 +161,7 @@ export default defineComponent({
 
   data() {
     return {
+      muteBanCounter: 0,
       memberList: [],
       newChannelName: "",
       invitation: {
@@ -181,6 +174,14 @@ export default defineComponent({
         channelId: this.channelId,
       },
     };
+  },
+
+  computed: {
+  
+  },
+
+  watch: {
+    
   },
 
   methods: {
@@ -313,7 +314,12 @@ export default defineComponent({
     });
 
     this.socket.on("/userUpdated/channel/" + this.channelId, () => {
-      console.log("user updated");
+      console.log("user muted or banned");
+      this.getChannelMembers();
+    });
+
+    this.socket.on("/userUpdated/channel/", () => {
+      console.log("user unmuted or unbanned");
       this.getChannelMembers();
     });
 

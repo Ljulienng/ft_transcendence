@@ -21,7 +21,7 @@ import { CreateChannelDto } from "src/channel/models/channel.dto";
 import { Observable } from 'rxjs'
 import { User } from "./models/user.entity";
 import { UpdateMemberChannelDto } from "src/channelMember/models/channelMember.dto";
-
+import { OnEvent } from '@nestjs/event-emitter'
 
 // export type UserSocket = {
 // 	socketId: string,
@@ -208,6 +208,12 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.to(userToUpdateSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToUpdate, channel));
         this.server.emit('messageUpdate');
         this.server.emit("/userUpdated/channel/" + channel.id);
+    }
+    
+    @OnEvent('unmutedOrUnbannedMember')
+    sendDataToFront() {
+        console.log("On event unmutedOrUnbannedMember");
+        this.server.emit("/userUpdated/channel/");
 
     }
 

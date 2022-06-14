@@ -6,12 +6,14 @@ import { User } from "src/user/models/user.entity";
 import { LessThan, Repository } from "typeorm";
 import { UpdateMemberChannelDto } from "../models/channelMember.dto";
 import { ChannelMember } from "../models/channelMember.entity";
+import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()
 export class ChannelMemberService {
     constructor(
         @InjectRepository(ChannelMember)
         private channelMemberRepository: Repository<ChannelMember>,
+        private eventEmitter: EventEmitter2,
     ) {}
    
     async findOne(user: User, channel: Channel): Promise<ChannelMember> {
@@ -166,7 +168,13 @@ export class ChannelMemberService {
             member.mutedEnd = null;
         });
         await this.channelMemberRepository.save(muteMembers);
+        
         console.log(`Unbanned ${banMembers.length} member(s) and Unmuted ${muteMembers.length} member(s)`);
+        
+        // emit to the gateway to udate the front
+        if (banMembers.length || muteMembers.length) {
+            this.eventEmitter.emit('unmutedOrUnbannedMember');
+        }
     }
 
     async deleteMember(userToRemove: User, channel: Channel) {

@@ -45,7 +45,7 @@ export class ChannelController {
     async findChannelAdmins(@Param('channelId') channelId: number) {
         return this.channelService.findAdmins(channelId);
     }
-    
+  
     // test : curl -v  -X POST -d '{"name":"room42", "type": 1,  "password":"supersecuremdp"}' -H "Content-Type: application/json" http://localhost:3000/channel/createChannel
     // @UseGuards(JwtAuthGuard) // user has to be connected
     // @Post('/createChannel')
