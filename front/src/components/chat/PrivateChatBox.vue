@@ -44,11 +44,8 @@ export default defineComponent({
   props: {
     receiverId: {
       type: Number,
-      default: 0,
+      required: true,
     },
-    // socket: {
-    //   type: Socket,
-    // },
   },
 
   components: {
