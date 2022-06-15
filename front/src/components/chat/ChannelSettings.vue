@@ -24,11 +24,13 @@
         </div>
         <div v-if="channelType == 'protected'">
           <!-- change password only by owner -->
-          <button @click="changePassword()" class="btn-primary">Change password :</button>
+          <button @click="changePassword()" class="btn-primary">
+            Change password :
+          </button>
           <input
             type="password"
             maxlength="100"
-            v-model="passwordI.old" 
+            v-model="passwordI.old"
             class="inputMessage"
             placeholder="old password"
           />
@@ -59,73 +61,57 @@
     <ul>
       <li v-for="member in memberList" :key="member">
         <!-- <div>{{ member.user.username }}</div> -->
-          <template v-if="member.owner">OWNER = </template>
-          {{ member.user.username }}
-          <template v-if="channelMember.owner">
-            <button
-              @click="setMemberAsAdmin(member.user.username)"
-              class="btn-primary"
-              v-if="member.admin === false"
-            >
-              PROMOTE
-            </button>
-            <button
-              @click="unsetMemberAsAdmin(member.user.username)"
-              class="btn-primary"
-              v-if="member.admin === true && !member.owner"
-            >
-              DEMOTE
-            </button>
-          </template>
-          <template v-if="channelMember.admin">
-            <button
-              @click="kickMember(member.user.username)"
-              class="btn-danger"
-              v-if="member.admin === false"
-            >
-              Kick
-            </button>
-            <button
-              @click="kickMember(member.user.username)"
-              class="btn-danger"
-              v-if="member.admin && !member.owner && channelMember.owner"
-            >
-              Kick
-            </button>
-          </template>
-          <template v-if="channelMember.admin">
-            <button
-              @click="mute(member.user.username)"
-              class="btn-secondary"
-              v-if="!member.admin && !member.muted"
-            >
-              Mute
-            </button>
-            <button
-              @click="unmute(member.user.username)"
-              class="btn-secondary"
-              v-if="!member.admin && member.muted"
-            >
-              Unmute
-            </button>
-            <button
-              @click="ban(member.user.username)"
-              class="btn-secondary"
-              v-if="!member.admin && !member.banned"
-            >
-              Ban
-            </button>
-            <button
-              @click="unban(member.user.username)"
-              class="btn-secondary"
-              v-if="!member.admin && member.banned"
-            >
-              Unban
-            </button>
-          </template>
-          <template v-if="member.admin">(admin)</template>
-          <template v-if="member.muted">(muted)</template>
-          <template v-if="member.banned">(banned)</template>
+        <template v-if="member.owner">OWNER = </template>
+        {{ member.user.username }}
+        <template v-if="channelMember.owner">
+          <button
+            @click="setMemberAsAdmin(member.user.username)"
+            class="btn-primary"
+            v-if="member.admin === false"
+          >
+            PROMOTE
+          </button>
+          <button
+            @click="unsetMemberAsAdmin(member.user.username)"
+            class="btn-primary"
+            v-if="member.admin === true && !member.owner"
+          >
+            DEMOTE
+          </button>
+        </template>
+        <template v-if="channelMember.admin">
+          <button
+            @click="kickMember(member.user.username)"
+            class="btn-danger"
+            v-if="member.admin === false"
+          >
+            Kick
+          </button>
+          <button
+            @click="kickMember(member.user.username)"
+            class="btn-danger"
+            v-if="member.admin && !member.owner && channelMember.owner"
+          >
+            Kick
+          </button>
+        </template>
+        <template v-if="channelMember.admin">
+          <BanMuteModal
+            v-bind:context="'mute'"
+            v-bind:member="member"
+            v-bind:socket="socket"
+            v-bind:channelId="channelId"
+          />
+          <BanMuteModal
+            v-bind:context="'ban'"
+            v-bind:member="member"
+            v-bind:socket="socket"
+            v-bind:channelId="channelId"
+          />
+        </template>
+        <template v-if="member.admin">(admin)</template>
+        <template v-if="member.muted">(muted)</template>
+        <template v-if="member.banned">(banned)</template>
       </li>
     </ul>
   </div>
@@ -136,26 +122,31 @@
 import { defineComponent } from "@vue/runtime-core";
 import { Socket } from "socket.io-client";
 import http from "../../http-common";
-import VueCrontab from 'vue-crontab'
+import VueCrontab from "vue-crontab";
+import BanMuteModal from "./BanMuteModal.vue";
 
 export default defineComponent({
+  components: {
+    BanMuteModal,
+  },
+
   props: {
     currentUser: {
       type: Object,
-      required: true
+      required: true,
     },
     channelId: {
       type: Number,
-      required: true
+      required: true,
     },
     channelType: String,
     socket: {
       type: Socket,
-      required: true
+      required: true,
     },
     channelMember: {
       type: Object,
-      required: true
+      required: true,
     },
   },
 
@@ -176,13 +167,9 @@ export default defineComponent({
     };
   },
 
-  computed: {
-  
-  },
+  computed: {},
 
-  watch: {
-    
-  },
+  watch: {},
 
   methods: {
     async getChannelMembers() {
@@ -247,7 +234,7 @@ export default defineComponent({
 
     ban(username: string, timeToBan: number) {
       console.log("test to mute for 1 minutes");
-      timeToBan = 1; // TEST 
+      timeToBan = 1; // TEST
       const update = {
         channelId: this.channelId,
         username: username,
@@ -268,7 +255,7 @@ export default defineComponent({
 
     mute(username: string, timeToMute: number) {
       console.log("test to mute for 1 minutes");
-      timeToMute = 1; // TEST 
+      timeToMute = 1; // TEST
       const update = {
         channelId: this.channelId,
         username: username,
@@ -322,7 +309,6 @@ export default defineComponent({
       console.log("user unmuted or unbanned");
       this.getChannelMembers();
     });
-
   },
 
   created() {

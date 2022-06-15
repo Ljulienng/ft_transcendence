@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import http from "./http-common";
+// import http from "./http-common";
 import store from "./store";
 import router from "./router";
 import FirstTimeModal from "./components/auth/FirstTimeModal.vue";
@@ -41,15 +41,7 @@ export default defineComponent({
 
       if (!userSocket) store.dispatch("auth/setUserSocket");
       store.dispatch("auth/setUserStatus", "Offline");
-      http
-        .post("/users/setstatus", { newStatus: "Offline" })
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
+    }
   },
 
   async beforeCreate() {
@@ -63,12 +55,18 @@ export default defineComponent({
 
     if (userProfile.id === 0) router.push("http://localhost:3001/authmodal");
     // const user = store.getters["auth/getUserProfile"];
+    if (userProfile.id !== 0) {
+      const socket = store.getters["auth/getUserSocket"];
+      socket.on('moveToMatch', () => {console.log('MATCH'); this.$router.push("/play");})
 
-    // console.log('test = ', user);
+    }
+
+
     // if (user.id) await store.dispatch("auth/setUserStatus", "Online");
   },
 
   created() {
+    console.log('created')
     window.addEventListener("beforeunload", this.setOffline);
     // if (this.getUserProfile.status === "Offline") store.dispatch("auth/setUserStatus", "Online");
     // console.log('user status', store.getters["auth/getUserProfile"].status)

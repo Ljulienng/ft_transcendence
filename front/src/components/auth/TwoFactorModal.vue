@@ -23,9 +23,7 @@
         </div>
           <div v-if="getUserProfile.twoFAEnabled === false">
             <form v-on:submit.prevent="activateTwoFA">
-              <p>
-                <label for="twoFAcodeActivate" class="form-label mx-auto text-center">twoFAcodeActivate</label>
-                <br>
+              <div class="form-floating">
                 <input
                   class="form-control"
                   id="twoFAcodeActivate"
@@ -33,7 +31,8 @@
                   type="text"
                   twoFactorAuthenticationCode="twoFactorAuthenticationCode"
                 />
-              </p>
+                <label for="twoFAcodeActivate" class="form-label mx-auto text-center">Authenticator code</label>
+              </div>
               <p class="form-text" v-if="errorMsg !== ''" style="color: red; font-size: 12px">
                 {{ errorMsg }}
               </p>
@@ -45,9 +44,8 @@
             v-on:submit.prevent="deactivateTwoFA"
             v-if="getUserProfile.twoFAEnabled === true"
           >
-            <p>
-              <label for="twoFAcodeDeactivate" class="form-label mx-auto text-center">deactivate two factor authentication</label>
-              <br>
+            <div class="form-floating">
+
               <input
                 class="form-control"
                 id="twoFAcodeDeactivate"
@@ -55,7 +53,8 @@
                 type="text"
                 twoFactorAuthenticationCodeTwo="twoFactorAuthenticationCodeTwo"
               />
-            </p>
+              <label for="twoFAcodeDeactivate" class="form-label mx-auto text-center">deactivate two factor authentication</label>
+            </div>
             <p>
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <input type="submit" class="btn btn-primary" value="Deactivate" />
