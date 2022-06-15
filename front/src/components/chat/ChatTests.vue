@@ -104,12 +104,13 @@
             </button>
           </div>
 
-          <div v-if="showChatBox === true">
+          <div v-if="selectedUser > 0">
             <PrivateChatBox
               v-bind:receiverId="selectedUser"
               :is="showChatBox"
             ></PrivateChatBox>
           </div>
+
         </div>
       </div>
 
