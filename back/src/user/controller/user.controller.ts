@@ -246,6 +246,7 @@ export class UserController {
 		}
 	}
 
+	@UseInterceptors(ClassSerializerInterceptor)
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get('/joinedchannel')
 	async getJoinedChannel(@Req() req) {

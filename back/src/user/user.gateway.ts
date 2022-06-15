@@ -165,12 +165,13 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async leaveChannel(client: Socket, channelId: number) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
 
+        this.server.emit("/userLeft/" + user.username, (await this.channelService.findChannelById(channelId)).name);
         await this.channelService.deleteChannelMember(channelId, user.id);
         this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(String(channelId)).emit("updateMembersJoinedChannels");
         client.leave(String(channelId));
         this.server.emit("/userLeft/channel/" + channelId);
-        this.server.emit("/userLeft/" + user.username, (await this.channelService.findChannelById(channelId)).name);
+        console.log("USER LEFT", user.username);
     }
 
     @UseGuards(SocketGuard)
@@ -248,6 +249,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this.channelService.changePassword(user.id, passwordI);
         // need to inform members of the channel of this change !
         this.server.to(client.id).emit("passwordChanged", "password is changed");
+        // this.server.emit("/passwordChanged/" + user.username, (await this.channelService.findChannelById(channel.id)).name);
+
     }
 
     @UseGuards(SocketGuard)
@@ -276,7 +279,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@UseGuards(SocketGuard)
     @SubscribeMessage('getUserMsg')
     async getUserMsg(client: Socket, userId: number) {
-        console.log("getUserMsg = ", client.id)
+        console.log("getUserMsg = ", client.id);
         const sender :User = this.socketList?.find(socket => socket.socketId === client.id).user
         // console.log("getUserMsg = ", userId)
         const receiver :User = await this.userService.findOne({id: userId});

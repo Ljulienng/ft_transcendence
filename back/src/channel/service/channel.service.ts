@@ -86,13 +86,17 @@ export class ChannelService {
 
     /* create channel */
    async createChannel(createChannel: CreateChannelDto, userId: number) {
+        const regex = /^[a-zA-Z0-9_]+$/
         const user = await this.userRepository.findOne({id: userId});
+
+        if (regex.test(createChannel.name) === false) {
+            throw new HttpException('Wrong format for chat name only underscore are allowed.', HttpStatus.FORBIDDEN);    
+        }
+        if (!createChannel.name || createChannel.name.length < 8 || createChannel.name.length > 20) {
+            throw new HttpException('chat name beetween 8 and 20 characters please', HttpStatus.FORBIDDEN); 
+        }
         if (!user) {
             throw new HttpException('user does not exist', HttpStatus.FORBIDDEN);
-        }
-
-        if (!createChannel.name) {
-            throw new HttpException('channel name cannot be null', HttpStatus.FORBIDDEN);
         }
 
         const isSameChatName = await this.channelRepository.findOne({name: createChannel.name});
@@ -113,8 +117,8 @@ export class ChannelService {
            if (!newChannel.password) {
                 throw new BadRequestException('need a password for protected channel');
            }
-           if (newChannel.password.length < 8) {
-                throw new HttpException('password too short', HttpStatus.FORBIDDEN);
+           if (newChannel.password.length < 8 || newChannel.password.length > 20) {
+                throw new HttpException('password beetween 8 and 20 characters please', HttpStatus.FORBIDDEN);
            }
             const saltOrRounds = await bcrypt.genSalt();
             newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);

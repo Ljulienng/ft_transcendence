@@ -92,11 +92,11 @@ export default defineComponent({
     });
 
     this.socket.on("/userJoined/" + this.currentUser.userName, (data: string) => {
-      this.show("channel", "You join the channel " + data, data, "CHANNEL", 'success');
+      this.show("channel", "You've joined the channel " + data, data, "CHANNEL", 'success');
     });
 
     this.socket.on("/userLeft/" + this.currentUser.userName, (data: string) => {
-      this.show("channel", "You left the channel " + data, data, "CHANNEL", 'success');
+      this.show("channel", "You've left the channel " + data, data, "CHANNEL", 'success');
     });
 
     this.socket.on("/invitationChannel/" + this.currentUser.userName, (data: string) => {
