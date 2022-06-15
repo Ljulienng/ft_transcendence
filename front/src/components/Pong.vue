@@ -12,10 +12,11 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/runtime-core'
-import io from 'socket.io-client'
+// import io from 'socket.io-client'
+import store from '../store'
 import PointI from '../types/interfaces/point.interface'
 import PongI from '../types/interfaces/pong.interface'
-
+/* eslint-disable */
 // TODO: fix paddle collision with canvas border (mouse/keyboard)
 // TODO: waiting for opponent animation
 // TODO: Countdown before game start
@@ -33,7 +34,8 @@ export default defineComponent({
   name: 'Pong',
   data() {
     return {
-      socket: io(),
+      socket: store.getters['auth/getUserSocket']
+,
       pong: {} as PongI,
       state: State.INIT,
       unsupportedMsg: 'Sorry, your browser does not support canvas.',
@@ -175,21 +177,18 @@ export default defineComponent({
     },
     onReady() {
       this.pausePage();
-      if (this.socket.connected == false) {
-        this.socket = io('localhost:3000/play', { withCredentials: true });
-      }
 
       this.socket.on('pause', () => { this.pausePage(); });
       this.socket.on('youWin', () => { this.winPage(); });
       this.socket.on('youLose', () => { this.losePage(); });
 
-      this.socket.on('start', async (isLeftSide: boolean, callback) => {
+      this.socket.on('start', async (isLeftSide: boolean, callback: any) => {
         callback('ok');
         this.state = State.PLAY;
         this.pong.playerLeft.y = this.pong.canvas.height / 2 - this.pong.playerSize.y / 2;
         this.pong.playerRight.y = this.pong.canvas.height / 2 - this.pong.playerSize.y / 2;
         this.pong.isLeftSide = isLeftSide;
-        this.socket.on('opponentMove', async (y: number, callback) => {
+        this.socket.on('opponentMove', async (y: number, callback: any) => {
           callback('ok');
           y = y / 66 * this.pong.canvas.height;
           await this.$nextTick();
@@ -199,12 +198,12 @@ export default defineComponent({
             this.pong.playerLeft.y = y;
           }
         });
-        this.socket.on('ballMove', (pos: PointI, callback) => {
+        this.socket.on('ballMove', (pos: PointI, callback: any) => {
           callback('ok');
           this.pong.ball.pos.x = pos.x / 100 * this.pong.canvas.width;
           this.pong.ball.pos.y = pos.y / 66 * this.pong.canvas.height;
         });
-        this.socket.on('updateScore', (score: PointI, callback) => {
+        this.socket.on('updateScore', (score: PointI, callback: any) => {
           callback('ok');
           this.pong.playerLeft.score = score.x;
           this.pong.playerRight.score = score.y;
@@ -239,7 +238,7 @@ export default defineComponent({
   async mounted() {
     await this.init();
     this.startPage();
-  }
+  },
 });
 </script>
 

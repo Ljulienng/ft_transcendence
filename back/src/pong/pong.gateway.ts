@@ -17,7 +17,7 @@ import { GameState } from './game';
 // TODO: stop game if both player are disconnected ?
 // TODO: save stats in db
 
-@WebSocketGateway({ namespace: 'play', path: '/play', cors: { origin: true, credentials: true } })
+@WebSocketGateway({cors: { origin: true, credentials: true } })
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer()

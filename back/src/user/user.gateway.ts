@@ -30,7 +30,6 @@ import { UserModule } from "./user.module";
 // }
 
 @WebSocketGateway({
-	namespace: '/user',
 	cors: {
 		origin: true,
 		credentials: true

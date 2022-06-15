@@ -35,7 +35,8 @@ const routes = [
 	{
 		name: 'Play',
 		path: '/play',
-		component: Pong
+		component: Pong,
+		meta: {requiredAuth: true}
 	},
 	{
 		name: 'AuthModal',
