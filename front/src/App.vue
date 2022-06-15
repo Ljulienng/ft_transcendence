@@ -5,7 +5,10 @@
       v-if="getUserProfile.firstTime === true"
       v-bind:currentUser="getUserProfile"
     />
-    <Notification v-if="getUserProfile.id !== 0" v-bind:currentUser="getUserProfile"/>
+    <Notification
+      v-if="getUserProfile.id !== 0"
+      v-bind:currentUser="getUserProfile"
+    />
     <router-view />
     <!-- <teleport :to="someVar" v-if="someVar"> -->
     <div id="my-modals" />
@@ -41,7 +44,7 @@ export default defineComponent({
 
       if (!userSocket) store.dispatch("auth/setUserSocket");
       store.dispatch("auth/setUserStatus", "Offline");
-    }
+    },
   },
 
   async beforeCreate() {
@@ -57,17 +60,19 @@ export default defineComponent({
     // const user = store.getters["auth/getUserProfile"];
     if (userProfile.id !== 0) {
       const socket = store.getters["auth/getUserSocket"];
-      socket.on('moveToMatch', () => {console.log('MATCH'); this.$router.push("/play");})
-
+      socket.on("moveToMatch", () => {
+        console.log("MATCH");
+        this.$router.push("/play");
+      });
     }
-
 
     // if (user.id) await store.dispatch("auth/setUserStatus", "Online");
   },
 
   created() {
-    console.log('created')
-    window.addEventListener("beforeunload", this.setOffline);
+    console.log("created");
+    if (store.getters["auth/getUserProfile"].id !== 0)
+      window.addEventListener("beforeunload", this.setOffline);
     // if (this.getUserProfile.status === "Offline") store.dispatch("auth/setUserStatus", "Online");
     // console.log('user status', store.getters["auth/getUserProfile"].status)
   },

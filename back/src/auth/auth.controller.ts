@@ -77,9 +77,12 @@ export class AuthController {
     try {
     const user = await this.userService.findByUsername(req.user.username);
 
+    if (!user)
+      throw new UnauthorizedException("Not authorized")
+
 		return user;
 	  } catch (e) {
-		  throw new UnauthorizedException(e);
+		  throw e;
 	  }
   }
 
