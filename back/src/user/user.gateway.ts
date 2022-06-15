@@ -156,7 +156,22 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
         this.server.emit("/userJoined/channel/" + joinChannel.id);
-    } 
+        this.server.emit("/userJoined/" + user.username, (await this.channelService.findChannelById(joinChannel.id)).name);
+    }
+
+    // @UseGuards(JwtAuthGuard, TwoFAAuth)
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('leaveChannel') 
+    async leaveChannel(client: Socket, channelId: number) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+
+        await this.channelService.deleteChannelMember(channelId, user.id);
+        this.server.emit("updateChannel", await this.channelService.findAll());
+        this.server.to(String(channelId)).emit("updateMembersJoinedChannels");
+        client.leave(String(channelId));
+        this.server.emit("/userLeft/channel/" + channelId);
+        this.server.emit("/userLeft/" + user.username, (await this.channelService.findChannelById(channelId)).name);
+    }
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('inviteInPrivateChannel')
@@ -167,6 +182,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const guestSocket = (this.socketList.find(s => s.user.id === guest.id )).socket;
         guestSocket.join(String(invitation.channelId));
         this.server.to(guestSocket.id).emit("updateJoinedChannel", await this.userService.joinedChannel(guest));
+        this.server.emit("/invitationChannel/" + guest.username, (await this.channelService.findChannelById(invitation.channelId)).name);
     }
 
     @UseGuards(SocketGuard)
@@ -207,26 +223,13 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.to(userToUpdateSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToUpdate, channel));
         this.server.emit('messageUpdate');
         this.server.emit("/userUpdated/channel/" + channel.id);
+        this.server.emit("/muteorban/" + userToUpdate.username, (await this.channelService.findChannelById(channel.id)).name);
     }
     
     @OnEvent('unmutedOrUnbannedMember')
     sendDataToFront() {
-        console.log("On event unmutedOrUnbannedMember");
+        // console.log("On event unmutedOrUnbannedMember");
         this.server.emit("/userUpdated/channel/");
-
-    }
-
-    // @UseGuards(JwtAuthGuard, TwoFAAuth)
-    @UseGuards(SocketGuard)
-    @SubscribeMessage('leaveChannel') 
-    async leaveChannel(client: Socket, channelId: number) {
-        const user = this.socketList.find(socket => socket.socketId === client.id).user
-
-        await this.channelService.deleteChannelMember(channelId, user.id);
-        this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.to(String(channelId)).emit("updateMembersJoinedChannels");
-        client.leave(String(channelId));
-        this.server.emit("/userLeft/channel/" + channelId);
     }
 
     @UseGuards(SocketGuard)

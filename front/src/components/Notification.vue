@@ -54,7 +54,7 @@ export default defineComponent({
     };
   },
   methods: {
-    show(group: string, text: string, data = null, title = "", type = "") {
+    show(group: string, text: string, data = null as any, title = "", type = "") {
       console.log(group, text, data, title, type)
       this.$notify({
         group,
@@ -89,6 +89,22 @@ export default defineComponent({
 
     this.socket.on("/friendDeleted/" + this.currentUser.userName, (data: string) => {
       this.show("friend", data + " deleted you from his friendlist..", data, "FRIENDS", 'warn');
+    });
+
+    this.socket.on("/userJoined/" + this.currentUser.userName, (data: string) => {
+      this.show("channel", "You join the channel " + data, data, "CHANNEL", 'success');
+    });
+
+    this.socket.on("/userLeft/" + this.currentUser.userName, (data: string) => {
+      this.show("channel", "You left the channel " + data, data, "CHANNEL", 'success');
+    });
+
+    this.socket.on("/invitationChannel/" + this.currentUser.userName, (data: string) => {
+      this.show("channel", "You've been added to the private channel " + data, data, "CHANNEL", 'success');
+    });
+
+    this.socket.on("/muteorban/" + this.currentUser.userName, (data: string) => {
+      this.show("channel", "The administrators have changed your status in the channel " + data, data, "CHANNEL", 'warn');
     });
   }
 });
