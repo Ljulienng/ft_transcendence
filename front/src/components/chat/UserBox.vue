@@ -1,8 +1,10 @@
 <template>
-  <div class="d-flex align-items-center">
-    <img :src="this.image" class="small_profile_avatar" />
-    <p class="mx-3">{{ userInfo.username }}</p>
-  </div>
+
+    <div class="d-flex align-items-center" v-if="!isSelected">
+      <img :src="this.image" class="small_profile_avatar" />
+      <p class="mx-3">{{ userInfo.username }}</p>
+    </div>
+
 </template>
 
 <script lang="ts">

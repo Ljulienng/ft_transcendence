@@ -104,7 +104,7 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   height: 100vh;
-  overflow: hidden;
+  // overflow-y: scroll;
 }
 button {
   cursor: pointer;

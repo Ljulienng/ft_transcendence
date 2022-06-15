@@ -1,7 +1,7 @@
 <template>
   <div class="chatBox h-100">
 
-    <div class="container-fluid" style="height: 90%; overflow-y: scroll;">
+    <div class="container-fluid" style="height: 90%; overflow-y: scroll; overflow-x: hidden;">
       <p v-for="msg in messageList.slice()" :key="msg">
         <!-- {{ msg.sender.username }}: {{ msg.content }} -->
         <Message
