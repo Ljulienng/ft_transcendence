@@ -41,15 +41,7 @@ export default defineComponent({
 
       if (!userSocket) store.dispatch("auth/setUserSocket");
       store.dispatch("auth/setUserStatus", "Offline");
-      http
-        .post("/users/setstatus", { newStatus: "Offline" })
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
+    }
   },
 
   async beforeCreate() {

@@ -102,21 +102,12 @@
             v-bind:socket="socket"
             v-bind:channelId="channelId"
           />
-          <!-- 
-          <button
-            @click="ban(member.user.username)"
-            class="btn-secondary"
-            v-if="!member.admin && !member.banned"
-          >
-            Ban
-          </button>
-          <button
-            @click="unban(member.user.username)"
-            class="btn-secondary"
-            v-if="!member.admin && member.banned"
-          >
-            Unban
-          </button> -->
+          <BanMuteModal
+            v-bind:context="'ban'"
+            v-bind:member="member"
+            v-bind:socket="socket"
+            v-bind:channelId="channelId"
+          />
         </template>
         <template v-if="member.admin">(admin)</template>
         <template v-if="member.muted">(muted)</template>

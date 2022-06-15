@@ -53,12 +53,10 @@ export default defineComponent({
 
   methods: {
     async getFriendList() {
-      try {
-        const response = await http.get("/users/friendlist");
-        this.friendList = response.data;
-      } catch (e) {
-        console.log(e);
-      }
+        const response = await http.get("/users/friendlist").catch(() =>{console.log('')});
+        if (response)
+          this.friendList = response.data;
+
     },
 
     blockUser(userToBlock: number) {

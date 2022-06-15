@@ -10,7 +10,7 @@
       <i style="color: #fff774" class="material-icons">border_color</i>
     </a>
 
-    <form v-on:submit.prevent="sendForm">
+    <form class="form-floating" v-on:submit.prevent="sendForm">
       <div
         class="modal fade"
         id="usernameModal"
@@ -32,14 +32,17 @@
               ></button>
             </div>
             <div class="modal-body">
-              <label for="username">Username</label>
-              <br />
+              <div class="form-floating">
+
               <input
                 id="username"
                 v-model="usernameToSet.username"
                 type="text"
                 username="username"
+                class="form-control"
               />
+              <label for="username">Username</label>
+              </div>
               <p v-if="errorMsg !== ''" style="color: red">{{ errorMsg }}</p>
             </div>
             <div class="modal-footer">

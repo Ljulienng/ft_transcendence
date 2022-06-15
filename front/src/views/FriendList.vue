@@ -117,15 +117,12 @@ export default defineComponent({
   },
 
   methods: {
-    async getFriendList() {
-      try {
-        const response = await http.get("/users/friendlist");
-        this.friendList = response.data;
-        this.updateComp++;
-      } catch (e) {
-        console.log(e);
-      }
-    },
+    // async getFriendList() {
+    //     const response = await http.get("/users/friendlist").catch(() =>{console.log('rien')});
+    //     this.friendList = response.data;
+    //     this.updateComp++;
+
+    // },
 
     async addFriend() {
       this.socket.emit("addFriend", this.friendToAdd);
@@ -154,9 +151,9 @@ export default defineComponent({
     });
   },
 
-  created() {
-    this.getFriendList();
-  },
+  // created() {
+  //   this.getFriendList();
+  // },
 });
 </script>
 
