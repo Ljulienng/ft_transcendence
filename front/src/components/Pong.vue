@@ -33,8 +33,7 @@ export default defineComponent({
   name: 'Pong',
   data() {
     return {
-      socket: store.getters['auth/getUserSocket']
-,
+      socket: store.getters['auth/getUserSocket'],
       pong: {} as PongI,
       state: State.INIT,
       unsupportedMsg: 'Sorry, your browser does not support canvas.',
@@ -248,9 +247,6 @@ export default defineComponent({
     }
   },
   async mounted() {
-    if (this.socket.connected == false) {
-      this.socket = io('localhost:3000/play', { withCredentials: true});
-    }
     await this.init();
     if (this.$route.name == 'Play') {
       this.isPlayer = true;
@@ -262,16 +258,7 @@ export default defineComponent({
   },
   beforeUnmount() {
     this.socket.emit('playerLeave');
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  },
- 
-=======
-  }
->>>>>>> Stashed changes
-=======
-  }
->>>>>>> Stashed changes
+  } 
 });
 </script>
 
