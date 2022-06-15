@@ -54,7 +54,8 @@ export default defineComponent({
     };
   },
   methods: {
-    show(group: string, text: string, data = null, title = "", type = "") {
+    // eslint-disable-next-line
+    show(group: string, text: string, data = null as any, title = "", type = "") {
       console.log(group, text, data, title, type)
       this.$notify({
         group,

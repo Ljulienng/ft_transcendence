@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <template v-if="context === 'mute'"> -->
+    <template v-if="context === 'mute'">
     <button
       type="button"
       class="btn btn-secondary"
@@ -11,13 +11,13 @@
     </button>
 
     <button
-      @click="unmute()"
+      @click="unmute"
       class="btn-secondary"
       v-if="!member.admin && member.muted"
     >
       Unmute
     </button>
-    <!-- <form v-on:submit="mute()"> -->
+    <form v-on:submit.prevent="mute">
     <div
       class="modal fade"
       id="mutemodal"
@@ -26,7 +26,7 @@
       aria-labelledby="mutemodal"
       aria-hidden="true"
     >
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-sm">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="mutemodal">Mute timer</h5>
@@ -57,8 +57,9 @@
             </button>
             <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
             <button
-              type="submit"
               class="btn btn-primary"
+              value="submit"
+              type="submit"
               data-bs-dismiss="modal"
             >
               Mute
@@ -67,8 +68,8 @@
         </div>
       </div>
     </div>
-    <!-- </form> -->
-    <!-- </template> -->
+    </form>
+    </template>
   </div>
 </template>
 
@@ -112,7 +113,7 @@ export default defineComponent({
     },
 
     mute() {
-      console.log("test to mute for 1 minutes");
+      console.log("test to mute for", this.timeToMute, "minutes");
       const timeToMute = this.timeToMute; // TEST
       const update = {
         channelId: this.channelId,
@@ -136,6 +137,10 @@ export default defineComponent({
       this.modal = new Modal(this.$refs.mutemodal as any);
       this.modal.show();
     },
+
+    closeModal() {
+      this.modal.close()
+    }
   },
 
   //   created() {
