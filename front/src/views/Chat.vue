@@ -12,7 +12,10 @@
                     <ChatTests @conv="getConv"/>
                 </div>
             </div>
-            <div class="col-7 colorbox h-100">
+            <div class="col-7 colorbox h-100" v-if="this.convToShow === 0">
+                Select a conversation
+            </div>
+            <div class="col-7 colorbox h-100" v-if="this.convToShow > 0">
                 <PrivateChatBox
                     v-bind:receiverId="this.convToShow"
                     :is="true"
