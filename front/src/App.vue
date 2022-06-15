@@ -1,16 +1,15 @@
 <template>
   <div class="app">
-    <!-- <Notifications
-		group="foo-css"
-		position="bottom left"
-		:speed="500"
-	/> -->
     <Sidebar />
-    <FirstTimeModal v-if="getUserProfile.firstTime === true" v-bind:currentUser="getUserProfile"/>
+    <FirstTimeModal
+      v-if="getUserProfile.firstTime === true"
+      v-bind:currentUser="getUserProfile"
+    />
+    <Notification v-if="getUserProfile.id !== 0" v-bind:currentUser="getUserProfile"/>
     <router-view />
     <!-- <teleport :to="someVar" v-if="someVar"> -->
-    <div id="my-modals"/>
-      <!-- <MyModal /> -->
+    <div id="my-modals" />
+    <!-- <MyModal /> -->
   </div>
 </template>
 
@@ -19,12 +18,12 @@ import { defineComponent } from "@vue/runtime-core";
 import http from "./http-common";
 import store from "./store";
 import router from "./router";
-import FirstTimeModal from "./components/auth/FirstTimeModal.vue"
+import FirstTimeModal from "./components/auth/FirstTimeModal.vue";
+import Notification from "./components/Notification.vue";
 
 import { mapGetters } from "vuex";
 
 export default defineComponent({
-  
   computed: {
     ...mapGetters("auth", {
       getUserProfile: "getUserProfile",
@@ -32,23 +31,11 @@ export default defineComponent({
   },
 
   components: {
-    FirstTimeModal
+    FirstTimeModal,
+    Notification,
   },
+
   methods: {
-    async checkUserstatus() {
-      let userProfile = store.getters["auth/getUserProfile"];
-
-      if (userProfile.id === 0) {
-        await store.dispatch("auth/userProfile");
-        userProfile = store.getters["auth/getUserProfile"];
-      }
-
-      if (userProfile.id === 0) router.push("http://localhost:3001/authmodal");
-      const userId = store.getters["auth/getUserProfile"].id;
-
-      if (userId) await store.dispatch("auth/setUserStatus", "Online");
-    },
-
     setOffline() {
       const userSocket = store.getters["auth/getUserSocket"].id;
 
@@ -75,13 +62,16 @@ export default defineComponent({
     }
 
     if (userProfile.id === 0) router.push("http://localhost:3001/authmodal");
-    const userId = store.getters["auth/getUserProfile"].id;
+    // const user = store.getters["auth/getUserProfile"];
 
-    if (userId) await store.dispatch("auth/setUserStatus", "Online");
+    // console.log('test = ', user);
+    // if (user.id) await store.dispatch("auth/setUserStatus", "Online");
   },
 
   created() {
     window.addEventListener("beforeunload", this.setOffline);
+    // if (this.getUserProfile.status === "Offline") store.dispatch("auth/setUserStatus", "Online");
+    // console.log('user status', store.getters["auth/getUserProfile"].status)
   },
 });
 </script>
@@ -89,9 +79,8 @@ export default defineComponent({
 <script></script>
 
 <style lang="scss">
-
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
-@import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Orbitron&display=swap");
 
 :root {
   --primary: #fff774;
@@ -114,7 +103,8 @@ body {
   background-image: url("~@/assets/background.jpg");
   background-repeat: no-repeat;
   background-size: cover;
-  height: 100vh
+  height: 100vh;
+  overflow: hidden;
 }
 button {
   cursor: pointer;
@@ -134,13 +124,13 @@ button {
     }
   }
 
-$primary: #fff774;
-@import "bootstrap";
+  $primary: #fff774;
+  @import "bootstrap";
 
-h1 {
+  h1 {
     color: #fff774;
     font-size: 125px;
-    font-family: 'Inter';
-}
+    font-family: "Inter";
+  }
 }
 </style>

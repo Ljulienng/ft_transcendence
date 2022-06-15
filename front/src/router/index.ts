@@ -107,6 +107,8 @@ router.beforeEach(async (to, from, next) => {
         return next({ path: "/authmodal" });
       }
       else {
+		store.dispatch("auth/setUserStatus", "Online");
+
         if (userProfile.twoFAEnabled === true) {
           let TwoFAauth = store.getters["auth/getTwoFAauth"];
 

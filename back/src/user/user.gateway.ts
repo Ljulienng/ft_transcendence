@@ -80,6 +80,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 		console.log('user:', user.username, 'is connected');
 		this.userService.setStatus(user, 'Online');
+        this.server.to(client.id).emit("Connected");
         this.socketList.forEach(async (socket) => {
             if(await this.userService.checkIfFriend(user.id, socket.user.id))                
                 this.server.to(socket.socketId).emit("friendConnected");
@@ -192,7 +193,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
         await this.channelService.deleteChannelMember(member.channelId, userToKick.id);
         this.server.emit("/memberKicked/channel/" + member.channelId);
-        this.server.emit("/userKicked/" + member.username);
+        this.server.emit("/userKicked/" + member.username, (await this.channelService.findChannelById(member.channelId)).name);
     }
 
     @UseGuards(SocketGuard)
@@ -272,10 +273,13 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	@UseGuards(SocketGuard)
     @SubscribeMessage('getUserMsg')
     async getUserMsg(client: Socket, userId: number) {
-        const sender :User = await this.socketList.find(socket => socket.socketId === client.id).user
+        console.log("getUserMsg = ", client.id)
+        const sender :User = this.socketList?.find(socket => socket.socketId === client.id).user
         // console.log("getUserMsg = ", userId)
         const receiver :User = await this.userService.findOne({id: userId});
         // console.log(sender.username ,'wants the msgs from ', userId);
+        console.log("sender = ", sender.id)
+        console.log("receiver = ", receiver.id)
         const messages = await this.userService.getMessage(sender.id, receiver.id)
 
         this.server.emit('getUserMessages' + receiver.id, messages)
@@ -327,12 +331,21 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     /* ============= FRIEND USER ============*/
     @UseGuards(SocketGuard)
     @SubscribeMessage('addFriend') 
-    async addFriend(client: Socket, userId: string) {
+    async addFriend(client: Socket, userId: any) {
         const user :User = this.socketList.find(socket => socket.socketId === client.id).user;
         
         await this.userService.addFriend(user, userId);
         this.server.to(client.id).emit('friendAdded');
+        this.server.emit('/friendAdded/' + userId.friendUsername, user.username)
     }
 
-
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('deleteFriend') 
+    async deleteFriend(client: Socket, userToDelete: string) {
+        const user :User = this.socketList.find(socket => socket.socketId === client.id).user;
+        
+        await this.userService.deleteFriend(user, userToDelete);
+        this.server.to(client.id).emit('friendDeleted');
+        this.server.emit('/friendDeleted/' + userToDelete, user.username)
+    }
 }

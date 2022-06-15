@@ -141,6 +141,10 @@ export default defineComponent({
       this.getFriendList();
     });
 
+    this.socket.on("friendDeleted", () => {
+      this.getFriendList();
+    });
+
     this.socket.on("friendConnected", () => {
       this.getFriendList();
     });
