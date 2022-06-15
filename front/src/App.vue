@@ -55,9 +55,9 @@ export default defineComponent({
 
     if (userProfile.id === 0) router.push("http://localhost:3001/authmodal");
     // const user = store.getters["auth/getUserProfile"];
-    if (userProfile.id === 0) {
+    if (userProfile.id !== 0) {
       const socket = store.getters["auth/getUserSocket"];
-      socket.on('moveToMatch', () => {console.log('MATCH')})
+      socket.on('moveToMatch', () => {console.log('MATCH'); this.$router.push("/play");})
 
     }
 
