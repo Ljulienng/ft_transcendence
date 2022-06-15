@@ -1,9 +1,8 @@
 <template lang="html">
   <div class="container">
-    <!-- <h1>Pong</h1> -->
+    <h1>Pong</h1>
     <div class="board" ref="board">
-      <canvas id="canvas" ref="canvas" tabindex="0" :width="width" :height="height" @click.once="onReady"
-        @mousemove="onMove" @keydown="onMove">
+      <canvas id="canvas" ref="canvas" tabindex="0" :width="width" :height="height" @click.once="onReady" @mousemove="onMove" @keydown="onMove">
         {{ unsupportedMsg }}
       </canvas>
     </div>
@@ -12,15 +11,15 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/runtime-core'
-import io from 'socket.io-client'
+// import io from 'socket.io-client'
+import store from '../store'
 import PointI from '../types/interfaces/point.interface'
 import PongI from '../types/interfaces/pong.interface'
 
-// TODO: fix paddle collision with canvas border (mouse/keyboard)
+/* eslint-disable */
 // TODO: waiting for opponent animation
 // TODO: Countdown before game start
 // TODO: menu for 'win by forfait'
-// TODO: event beforeUnload should emit disconnect
 
 const State = {
   INIT: 0,
@@ -34,12 +33,14 @@ export default defineComponent({
   name: 'Pong',
   data() {
     return {
-      socket: io(),
+      socket: store.getters['auth/getUserSocket']
+,
       pong: {} as PongI,
       state: State.INIT,
       unsupportedMsg: 'Sorry, your browser does not support canvas.',
       width: 640,
-      height: 480
+      height: 480,
+      isPlayer: false
     };
   },
   methods: {
@@ -105,7 +106,7 @@ export default defineComponent({
       this.pong.context.font = '40px Orbitron';
       this.pong.context.fillText('Waiting for opponent...', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
     },
-    draw() {
+    draw(): void {
       switch (this.state) {
         case State.INIT:
           return this.startPage();
@@ -138,6 +139,7 @@ export default defineComponent({
       // Draw playerLeft
       this.pong.context.fillStyle = 'lightgrey';
       this.pong.context.fillRect(0, this.pong.playerLeft.y, this.pong.playerSize.x, this.pong.playerSize.y);
+
       // Draw playerRight
       this.pong.context.fillStyle = 'lightgrey';
       this.pong.context.fillRect(this.pong.canvas.width - this.pong.playerSize.x, this.pong.playerRight.y, this.pong.playerSize.x, this.pong.playerSize.y);
@@ -149,7 +151,7 @@ export default defineComponent({
       this.pong.context.fill();
     },
     onMove(e: Event) {
-      if (this.state != State.PLAY)
+      if (this.state != State.PLAY || !this.isPlayer)
         return;
       const playerToMove = this.pong.isLeftSide ? this.pong.playerLeft : this.pong.playerRight;
       if (e.type == 'mousemove') {
@@ -174,29 +176,32 @@ export default defineComponent({
       if (playerToMove.y < 0) {
         playerToMove.y = 0;
       }
-       if (playerToMove.y > this.pong.canvas.height - this.pong.playerSize.y) {
+      if (playerToMove.y > this.pong.canvas.height - this.pong.playerSize.y) {
         playerToMove.y = this.pong.canvas.height - this.pong.playerSize.y;
       }
       this.draw();
       this.socket.emit('playerMove', { x: playerToMove.y, y: this.pong.canvas.height });
     },
     onReady() {
+      console.log('onReady called !');
       this.pausePage();
-      if (this.socket.connected == false) {
-        this.socket = io('localhost:3000/play', { withCredentials: true });
+
+      if (this.isPlayer == true) {
+        this.socket.emit('playerJoin');
       }
 
+      // TODO: send connect
       this.socket.on('pause', () => { this.pausePage(); });
       this.socket.on('youWin', () => { this.winPage(); });
       this.socket.on('youLose', () => { this.losePage(); });
 
-      this.socket.on('start', async (isLeftSide: boolean, callback) => {
+      this.socket.on('start', async (isLeftSide: boolean, callback: any) => {
         callback('ok');
         this.state = State.PLAY;
         this.pong.playerLeft.y = this.pong.canvas.height / 2 - this.pong.playerSize.y / 2;
         this.pong.playerRight.y = this.pong.canvas.height / 2 - this.pong.playerSize.y / 2;
         this.pong.isLeftSide = isLeftSide;
-        this.socket.on('opponentMove', async (y: number, callback) => {
+        this.socket.on('opponentMove', async (y: number, callback: any) => {
           callback('ok');
           y = y / 66 * this.pong.canvas.height;
           await this.$nextTick();
@@ -206,12 +211,12 @@ export default defineComponent({
             this.pong.playerLeft.y = y;
           }
         });
-        this.socket.on('ballMove', (pos: PointI, callback) => {
+        this.socket.on('ballMove', (pos: PointI, callback: any) => {
           callback('ok');
           this.pong.ball.pos.x = pos.x / 100 * this.pong.canvas.width;
           this.pong.ball.pos.y = pos.y / 66 * this.pong.canvas.height;
         });
-        this.socket.on('updateScore', (score: PointI, callback) => {
+        this.socket.on('updateScore', (score: PointI, callback: any) => {
           callback('ok');
           this.pong.playerLeft.score = score.x;
           this.pong.playerRight.score = score.y;
@@ -219,7 +224,6 @@ export default defineComponent({
         await this.$nextTick();
         this.play();
       });
-
       // TODO: countdown before game start
     },
     play() {
@@ -244,13 +248,30 @@ export default defineComponent({
     }
   },
   async mounted() {
+    if (this.socket.connected == false) {
+      this.socket = io('localhost:3000/play', { withCredentials: true});
+    }
     await this.init();
+    if (this.$route.name == 'Play') {
+      this.isPlayer = true;
+    } else if (this.$route.name == 'Spectate') {
+      this.isPlayer = false;
+      this.state = State.PLAY;
+    }
     this.startPage();
   },
   beforeUnmount() {
-      this.socket.emit('playerLeave');
-    },
+    this.socket.emit('playerLeave');
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+  },
  
+=======
+  }
+>>>>>>> Stashed changes
+=======
+  }
+>>>>>>> Stashed changes
 });
 </script>
 
@@ -261,7 +282,7 @@ export default defineComponent({
 
 .board {
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 155px);
 }
 
 #canvas {

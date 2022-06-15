@@ -71,6 +71,11 @@ export class ChannelService {
         return await this.channelMemberService.findAdmins(channel);
     }
 
+    async   findMutedAndBanned(channelId: number): Promise<ChannelMember[]> {
+        const channel = await this.findChannelById(channelId);
+        return await this.channelMemberService.findMutedAndBanned(channel);
+    }
+    
     /* get channels where user = owner */
     async   findChannelsWhereUserIsOwner(user: User) {
         return await this.channelRepository.find({
@@ -302,7 +307,6 @@ export class ChannelService {
         if (!channel) {
             throw new NotFoundException();
         }
-        console.log("member:", channelMember);
         if (!channelMember.owner) {
             throw new HttpException('only the owner can delete channels', HttpStatus.FORBIDDEN);
         }
@@ -316,13 +320,6 @@ export class ChannelService {
     /*
     ** the  user wants to update element(s) of a channel member (ban, mute)
     */
-    // async updateChannelMember(userId: number, memberId: number, channelId: number, updates: UpdateMemberChannelDto) {
-    //     const userWhoUpdate = await this.userRepository.findOne({id: userId});
-    //     const userToUpdate = await this.userRepository.findOne({id: memberId});
-    //     const channel = await this.findChannelById(channelId);
-    //     return await this.channelMemberService.updateMember(userWhoUpdate, userToUpdate, channel, updates);
-    // }
-
     async updateMember(owner: User, update: UpdateMemberChannelDto) {
         const userToUpdate = await this.userRepository.findOne({username: update.username});
         const channel = await this.findChannelById(update.channelId);
@@ -347,9 +344,9 @@ export class ChannelService {
     ** get all the messages of a channel
     ** returns most recent last
     */
-    async findChannelMessagesByChannelName(channelName: string) {
+    async findChannelMessagesByChannelName(user: User, channelName: string) {
         const channel = await this.findChannelByName(channelName);
-        const messages = await this.messageService.findMessagesByChannel(channel);
+        const messages = await this.messageService.findMessagesByChannel(user, channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
 
@@ -357,11 +354,11 @@ export class ChannelService {
     ** get all the messages of a channel
     ** returns most recent last
     */
-    async findChannelMessagesByChannelId(channelId: number) {
-        const channel = await this.findChannelById(channelId);
-        const messages = await this.messageService.findMessagesByChannel(channel);
-        return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
-    }
+    // async findChannelMessagesByChannelId(channelId: number) {
+    //     const channel = await this.findChannelById(channelId);
+    //     const messages = await this.messageService.findMessagesByChannel(channel);
+    //     return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
+    // }
 
     async saveMessage(userId: number, createMessageDto: CreateMessageDto) {
         const user = await this.userRepository.findOne({id: userId});

@@ -6,6 +6,7 @@ import { Event } from './event';
 import { Repository } from 'typeorm';
 import { Match } from './models/match.entity';
 import { User } from 'src/user/models/user.entity';
+import { Spectator } from './interfaces/spectator.interface';
 
 export const WIDTH = 100;
 export const HEIGHT = 66;
@@ -24,11 +25,13 @@ export class Game {
   public state: GameState;
   public name: string;
   private id: number;
+  public spectators: Spectator[];
+  public spectatorRoom: string;
 
   constructor(
     private userRepository: Repository<User>,
     private matchRepository: Repository<Match>,
-    private event: Event,
+    public event: Event,
     private ball: Ball,
     public playerLeft: Player,
     public playerRight: Player,
@@ -36,9 +39,11 @@ export class Game {
     this.state = GameState.PLAY;
     this.name = 'game_' + playerLeft.user.id + '_' + playerRight.user.id;
     this.id = null;
+    this.spectators = [];
+    this.spectatorRoom = 'spec_' + playerLeft.user.id + '_' + playerRight.user.id;
     this.playerLeft.socket.join(this.name);
     this.playerRight.socket.join(this.name);
-    this.start()
+    this.start();
   }
 
   async saveUser(userId: number, status: string, won: boolean, lost: boolean, points: number) {
@@ -136,7 +141,7 @@ export class Game {
     this.event.emitYouWin(winner.socket.id);
     this.event.emitYouLose(opponent.socket.id);
     await this.saveMatch(winner.user, opponent.user, false);
-    await this.saveUser(winner.user.id, 'Online', true, false, this.winScore);  // TODO: the winner wins this.winScore point
+    await this.saveUser(winner.user.id, 'Online', true, false, winner.score); // the winner wins his goals as points
     await this.saveUser(opponent.user.id, 'Online', false, true, null);
     winner.socket.leave(this.name);
     opponent.socket.leave(this.name);
@@ -145,7 +150,6 @@ export class Game {
   }
 
   async sendStart() {
-    // TODO: update user status
     if (await this.event.emitStart(this.playerLeft.socket.id, true) != 'ok') {
       this.playerLeft.disconnect()
       this.setState(GameState.PAUSE);
@@ -194,5 +198,10 @@ export class Game {
       return;
     }
     this.state = state;
+  }
+
+  connectSpectator(spectator: Spectator) {
+    this.spectators.push(spectator);
+    spectator.socket.join(this.spectatorRoom);
   }
 }

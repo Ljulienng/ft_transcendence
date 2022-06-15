@@ -24,6 +24,11 @@ export class PongService {
     this.waitingPlayers = [];
   }
 
+  duel(event: Event, playerLeft: Player, playerRight: Player) { // TODO: test
+    const ball = new Ball(event);
+    this.games.push(new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, 5)); // TODO: dynamic winScore
+  }
+
   matchmake(event: Event, playerLeft: Player) {
     // TODO: smarter matchmaking
     if (!this.waitingPlayers.length) {

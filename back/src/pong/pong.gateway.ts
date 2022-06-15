@@ -1,6 +1,4 @@
 import {
-  OnGatewayConnection,
-  OnGatewayDisconnect,
   OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
@@ -13,12 +11,12 @@ import { Point } from './interfaces/point.interface';
 import { PongService } from './pong.service';
 import { Player } from './player';
 import { GameState } from './game';
+import { Spectator } from './interfaces/spectator.interface';
 
 // TODO: stop game if both player are disconnected ?
-// TODO: save stats in db
 
-@WebSocketGateway({ namespace: 'play', path: '/play', cors: { origin: true, credentials: true } })
-export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+@WebSocketGateway({cors: { origin: true, credentials: true } })
+export class PongGateway implements OnGatewayInit {
 
   @WebSocketServer()
   private server: Server;
@@ -32,7 +30,8 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.server = server;
   }
 
-  async handleConnection(client: Socket) {
+  @SubscribeMessage('playerJoin') // TODO: test
+  async playerJoin(client: Socket) {
     this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
     const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
     const game = this.pongService.findGame(user.id);
@@ -40,24 +39,41 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       game.reconnectPlayer(user.id, client);
       return;
     }
-
     const event = new Event(this.server);
     const player = new Player(event, client, user);
     this.pongService.matchmake(event, player);
   }
 
-  async handleDisconnect(client: Socket) {
+  @SubscribeMessage('duel') // TODO: test
+  async duel(client: Socket, userRightId: number) {
+    this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
+    const event = new Event(this.server);
+    const userLeft = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
+    const playerLeft = new Player(event, client, userLeft);
+    const userRight = await this.userService.findOne({id: userRightId});
+    const playerRight = new Player(event, null, userRight);
+    this.pongService.duel(event, playerLeft, playerRight);
+  }
+
+  @SubscribeMessage('playerLeave')
+  async playerLeave(client: Socket) {
     const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
     const game = this.pongService.findGame(user.id);
     if (game) {
-      game.disconnectPlayer(user.id);
+      const spectator = game.spectators.find(e => e.user.id == user.id);
+      if (spectator) {
+        spectator.socket.leave(game.spectatorRoom);
+        game.spectators.filter(e => e.user.id != user.id);
+      } else {
+        game.disconnectPlayer(user.id);
+      }
     } else {
       this.pongService.waitingPlayers.filter(e => e.user.id != user.id);
     }
   }
 
   @SubscribeMessage('playerMove')
-  async movePaddle(client: Socket, data: Point) {
+  async playerMove(client: Socket, data: Point) {
     const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
     const game = this.pongService.findGame(user.id);
     const player = game.findPlayer(user.id);
@@ -65,8 +81,20 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     game.setState(await player.move(opponent, data.x, data.y));
   }
 
-  @SubscribeMessage('playerLeave')
-  async disconnect(client: Socket) {
-    this.handleDisconnect(client);
+  @SubscribeMessage('spectate') // TODO: test
+  async spectate(client: Socket, userId: number) {
+    this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
+    const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
+    const game = this.pongService.findGame(userId);
+    if (game == null) {
+      // TODO: this player is not in a game
+      console.error('Cannot spectate because this player is not in a game.')
+      return ;
+    }
+    const spectator: Spectator = {
+      socket: client,
+      user: user
+    };
+    game.connectSpectator(spectator);
   }
 }

@@ -14,7 +14,7 @@ import PublicUserProfile from '@/views/PublicUserProfile.vue'
 
 const routes = [
 
-  {
+	{
 		path: "/:catchAll(.*)",
 		name: "NotFound",
 		component: NotFound,
@@ -35,6 +35,17 @@ const routes = [
 	{
 		name: 'Play',
 		path: '/play',
+		component: Pong,
+		meta: {requiredAuth: true}
+	},
+	{
+		name: 'Spectate',
+		path: '/spectate',
+		component: Pong
+	},
+	{
+		name: 'Spectate',
+		path: '/spectate',
 		component: Pong
 	},
 	{
@@ -107,6 +118,8 @@ router.beforeEach(async (to, from, next) => {
         return next({ path: "/authmodal" });
       }
       else {
+		store.dispatch("auth/setUserStatus", "Online");
+
         if (userProfile.twoFAEnabled === true) {
           let TwoFAauth = store.getters["auth/getTwoFAauth"];
 

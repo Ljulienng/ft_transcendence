@@ -191,7 +191,7 @@ aside {
 		}
 	}
 	@media (max-width: 1024px) {
-		position: absolute;
+		// position: absolute;
 		z-index: 99;
 	}
 }

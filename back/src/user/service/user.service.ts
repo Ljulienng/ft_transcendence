@@ -217,7 +217,6 @@ export class UserService {
 		const friend = await this.userRepository.findOne({username: friendToDelete});
 
 
-		console.log("deletefRiend username = ", user.friends ,friendToDelete)
 		if (!friend) {
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'This user doesn\'t exist');
 		}

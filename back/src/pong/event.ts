@@ -7,10 +7,9 @@ import { Point } from './interfaces/point.interface';
 @Injectable()
 export class Event {
 
-  private server: Server;
-
-  constructor(server: Server) {
-    this.server = server;
+  constructor(
+    private server: Server
+  ) {
   }
 
   emitStart(id: string, isLeftPlayer: boolean): Promise<string> {

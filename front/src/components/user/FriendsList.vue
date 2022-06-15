@@ -27,9 +27,11 @@
         <span class="material-icons px-1">person_remove</span>
         <!-- <span class="badge bg-primary rounded-pill">X</span> -->
       </button>
+      <invitation-button v-bind:userToInvite="friend.id" v-bind:socket="socket"/>
       <button v-on:click="blockUser(friend.id)">
         <span class="material-icons px-1" style="color: red">block</span>
       </button>
+
     </li>
   </ul>
 </template>
@@ -38,8 +40,13 @@
 import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 import store from "../../store";
+import InvitationButton from "../game/InvitationButton.vue"
 
 export default defineComponent({
+  components: {
+    InvitationButton,
+  },
+
   data() {
     return {
       socket: store.getters["auth/getUserSocket"],
@@ -53,12 +60,10 @@ export default defineComponent({
 
   methods: {
     async getFriendList() {
-      try {
-        const response = await http.get("/users/friendlist");
-        this.friendList = response.data;
-      } catch (e) {
-        console.log(e);
-      }
+        const response = await http.get("/users/friendlist").catch(() =>{console.log('')});
+        if (response)
+          this.friendList = response.data;
+
     },
 
     blockUser(userToBlock: number) {
@@ -73,17 +78,7 @@ export default defineComponent({
     },
 
     async deleteFriend(friendUsername: string) {
-      console.log("friend to delete =", friendUsername);
-      await http
-        .delete("/users/deletefriend", { data: { username: friendUsername } })
-        .then((response) => {
-          console.log("/users/deletefriend success", response);
-          this.getFriendList();
-          this.errorMsg = "";
-        })
-        .catch((error) => {
-          this.errorMsg = error.response.data.error;
-        });
+      this.socket.emit("deleteFriend", friendUsername);
     },
   },
 

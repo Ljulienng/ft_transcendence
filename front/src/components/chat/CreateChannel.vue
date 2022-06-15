@@ -2,11 +2,9 @@
 
     <div class="createChannel">
 
-        <div class="d-flex align-items-center mt-4">
-            <button class="btn" data-bs-toggle="modal" data-bs-target="#newChatModal">
-                <i style="color: #fff774" class="material-icons">add_box</i>
-            </button>
-        </div>
+        <button class="btn" data-bs-toggle="modal" data-bs-target="#newChatModal">
+            <i style="color: #fff774" class="material-icons">add_box</i>
+        </button>
 
         <div
             class="modal fade"
@@ -28,7 +26,7 @@
                             data-bs-dismiss="modal"
                             aria-label="Close"
                         ></button>
-                    </div>
+                    </div> <!-- modal-header -->
 
                     <div class="modal-body align-items-center justify-content-between">
 
@@ -54,13 +52,13 @@
                             <div class="row">
                                 <div class="btn-group" role="group" aria-label="Privacy toggle button group">
                                     <input type="radio" class="btn-check" name="type" id="public" autocomplete="off" value="public" v-model="type">
-                                    <label class="btn btn-outline-primary" for="public">public</label>
+                                    <label class="btn btn-primary" for="public">public</label>
 
                                     <input type="radio" class="btn-check" name="type" id="protected" autocomplete="off" value="protected" v-model="type">
-                                    <label class="btn btn-outline-primary" for="protected">protected</label>
+                                    <label class="btn btn-primary" for="protected">protected</label>
 
                                     <input type="radio" class="btn-check" name="type" id="private" autocomplete="off" value="private" v-model="type">
-                                    <label class="btn btn-outline-primary" for="private">private</label>
+                                    <label class="btn btn-primary" for="private">private</label>
                                 </div>
                             </div>
 
@@ -79,20 +77,20 @@
                             </div>
 
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-outline-primary" data-dismiss="modal" aria-label="Close">create channel</button>
+                                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" aria-label="Close">create channel</button>
                             </div>
-                    
-                        </form>
+                            
+                        </form> <!-- form -->
 
-                    </div>
+                    </div> <!-- modal-body -->
                 
-                </div>
+                </div> <!-- modal-content -->
 
-            </div>
+            </div> <!-- modal-dialog -->
 
-        </div>
+        </div> <!-- newChatModal -->
         
-    </div>
+    </div> <!-- createChannel -->
 </template>
 
 <script lang="ts">
@@ -121,7 +119,6 @@
                 this.name = "";
                 this.type = "public";
                 this.password = "";
-                // $('#newChatModal').modal('hide');
             },
         },
 

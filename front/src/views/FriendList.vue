@@ -63,7 +63,7 @@
                 </div>
                 <div class="col-auto">
                   <div class="mb-4 mt-4 text-center">
-                    <button type="submit">
+                    <button type="submit" data-bs-dismiss="modal" aria-label="Close">
                       <i style="color: #fff774" class="material-icons">send</i>
                     </button>
                   </div>
@@ -118,13 +118,11 @@ export default defineComponent({
 
   methods: {
     async getFriendList() {
-      try {
-        const response = await http.get("/users/friendlist");
-        this.friendList = response.data;
+        const response = await http.get("/users/friendlist").catch(() =>{console.log('rien')});
+        if (response)
+          this.friendList = response.data;
         this.updateComp++;
-      } catch (e) {
-        console.log(e);
-      }
+
     },
 
     async addFriend() {
@@ -141,6 +139,10 @@ export default defineComponent({
       this.getFriendList();
     });
 
+    this.socket.on("friendDeleted", () => {
+      this.getFriendList();
+    });
+
     this.socket.on("friendConnected", () => {
       this.getFriendList();
     });
@@ -150,9 +152,9 @@ export default defineComponent({
     });
   },
 
-  created() {
-    this.getFriendList();
-  },
+  // created() {
+  //   this.getFriendList();
+  // },
 });
 </script>
 

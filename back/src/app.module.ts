@@ -15,15 +15,17 @@ import { ChatModule } from './chat/chat.module';
 import { ChannelMemberModule } from './channelMember/channelMember.module';
 import { MessageUserModule } from './messageUser/messageUser.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { EventEmitterModule } from '@nestjs/event-emitter'
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({isGlobal: true}),
     TypeOrmModule.forRoot({ // for PostGres 
       type: 'postgres',
-      //url: process.env.DATABASE_URL,
-      url: "postgres://user:password@localhost:5432/db",
+      url: process.env.DATABASE_URL,
+      //url: "postgres://user:password@localhost:5432/db",
       autoLoadEntities: true,
       synchronize: true // false for production, with true typeOrm creates tables every time we run the app
     }),

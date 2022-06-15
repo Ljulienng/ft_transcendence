@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Game, GameState, HEIGHT, WIDTH } from './game';
 import { Point } from './interfaces/point.interface';
 import { Event } from './event';
-import { PlayerState, Player } from './player';
+import { Player } from './player';
 
 @Injectable()
 export class Ball {
