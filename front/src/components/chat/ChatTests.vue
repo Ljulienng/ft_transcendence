@@ -82,6 +82,7 @@
         </div>
       </div>
 
+      <!-- PRIVATE CHATS -->
       <div
         class="tab-pane fade"
         id="nav-friends"
@@ -96,16 +97,11 @@
             </button>
           </div>
 
-          <div v-if="selectedUser > 0">
-            <PrivateChatBox
-              v-bind:receiverId="selectedUser"
-              :is="showChatBox"
-            ></PrivateChatBox>
-          </div>
-
         </div>
       </div>
 
+
+      <!-- CHANNELS -->
       <div
         class="tab-pane fade"
         id="nav-joinedChannel"
@@ -113,7 +109,19 @@
         aria-labelledby="nav-joinedChannel-tab"
       >
         <div class="joinedChannelList">
-          <ul>
+
+          <div class="btn-group-vertical col-12 mx-auto" role="group" aria-label="channels">
+            <button type="button" class="btn" v-for="channel in joinedChannelList" :key="channel" @click="showChannel(channel.id, channel.type)">
+              <ChanBox 
+                :id="channel.id"
+                :type="channel.type"
+                :name="channel.name"
+                :owner="channel.owner.username"
+              />
+            </button>
+          </div>
+
+          <!-- <ul>
             <li v-for="channel in joinedChannelList" :key="channel">
               {{ channel.id }} [{{ channel.type }}] - "{{ channel.name }}" :
               created by {{ channel.owner.username }}
@@ -122,7 +130,7 @@
               </button>
               <button @click="leaveChannel(channel.id)">leave channel</button>
             </li>
-          </ul>
+          </ul> -->
           <div v-if="showBox === true">
             <ChannelBox
               v-bind:channel="selectedChannel"
@@ -131,6 +139,7 @@
               :is="showBox"
             ></ChannelBox>
           </div>
+
         </div>
       </div>
     </div>
@@ -145,6 +154,7 @@ import ChannelI from "../../types/interfaces/channel.interface";
 import ChannelBox from "./ChannelBox.vue";
 import PrivateChatBox from "./PrivateChatBox.vue";
 import UserBox from "./UserBox.vue";
+import ChanBox from "./ChanBox.vue";
 import store from "../../store";
 
 export default defineComponent({
@@ -152,6 +162,7 @@ export default defineComponent({
     PrivateChatBox,
     UserBox,
     ChannelBox,
+    ChanBox,
   },
 
   data() {
@@ -197,7 +208,9 @@ export default defineComponent({
     },
 
     showUser(userId: number) {
+      this.$emit('type', "priv");
       this.$emit('conv', userId);
+      this.$emit('privacy', "private");
       // if (this.showChatBox === true && userId === this.selectedUser) {
       //   this.showChatBox = false;
       // } else if (this.showChatBox === true && userId !== this.selectedUser) {
@@ -209,16 +222,19 @@ export default defineComponent({
     },
 
     showChannel(channelId: number, channelType: string) {
-      this.selectedChannelType = channelType;
-      if (this.showBox === true && channelId === this.selectedChannel) {
-        this.showBox = false;
-      } else if (this.showBox === true && channelId !== this.selectedChannel) {
-        this.selectedChannel = channelId;
-      } else {
-        this.showBox = true;
-        this.selectedChannel = channelId;
-      }
-      console.log("this selected channel = ", this.selectedChannel);
+      this.$emit('type', "chan");
+      this.$emit('conv', channelId);
+      this.$emit('privacy', channelType);
+      // this.selectedChannelType = channelType;
+      // if (this.showBox === true && channelId === this.selectedChannel) {
+      //   this.showBox = false;
+      // } else if (this.showBox === true && channelId !== this.selectedChannel) {
+      //   this.selectedChannel = channelId;
+      // } else {
+      //   this.showBox = true;
+      //   this.selectedChannel = channelId;
+      // }
+      // console.log("this selected channel = ", this.selectedChannel);
     },
 
     updateChannelListWithoutPrivate() {

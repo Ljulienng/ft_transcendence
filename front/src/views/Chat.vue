@@ -11,7 +11,7 @@
                 </div>
                 
                 <div class="container-fluid widebox" style="height: 70rem">
-                    <ChatTests @conv="getConv"/>
+                    <ChatTests @conv="getConv" @type="getType" @privacy="getPrivacy"/>
                 </div>
             </div>
 
@@ -20,11 +20,19 @@
                 Select a conversation
             </div>
             <div class="col-7 colorbox" style="height: 75rem;" v-if="convToShow > 0">
-                <PrivateChatBox
-                    v-bind:receiverId="convToShow"
+                <PrivateChatBox v-if="type==='priv'"
+                    :receiverId="convToShow"
                     :key="componentKey"
                     :is="true"
                 ></PrivateChatBox>
+
+                <ChannelBox v-if="type==='chan'"
+                    :channel="convToShow"
+                    :channelType="privacy"
+                    :socketChannel="socket"
+                    :key="componentKey"
+                    :is="true"
+                ></ChannelBox>
             </div>
             
         </div>
@@ -34,10 +42,12 @@
 
 <script lang="ts">
 
-    import { defineComponent } from "@vue/runtime-core"
-    import CreateChannel from "../components/chat/CreateChannel.vue"
-    import ChatTests from "../components/chat/ChatTests.vue"
+    import { defineComponent } from "@vue/runtime-core";
+    import CreateChannel from "../components/chat/CreateChannel.vue";
+    import ChatTests from "../components/chat/ChatTests.vue";
     import PrivateChatBox from "../components/chat/PrivateChatBox.vue";
+    import ChannelBox from "../components/chat/ChannelBox.vue";
+    import store from "../store";
 
     export default defineComponent({
 
@@ -45,23 +55,38 @@
             CreateChannel,
             ChatTests,
             PrivateChatBox,
+            ChannelBox,
         },
 
         data() {
             return {
                 convToShow: 0,
                 componentKey: 0,
+                type: "priv",
+                privacy: "public",
+                socket: store.getters["auth/getUserSocket"],
             };
         },
 
         methods: {
+
             getConv(value: number) {
-                this.convToShow = value
+                this.convToShow = value;
                 this.componentKey += 1;
                 console.log("conv= ", value);
-            }
+            },
+
+            getType(value: string) {
+                this.type = value;
+                console.log("type= ", value);
+            },
+
+            getPrivacy(value: string) {
+                this.privacy = value;
+                console.log("privacy= ", value);
+            },
         },
 
-    })
+    });
 
 </script>

@@ -115,20 +115,6 @@ export default defineComponent({
     console.log("chatbox created");
     this.getMessages();
   },
-  // setup() {
-  // },
+
 });
 </script>
-
-<!-- <style lang="scss">
-.messageList {
-  height: 200px; /* or any height you want */
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column-reverse;
-}
-
-.chatBox {
-  float: right;
-}
-</style> -->
