@@ -117,12 +117,12 @@ export default defineComponent({
   },
 
   methods: {
-    // async getFriendList() {
-    //     const response = await http.get("/users/friendlist").catch(() =>{console.log('rien')});
-    //     this.friendList = response.data;
-    //     this.updateComp++;
+    async getFriendList() {
+        const response = await http.get("/users/friendlist").catch(() =>{console.log('rien')});
+        this.friendList = response.data;
+        this.updateComp++;
 
-    // },
+    },
 
     async addFriend() {
       this.socket.emit("addFriend", this.friendToAdd);
