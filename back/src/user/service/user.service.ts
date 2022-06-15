@@ -398,6 +398,7 @@ export class UserService {
 	// }
 
 	async checkIfBlocked(user: User, otherUserId: number) {
+		console.log(user);
 		if (user.blocked === null)
 			user.blocked = [];
 

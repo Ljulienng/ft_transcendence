@@ -20,6 +20,7 @@ import { CreateChannelDto } from "src/channel/models/channel.dto";
 import { User } from "./models/user.entity";
 import { UpdateMemberChannelDto } from "src/channelMember/models/channelMember.dto";
 import { OnEvent } from '@nestjs/event-emitter'
+import { ChannelMember } from "src/channelMember/models/channelMember.entity";
 
 // export type UserSocket = {
 // 	socketId: string,
@@ -230,7 +231,10 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @OnEvent('unmutedOrUnbannedMember')
     sendDataToFront() {
         // console.log("On event unmutedOrUnbannedMember");
+        this.server.emit("channelMembersInfo");
         this.server.emit("/userUpdated/channel/");
+        
+
     }
 
     @UseGuards(SocketGuard)
