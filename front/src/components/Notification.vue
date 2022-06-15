@@ -107,9 +107,6 @@ export default defineComponent({
       this.show("channel", "The administrators have changed your status in the channel " + data, data, "CHANNEL", 'warn');
     });
 
-    this.socket.on("/muteorban/" + this.currentUser.userName, (data: string) => {
-      this.show("channel", "The administrators have changed your status in the channel " + data, data, "CHANNEL", 'warn');
-    });
   }
 });
 </script>

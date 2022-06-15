@@ -172,7 +172,6 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.to(String(channelId)).emit("updateMembersJoinedChannels");
         client.leave(String(channelId));
         this.server.emit("/userLeft/channel/" + channelId);
-        console.log("USER LEFT", user.username);
     }
 
     @UseGuards(SocketGuard)
