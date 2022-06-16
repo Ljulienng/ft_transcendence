@@ -16,7 +16,8 @@
       class="list-group-item bg-transparent border-0 text-white d-flex justify-content-between"
     >
       <div class="col">
-        <router-link :to="'/public/' + friend.username" class="button">
+        <!-- <SmallAvatar :v-bind:username="friend.username"> -->
+        <router-link :to="'/public/' + friend.username" class="button text-decoration-none">
           {{ friend.username }}
         </router-link>
       </div>
@@ -43,7 +44,6 @@ import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 import store from "../../store";
 import InvitationButton from "../game/InvitationButton.vue";
-
 export default defineComponent({
   components: {
     InvitationButton,
@@ -53,7 +53,6 @@ export default defineComponent({
     return {
       socket: store.getters["auth/getUserSocket"],
       currentUser: store.getters["auth/getUserProfile"],
-
       userStatus: "",
       errorMsg: "",
       friendList: [],

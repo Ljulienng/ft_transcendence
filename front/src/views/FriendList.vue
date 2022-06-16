@@ -7,7 +7,7 @@
       <button
         class="btn"
         data-bs-toggle="modal"
-        data-bs-target="#iendModal"
+        data-bs-target="#friendModal"
       >
         <i style="color: #fff774" class="material-icons">person_add_alt_1</i>
       </button>
@@ -16,15 +16,16 @@
     <!-- Modal -->
     <div
       class="modal fade"
-      id="iendModal"
+      id="friendModal"
+      ref="Modal"
       tabindex="-1"
-      aria-labelledby="iendModalLabel"
+      aria-labelledby="friendModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="iendModalLabel">Add friend</h5>
+            <h5 class="modal-title" id="friendModalLabel">Add friend</h5>
             <button
               id="closeModalButton"
               type="button"
@@ -37,7 +38,7 @@
             <form
               class="needs-validation"
               novalidate
-              v-on:submit.prevent="iend"
+              v-on:submit.prevent="addFriend"
             >
               <div class="row align-items-center justify-content-between">
                 <div class="col">
@@ -49,7 +50,7 @@
                       type="text"
                       name="id"
                       placeholder="Username..."
-                      @change="errorMsg=''"
+                      @input="test"
                       required
                     />
                   </div>
@@ -118,6 +119,12 @@ export default defineComponent({
   },
 
   methods: {
+    // closeModal() {
+    // }, 
+    test() {
+      console.log('test')
+      this.errorMsg = ''
+    },
     async getFriendList() {
         const response = await http.get("/users/friendlist").catch(() =>{console.log('rien')});
         if (response)
@@ -126,20 +133,23 @@ export default defineComponent({
 
     },
 
-    async iend() {
-      this.socket.emit("iend", this.friendToAdd);
+    async addFriend() {
+      this.socket.emit("addFriend", this.friendToAdd);
     },
 
     blockUser(userToBlock: number) {
       this.socket.emit("blockUser", userToBlock);
     },
+
   },
 
   mounted() {
     this.socket.on("friendAdded", () => {
       this.getFriendList();
+      this.errorMsg = ''; 
     });
 
+    // eslint-disable-next-line
     this.socket.on("friendAddedError", (data: any) => {
       console.log('errorfriend')
       this.errorMsg = data;

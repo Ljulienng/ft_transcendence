@@ -116,10 +116,10 @@ export default defineComponent({
   // },
 
   created() {
-    // eslint-disable-next-line
-
+    
     this.socket.on('matchRefused/' + this.currentUser.id, () => {console.log('REFUSED')})
 
+    // eslint-disable-next-line
     this.socket.on("matchInvitation/" + this.currentUser.id, (data: any) => {
       this.show("game", data.username + " invited you to a game !", data, "GAME");
     });

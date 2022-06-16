@@ -43,7 +43,6 @@ export default defineComponent({
       http
         .get("/users/stats/" + this.username)
         .then((response) => {
-          console.log(response.data);
           this.userStats.gameWon = response.data.gameWon;
           this.userStats.gameLost = response.data.gameLost;
           this.userStats.ranking = response.data.ranking;

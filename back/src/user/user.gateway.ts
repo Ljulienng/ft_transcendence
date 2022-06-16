@@ -19,8 +19,13 @@ import { CreateChannelDto } from "src/channel/models/channel.dto";
 import { User } from "./models/user.entity";
 import { UpdateMemberChannelDto } from "src/channelMember/models/channelMember.dto";
 import { OnEvent } from '@nestjs/event-emitter'
-import { ChannelMember } from "src/channelMember/models/channelMember.entity";
-import { UserModule } from "./user.module";
+import { GameState } from "src/pong/game";
+import { Spectator } from "src/pong/interfaces/spectator.interface";
+import { Point } from "src/pong/interfaces/point.interface";
+import { Player } from "src/pong/player";
+import { Event } from "src/pong/event";
+import { Options } from "src/pong/interfaces/options.interface";
+import { PongService } from "src/pong/pong.service";
 
 export interface SocketUserI {
     socketId: string;
@@ -41,8 +46,9 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 
     constructor(
-        protected channelService: ChannelService,
-        protected userService: UserService
+        private channelService: ChannelService,
+        private userService: UserService,
+        private pongService: PongService
     ) { }
     // connectedUser: []
 
@@ -68,6 +74,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     async handleDisconnect(client: Socket) {
+        this.playerLeave(client);
         const index = this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
         const user = this.socketList.find((socket) => socket.socketId === client.id).user
         // console.log(this.socketList[index].user.username ,'has disconnected from the server');
@@ -81,6 +88,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async connectUser(client: Socket, username: string) {
         const user = await this.userService.findByUsername(username);
 
+        if (!user)
+            return;
         console.log('user:', user.username, 'is connected');
         this.userService.setStatus(user, 'Online');
         this.server.to(client.id).emit("Connected");
@@ -408,5 +417,80 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('matchRefused')
     refuseMatch(client: Socket, otherUser: number) {
         this.server.emit("matchRefused/" + otherUser);
+    }
+
+    /* ============= PONG ============*/
+    @SubscribeMessage('playerJoin') // TODO: test
+    async playerJoin(client: Socket) {
+        this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
+        const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
+        const game = this.pongService.findGame(user.id);
+        if (game) {
+            game.reconnectPlayer(user.id, client);
+            return;
+        }
+        const event = new Event(this.server);
+        const player = new Player(event, client, user);
+        const options: Options = {
+            bgColor: '#1c1d21',
+            fgColor: 'lightgrey',
+            winScore: 5
+        };
+        this.pongService.matchmake(event, player, options);
+    }
+
+    @SubscribeMessage('duel') // TODO: test
+    async duel(client: Socket, userRightId: number) {
+        this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
+        const event = new Event(this.server);
+        const userLeft = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
+        const playerLeft = new Player(event, client, userLeft);
+        const userRight = await this.userService.findOne({ id: userRightId });
+        const playerRight = new Player(event, null, userRight);
+        this.pongService.duel(event, playerLeft, playerRight);
+    }
+
+    @SubscribeMessage('playerLeave')
+    async playerLeave(client: Socket) {
+        console.log('PONG: playerleaved event');
+        const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
+        const game = this.pongService.findGame(user.id);
+        if (game) {
+            const spectator = game.spectators.find(e => e.user.id == user.id);
+            if (spectator) {
+                spectator.socket.leave(game.spectatorRoom);
+                game.spectators.filter(e => e.user.id != user.id);
+            } else {
+                game.disconnectPlayer(user.id);
+            }
+        } else {
+            this.pongService.waitingPlayers.filter(e => e.user.id != user.id);
+        }
+    }
+
+    @SubscribeMessage('playerMove')
+    async playerMove(client: Socket, data: Point) {
+        const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
+        const game = this.pongService.findGame(user.id);
+        const player = game.findPlayer(user.id);
+        const opponent = game.findOpponent(user.id);
+        game.setState(await player.move(opponent, data.x, data.y));
+    }
+
+    @SubscribeMessage('spectate') // TODO: test
+    async spectate(client: Socket, userId: number) {
+        this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
+        const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
+        const game = this.pongService.findGame(userId);
+        if (game == null) {
+            // TODO: this player is not in a game
+            console.error('Cannot spectate because this player is not in a game.')
+            return;
+        }
+        const spectator: Spectator = {
+            socket: client,
+            user: user
+        };
+        game.connectSpectator(spectator);
     }
 }
