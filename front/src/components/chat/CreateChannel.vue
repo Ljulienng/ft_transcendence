@@ -39,7 +39,7 @@
                                 <input 
                                     type="text"
                                     class="form-control"
-                                    maxlength="50"
+                                    maxlength="20"
                                     minlength="3"
                                     v-model="name" 
                                     placeholder="Channel Name..." 
@@ -102,6 +102,7 @@
         data() {
             return {
                 socket: store.getters["auth/getUserSocket"],
+                errorMsg: "",
                 name: "",
                 password: "",
                 type: "public",
@@ -121,6 +122,12 @@
                 this.password = "";
             },
         },
+
+        mounted() {
+            this.socket.on("/createChannelError/", (data: string) => {
+            console.log(data);
+            });
+        }
 
     })
 </script>

@@ -152,6 +152,7 @@ export default defineComponent({
 
   data() {
     return {
+      errorMsg: "",
       memberList: [],
       newChannelName: "",
       invitation: {
@@ -271,9 +272,6 @@ export default defineComponent({
   },
 
   mounted() {
-    this.socket.on("passwordChanged", (data: string) => {
-      console.log("passwordChanged:", data);
-    });
     this.socket.on("/adminPromoted/" + this.channelId, () => {
       this.getChannelMembers();
     });
@@ -303,6 +301,12 @@ export default defineComponent({
     this.socket.on("/userUpdated/channel/", () => {
       console.log("user unmuted or unbanned");
       this.getChannelMembers();
+    });
+    this.socket.on("/passwordChanged/", (data: string) => {
+      console.log(data);
+    });
+    this.socket.on("/passwordError/", (data: string) => {
+      console.log(data);
     });
   },
 

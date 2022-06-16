@@ -92,8 +92,8 @@ export class ChannelService {
         if (regex.test(createChannel.name) === false) {
             throw new HttpException('Wrong format for chat name only underscore are allowed.', HttpStatus.FORBIDDEN);    
         }
-        if (!createChannel.name || createChannel.name.length < 4 || createChannel.name.length > 20) {
-            throw new HttpException('chat name beetween 4 and 20 characters please', HttpStatus.FORBIDDEN); 
+        if (!createChannel.name || createChannel.name.length < 3 || createChannel.name.length > 20) {
+            throw new HttpException('chat name beetween 3 and 20 characters please', HttpStatus.FORBIDDEN); 
         }
         if (!user) {
             throw new HttpException('user does not exist', HttpStatus.FORBIDDEN);
@@ -255,7 +255,7 @@ export class ChannelService {
    **       - the new password is not too short (could increase the constraints...)
    **       - security check : old channel password == old password sent by owner
    */
-   async changePassword(/*channelId: number, */userId: number, passwordI: changePasswordDto)
+   async changePassword(userId: number, passwordI: changePasswordDto)
    {
         // console.log('user:', userId, ' changes password of channel:', channelId, ' [new pass:', passwords.newPassword,']');
         const user = await this.userRepository.findOne({id: userId});
