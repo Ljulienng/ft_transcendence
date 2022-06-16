@@ -93,7 +93,7 @@
 
           <div class="btn-group-vertical col-12 mx-auto" role="group" aria-label="Basic example">
             <button type="button" class="btn" v-for="friend in friendList" :key="friend" @click="showUser(friend.id)">
-              <UserBox :username="friend.username" :is-selected="friend.id===selectedUser"/>
+              <PrivateChatListElem :username="friend.username" :is-selected="friend.id===selectedUser"/>
             </button>
           </div>
 
@@ -112,7 +112,7 @@
 
           <div class="btn-group-vertical col-12 mx-auto" role="group" aria-label="channels">
             <button type="button" class="btn" v-for="channel in joinedChannelList" :key="channel" @click="showChannel(channel.id, channel.type)">
-              <ChanBox 
+              <ChannelListElem 
                 :id="channel.id"
                 :type="channel.type"
                 :name="channel.name"
@@ -153,16 +153,16 @@ import http from "../../http-common";
 import ChannelI from "../../types/interfaces/channel.interface";
 import ChannelBox from "./ChannelBox.vue";
 import PrivateChatBox from "./PrivateChatBox.vue";
-import UserBox from "./UserBox.vue";
-import ChanBox from "./ChanBox.vue";
+import PrivateChatListElem from "./PrivateChatListElem.vue";
+import ChannelListElem from "./ChannelListElem.vue";
 import store from "../../store";
 
 export default defineComponent({
   components: {
     PrivateChatBox,
-    UserBox,
+    PrivateChatListElem,
     ChannelBox,
-    ChanBox,
+    ChannelListElem,
   },
 
   data() {
@@ -211,30 +211,12 @@ export default defineComponent({
       this.$emit('type', "priv");
       this.$emit('conv', userId);
       this.$emit('privacy', "private");
-      // if (this.showChatBox === true && userId === this.selectedUser) {
-      //   this.showChatBox = false;
-      // } else if (this.showChatBox === true && userId !== this.selectedUser) {
-      //   this.selectedUser = userId;
-      // } else {
-      //   this.showChatBox = true;
-      //   this.selectedUser = userId;
-      // }
     },
 
     showChannel(channelId: number, channelType: string) {
       this.$emit('type', "chan");
       this.$emit('conv', channelId);
       this.$emit('privacy', channelType);
-      // this.selectedChannelType = channelType;
-      // if (this.showBox === true && channelId === this.selectedChannel) {
-      //   this.showBox = false;
-      // } else if (this.showBox === true && channelId !== this.selectedChannel) {
-      //   this.selectedChannel = channelId;
-      // } else {
-      //   this.showBox = true;
-      //   this.selectedChannel = channelId;
-      // }
-      // console.log("this selected channel = ", this.selectedChannel);
     },
 
     updateChannelListWithoutPrivate() {

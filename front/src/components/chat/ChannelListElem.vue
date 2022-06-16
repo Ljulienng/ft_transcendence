@@ -25,7 +25,6 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import http from "../../http-common";
 
 export default defineComponent({
   props: ["id",
