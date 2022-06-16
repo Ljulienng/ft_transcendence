@@ -45,7 +45,7 @@ export class Player {
   goal(game: Game) {
     this.score += 1;
     game.sendScore();
-    if (this.score >= game.winScore) {
+    if (this.score >= game.options.winScore) {
       game.gameOver(this);
     }
   }

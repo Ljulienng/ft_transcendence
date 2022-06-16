@@ -80,19 +80,19 @@ export class Ball {
       //this.pong.playerRight.y = this.pong.boardSize.y / 2 - this.pong.playerSize.y / 2;
       //this.pong.playerLeft.y = this.pong.boardSize.y / 2 - this.pong.playerSize.y / 2;
     } else {  // player hit the ball
-      this.speed.x *= -1.1;
+      this.speed.x *= -1.0; // TODO: increment ball speed
       this.poundSpeed();
 
       // TODO: review
       // Add a ratio to increment ball speed depending on the paddle impact position
-      let y = playerLeft.y;
-      if (this.pos.x > WIDTH / 2) {
-        y = playerRight.y;
-      }
-      const distanceFromPaddleMiddle = this.pos.y - y - Player.size.y / 2;
-      const ratio = 100 / (Player.size.y / 2);
-      this.speed.y = Math.round(distanceFromPaddleMiddle * ratio / 50);
-      this.poundSpeed();
+      //let y = playerLeft.y;
+      //if (this.pos.x > WIDTH / 2) {
+      //  y = playerRight.y;
+      //}
+      //const distanceFromPaddleMiddle = this.pos.y - y - Player.size.y / 2;
+      //const ratio = 100 / (Player.size.y / 2);
+      //this.speed.y = Math.round(distanceFromPaddleMiddle * ratio / 50);
+      //this.poundSpeed();
     }
   }
 }

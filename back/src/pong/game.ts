@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { Match } from './models/match.entity';
 import { User } from 'src/user/models/user.entity';
 import { Spectator } from './interfaces/spectator.interface';
+import { Options } from './interfaces/options.interface';
 
 export const WIDTH = 100;
 export const HEIGHT = 66;
@@ -35,7 +36,7 @@ export class Game {
     private ball: Ball,
     public playerLeft: Player,
     public playerRight: Player,
-    public winScore: number) {
+    public options: Options) {
     this.state = GameState.PLAY;
     this.name = 'game_' + playerLeft.user.id + '_' + playerRight.user.id;
     this.id = null;
@@ -47,7 +48,7 @@ export class Game {
   }
 
   async saveUser(userId: number, status: string, won: boolean, lost: boolean, points: number) {
-    let user = await this.userRepository.findOne({id: this.playerLeft.user.id});
+    let user = await this.userRepository.findOne({ id: this.playerLeft.user.id });
     if (status) {
       user.status = status;
     }
@@ -150,11 +151,11 @@ export class Game {
   }
 
   async sendStart() {
-    if (await this.event.emitStart(this.playerLeft.socket.id, true) != 'ok') {
+    if (await this.event.emitStart(this.options, this.playerLeft.socket.id, this.playerRight.user, true) != 'ok') {
       this.playerLeft.disconnect()
       this.setState(GameState.PAUSE);
     }
-    if (await this.event.emitStart(this.playerRight.socket.id, false) != 'ok') {
+    if (await this.event.emitStart(this.options, this.playerRight.socket.id, this.playerLeft.user, false) != 'ok') {
       this.playerRight.disconnect()
       this.setState(GameState.PAUSE);
     }

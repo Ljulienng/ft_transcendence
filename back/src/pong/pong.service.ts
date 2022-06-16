@@ -7,6 +7,7 @@ import { Game } from './game';
 import { Event } from './event';
 import { Player } from './player';
 import { Ball } from './ball';
+import { Options } from './interfaces/options.interface';
 
 @Injectable()
 export class PongService {
@@ -26,10 +27,15 @@ export class PongService {
 
   duel(event: Event, playerLeft: Player, playerRight: Player) { // TODO: test
     const ball = new Ball(event);
-    this.games.push(new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, 5)); // TODO: dynamic winScore
+    const options = {
+      bgColor: '#1c1d21',
+      fgColor: 'lightgrey',
+      winScore: 5
+    };
+    this.games.push(new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, options)); // TODO: dynamic winScore
   }
 
-  matchmake(event: Event, playerLeft: Player) {
+  matchmake(event: Event, playerLeft: Player, options: Options) {
     // TODO: smarter matchmaking
     if (!this.waitingPlayers.length) {
       this.waitingPlayers.push(playerLeft);
@@ -37,7 +43,7 @@ export class PongService {
     }
     const playerRight = this.waitingPlayers.shift();
     const ball = new Ball(event);
-    this.games.push(new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, 5)); // TODO: dynamic winScore
+    this.games.push(new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, options)); // TODO: dynamic winScore
   }
 
   findGame(userId: number): Game {
