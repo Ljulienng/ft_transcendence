@@ -333,9 +333,16 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async addFriend(client: Socket, userId: any) {
         const user: User = this.socketList.find(socket => socket.socketId === client.id).user;
 
-        await this.userService.addFriend(user, userId);
-        this.server.to(client.id).emit('friendAdded');
-        this.server.emit('/friendAdded/' + userId.friendUsername, user.username)
+        await this.userService.addFriend(user, userId)
+        .then(() => {
+            this.server.to(client.id).emit('friendAdded')
+            this.server.emit('/friendAdded/' + userId.friendUsername, user.username)
+        })
+        .catch((error) => {
+            console.log('error friend - ', error.response)
+            this.server.to(client.id).emit('friendAddedError', error.response.error)
+
+        })
     }
 
     @UseGuards(SocketGuard)

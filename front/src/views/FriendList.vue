@@ -7,7 +7,7 @@
       <button
         class="btn"
         data-bs-toggle="modal"
-        data-bs-target="#addFriendModal"
+        data-bs-target="#iendModal"
       >
         <i style="color: #fff774" class="material-icons">person_add_alt_1</i>
       </button>
@@ -16,15 +16,15 @@
     <!-- Modal -->
     <div
       class="modal fade"
-      id="addFriendModal"
+      id="iendModal"
       tabindex="-1"
-      aria-labelledby="addFriendModalLabel"
+      aria-labelledby="iendModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="addFriendModalLabel">Add friend</h5>
+            <h5 class="modal-title" id="iendModalLabel">Add friend</h5>
             <button
               id="closeModalButton"
               type="button"
@@ -37,7 +37,7 @@
             <form
               class="needs-validation"
               novalidate
-              v-on:submit.prevent="addFriend"
+              v-on:submit.prevent="iend"
             >
               <div class="row align-items-center justify-content-between">
                 <div class="col">
@@ -49,6 +49,7 @@
                       type="text"
                       name="id"
                       placeholder="Username..."
+                      @change="errorMsg=''"
                       required
                     />
                   </div>
@@ -63,7 +64,7 @@
                 </div>
                 <div class="col-auto">
                   <div class="mb-4 mt-4 text-center">
-                    <button type="submit" data-bs-dismiss="modal" aria-label="Close">
+                    <button v-if="errorMsg === ''" type="submit" data-bs-dismiss="modal" aria-label="Close">
                       <i style="color: #fff774" class="material-icons">send</i>
                     </button>
                   </div>
@@ -125,8 +126,8 @@ export default defineComponent({
 
     },
 
-    async addFriend() {
-      this.socket.emit("addFriend", this.friendToAdd);
+    async iend() {
+      this.socket.emit("iend", this.friendToAdd);
     },
 
     blockUser(userToBlock: number) {
@@ -137,6 +138,11 @@ export default defineComponent({
   mounted() {
     this.socket.on("friendAdded", () => {
       this.getFriendList();
+    });
+
+    this.socket.on("friendAddedError", (data: any) => {
+      console.log('errorfriend')
+      this.errorMsg = data;
     });
 
     this.socket.on("friendDeleted", () => {
