@@ -21,6 +21,7 @@ import { User } from "./models/user.entity";
 import { UpdateMemberChannelDto } from "src/channelMember/models/channelMember.dto";
 import { OnEvent } from '@nestjs/event-emitter'
 import { ChannelMember } from "src/channelMember/models/channelMember.entity";
+import { UserModule } from "./user.module";
 
 // export type UserSocket = {
 // 	socketId: string,
@@ -28,7 +29,6 @@ import { ChannelMember } from "src/channelMember/models/channelMember.entity";
 // }
 
 @WebSocketGateway({
-	namespace: '/user',
 	cors: {
 		origin: true,
 		credentials: true
@@ -61,6 +61,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         newSocket.user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
         if (newSocket.user)
             console.log('client connected to the Server, user = ', newSocket.user.username);
+        else
+            return ;
 		this.socketList.push(newSocket);
 
 	}
@@ -222,7 +224,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const userToUpdateSocket = (this.socketList.find(s => s.user.id === userToUpdate.id )).socket;
         const channel = await this.channelService.findChannelById(update.channelId);
         this.server.to(userToUpdateSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToUpdate, channel));
-        this.server.emit('messageUpdate');
+        this.server.emit('messageUpdate/' + channel.id);
         this.server.emit("/userUpdated/channel/" + channel.id);
         this.server.emit("/muteorban/" + userToUpdate.username, (await this.channelService.findChannelById(channel.id)).name);
     }
@@ -274,7 +276,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         // client.emit('messageUpdate', message, channelId);
         // this.server.emit('sendMessageToClient', createMessageDto.content);
         await this.channelService.saveMessage(createMessageDto.userId, createMessageDto);
-        this.server.to(String(createMessageDto.channelId)).emit('messageUpdate');
+        this.server.emit('messageUpdate/' + createMessageDto.channelId);
     }
 
     /* ============= USER CHAT PART ============*/
@@ -351,5 +353,28 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this.userService.deleteFriend(user, userToDelete);
         this.server.to(client.id).emit('friendDeleted');
         this.server.emit('/friendDeleted/' + userToDelete, user.username)
+    }
+
+    /* ============= GAME USER ============*/
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('matchInvitation')
+    async matchInvitation(client: Socket, userToInvite: number) {
+        const user :User = this.socketList.find(socket => socket.socketId === client.id).user;
+
+        this.server.to(client.id).emit("moveToMatch");
+        this.server.emit('matchInvitation/' + userToInvite, {id: user.id, username: user.username} as unknown);
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('matchAccepted')
+    acceptMatch(client: Socket, otherUser: number) {
+        this.server.to(client.id).emit("moveToMatch");
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('matchRefused')
+    refuseMatch(client: Socket, otherUser: number) {
+        this.server.emit("matchRefused/" + otherUser);
     }
 }

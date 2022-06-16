@@ -118,13 +118,11 @@ export default defineComponent({
 
   methods: {
     async getFriendList() {
-      try {
-        const response = await http.get("/users/friendlist");
-        this.friendList = response.data;
+        const response = await http.get("/users/friendlist").catch(() =>{console.log('rien')});
+        if (response)
+          this.friendList = response.data;
         this.updateComp++;
-      } catch (e) {
-        console.log(e);
-      }
+
     },
 
     async addFriend() {
@@ -154,9 +152,9 @@ export default defineComponent({
     });
   },
 
-  created() {
-    this.getFriendList();
-  },
+  // created() {
+  //   this.getFriendList();
+  // },
 });
 </script>
 
