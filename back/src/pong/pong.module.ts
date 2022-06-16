@@ -1,6 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { PongService } from './pong.service';
-import { PongGateway } from './pong.gateway';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Match } from './models/match.entity';
 import { User } from 'src/user/models/user.entity';
@@ -11,18 +10,14 @@ import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
-    forwardRef(() => AuthModule),
-    forwardRef(() => UserModule),
-    forwardRef(() => ChatModule),
-    forwardRef(() => ChannelModule),
     TypeOrmModule.forFeature([Match]),
     TypeOrmModule.forFeature([User]),
+
   ],
   providers: [
-    PongGateway,
     PongService,
   ],
-  exports: [PongGateway, PongService]
+  exports: [PongService]
 })
 
 export class PongModule { }
