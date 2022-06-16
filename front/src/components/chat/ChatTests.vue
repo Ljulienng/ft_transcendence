@@ -278,7 +278,7 @@ export default defineComponent({
       this.socket = store.getters["auth/getUserSocket"];
     }
 
-    this.socket.on("updateChannel", (data: ChannelI[]) => {
+    this.socket.on("updateChannel", () => {
       console.log("updateChannel");
       this.getChannelList();
       this.getJoinedChannelList();
@@ -287,14 +287,7 @@ export default defineComponent({
 
     this.socket.on("updateJoinedChannel", (data: ChannelI[]) => {
       console.log("updateJoinedChannel");
-      this.joinedChannelList = data;
       this.getChannelList();
-      // this.getJoinedChannelList();
-    });
-
-    this.socket.on("updateMembersJoinedChannels", () => {
-      console.log("updateMembersJoinedChannels");
-      this.getJoinedChannelList();
     });
 
     this.socket.on("/userKicked/" + this.currentUser.userName, () => {
