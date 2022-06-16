@@ -1,5 +1,5 @@
 import { User } from "src/user/models/user.entity";
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn } from "typeorm";
 
 @Entity()
 export class Match {
@@ -24,11 +24,17 @@ export class Match {
   @Column({ default: 0 })
   playerTwoScore: number;
 
-  @Column({ default: "" })
-  winner: string;
+  @ManyToOne(() => User, user => user.id, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
+  winner: User;
 
-  @Column({ default: "" })
-  loser: string;
+  @ManyToOne(() => User, user => user.id, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
+  loser: User;
 
   @Column({ default: true })
   inProgress: boolean;
