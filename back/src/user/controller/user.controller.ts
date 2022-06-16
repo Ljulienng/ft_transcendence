@@ -41,9 +41,19 @@ export class UserController {
 
 	@UseInterceptors(ClassSerializerInterceptor)
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
-	@Get()
-	findAll() {
-		return this.userService.findAll();
+	@Get('/leaderboard')
+	async findAll() {
+		try {
+			const rankingList: User[] = await this.userService.findAll();
+
+			if (rankingList.length > 1 )
+				return rankingList.sort((n1: User, n2: User) => (n1.points > n2.points ? -1 : 1))
+			else
+				return rankingList
+		} catch (e) {
+			throw e;
+		}
+
 	}
 
 	@UseGuards(JwtAuthGuard, TwoFAAuth)

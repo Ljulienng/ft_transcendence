@@ -89,6 +89,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async connectUser(client: Socket, username: string) {
         const user = await this.userService.findByUsername(username);
 
+        if (!user)
+            return;
         console.log('user:', user.username, 'is connected');
         this.userService.setStatus(user, 'Online');
         this.server.to(client.id).emit("Connected");

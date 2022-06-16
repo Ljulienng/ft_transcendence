@@ -22,7 +22,6 @@
 
 <script lang="ts">
 import GameOptionI from '@/types/interfaces/gameoption.interface';
-import { UserProfile } from '@/views/Home.vue';
 import { defineComponent } from '@vue/runtime-core'
 // import io from 'socket.io-client'
 import store from '../../store'
@@ -43,6 +42,7 @@ const State = {
 };
 
 export default defineComponent({
+  /* eslint-disable */ 
   name: 'Pong',
   data() {
     return {

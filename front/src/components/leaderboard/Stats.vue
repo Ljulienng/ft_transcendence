@@ -1,15 +1,22 @@
 <template>
   <tr>
-    <th scope="row">{{ user.username }}</th>
-    <td>{{ userStats.total }}</td>
-    <td>{{ userStats.gameWon }}</td>
-    <td>{{ userStats.gameLost }}</td>
-    <td>{{ userStats.ranking }}</td>
-    <td>{{ userStats.points }}</td>
+    <th scope="row" class='text-center'>{{ userStats.ranking }}</th>
+    <td>
+
+      <router-link :to="'/public/' + currentUser.username" class="button text-right text-decoration-none" >
+        <img :src="this.image" class="profile_avatar_small" />
+        {{ currentUser.username }}
+      </router-link>
+    </td>
+    <td class='text-center'>{{ userStats.total }}</td>
+    <td class='text-center'>{{ userStats.gameWon }}</td>
+    <td class='text-center'>{{ userStats.gameLost }}</td>
+    <td class='text-center'>{{ userStats.points }}</td>
   </tr>
 </template>
 
 <script lang="ts">
+/* eslint-disable */
 import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 
@@ -18,7 +25,7 @@ export default defineComponent({
 
   data() {
     return {
-      x: this.user,
+      currentUser: this.user,
       //   stats: any,
       userStats: {
         total: 0,
@@ -27,24 +34,40 @@ export default defineComponent({
         ranking: 0,
         points: 0,
       },
+      image: null as any
     };
   },
 
   methods: {
     async getStats() {
       try {
-        const response = await http.get("/users/stats");
 
-        this.userStats = response.data;
-        this.userStats.total = this.userStats.gameWon + this.userStats.gameLost;
+        this.userStats = this.currentUser;
+        this.userStats.total = this.currentUser.gameWon + this.currentUser.gameLost;
       } catch (error) {
         console.log(error);
       }
     },
+    async getAvatar() {
+      http
+        .get("/users/avatar/" + this.currentUser.username, {
+          responseType: "blob",
+        })
+        .then((response) => {
+          const blob = response.data;
+
+          this.image = URL.createObjectURL(blob);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
   },
+
 
   created() {
     this.getStats();
+    this.getAvatar();
   },
 });
 </script>

@@ -20,7 +20,7 @@
                 <td scope="row" v-if="match.playerOne.username === username">{{ match.playerTwo.username }}</td>
                 <td v-else>{{ match.playerOne.username }}</td>
                 <td>{{ match.playerOneScore }}:{{ match.playerTwoScore }}</td>
-                <td v-if="username === match.winner" style="color: green">Victory</td>
+                <td v-if="username === match.winner.username" style="color: green">Victory</td>
                 <td v-else style="color: red">Defeat</td>
                 <td>0</td>
             </tr>
