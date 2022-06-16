@@ -89,8 +89,8 @@ const actions = {
 				commit("setUserProfile", response.data)
 			}
 		})
-		.catch((err) => {
-			console.log(err);
+		.catch(() => {
+			console.log("");
 		});
 
 	}

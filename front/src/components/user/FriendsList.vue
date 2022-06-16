@@ -27,11 +27,13 @@
         <span class="material-icons px-1">person_remove</span>
         <!-- <span class="badge bg-primary rounded-pill">X</span> -->
       </button>
-      <invitation-button v-bind:userToInvite="friend.id" v-bind:socket="socket"/>
+      <invitation-button
+        v-bind:userToInvite="friend.id"
+        v-bind:socket="socket"
+      />
       <button v-on:click="blockUser(friend.id)">
         <span class="material-icons px-1" style="color: red">block</span>
       </button>
-
     </li>
   </ul>
 </template>
@@ -40,7 +42,7 @@
 import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 import store from "../../store";
-import InvitationButton from "../game/InvitationButton.vue"
+import InvitationButton from "../game/InvitationButton.vue";
 
 export default defineComponent({
   components: {
@@ -60,21 +62,14 @@ export default defineComponent({
 
   methods: {
     async getFriendList() {
-        const response = await http.get("/users/friendlist").catch(() =>{console.log('')});
-        if (response)
-          this.friendList = response.data;
-
+      const response = await http.get("/users/friendlist").catch((error) => {
+        console.log(error);
+      });
+      if (response) this.friendList = response.data;
     },
 
     blockUser(userToBlock: number) {
       this.socket.emit("blockUser", userToBlock);
-      // console.log("blockUser", userToBlock);
-      // eslint-disable-next-line
-      // const x: any = this.friendList.find(d => d["id"] === userToBlock)
-      // console.log("FRIENDLIST", x.username);
-      // this.deleteFriend(x.username);
-      // this.getFriendList();
-      // this.$forceUpdate();
     },
 
     async deleteFriend(friendUsername: string) {

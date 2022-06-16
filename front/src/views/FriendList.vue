@@ -152,9 +152,9 @@ export default defineComponent({
     });
   },
 
-  // created() {
-  //   this.getFriendList();
-  // },
+  created() {
+    this.getFriendList();
+  },
 });
 </script>
 

@@ -39,11 +39,7 @@ export class UserController {
 		return this.userService.add(user);
 	}
 
-	@Delete('/delete')
-	delete(@Body() idToDelete: string): any {
-		return this.userService.delete(idToDelete);
-	}
-
+	@UseInterceptors(ClassSerializerInterceptor)
 	@UseGuards(JwtAuthGuard, TwoFAAuth)
 	@Get()
 	findAll() {
@@ -65,7 +61,7 @@ export class UserController {
 
 			return await this.userService.friendList(user);
 		} catch(e) {
-			throw new UnauthorizedException("Error: getFriendList");
+			throw e;
 
 		}
 	}
