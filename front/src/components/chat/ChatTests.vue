@@ -131,14 +131,14 @@
               <button @click="leaveChannel(channel.id)">leave channel</button>
             </li>
           </ul> -->
-          <div v-if="showBox === true">
+          <!-- <div v-if="showBox === true">
             <ChannelBox
               v-bind:channel="selectedChannel"
               v-bind:channelType="selectedChannelType"
               v-bind:socketChannel="socket"
               :is="showBox"
             ></ChannelBox>
-          </div>
+          </div> -->
 
         </div>
       </div>

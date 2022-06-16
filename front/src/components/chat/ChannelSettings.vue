@@ -7,7 +7,7 @@
         
         <!-- CHANGE NAME -->
         <a type="button" data-bs-toggle="modal" data-bs-target="#channameModal" class="primary text-decoration-none display-5">
-          name <i style="color: #fff774" class="material-icons">border_color</i>
+          {{ name }} <i style="color: #fff774" class="material-icons">border_color</i>
         </a>
 
         <form v-on:submit.prevent="changeChannelName">
@@ -65,7 +65,6 @@
                         name="name"
                         placeholder="old password"
                       />
-                      <!-- !!!! Check that old password is ok -->
                       <input
                         id="name"
                         class="form-control"
@@ -136,7 +135,7 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
               <div class="modal-body">
-                  <ul>
+                  <!-- <ul>
                     <li v-for="member in memberList" :key="member">
                         {{ member.user.username }}
                         <template v-if="channelMember.owner">
@@ -205,7 +204,7 @@
                         <template v-if="member.muted">(muted)</template>
                         <template v-if="member.banned">(banned)</template>
                     </li>
-                  </ul>
+                  </ul> -->
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -249,6 +248,7 @@ export default defineComponent({
   data() {
     return {
       muteBanCounter: 0,
+      name: "",
       memberList: [],
       newChannelName: "",
       invitation: {
@@ -283,8 +283,21 @@ export default defineComponent({
         });
     },
 
+    getChannelName() {
+      http
+        .get("/channel/" + this.channelId)
+        .then((response) => {
+          console.log("channel name=", response.data.name);
+          this.name = response.data.name;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
     deleteChannel() {
       this.socket.emit("deleteChannel", this.channelId);
+      this.$emit("close");
     },
 
     changeChannelName() {
@@ -414,6 +427,7 @@ export default defineComponent({
 
   created() {
     this.getChannelMembers();
+    this.getChannelName();
   },
 });
 </script>

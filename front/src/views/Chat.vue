@@ -32,6 +32,7 @@
                     :socketChannel="socket"
                     :key="componentKey"
                     :is="true"
+                    @close="updateComponent"
                 ></ChannelBox>
             </div>
             
@@ -74,6 +75,11 @@
                 this.convToShow = value;
                 this.componentKey += 1;
                 console.log("conv= ", value);
+            },
+
+            updateComponent() {
+                this.convToShow = 0;
+                this.componentKey += 1;
             },
 
             getType(value: string) {
