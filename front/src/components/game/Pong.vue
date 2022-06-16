@@ -56,7 +56,7 @@ export default defineComponent({
       socket: store.getters['auth/getUserSocket'],
       user: store.getters['auth/getUserProfile'],
       imageUser: null as any,
-      opponent: {} as UserProfile,
+      opponent: null as any,
       imageOpponent: null as any,
       pong: {} as PongI,
       options: {} as GameOptionI,
@@ -224,7 +224,7 @@ export default defineComponent({
       this.socket.on('youWin', () => { this.winPage(); });
       this.socket.on('youLose', () => { this.losePage(); });
 
-      this.socket.on('start', async (options: GameOptionI, opponent: UserProfile, isLeftSide: boolean, callback: any) => {
+      this.socket.on('start', async (options: GameOptionI, opponent: any, isLeftSide: boolean, callback: any) => {
         callback('ok');
         this.opponent = opponent;
         this.options = options;
