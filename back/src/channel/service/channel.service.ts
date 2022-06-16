@@ -277,6 +277,35 @@ export class ChannelService {
         this.channelRepository.update(channel.id, { password });
    }
 
+   async addPasswordToPublicChannel(owner: User, passwordI: changePasswordDto) {
+        const channel = await this.findChannelById(passwordI.channelId);
+        const channelMember = await this.channelMemberService.findOne(owner, channel);
+        
+        if (!channelMember.owner) {
+            throw new HttpException('you are not authorized to change the status of the channel', HttpStatus.FORBIDDEN);
+        }
+        if (passwordI.new.length < 8) {
+            throw new HttpException('new password too short', HttpStatus.FORBIDDEN);
+        }
+        const saltOrRounds = await bcrypt.genSalt();
+        const password = await bcrypt.hash(passwordI.new, saltOrRounds);
+        channel.password = password;
+        channel.type = "protected";
+        this.channelRepository.save(channel);
+   }
+
+   async removePasswordToProtectedChannel(owner: User, channelId: number) {
+        const channel = await this.findChannelById(channelId);
+        const channelMember = await this.channelMemberService.findOne(owner, channel);
+        
+        if (!channelMember.owner) {
+            throw new HttpException('you are not authorized to change the status of the channel', HttpStatus.FORBIDDEN);
+        }
+        channel.password = "";
+        channel.type = "public";
+        this.channelRepository.save(channel);
+    }
+
    async changeChannelName(owner: User, updates: updateChannelDto) {
     const channel = await this.findChannelById(updates.channelId);
     const member = await this.channelMemberService.findOne(owner, channel);

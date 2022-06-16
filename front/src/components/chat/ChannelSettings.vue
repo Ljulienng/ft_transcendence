@@ -7,7 +7,6 @@
         <button
           @click="deleteChannel()"
           class="btn-danger"
-          v-if="channelMember.owner"
         >
           Delete channel
         </button>
@@ -41,6 +40,25 @@
             class="inputMessage"
             placeholder="new password"
           />
+        </div>
+        <div v-if="channelType == 'public'">
+          <!-- change channel type : public->protected -->
+          <button @click="addPasswordToPublicChannel()" class="btn-primary">
+            Add a password :
+          </button>
+          <input
+            type="password"
+            maxlength="100"
+            v-model="passwordI.new"
+            class="inputMessage"
+            placeholder="password"
+          />
+        </div>
+        <div v-if="channelType == 'protected'">
+          <!-- change channel type : public->protected -->
+          <button @click="removePasswordToProtectedChannel()" class="btn-primary">
+            Remove the password
+          </button>
         </div>
         <div v-if="channelMember.admin && channelType == 'private'">
           <!-- invitations only by admins -->
@@ -202,6 +220,17 @@ export default defineComponent({
       this.socket.emit("changePassword", this.passwordI);
       this.passwordI.old = "";
       this.passwordI.new = "";
+    },
+
+    // change channel type : public->protected
+    addPasswordToPublicChannel() {
+      this.socket.emit("addPasswordToPublicChannel", this.passwordI);
+      this.passwordI.new = "";
+    },
+
+    // change channel type : protected->public
+    removePasswordToProtectedChannel() {
+      this.socket.emit("removePasswordToProtectedChannel", this.channelId);
     },
 
     kickMember(username: string) {

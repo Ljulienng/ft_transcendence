@@ -234,12 +234,14 @@ export default defineComponent({
           this.channelListWithoutPrivate.push(channel);
         }
       }
+      console.log("channelListWithoutPrivate : ", this.channelListWithoutPrivate);
     },
 
     async getChannelList() {
       try {
         const response = await http.get("/channel");
         this.channelList = response.data;
+        console.log("channelList : ", this.channelList);
         this.updateChannelListWithoutPrivate();
       } catch (error) {
         console.log(error);
@@ -277,24 +279,28 @@ export default defineComponent({
     }
 
     this.socket.on("updateChannel", (data: ChannelI[]) => {
-      this.channelList = data;
-      this.updateChannelListWithoutPrivate();
+      console.log("updateChannel");
+      this.getChannelList();
+      this.getJoinedChannelList();
       this.socket.emit("updateJoinedChannels");
     });
 
     this.socket.on("updateJoinedChannel", (data: ChannelI[]) => {
       console.log("updateJoinedChannel");
       this.joinedChannelList = data;
+      this.getChannelList();
+      // this.getJoinedChannelList();
     });
 
     this.socket.on("updateMembersJoinedChannels", () => {
       console.log("updateMembersJoinedChannels");
-      this.socket.emit("updateJoinedChannels");
+      this.getJoinedChannelList();
     });
 
     this.socket.on("/userKicked/" + this.currentUser.userName, () => {
       this.getJoinedChannelList();
     });
+
   },
 
   created() {

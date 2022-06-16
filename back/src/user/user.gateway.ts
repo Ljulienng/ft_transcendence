@@ -150,6 +150,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('updateJoinedChannels')
     async updateJoinedChannels(client: Socket) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
+        // this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
     }
 
@@ -188,6 +189,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         
         const guestSocket = (this.socketList.find(s => s.user.id === guest.id )).socket;
         guestSocket.join(String(invitation.channelId));
+        // this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(guestSocket.id).emit("updateJoinedChannel", await this.userService.joinedChannel(guest));
         this.server.emit("/invitationChannel/" + guest.username, (await this.channelService.findChannelById(invitation.channelId)).name);
     }
@@ -262,6 +264,37 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             .catch(error => {
                 this.server.to(client.id).emit("/passwordError/", error.response)
             })
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('addPasswordToPublicChannel')
+    async addPasswordToPublicChannel(client: Socket, passwordI: changePasswordDto) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.addPasswordToPublicChannel(user, passwordI)
+            .then(async () => {
+                this.server.emit("updateChannel", await this.channelService.findAll());
+                // this.server.to(String(passwordI.channelId)).emit("updateMembersJoinedChannels");
+                // this.server.to(client.id).emit("/passwordAdded/", "password is added, channel is now protected")
+            })
+            .catch(error => {
+                this.server.to(client.id).emit("/passwordAddedError/", error.response)
+            })
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('removePasswordToProtectedChannel')
+    async removePasswordToProtectedChannel(client: Socket, channelId: number) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.removePasswordToProtectedChannel(user, channelId)
+            .then(async () => {
+                this.server.emit("updateChannel", await this.channelService.findAll());
+                // this.server.to(String(channelId)).emit("updateMembersJoinedChannels");
+                // this.server.to(client.id).emit("/passwordRemoved/", "password is removed, channel is now public")
+            })
+            .catch(error => {
+                this.server.to(client.id).emit("/passwordRemovedError/", error.response)
+            })
+            
     }
 
     @UseGuards(SocketGuard)
