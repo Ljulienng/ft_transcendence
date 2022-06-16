@@ -8,7 +8,8 @@
 
     <div v-if="!channelMember.banned">
 
-      <div v-if="channelMember.owner" class="boxhead" style="height: 10%;">
+      <!-- <div v-if="channelMember.owner" class="boxhead" style="height: 10%;"> -->
+      <div class="boxhead" style="height: 10%;">
         <ChannelSettings
           v-bind:currentUser="currentUser"
           v-bind:channelId="channel"
@@ -158,7 +159,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.channelBox {
-  float: right;
-}
+// .channelBox {
+//   float: right;
+// }
 </style>

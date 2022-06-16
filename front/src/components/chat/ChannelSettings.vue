@@ -1,14 +1,15 @@
 <template>
-  <div>
+  <div class="input-group align-items-center justify-content-between">
     <!--=========================== ADMIN SETTINGS ===========================-->
 
+    <h2>{{ name }}</h2>
+
     <div v-if="channelMember.admin">
-      <div>
-        
+
         <!-- CHANGE NAME -->
-        <a type="button" data-bs-toggle="modal" data-bs-target="#channameModal" class="primary text-decoration-none display-5">
-          {{ name }} <i style="color: #fff774" class="material-icons">border_color</i>
-        </a>
+        <button class="input-group-btn" type="button" data-bs-toggle="modal" data-bs-target="#channameModal">
+          <i style="color: #fff774" class="material-icons">border_color</i>
+        </button>
 
         <form v-on:submit.prevent="changeChannelName">
           <div class="modal fade" id="channameModal" tabindex="-1" aria-labelledby="channameModal" aria-hidden="true">
@@ -37,15 +38,23 @@
           </div>
         </form>
 
+    </div>
+
+    <div v-if="channelMember.admin">
+
         <!-- DELETE -->
         <button @click="deleteChannel()">
           <span class="material-icons px-1" style="color: red">delete</span>
         </button>
 
+    </div>
+
+    <div v-if="channelMember.admin">
+
         <!-- CHANGE PASSWORD -->
-        <a v-if="channelType == 'protected'" type="button" data-bs-toggle="modal" data-bs-target="#chanpwdModal" class="primary text-decoration-none display-5">
+        <button v-if="channelType == 'protected'" type="button" data-bs-toggle="modal" data-bs-target="#chanpwdModal">
           <i style="color: #fff774" class="material-icons">key</i>
-        </a>
+        </button>
 
         <form v-if="channelType == 'protected'" v-on:submit.prevent="changePassword">
           <div class="modal fade" id="chanpwdModal" tabindex="-1" aria-labelledby="chanpwdModal" aria-hidden="true">
@@ -84,10 +93,14 @@
           </div>
         </form>
 
+      </div>
+
+      <div v-if="channelMember.admin">
+
         <!-- INVITE -->
-        <a v-if="channelMember.admin && channelType == 'private'" type="button" data-bs-toggle="modal" data-bs-target="#inviteModal" class="primary text-decoration-none display-5">
+        <button v-if="channelMember.admin && channelType == 'private'" type="button" data-bs-toggle="modal" data-bs-target="#inviteModal" class="primary text-decoration-none display-5">
           <i style="color: #fff774" class="material-icons">person_add</i>
-        </a>
+        </button>
 
         <form v-if="channelMember.admin && channelType == 'private'" v-on:submit.prevent="invite">
           <div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModal" aria-hidden="true">
@@ -118,101 +131,101 @@
         </form>
 
       </div>
-    </div>
 
 
     <!-- USERS -->
-    <a type="button" data-bs-toggle="modal" data-bs-target="#users" class="primary text-decoration-none display-5">
+    <button type="button" data-bs-toggle="modal" data-bs-target="#usersModal" class="primary text-decoration-none display-5">
       <i style="color: #fff774" class="material-icons">group</i>
-    </a>
+    </button>
 
-    <form v-if="channelMember.admin && channelType == 'private'" v-on:submit.prevent="invite">
-      <div class="modal fade" id="users" tabindex="-1" aria-labelledby="users" aria-hidden="true">
+    <!-- <form v-if="channelMember.admin && channelType == 'private'" v-on:submit.prevent="invite"> -->
+      <div class="modal fade" id="usersModal" tabindex="-1" aria-labelledby="usersModal" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
+
             <div class="modal-header">
-              <h5 class="modal-title" id="users">Channel members</h5>
+              <h5 class="modal-title" id="usersModal">Channel members</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-              <div class="modal-body">
-                  <!-- <ul>
-                    <li v-for="member in memberList" :key="member">
-                        {{ member.user.username }}
-                        <template v-if="channelMember.owner">
-                          <button
-                            @click="setMemberAsAdmin(member.user.username)"
-                            class="btn-primary"
-                            v-if="member.admin === false"
-                          >
-                            PROMOTE
-                          </button>
-                          <button
-                            @click="unsetMemberAsAdmin(member.user.username)"
-                            class="btn-primary"
-                            v-if="member.admin === true && !member.owner"
-                          >
-                            DEMOTE
-                          </button>
-                        </template>
-                        <template v-if="channelMember.admin">
-                          <button
-                            @click="kickMember(member.user.username)"
-                            class="btn-danger"
-                            v-if="member.admin === false"
-                          >
-                            Kick
-                          </button>
-                          <button
-                            @click="kickMember(member.user.username)"
-                            class="btn-danger"
-                            v-if="member.admin && !member.owner && channelMember.owner"
-                          >
-                            Kick
-                          </button>
-                        </template>
-                        <template v-if="channelMember.admin">
-                          <button
-                            @click="mute(member.user.username)"
-                            class="btn-secondary"
-                            v-if="!member.admin && !member.muted"
-                          >
-                            Mute
-                          </button>
-                          <button
-                            @click="unmute(member.user.username)"
-                            class="btn-secondary"
-                            v-if="!member.admin && member.muted"
-                          >
-                            Unmute
-                          </button>
-                          <button
-                            @click="ban(member.user.username)"
-                            class="btn-secondary"
-                            v-if="!member.admin && !member.banned"
-                          >
-                            Ban
-                          </button>
-                          <button
-                            @click="unban(member.user.username)"
-                            class="btn-secondary"
-                            v-if="!member.admin && member.banned"
-                          >
-                            Unban
-                          </button>
-                        </template>
-                        <template v-if="member.admin">(admin)</template>
-                        <template v-if="member.muted">(muted)</template>
-                        <template v-if="member.banned">(banned)</template>
-                    </li>
-                  </ul> -->
+
+            <div class="modal-body">
+                <ul>
+                  <li v-for="member in memberList" :key="member" class="text-dark">
+                      {{ member.user.username }}
+                      <template v-if="channelMember.owner">
+                        <button
+                          @click="setMemberAsAdmin(member.user.username)"
+                          v-if="member.admin === false"
+                        >
+                          <span class="material-icons" style="color: grey">star</span>
+                        </button>
+
+                        <button
+                          @click="unsetMemberAsAdmin(member.user.username)"
+                          v-if="member.admin === true && !member.owner"
+                        >
+                          <span class="material-icons" style="color: #fff774">star</span>
+                        </button>
+                      </template>
+
+                      <template v-if="channelMember.admin">
+                        <button
+                          @click="mute(member.user.username)"
+                          v-if="!member.admin && !member.muted"
+                        >
+                          <span class="material-icons" style="color: grey">volume_off</span>
+                        </button>
+                        <button
+                          @click="unmute(member.user.username)"
+                          v-if="!member.admin && member.muted"
+                        >
+                          <span class="material-icons" style="color: grey">volume_up</span>
+                        </button>
+                        <button
+                          @click="ban(member.user.username)"
+                          v-if="!member.admin && !member.banned"
+                        >
+                          <span class="material-icons" style="color: grey">block</span>
+                        </button>
+                        <button
+                          @click="unban(member.user.username)"
+                          v-if="!member.admin && member.banned"
+                        >
+                          <span class="material-icons" style="color: red">block</span>
+                        </button>
+                      </template>
+
+                      <template v-if="channelMember.admin">
+                        <button
+                          @click="kickMember(member.user.username)"
+                          v-if="member.admin === false"
+                        >
+                          <span class="material-icons" style="color: grey">close</span>
+                        </button>
+
+                        <button
+                          @click="kickMember(member.user.username)"
+                          v-if="member.admin && !member.owner && channelMember.owner"
+                        >
+                          <span class="material-icons" style="color: red">close</span>
+                        </button>
+                      </template>
+
+                      <template v-if="member.admin">(admin)</template>
+                      <template v-if="member.muted">(muted)</template>
+                      <template v-if="member.banned">(banned)</template>
+                  </li>
+                </ul>
+
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               </div>
+
           </div>
         </div>
       </div>
-    </form>
+    <!-- </form> -->
     
   </div>
 </template>
@@ -222,7 +235,7 @@
 import { defineComponent } from "@vue/runtime-core";
 import { Socket } from "socket.io-client";
 import http from "../../http-common";
-import VueCrontab from 'vue-crontab'
+// import VueCrontab from 'vue-crontab's
 
 export default defineComponent({
   props: {

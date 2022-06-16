@@ -19,7 +19,7 @@
             <div class="col-7 colorbox h-100" v-if="convToShow === 0">
                 Select a conversation
             </div>
-            <div class="col-7 colorbox" style="height: 75rem;" v-if="convToShow > 0">
+            <div class="col-7 colorbox h-100" style="height: 75rem; padding: 0%;" v-if="convToShow > 0">
                 <PrivateChatBox v-if="type==='priv'"
                     :receiverId="convToShow"
                     :key="componentKey"
