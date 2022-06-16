@@ -34,4 +34,4 @@ import { Match } from 'src/pong/models/match.entity';
   exports: [UserService]
 
 })
-export class UserModule {}
+export class UserModule { }

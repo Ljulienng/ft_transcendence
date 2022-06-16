@@ -1,5 +1,5 @@
 import { Socket, Server } from "socket.io";
-import { 
+import {
     ConnectedSocket,
     OnGatewayConnection,
     OnGatewayDisconnect,
@@ -30,28 +30,28 @@ import { UserModule } from "./user.module";
 // }
 
 @WebSocketGateway({
-	cors: {
-		origin: true,
-		credentials: true
-	}
+    cors: {
+        origin: true,
+        credentials: true
+    }
 })
 
-export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect{
-	@WebSocketServer() server: Server;
-	socketList: SocketUserI[] = []; // Socket connected linked to their users entities list
+export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+    @WebSocketServer() server: Server;
+    socketList: SocketUserI[] = []; // Socket connected linked to their users entities list
 
 
-	constructor(
-		private channelService: ChannelService,
-		private userService: UserService
-	) {}
-	// connectedUser: []
+    constructor(
+        protected channelService: ChannelService,
+        protected userService: UserService
+    ) { }
+    // connectedUser: []
 
     afterInit(server: any) {
         console.log('init userGateWay');
     }
 
-	async handleConnection(client: Socket) {
+    async handleConnection(client: Socket) {
         let newSocket: SocketUserI = {
             socketId: '',
             socket: client,
@@ -63,12 +63,12 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         if (newSocket.user)
             console.log('client connected to the Server, user = ', newSocket.user.username);
         else
-            return ;
-		this.socketList.push(newSocket);
+            return;
+        this.socketList.push(newSocket);
 
-	}
+    }
 
-	async handleDisconnect(client: Socket) {
+    async handleDisconnect(client: Socket) {
         const index = this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
         const user = this.socketList.find((socket) => socket.socketId === client.id).user
         // console.log(this.socketList[index].user.username ,'has disconnected from the server');
@@ -78,38 +78,38 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         // this.docketListthis.socketList.find(socket => socket.socketId === client.id)
     }
 
-	@SubscribeMessage('connectUser')
-	async connectUser(client: Socket, username: string) {
-		const user = await this.userService.findByUsername(username);
+    @SubscribeMessage('connectUser')
+    async connectUser(client: Socket, username: string) {
+        const user = await this.userService.findByUsername(username);
 
-		console.log('user:', user.username, 'is connected');
-		this.userService.setStatus(user, 'Online');
+        console.log('user:', user.username, 'is connected');
+        this.userService.setStatus(user, 'Online');
         this.server.to(client.id).emit("Connected");
         this.socketList.forEach(async (socket) => {
-            if(await this.userService.checkIfFriend(user.id, socket.user.id))                
+            if (await this.userService.checkIfFriend(user.id, socket.user.id))
                 this.server.to(socket.socketId).emit("friendConnected");
         })
-	}
+    }
 
-	@SubscribeMessage('disconnectUser')
-	async disconnectUser(client: Socket, username: string) {
-		const user = await this.userService.findByUsername(username);
+    @SubscribeMessage('disconnectUser')
+    async disconnectUser(client: Socket, username: string) {
+        const user = await this.userService.findByUsername(username);
 
         if (!user)
-            return ;
-		console.log('user:', user.username, 'is disconnected');
-		this.userService.setStatus(user, "Offline");
+            return;
+        console.log('user:', user.username, 'is disconnected');
+        this.userService.setStatus(user, "Offline");
         this.socketList.forEach(async (socket) => {
-        if(await this.userService.checkIfFriend(user.id, socket.user.id))                
+            if (await this.userService.checkIfFriend(user.id, socket.user.id))
                 this.server.to(socket.socketId).emit("friendDisconnected");
         })
-	}
+    }
 
 
 
-	/* ============= CHANNEL CHAT PART ============*/
+    /* ============= CHANNEL CHAT PART ============*/
 
-	@UseGuards(SocketGuard)
+    @UseGuards(SocketGuard)
     @SubscribeMessage('getChannelMsg')
     async getChannelMsg(client: Socket, channelId: number) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
@@ -121,7 +121,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.emit('getChannelMessages' + this.socketList[index].user.id, messages)
     }
 
-	@UseGuards(SocketGuard)
+    @UseGuards(SocketGuard)
     @SubscribeMessage('createChannel')
     async createChannel(client: Socket, createChannel: CreateChannelDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
@@ -132,7 +132,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
     }
 
-	@UseGuards(SocketGuard)
+    @UseGuards(SocketGuard)
     @SubscribeMessage('deleteChannel')
     async deleteChannel(client: Socket, channelId: number) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
@@ -154,21 +154,21 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('joinChannel')
     async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
-        
+
         await this.channelService.addUserToChannel(joinChannel, user.id);
         client.join(String(joinChannel.id));
         this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
         this.server.emit("/userJoined/channel/" + joinChannel.id);
-    } 
+    }
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('inviteInPrivateChannel')
     async inviteUserInChannel(client: Socket, invitation: channelInvitationDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         const guest = await this.channelService.inviteUserInChannel(user, invitation);
-        
-        const guestSocket = (this.socketList.find(s => s.user.id === guest.id )).socket;
+
+        const guestSocket = (this.socketList.find(s => s.user.id === guest.id)).socket;
         guestSocket.join(String(invitation.channelId));
         this.server.to(guestSocket.id).emit("updateJoinedChannel", await this.userService.joinedChannel(guest));
     }
@@ -190,7 +190,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @UseGuards(SocketGuard)
-    @SubscribeMessage('kickMember') 
+    @SubscribeMessage('kickMember')
     async kickMember(client: Socket, member: updateMemberDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         const userToKick = await this.userService.findByUsername(member.username)
@@ -206,13 +206,13 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.updateMember(user, update);
         const userToUpdate = await this.userService.findByUsername(update.username);
-        const userToUpdateSocket = (this.socketList.find(s => s.user.id === userToUpdate.id )).socket;
+        const userToUpdateSocket = (this.socketList.find(s => s.user.id === userToUpdate.id)).socket;
         const channel = await this.channelService.findChannelById(update.channelId);
         this.server.to(userToUpdateSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToUpdate, channel));
         this.server.emit('messageUpdate/' + channel.id);
         this.server.emit("/userUpdated/channel/" + channel.id);
     }
-    
+
     @OnEvent('unmutedOrUnbannedMember')
     sendDataToFront() {
         console.log("On event unmutedOrUnbannedMember");
@@ -222,7 +222,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)
     @UseGuards(SocketGuard)
-    @SubscribeMessage('leaveChannel') 
+    @SubscribeMessage('leaveChannel')
     async leaveChannel(client: Socket, channelId: number) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
 
@@ -234,7 +234,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @UseGuards(SocketGuard)
-    @SubscribeMessage('getChannelMemberInfo') 
+    @SubscribeMessage('getChannelMemberInfo')
     async getChannelMemberInfo(client: Socket, channelId: number) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         const members = await this.channelService.findMembers(channelId);
@@ -243,7 +243,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @UseGuards(SocketGuard)
-    @SubscribeMessage('changePassword') 
+    @SubscribeMessage('changePassword')
     async changePassword(client: Socket, passwordI: changePasswordDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.changePassword(user.id, passwordI);
@@ -256,14 +256,14 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async changeChannelName(client: Socket, updates: updateChannelDto) {
         const owner = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.changeChannelName(owner, updates);
-        
+
         this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(String(updates.channelId)).emit("updateMembersJoinedChannels");
     }
 
 
     @UseGuards(SocketGuard)
-    @SubscribeMessage('sendMessageToServer') 
+    @SubscribeMessage('sendMessageToServer')
     async sendMessage(client: Socket, createMessageDto: CreateMessageDto /*message: string, channelId: number*/) {
         // console.log('Message sent to the back in channel ', createMessageDto);
         // client.emit('messageUpdate', message, channelId);
@@ -274,25 +274,25 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     /* ============= USER CHAT PART ============*/
 
-	@UseGuards(SocketGuard)
+    @UseGuards(SocketGuard)
     @SubscribeMessage('getUserMsg')
     async getUserMsg(client: Socket, userId: number) {
-        const sender :User = this.socketList?.find(socket => socket.socketId === client.id).user
-        const receiver :User = await this.userService.findOne({id: userId});
+        const sender: User = this.socketList?.find(socket => socket.socketId === client.id).user
+        const receiver: User = await this.userService.findOne({ id: userId });
         const messages = await this.userService.getMessage(sender.id, receiver.id)
 
         this.server.emit('getUserMessages' + receiver.id, messages)
     }
 
     @UseGuards(SocketGuard)
-    @SubscribeMessage('sendMessageToUser') 
+    @SubscribeMessage('sendMessageToUser')
     async sendMessageUser(client: Socket, createMessageUserDto: CreateMessageUserDto) {
         console.log('Message sent to the back in User ', createMessageUserDto);
         const senderSocket = this.socketList.find(socket => socket.user.id === createMessageUserDto.senderId)
         // VERIFY IF THE USER IS BLOCKED 
         if (await this.userService.checkIfBlocked(senderSocket.user, createMessageUserDto.receiverId)) {
             this.server.to(client.id).emit('chatBlocked', createMessageUserDto.content);
-            return ;
+            return;
         }
         await this.userService.saveMessage(createMessageUserDto.senderId, createMessageUserDto);
         // this.server.emit('messageSentFromUser' + createMessageUserDto.senderId, createMessageUserDto.content);
@@ -303,19 +303,19 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     /* ============= BLOCK USER ============*/
 
     @UseGuards(SocketGuard)
-    @SubscribeMessage('blockUser') 
+    @SubscribeMessage('blockUser')
     async blockUser(client: Socket, userId: number) {
-        const user :User = this.socketList.find(socket => socket.socketId === client.id).user;
-        
+        const user: User = this.socketList.find(socket => socket.socketId === client.id).user;
+
         await this.userService.blockUser(user, userId);
         this.server.emit('updateBlocked/' + user.id);
     }
 
     @UseGuards(SocketGuard)
-    @SubscribeMessage('unblockUser') 
+    @SubscribeMessage('unblockUser')
     async unblockUser(client: Socket, userId: number) {
-        const user :User = this.socketList.find(socket => socket.socketId === client.id).user;
-        
+        const user: User = this.socketList.find(socket => socket.socketId === client.id).user;
+
         await this.userService.unblockUser(user, userId);
         this.server.emit('updateBlocked/' + user.id);
     }
@@ -323,26 +323,26 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // @SubscribeMessage('blockUser') 
     // async blockUser(client: Socket, userId: number) {
     //     const user :User = await this.socketList.find(socket => socket.socketId === client.id).user;
-        
+
     //     await this.userService.blockUser(user, userId);
     // }
 
     /* ============= FRIEND USER ============*/
     @UseGuards(SocketGuard)
-    @SubscribeMessage('addFriend') 
+    @SubscribeMessage('addFriend')
     async addFriend(client: Socket, userId: any) {
-        const user :User = this.socketList.find(socket => socket.socketId === client.id).user;
-        
+        const user: User = this.socketList.find(socket => socket.socketId === client.id).user;
+
         await this.userService.addFriend(user, userId);
         this.server.to(client.id).emit('friendAdded');
         this.server.emit('/friendAdded/' + userId.friendUsername, user.username)
     }
 
     @UseGuards(SocketGuard)
-    @SubscribeMessage('deleteFriend') 
+    @SubscribeMessage('deleteFriend')
     async deleteFriend(client: Socket, userToDelete: string) {
-        const user :User = this.socketList.find(socket => socket.socketId === client.id).user;
-        
+        const user: User = this.socketList.find(socket => socket.socketId === client.id).user;
+
         await this.userService.deleteFriend(user, userToDelete);
         this.server.to(client.id).emit('friendDeleted');
         this.server.emit('/friendDeleted/' + userToDelete, user.username)
@@ -353,10 +353,10 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @UseGuards(SocketGuard)
     @SubscribeMessage('matchInvitation')
     async matchInvitation(client: Socket, userToInvite: number) {
-        const user :User = this.socketList.find(socket => socket.socketId === client.id).user;
+        const user: User = this.socketList.find(socket => socket.socketId === client.id).user;
 
         this.server.to(client.id).emit("moveToMatch");
-        this.server.emit('matchInvitation/' + userToInvite, {id: user.id, username: user.username} as unknown);
+        this.server.emit('matchInvitation/' + userToInvite, { id: user.id, username: user.username } as unknown);
     }
 
     @UseGuards(SocketGuard)
