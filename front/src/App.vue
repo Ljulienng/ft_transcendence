@@ -20,7 +20,6 @@
 import { defineComponent } from "@vue/runtime-core";
 // import http from "./http-common";
 import store from "./store";
-import router from "./router";
 import FirstTimeModal from "./components/auth/FirstTimeModal.vue";
 import Notification from "./components/Notification.vue";
 
@@ -45,6 +44,10 @@ export default defineComponent({
       if (!userSocket) store.dispatch("auth/setUserSocket");
       store.dispatch("auth/setUserStatus", "Offline");
     },
+
+    updateAvatar() {
+      console.log('updateavatar')
+    }
   },
 
   // async beforeCreate() {

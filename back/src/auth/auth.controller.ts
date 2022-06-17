@@ -62,10 +62,12 @@ export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
   @Get('/auth/42/callback')
   async FortyTwoAuthRedirect(@Req() req, @Res({passthrough: true}) res) {
+    console.log('went in callback user = ', req.user['username'])
     const payload = { username: req.user['username'], auth: false };
 		const accessToken = await this.jwtService.signAsync(payload);
     if (req.user.status === 'Offline')
       req.user.status = 'Online';
+    console.log('went in callback')
 		res.cookie('jwt', accessToken, {httpOnly: true})
 		res.redirect('http://localhost:3001/home');
   }

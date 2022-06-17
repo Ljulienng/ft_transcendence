@@ -27,7 +27,9 @@ import { FortyTwoService } from "../fortytwo.service"
 			email: profile['emails'][0]['value'],
 
 		}
-		// console.log("VALIDATE: ", userIdentity);
-		return await this.fortyTwoService.validateUser(userIdentity);
+		const user: User = await this.fortyTwoService.validateUser(userIdentity);
+
+		if (user)
+			return user;
 	 }
  }

@@ -37,7 +37,7 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
-import store from "../../store"
+// import store from "../../store"
 
 export default defineComponent({
   data() {
@@ -62,8 +62,12 @@ export default defineComponent({
 
     onUpload() {
       let file = new FormData();
+      if (this.selectedFile === null)
+        return ;
       file.append("image", this.selectedFile, this.selectedFile.name);
 
+      if (file === null)
+        return;
       http
         .post("/users/uploadavatar", file)
         .then((res) => {

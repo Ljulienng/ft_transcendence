@@ -3,8 +3,8 @@
     <TwoFactorModal />
     <div class="d-flex mx-auto justify-content-evenly" style="width:70%">
       <div class="d-block text-center">
-        <UploadAvatar />
-        <UsernameModal @updateAvatar="console.log('poop')"/>
+        <UploadAvatar v-on:updateAvatar="updateAvatar"/>
+        <UsernameModal />
         <router-link :to="'/public/' + currentUser.userName" class="button text-decoration-none">
           <small> public profile </small> 
         </router-link>
@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import http from "../http-common";
+// import http from "../http-common";
 import TwoFactorModal from "../components/auth/TwoFactorModal.vue";
 // import UsernameModal from "../components/user/UsernameModal.vue";
 import UsernameModal from "../components/user/UsernameModal.vue";
@@ -36,9 +36,16 @@ export default defineComponent({
 
   data() {
     return {
+      socket: store.getters['auth/getUserSocket'],
       currentUser: store.getters["auth/getUserProfile"],
     };
   },
+
+  methods: {
+    updateAvatar() {
+      this.socket.emit('updateAvatar')
+    }
+  }
 
 
 });

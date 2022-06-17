@@ -73,6 +73,7 @@ export default defineComponent({
 
   data() {
 	return {
+		socket: store.getters["auth/getUserSocket"],
 		// eslint-disable-next-line
 		avatar: null as any
 	}
@@ -95,6 +96,14 @@ export default defineComponent({
           console.log(err);
         });
     },
+  },
+
+  mounted() {
+	  this.socket.on('updateAvatar', () => {
+		store.dispatch('auth/setUserAvatar').then(() => {
+			this.avatar = store.getters['auth/getUserAvatar']
+		})
+	  })
   },
 
   async created() {

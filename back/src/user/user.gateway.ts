@@ -114,6 +114,10 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         })
     }
 
+    @SubscribeMessage("updateAvatar")
+    updateAvatar(client: Socket) {
+        this.server.to(client.id).emit('updateAvatar')
+    }
 
 
     /* ============= CHANNEL CHAT PART ============*/
