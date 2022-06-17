@@ -279,14 +279,14 @@ export default defineComponent({
     }
 
     this.socket.on("updateChannel", () => {
-      console.log("updateChannel");
+      // console.log("updateChannel");
       this.getChannelList();
       this.getJoinedChannelList();
       this.socket.emit("updateJoinedChannels");
     });
 
     this.socket.on("updateJoinedChannel", (data: ChannelI[]) => {
-      console.log("updateJoinedChannel");
+      // console.log("updateJoinedChannel");
       this.getChannelList();
     });
 

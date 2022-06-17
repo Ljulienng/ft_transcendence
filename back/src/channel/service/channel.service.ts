@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Channel} from '../models/channel.entity'
@@ -23,13 +23,9 @@ export class ChannelService {
         private channelMemberService: ChannelMemberService,
         @Inject(MessageService)
         private messageService: MessageService,
-
     ) {}
 
-    /* 
-    ** get all channels
-    ** returns most recent first
-    */
+    /* get all channels : returns most recent first */
     async findAll(): Promise<Channel[]> {
         return (await this.channelRepository.find()).sort((a, b)=> b.createdTime.getTime() - a.createdTime.getTime());
     }
@@ -257,7 +253,6 @@ export class ChannelService {
    */
    async changePassword(userId: number, passwordI: changePasswordDto)
    {
-        // console.log('user:', userId, ' changes password of channel:', channelId, ' [new pass:', passwords.newPassword,']');
         const user = await this.userRepository.findOne({id: userId});
         const channel = await this.findChannelById(passwordI.channelId);
         const channelMember = await this.channelMemberService.findOne(user, channel);
@@ -307,15 +302,20 @@ export class ChannelService {
     }
 
    async changeChannelName(owner: User, updates: updateChannelDto) {
+    const regex = /^[a-zA-Z0-9_]+$/
     const channel = await this.findChannelById(updates.channelId);
     const member = await this.channelMemberService.findOne(owner, channel);
-
+    
     if (!member.owner) {
         throw new HttpException('only owner can update the channel', HttpStatus.FORBIDDEN);
     }
-    if (!updates.name) {
-        throw new HttpException('channel name cannot be null', HttpStatus.FORBIDDEN);
+    if (!updates.name || updates.name.length < 3 || updates.name.length > 20) {
+        throw new HttpException('chat name beetween 3 and 20 characters please', HttpStatus.FORBIDDEN);
     }
+    if (regex.test(updates.name) === false) {
+        throw new HttpException('Wrong format for chat name only underscore are allowed.', HttpStatus.FORBIDDEN);    
+    }
+
     const isSameChatName = await this.channelRepository.findOne({name: updates.name});
     if (isSameChatName) {
         throw new HttpException('this name is already used', HttpStatus.FORBIDDEN);
@@ -350,7 +350,7 @@ export class ChannelService {
     }
 
     /*
-    ** the  user wants to update element(s) of a channel member (ban, mute)
+    ** the user wants to update element(s) of a channel member (ban, mute)
     */
     async updateMember(owner: User, update: UpdateMemberChannelDto) {
         const userToUpdate = await this.userRepository.findOne({username: update.username});
@@ -381,16 +381,6 @@ export class ChannelService {
         const messages = await this.messageService.findMessagesByChannel(user, channel);
         return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
     }
-
-    /*
-    ** get all the messages of a channel
-    ** returns most recent last
-    */
-    // async findChannelMessagesByChannelId(channelId: number) {
-    //     const channel = await this.findChannelById(channelId);
-    //     const messages = await this.messageService.findMessagesByChannel(channel);
-    //     return messages.sort((a, b) => a.createdTime.getTime() - b.createdTime.getTime());
-    // }
 
     async saveMessage(userId: number, createMessageDto: CreateMessageDto) {
         const user = await this.userRepository.findOne({id: userId});

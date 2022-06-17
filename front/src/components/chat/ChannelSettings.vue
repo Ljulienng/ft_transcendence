@@ -305,11 +305,11 @@ export default defineComponent({
       this.getChannelMembers();
     });
     this.socket.on("/userJoined/channel/" + this.channelId, () => {
-      console.log("user Joined");
+      // console.log("user Joined");
       this.getChannelMembers();
     });
     this.socket.on("/userLeft/channel/" + this.channelId, () => {
-      console.log("user Left");
+      // console.log("user Left");
       this.getChannelMembers();
     });
     this.socket.on("/userKicked/" + this.currentUser.userName, () => {
@@ -317,12 +317,12 @@ export default defineComponent({
     });
 
     this.socket.on("/userUpdated/channel/" + this.channelId, () => {
-      console.log("user muted or banned");
+      // console.log("user muted or banned");
       this.getChannelMembers();
     });
 
     this.socket.on("/userUpdated/channel/", () => {
-      console.log("user unmuted or unbanned");
+      // console.log("user unmuted or unbanned");
       this.getChannelMembers();
     });
     this.socket.on("/passwordChanged/", (data: string) => {

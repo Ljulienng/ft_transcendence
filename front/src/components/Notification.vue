@@ -171,6 +171,10 @@ export default defineComponent({
     this.socket.on("/passwordChanged/", (data: string) => {
       this.show("channel", data, data, "CHANNEL", 'success');
     });
+
+    this.socket.on("/changeChannelNameError/", (data: string) => {
+      this.show("channel", data, data, "CHANNEL", 'warn');
+    });
   }
 });
 </script>
