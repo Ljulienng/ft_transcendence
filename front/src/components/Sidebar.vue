@@ -34,35 +34,84 @@
 			</router-link>
 			<router-link to="/leaderboard" class="button">
 				<span class="material-icons">emoji_events</span>
-				<span class="text">Play</span>
+				<span class="text">Leaderboard</span>
 			</router-link>
+			<template v-if="getUserProfile.id !== 0">
+				<router-link to="/userprofile" class="button">
+					<span >
+						<img :src="this.avatar" class="sidebar_profile_avatar"/>
+					</span>
+					<span class="text" style='margin-left: 1rem'>Profile</span>
+				</router-link>
+			</template>
 		</div>
 
 		<div class="flex"></div>
 		
 		<div class="menu" v-if="getUserProfile.id !== 0">
-			<router-link to="/userprofile" class="button">
-				<span class="material-icons">settings</span>
-				<span class="text">Settings</span>
-			</router-link>
+			<button class="button" @click='logout'>
+				<span class="material-icons">power_settings_new</span>
+				<span class="text">Chat</span>
+			</button>
 		</div>
+
 	</aside>
 </template>
 
-<script>
+<script lang='ts'>
+import { defineComponent } from "@vue/runtime-core";
 import { mapGetters } from "vuex";
+import http from '../http-common'
+import store from '../store'
 
-export default {
-  name: "App",
+export default defineComponent({
   computed: {
     ...mapGetters("auth", {
       getUserProfile: "getUserProfile",
     }),
   },
-}
+
+  data() {
+	return {
+		// eslint-disable-next-line
+		avatar: null as any
+	}
+  },
+  
+  methods: {
+    logout() {
+      const userSocket = store.getters["auth/getUserSocket"].id;
+
+      if (!userSocket) store.dispatch("auth/setUserSocket");
+      store.dispatch("auth/setUserStatus", "Offline");
+      http
+        .delete("/logout")
+        .then((res) => {
+          console.log(res);
+		//   this.$router.push('/authmodal');
+          window.location.reload();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+  },
+
+  async created() {
+	if (this.getUserProfile.id !== 0)
+	{
+		if (!store.getters['auth/getUserAvatar']) {
+			await store.dispatch('auth/setUserAvatar')
+			// console.log('test', store.getters['auth/getUserAvatar'])
+			this.avatar = store.getters['auth/getUserAvatar'] 
+		}
+
+	}
+  }
+})
 </script>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
   /* tslint:disable:no-unused-variable */
 import logoURL from '../assets/42_Logo.svg.png'
@@ -72,6 +121,8 @@ const ToggleMenu = () => {
 	localStorage.setItem("is_expanded", is_expanded.value)
 }
 </script>
+
+
 
 
 <style lang="scss">

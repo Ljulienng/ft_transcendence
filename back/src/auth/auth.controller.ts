@@ -18,7 +18,7 @@ export class AuthController {
 
   @UseGuards(FortyTwoAuthGuard)
   @Get('/auth/42')
-  async FortyTwoAuth(@Req() req)  {
+  FortyTwoAuth(@Req() req)  {
   }
 
   // @UseGuards(FortyTwoAuthGuard)
@@ -72,6 +72,7 @@ export class AuthController {
 
   @UseInterceptors(ClassSerializerInterceptor)
 	@UseGuards(JwtAuthGuard)
+  @HttpCode(200)
   @Get('userinfo')
   async userinfo(@Req() req) {
     try {

@@ -1,11 +1,10 @@
 <template>
   <div class="userProfile mx-auto p-4">
-    <button class="logout" @click="logout">Logout</button>
     <TwoFactorModal />
     <div class="d-flex mx-auto justify-content-evenly" style="width:70%">
-      <div class="d-block">
+      <div class="d-block text-center">
         <UploadAvatar />
-        <UsernameModal />
+        <UsernameModal @updateAvatar="console.log('poop')"/>
         <router-link :to="'/public/' + currentUser.userName" class="button text-decoration-none">
           <small> public profile </small> 
         </router-link>
@@ -41,41 +40,7 @@ export default defineComponent({
     };
   },
 
-  methods: {
-    setStatus() {
-      http.post("/users/setstatus", { newStatus: "Offline" });
-      // .then((res) => {
-      //   console.log(res);
-      // })
-      // .catch((err) => {
-      //   console.log(err);
-      // });
-    },
 
-    logout() {
-      const userSocket = store.getters["auth/getUserSocket"].id;
-
-      if (!userSocket) store.dispatch("auth/setUserSocket");
-      store.dispatch("auth/setUserStatus", "Offline");
-      http
-        .delete("/logout")
-        .then((res) => {
-          console.log(res);
-          window.location.reload();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-  },
-
-  // created() {
-  //   console.log("currentUser = ", this.currentUser);
-  // },
-
-  // beforeCreate() {
-  //   console.log("getUserprofile  = ", this.userProfile);
-  // },
 });
 </script>
 

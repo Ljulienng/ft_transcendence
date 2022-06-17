@@ -28,6 +28,6 @@ import { FortyTwoService } from "../fortytwo.service"
 
 		}
 		// console.log("VALIDATE: ", userIdentity);
-		return this.fortyTwoService.validateUser(userIdentity);
+		return await this.fortyTwoService.validateUser(userIdentity);
 	 }
  }

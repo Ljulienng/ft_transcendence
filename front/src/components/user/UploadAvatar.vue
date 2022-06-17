@@ -1,6 +1,6 @@
 <template>
   <div class="uploadAvatar">
-    <div class="img-container">
+    <div class="img-container mx-auto">
       <img :src="this.image" class="profile_avatar_private"/>
       <div class="modify_avatar" type="button" data-bs-toggle="modal" data-bs-target="#twoFaModal">
         <div class="modify_avatar_icon"><i style="color: #fff774" class="material-icons">edit</i></div>
@@ -37,7 +37,7 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
-// import store from "../../store"
+import store from "../../store"
 
 export default defineComponent({
   data() {
@@ -69,7 +69,7 @@ export default defineComponent({
         .then((res) => {
           console.log(res), (this.success = true);
           this.getAvatar();
-
+          this.$emit('updateAvatar')
         })
         .catch((error) => {
           console.log("error on upload = ", error);

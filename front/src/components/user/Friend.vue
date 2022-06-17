@@ -1,5 +1,5 @@
 <template>
-  <div class="col text-center">
+  <th class="text-left" style="width: 11rem">
     <router-link
       :to="'/public/' + username"
       class="button text-decoration-none"
@@ -7,7 +7,7 @@
       <img :src="this.image" class="profile_avatar_small" />
       {{ username }}
     </router-link>
-  </div>
+  </th>
 </template>
 
 <script lang="ts">

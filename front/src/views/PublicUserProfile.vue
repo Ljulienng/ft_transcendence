@@ -2,7 +2,7 @@
   <div class="userProfile mx-auto p-4">
     <!-- <div class="avatar"> -->
     <div class="d-flex mx-auto justify-content-evenly" style="width:70%">
-      <div class="d-block">
+      <div class="d-block text-center">
         <img :src="this.image" class="profile_avatar_public" />
         <p class="primary text-decoration-none display-5" style="color: #fff774">{{userInfo.username}}</p>
       </div>
