@@ -140,7 +140,6 @@
 import { defineComponent } from "@vue/runtime-core";
 import { Socket } from "socket.io-client";
 import http from "../../http-common";
-import VueCrontab from "vue-crontab";
 import BanMuteModal from "./BanMuteModal.vue";
 
 export default defineComponent({
@@ -170,7 +169,6 @@ export default defineComponent({
 
   data() {
     return {
-      errorMsg: "",
       memberList: [],
       newChannelName: "",
       invitation: {
@@ -328,21 +326,9 @@ export default defineComponent({
       this.getChannelMembers();
     });
     this.socket.on("/passwordChanged/", (data: string) => {
-      this.getChannelMembers();
-      console.log(data);
+      this.getChannelMembers();   
     });
 
-  },
-
-  computed: {
-    childData:  {
-      get() {
-        return this.channelType
-      },
-      set (newChannelType: string) {
-        this.$emit('input', newChannelType)
-      }
-    }
   },
 
   created() {

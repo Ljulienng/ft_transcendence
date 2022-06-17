@@ -249,8 +249,6 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     sendDataToFront() {
         this.server.emit("channelMembersInfo");
         this.server.emit("/userUpdated/channel/");
-        
-
     }
 
     @UseGuards(SocketGuard)

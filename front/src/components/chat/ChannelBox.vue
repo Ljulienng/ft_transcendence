@@ -58,7 +58,7 @@ export default defineComponent({
     socketChannel: {
       type: Socket,
     },
-  },
+  },  
 
   data() {
     /* eslint-disable */
