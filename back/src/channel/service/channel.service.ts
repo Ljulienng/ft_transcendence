@@ -115,7 +115,7 @@ export class ChannelService {
  
        if (newChannel.type === "protected") {
            if (!newChannel.password) {
-                throw new BadRequestException('need a password for protected channel');
+                throw new HttpException('need a password for protected channel', HttpStatus.FORBIDDEN);    
            }
            if (newChannel.password.length < 8 || newChannel.password.length > 20) {
                 throw new HttpException('password beetween 8 and 20 characters please', HttpStatus.FORBIDDEN);
@@ -139,12 +139,12 @@ export class ChannelService {
         const user2 = await this.userRepository.findOne({id: user2Id});
         
         if (!user1 || !user2) {
-            throw new UnauthorizedException('user does not exist');
+            throw new HttpException('user does not exist', HttpStatus.FORBIDDEN);    
         }
 
         const isSameChatName = await this.channelRepository.findOne({name: createChannel.name});
         if (isSameChatName) {
-            throw new UnauthorizedException('this name is already used');  
+            throw new HttpException('this name is already used', HttpStatus.FORBIDDEN);    
         }
 
         const newChannel = this.channelRepository.create({
@@ -180,14 +180,14 @@ export class ChannelService {
             if (welcomingChannel.password) {
                 const match = await this.checkPasswordMatch(joinChannel.password, welcomingChannel.password);
                 if (!match) {
-                    throw new UnauthorizedException('incorrect password');
+                    throw new HttpException('incorrect password', HttpStatus.FORBIDDEN);    
                 }
             }
         }
 
         const channelMember = await this.channelMemberService.findOne(user, welcomingChannel);
         if (channelMember) {
-            throw new UnauthorizedException('user already in this channel');
+            throw new HttpException('user already in this channel', HttpStatus.FORBIDDEN);    
         }
 
         await this.channelRepository.save(welcomingChannel);
@@ -205,13 +205,13 @@ export class ChannelService {
         const guest = await this.userRepository.findOne({username: invitation.guest});
 
         if (channel.owner.id !== user.id) {
-            throw new UnauthorizedException('you are not allowed to invite someone to join this channel');
+            throw new HttpException('you are not allowed to invite someone to join this channel', HttpStatus.FORBIDDEN);    
         }
         if (!guest) {
-            throw new UnauthorizedException('the guest you want to invite does not exist');
+            throw new HttpException('the guest you want to invite does not exist', HttpStatus.FORBIDDEN);    
         }
         if (await this.channelMemberService.findOne(guest, channel)) {
-            throw new UnauthorizedException('the guest is already in the channel');
+            throw new HttpException('the guest is already in the channel', HttpStatus.FORBIDDEN);    
         }
 
         await this.addUserToChannel({
@@ -234,7 +234,7 @@ export class ChannelService {
         const channelMember = await this.channelMemberService.findOne(user, channelToLeave);
 
         if (!channelMember) {
-            throw new UnauthorizedException('user not in this channel');
+            throw new HttpException('user not in this channel', HttpStatus.FORBIDDEN);    
         }
         
         // if the owner leave the channel, we delete the channel
@@ -337,7 +337,7 @@ export class ChannelService {
         const channelMember = await this.channelMemberService.findOne(user, channel);
 
         if (!channel) {
-            throw new NotFoundException();
+            throw new HttpException('channel not found', HttpStatus.FORBIDDEN);
         }
         if (!channelMember.owner) {
             throw new HttpException('only the owner can delete channels', HttpStatus.FORBIDDEN);

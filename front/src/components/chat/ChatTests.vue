@@ -99,7 +99,8 @@
               v-for="friend in friendList"
               :key="friend"
               @click="showUser(friend.id)"
-            >
+            >                this.server.to(client.id).emit("/passwordChanged/", "password is changed")
+
               <UserBox :username="friend.username" :is-selected="false" />
             </button>
           </div>
@@ -292,6 +293,9 @@ export default defineComponent({
 
     this.socket.on("/userKicked/" + this.currentUser.userName, () => {
       this.getJoinedChannelList();
+    });
+    this.socket.on("/joinChannelError/", (data: string) => {
+      console.log(data);
     });
 
   },

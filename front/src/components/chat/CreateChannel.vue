@@ -122,13 +122,6 @@
                 this.password = "";
             },
         },
-
-        mounted() {
-            this.socket.on("/createChannelError/", (data: string) => {
-            console.log(data);
-            });
-        }
-
     })
 </script>
 

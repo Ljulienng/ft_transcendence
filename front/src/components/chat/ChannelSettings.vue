@@ -258,13 +258,11 @@ export default defineComponent({
     },
 
     ban(username: string, timeToBan: number) {
-      console.log("test to mute for 1 minutes");
-      timeToBan = 1; // TEST
       const update = {
         channelId: this.channelId,
         username: username,
         banned: true,
-        timeToBan: timeToBan == undefined ? null : timeToBan,
+        timeToBan: timeToBan,
       };
       this.socket.emit("muteban", update);
     },
@@ -279,13 +277,11 @@ export default defineComponent({
     },
 
     mute(username: string, timeToMute: number) {
-      console.log("test to mute for 1 minutes");
-      timeToMute = 1; // TEST
       const update = {
         channelId: this.channelId,
         username: username,
         muted: true,
-        timeToMute: timeToMute == undefined ? null : timeToMute,
+        timeToMute: timeToMute,
       };
       this.socket.emit("muteban", update);
     },
@@ -332,11 +328,21 @@ export default defineComponent({
       this.getChannelMembers();
     });
     this.socket.on("/passwordChanged/", (data: string) => {
+      this.getChannelMembers();
       console.log(data);
     });
-    this.socket.on("/passwordError/", (data: string) => {
-      console.log(data);
-    });
+
+  },
+
+  computed: {
+    childData:  {
+      get() {
+        return this.channelType
+      },
+      set (newChannelType: string) {
+        this.$emit('input', newChannelType)
+      }
+    }
   },
 
   created() {

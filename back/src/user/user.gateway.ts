@@ -166,11 +166,17 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
 
-        await this.channelService.addUserToChannel(joinChannel, user.id);
-        client.join(String(joinChannel.id));
-        this.server.emit("updateChannel");
-        this.server.emit("/userJoined/channel/" + joinChannel.id);
-        this.server.emit("/userJoined/" + user.username, (await this.channelService.findChannelById(joinChannel.id)).name);
+        await this.channelService.addUserToChannel(joinChannel, user.id)
+            .then(async () => {
+                client.join(String(joinChannel.id));
+                this.server.emit("updateChannel");
+                this.server.emit("/userJoined/channel/" + joinChannel.id);
+                this.server.emit("/userJoined/" + user.username, (await this.channelService.findChannelById(joinChannel.id)).name);
+            })
+            .catch(error => {
+                this.server.to(client.id).emit("/joinChannelError/", error.response)
+            })
+        
     }
 
     // @UseGuards(JwtAuthGuard, TwoFAAuth)
@@ -275,7 +281,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.addPasswordToPublicChannel(user, passwordI)
             .then(async () => {
-                this.server.emit("updateChannel", await this.channelService.findAll());
+                this.server.emit("updateChannel")
             })
             .catch(error => {
                 this.server.to(client.id).emit("/passwordAddedError/", error.response)
@@ -288,7 +294,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.removePasswordToProtectedChannel(user, channelId)
             .then(async () => {
-                this.server.emit("updateChannel", await this.channelService.findAll());
+                this.server.emit("updateChannel")
             })
             .catch(error => {
                 this.server.to(client.id).emit("/passwordRemovedError/", error.response)

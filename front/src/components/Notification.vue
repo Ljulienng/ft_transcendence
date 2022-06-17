@@ -156,6 +156,21 @@ export default defineComponent({
       this.show("channel", "The administrators have changed your status in the channel " + data, data, "CHANNEL", 'warn');
     });
 
+    this.socket.on("/joinChannelError/", (data: string) => {
+      this.show("channel", data, data, "CHANNEL", 'warn');
+    });
+
+    this.socket.on("/createChannelError/", (data: string) => {
+      this.show("channel", data, data, "CHANNEL", 'warn');
+    });
+
+    this.socket.on("/passwordError/", (data: string) => {
+      this.show("channel", data, data, "CHANNEL", 'warn');
+    });
+
+    this.socket.on("/passwordChanged/", (data: string) => {
+      this.show("channel", data, data, "CHANNEL", 'success');
+    });
   }
 });
 </script>
