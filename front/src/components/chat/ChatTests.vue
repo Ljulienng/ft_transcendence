@@ -99,8 +99,7 @@
               v-for="friend in friendList"
               :key="friend"
               @click="showUser(friend.id)"
-            >                this.server.to(client.id).emit("/passwordChanged/", "password is changed")
-
+            >
               <UserBox :username="friend.username" :is-selected="false" />
             </button>
           </div>
