@@ -45,7 +45,6 @@ const State = {
 };
 
 export default defineComponent({
-  /* eslint-disable */
   name: 'Pong',
   data() {
     return {

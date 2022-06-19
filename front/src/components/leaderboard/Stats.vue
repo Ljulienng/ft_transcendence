@@ -1,65 +1,76 @@
 <template>
-    <tr>
-        <th scope="row">{{ user.username }}</th>
-        <td>{{ userStats.total }}</td>
-        <td>{{ userStats.gameWon }}</td>
-        <td>{{ userStats.gameLost }}</td>
-        <td>{{ userStats.ranking }}</td>
-        <td>{{ userStats.points }}</td>
-    </tr>
+  <tr>
+    <th scope="row" class="text-center">{{ userStats.ranking }}</th>
+    <td class="text-left" style="width: 11rem">
+      <router-link
+        :to="'/public/' + currentUser.username"
+        class="button text-right text-decoration-none"
+      >
+        <img :src="this.image" class="profile_avatar_small" />
+        {{ currentUser.username }}
+      </router-link>
+    </td>
+    <td class="text-center">{{ userStats.total }}</td>
+    <td class="text-center">{{ userStats.gameWon }}</td>
+    <td class="text-center">{{ userStats.gameLost }}</td>
+    <td class="text-center">{{ userStats.points }}</td>
+  </tr>
 </template>
 
 <script lang="ts">
+/* eslint-disable */
+import { defineComponent } from "@vue/runtime-core";
+import http from "../../http-common";
 
-    import { defineComponent } from "@vue/runtime-core";
-    import http from "../../http-common"
+export default defineComponent({
+  props: ["user"],
 
-    export default defineComponent({
+  data() {
+    return {
+      currentUser: this.user,
+      //   stats: any,
+      userStats: {
+        total: 0,
+        gameWon: 0,
+        gameLost: 0,
+        ranking: 0,
+        points: 0,
+      },
+      image: null as any,
+    };
+  },
 
-        props: ['user'], 
+  methods: {
+    async getStats() {
+      try {
+        this.userStats = this.currentUser;
+        this.userStats.total =
+          this.currentUser.gameWon + this.currentUser.gameLost;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getAvatar() {
+      http
+        .get("/users/avatar/" + this.currentUser.username, {
+          responseType: "blob",
+        })
+        .then((response) => {
+          const blob = response.data;
 
-        data () {
-            return {
-                x: this.user,
-                stats: [],
-                userStats: {
-                    total: 0,
-                    gameWon: 0,
-                    gameLost: 0,
-                    ranking: 0,
-                    points: 0,
-                },
-            }
-        },
+          this.image = URL.createObjectURL(blob);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+  },
 
-        methods: {
-            async getStats() {
-                try {
-                    // const response  = await http.get('/stats');
-                    const response  = await http.get('/users/stats');
-                    this.stats = response.data;
-                    // const x: any = this.stats.find(d => d["user_id"] === this.user.id)
-                    // eslint-disable-next-line 
-                    const user_stats: any = this.stats.find(d => d["id"] === this.user.id)
-                    console.log("user stats = ", user_stats)
-                    this.userStats.gameWon = user_stats.gameWon;
-                    this.userStats.gameLost = user_stats.gameLost;
-                    this.userStats.ranking = user_stats.ranking;
-                    this.userStats.points = user_stats.points;
-                    this.userStats.total =
-                        this.userStats.gameWon + this.userStats.gameLost;
-                } catch (error) {
-                    console.log(error);
-                }
-            },
-        },
-        
-        created () {
-            this.getStats();
-        },
-
-    })
+  created() {
+    this.getStats();
+    this.getAvatar();
+  },
+});
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

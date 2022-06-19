@@ -15,7 +15,7 @@ export class FortyTwoService {
 	}
 
 	async validateUser(user: Student): Promise<User> {
-		return this.userService.validateStudent(user);
+		return await this.userService.validateStudent(user);
 	}
 
 }

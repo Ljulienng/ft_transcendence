@@ -1,11 +1,14 @@
 <template>
   <div class="app">
-    <Sidebar />
+    <Sidebar v-if="getUserProfile.id !== 0"/>
     <FirstTimeModal
       v-if="getUserProfile.firstTime === true"
       v-bind:currentUser="getUserProfile"
     />
-    <Notification v-if="getUserProfile.id !== 0" v-bind:currentUser="getUserProfile"/>
+    <Notification
+      v-if="getUserProfile.id !== 0"
+      v-bind:currentUser="getUserProfile"
+    />
     <router-view />
     <!-- <teleport :to="someVar" v-if="someVar"> -->
     <div id="my-modals" />
@@ -17,7 +20,6 @@
 import { defineComponent } from "@vue/runtime-core";
 // import http from "./http-common";
 import store from "./store";
-import router from "./router";
 import FirstTimeModal from "./components/auth/FirstTimeModal.vue";
 import Notification from "./components/Notification.vue";
 
@@ -41,33 +43,30 @@ export default defineComponent({
 
       if (!userSocket) store.dispatch("auth/setUserSocket");
       store.dispatch("auth/setUserStatus", "Offline");
+    },
+
+    updateAvatar() {
+      console.log('updateavatar')
     }
   },
 
-  async beforeCreate() {
-    let userProfile = store.getters["auth/getUserProfile"];
+  // async beforeCreate() {
+  //   let userProfile = store.getters["auth/getUserProfile"];
 
-    if (userProfile.id === 0) {
-      await store.dispatch("auth/userProfile");
-      userProfile = store.getters["auth/getUserProfile"];
-      console.log("userprofile beforecreate = ", userProfile.id);
-    }
+  //   if (userProfile.id === 0) {
+  //     await store.dispatch("auth/userProfile");
+  //     userProfile = store.getters["auth/getUserProfile"];
+  //     console.log("userprofile beforecreate = ", userProfile.id);
+  //   }
 
-    if (userProfile.id === 0) router.push("http://localhost:3001/authmodal");
-    // const user = store.getters["auth/getUserProfile"];
-    if (userProfile.id !== 0) {
-      const socket = store.getters["auth/getUserSocket"];
-      socket.on('moveToMatch', () => {console.log('MATCH'); this.$router.push("/play");})
+  //   if (userProfile.id === 0) router.push("http://localhost:3001/authmodal");
+  //   // const user = store.getters["auth/getUserProfile"];
 
-    }
-
-
-    // if (user.id) await store.dispatch("auth/setUserStatus", "Online");
-  },
+  // },
 
   created() {
-    console.log('created')
-    window.addEventListener("beforeunload", this.setOffline);
+    if (store.getters["auth/getUserProfile"].id !== 0)
+      window.addEventListener("beforeunload", this.setOffline);
     // if (this.getUserProfile.status === "Offline") store.dispatch("auth/setUserStatus", "Online");
     // console.log('user status', store.getters["auth/getUserProfile"].status)
   },

@@ -99,7 +99,7 @@ export default defineComponent({
   },
 
   mounted() {
-    this.socket.on("messageUpdate", () => {
+    this.socket.on("messageUpdate/" + this.channel, () => {
       console.log("messageUpdate");
       this.socket.emit("getChannelMsg", this.channel);
     });

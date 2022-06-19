@@ -106,8 +106,8 @@ export class UserService {
 		await this.userRepository.save(currentUser);
 	}
 
-	findAll(): any {
-		return from(this.userRepository.find());
+	async findAll() {
+		return await this.userRepository.find();
 	}
 
 	async findByCookie(cookie: any): Promise<User> {

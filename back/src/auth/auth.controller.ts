@@ -18,7 +18,7 @@ export class AuthController {
 
   @UseGuards(FortyTwoAuthGuard)
   @Get('/auth/42')
-  async FortyTwoAuth(@Req() req)  {
+  FortyTwoAuth(@Req() req)  {
   }
 
   // @UseGuards(FortyTwoAuthGuard)
@@ -62,24 +62,30 @@ export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
   @Get('/auth/42/callback')
   async FortyTwoAuthRedirect(@Req() req, @Res({passthrough: true}) res) {
+    console.log('went in callback user = ', req.user['username'])
     const payload = { username: req.user['username'], auth: false };
 		const accessToken = await this.jwtService.signAsync(payload);
     if (req.user.status === 'Offline')
       req.user.status = 'Online';
+    console.log('went in callback')
 		res.cookie('jwt', accessToken, {httpOnly: true})
 		res.redirect('http://localhost:3001/home');
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
 	@UseGuards(JwtAuthGuard)
+  @HttpCode(200)
   @Get('userinfo')
   async userinfo(@Req() req) {
     try {
     const user = await this.userService.findByUsername(req.user.username);
 
+    if (!user)
+      throw new UnauthorizedException("Not authorized")
+
 		return user;
 	  } catch (e) {
-		  throw new UnauthorizedException(e);
+		  throw e;
 	  }
   }
 

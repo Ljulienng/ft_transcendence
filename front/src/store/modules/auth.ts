@@ -1,7 +1,7 @@
 import http from '../../http-common'
 import { Commit } from "vuex"
 import { io, Socket } from 'socket.io-client'
-
+/* eslint-disable */
 
 export interface State {
 	loginApiStatus: string,
@@ -15,6 +15,7 @@ export interface State {
 		twoFAEnabled: boolean,
 		firstTime: boolean
 	}
+	avatar: any
 }
 
 const state = () => ({
@@ -43,11 +44,28 @@ const getters = {
 	getTwoFAauth(state: State) {
 		return state.twoFAauth;
 	},
+
+	getUserAvatar(state: State) {
+		return state.avatar;
+	},
 };
 
 const actions = {
 	setUserSocket({commit}: {commit: Commit}) {
 		commit("setUserSocket")
+	},
+
+	async setUserAvatar({commit}: {commit: Commit}) {
+		await http
+        .get("/users/avatar", { responseType: "blob" })
+        .then((response: any) => {
+			const blob = response.data;
+			
+			commit('setUserAvatar', URL.createObjectURL(blob));
+        })
+        .catch((error:any) => {
+          console.log(error.response.data);
+        });
 	},
 
 	async setUserStatus({commit}: {commit: Commit}, userStatus: string) {
@@ -57,7 +75,7 @@ const actions = {
 			await commit('connectUser');
 		}
 		else if (userStatus === 'Offline')
-			await commit('disconnectUser');
+		await commit('disconnectUser');
 		else {
 			console.log('status unknown');
 			return ;
@@ -66,7 +84,7 @@ const actions = {
 
 	async setTwoFAauth({commit}: {commit: Commit}) {
 		const data: boolean = await http.get('/twofa/check', {withCredentials: true})
-		.then ( res => {
+		.then ( (res: any)=> {
 			return res.data
 		})
 		.catch( (err: Error) => {
@@ -83,14 +101,14 @@ const actions = {
 
 	async userProfile({commit}: {commit: Commit}){
 		await http.get("userinfo", {withCredentials: true})
-		.then((response) => {
+		.then((response: any) => {
 			if(response && response.data){
 				console.log("userinfo =", response.data)
 				commit("setUserProfile", response.data)
 			}
 		})
-		.catch((err) => {
-			console.log(err);
+		.catch(() => {
+			console.log("");
 		});
 
 	}
@@ -98,6 +116,11 @@ const actions = {
 
 const mutations = {
 	// eslint-disable-next-line
+	setUserAvatar(state: State, data: any) {
+		// if (!state.avatar)
+		state.avatar = data;
+	},
+
 	setUserSocket(state: State) {
 		if (!state.socket)
 			state.socket = io('http://localhost:3000/user', {  withCredentials: true });
@@ -114,7 +137,7 @@ const mutations = {
 
 	disconnectUser(state: State) {
 		// console.log('disconnect user with socket')
-
+		
 		state.userProfile.status = "Offline";
 		
 		state.socket.emit('disconnectUser', state.userProfile.userName)

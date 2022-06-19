@@ -1,159 +1,155 @@
 <template>
   <div>
     <template v-if="context === 'mute'">
-    <button
-      type="button"
-      class="btn btn-secondary"
-      @click="createModal"
-      v-if="!member.admin && !member.muted"
-    >
-      mute
-    </button>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        @click="createModal"
+        v-if="!member.admin && !member.muted"
+      >
+        mute
+      </button>
 
-    <button
-      @click="unmute"
-      class="btn-secondary"
-      v-if="!member.admin && member.muted"
-    >
-      Unmute
-    </button>
-    <form v-on:submit.prevent="mute">
-    <div
-      class="modal fade"
-      id="mutemodal"
-      ref="mutemodal"
-      tabindex="-1"
-      aria-labelledby="mutemodal"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="mutemodal">Mute timer</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <input
-              class="form-range"
-              id="timeToMute"
-              v-model="timeToMute"
-              type="range"
-              min="0"
-              max="60"
-              timeToMute="timeToMute"
-              onchange="rangeValue = timeToMute"
-            />
-            <div class="form-text">0 means until unmuted manually*</div>
-            <div class="form-text">Mute for {{timeToMute}} minutes*</div>
-
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
-            <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
-            <button
-              class="btn btn-primary"
-              value="submit"
-              type="submit"
-              data-bs-dismiss="modal"
-            >
-              Mute
-            </button>
+      <button
+        @click="unmute"
+        class="btn-secondary"
+        v-if="!member.admin && member.muted"
+      >
+        Unmute
+      </button>
+      <form v-on:submit.prevent="mute">
+        <div
+          class="modal fade"
+          id="mutemodal"
+          ref="mutemodal"
+          tabindex="-1"
+          aria-labelledby="mutemodal"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="mutemodal">Mute timer</h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <input
+                  class="form-range"
+                  id="timeToMute"
+                  v-model="timeToMute"
+                  type="range"
+                  min="0"
+                  max="60"
+                  timeToMute="timeToMute"
+                  onchange="rangeValue = timeToMute"
+                />
+                <div class="form-text">0 means until unmuted manually*</div>
+                <div class="form-text">Mute for {{ timeToMute }} minutes*</div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                <button
+                  class="btn btn-primary"
+                  value="submit"
+                  type="submit"
+                  data-bs-dismiss="modal"
+                >
+                  Mute
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    </form>
+      </form>
     </template>
 
     <!-- ================ BAN TEMPLATE =================== -->
 
     <template v-else>
+      <button
+        type="button"
+        class="btn-secondary"
+        @click="createModal"
+        v-if="!member.admin && !member.banned"
+      >
+        Ban
+      </button>
+      <button
+        @click="unban"
+        class="btn-secondary"
+        v-if="!member.admin && member.banned"
+      >
+        Unban
+      </button>
 
-
-          
-    <button
-      type="button"
-      class="btn-secondary"
-      @click="createModal"
-      v-if="!member.admin && !member.banned"
-    >
-      Ban
-    </button>
-    <button
-      @click="unban"
-      class="btn-secondary"
-      v-if="!member.admin && member.banned"
-    >
-      Unban
-    </button>
-
-    <form v-on:submit.prevent="ban">
-    <div
-      class="modal fade"
-      id="banmodal"
-      ref="banmodal"
-      tabindex="-1"
-      aria-labelledby="banmodal"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="banmodal">Ban timer</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <input
-              class="form-range"
-              id="timeToBan"
-              v-model="timeToBan"
-              type="range"
-              min="0"
-              max="60"
-              timeToBan="timeToBan"
-              onchange="rangeValue = timeToBan"
-            />
-            <div class="form-text">0 means until unbanned manually*</div>
-            <div class="form-text">Ban for {{timeToBan}} minutes*</div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
-            <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
-            <button
-              class="btn btn-primary"
-              value="submit"
-              type="submit"
-              data-bs-dismiss="modal"
-            >
-              Ban
-            </button>
+      <form v-on:submit.prevent="ban">
+        <div
+          class="modal fade"
+          id="banmodal"
+          ref="banmodal"
+          tabindex="-1"
+          aria-labelledby="banmodal"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="banmodal">Ban timer</h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <input
+                  class="form-range"
+                  id="timeToBan"
+                  v-model="timeToBan"
+                  type="range"
+                  min="0"
+                  max="60"
+                  timeToBan="timeToBan"
+                  onchange="rangeValue = timeToBan"
+                />
+                <div class="form-text">0 means until unbanned manually*</div>
+                <div class="form-text">Ban for {{ timeToBan }} minutes*</div>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                <button
+                  class="btn btn-primary"
+                  value="submit"
+                  type="submit"
+                  data-bs-dismiss="modal"
+                >
+                  Ban
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    </form>
+      </form>
     </template>
   </div>
 </template>
@@ -222,15 +218,14 @@ export default defineComponent({
     createModal() {
       if (this.context === "mute")
         this.modal = new Modal(this.$refs.mutemodal as any);
-      else
-        this.modal = new Modal(this.$refs.banmodal as any);
+      else this.modal = new Modal(this.$refs.banmodal as any);
 
       this.modal.show();
     },
 
     closeModal() {
-      this.modal.close()
-    }
+      this.modal.close();
+    },
   },
 
   //   created() {

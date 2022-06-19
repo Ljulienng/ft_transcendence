@@ -65,7 +65,7 @@ export class User {
 	channelMembers: ChannelMember[];
 
 
-	@Column("simple-array", {nullable: true})
+	@Column("simple-array", {default: -1})
 	friends: string[];
 
 	@Column("simple-array", {default: -1})

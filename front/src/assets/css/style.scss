@@ -190,6 +190,16 @@ text {
     border:3px solid #fff774;
 }
 
+.profile_avatar_small {
+    vertical-align: middle;
+    width: 3rem;
+    height: 3rem;
+    margin-right: 1rem;
+    margin-left: 1rem;
+    // border-radius: 50%;
+    border:3px solid #fff774;
+}
+
 .profile_avatar_private {
     vertical-align: middle;
     width: 200px;
@@ -206,7 +216,12 @@ text {
     border:2px solid #fff774;
 }
 
-
+.sidebar_profile_avatar {
+    vertical-align: middle;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+}
 
 .modify_avatar {
     position: absolute;
