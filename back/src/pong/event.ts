@@ -32,10 +32,12 @@ export class Event {
   }
 
   emitYouWin(id: string) {
-    this.server.to(id).volatile.emit('youWin');
+    console.log('emit youWin to', id);
+    this.server.to(id).emit('youWin');
   }
 
   emitYouLose(id: string) {
-    this.server.to(id).volatile.emit('youLose');
+    console.log('emit youLose to', id);
+    this.server.to(id).emit('youLose');
   }
 }

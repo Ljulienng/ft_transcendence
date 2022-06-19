@@ -38,7 +38,9 @@ export class PongService {
     }
     const playerRight = this.waitingPlayers.find(e => e.options.winScore == playerLeft.options.winScore && e.user.id != playerLeft.user.id);
     if (playerRight == undefined) {
-      this.waitingPlayers.push(playerLeft);
+      if (!this.waitingPlayers.find(e => e.user.id == playerLeft.user.id)) {
+        this.waitingPlayers.push(playerLeft);
+      }
       return;
     }
     this.waitingPlayers.splice(this.waitingPlayers.indexOf(playerRight), 1);

@@ -123,7 +123,9 @@ export class Game {
     const interval = setInterval(async () => {
       if (this.state == GameState.PAUSE) {
         this.checkForfait();
-      } else if (this.state == GameState.OVER) {
+        return;
+      }
+      if (this.state == GameState.OVER) {
         clearInterval(interval);
         return;
       }
@@ -133,6 +135,7 @@ export class Game {
   }
 
   async gameOver(winner: Player) {
+    this.setState(GameState.OVER);
     const opponent: Player = this.findOpponent(winner.user.id);
     this.event.emitYouWin(winner.socket.id);
     this.event.emitYouLose(opponent.socket.id);
@@ -141,7 +144,6 @@ export class Game {
     await this.saveUser(opponent.user.id, 'Online', false, true, null);
     winner.socket.leave(this.name);
     opponent.socket.leave(this.name);
-    this.setState(GameState.OVER);
     console.log(`PONG: GAME OVER ! ${winner.user.username} won the game !\n`);
   }
 
@@ -161,7 +163,8 @@ export class Game {
     player.reconnect(user, socket);
     if (this.playerLeft.state == PlayerState.CONNECTED && this.playerRight.state == PlayerState.CONNECTED) {
       this.setState(GameState.PLAY);
-      this.start();
+      this.sendStart();
+      // this.start();
     }
   }
 

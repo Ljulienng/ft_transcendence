@@ -392,7 +392,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async playerRegister(client: Socket, options: Options) {
         this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
         const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);    // TODO: does not work if client changed name
-        console.log('playerRegister:', client.id, 'with a score of', options.winScore);
+        console.log('playerRegister:', user.username, 'with a score of', options.winScore);
         const event = new Event(this.server);
         const player = new Player(event, client, user, options);
         this.pongService.matchmake(event, player);
@@ -404,47 +404,22 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
         this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
         const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);    // TODO: does not work if client changed name
-        console.log('playerReconnect:', client.id);
+        console.log('playerReconnect:', user.username);
         const game = this.pongService.findGame(user.id);
+        // console.log('findGame ret', game);
         if (game) {
             game.reconnectPlayer(user, client);
             return (true);
         }
         const player = this.pongService.waitingPlayers.find(e => e.user.id == user.id);
         return (player ? true : false);
-
-        // if (!options) {
-        //     return;
-        // } else {
-        //     this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
-        //     const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
-        // console.log('>>>>> PONG: playerJoin ' + user.username + ' ' + user.id);
-        // console.log('GAMES a:', this.pongService.games.length);
-        // console.log('WAITING LIST', this.pongService.waitingPlayers.length);
-        // const game = await this.pongService.findGame(user.id);
-        // if (game) {
-        //     console.log('GAMES b:', this.pongService.games.length);
-        // console.log('>>>>> PONG: found game ' + game.name + ' ' + game.id);
-        // game.reconnectPlayer(user, client);
-        //     } else {
-        //         console.log('>>>>> PONG: NOT found game');
-        //         const event = new Event(this.server);
-        //         const options: Options = {
-        //             theme: { name: 'dark', bgColor: '#1c1d21', fgColor: 'lightgrey' },
-        //             winScore: 5
-        //         };
-        //         const player = new Player(event, client, user, options);
-        //         this.pongService.matchmake(event, player);
-        //         console.log('GAMES c:', this.pongService.games.length);
-        //     }
-        // }
     }
 
     @SubscribeMessage('playerLeave')
     async playerLeave(client: Socket) {
         this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
         const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);    // TODO: does not work if client changed name
-        console.log('playerLeave:', client.id);
+        console.log('playerLeave:', user.username);
         const game = this.pongService.findGame(user.id);
         if (!game) {
             this.pongService.waitingPlayers = this.pongService.waitingPlayers.filter(e => e.user.id != user.id);
@@ -462,28 +437,6 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             game.setState(GameState.OVER);
             this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
         }
-        return;
-        //console.log('>>>>> PONG: playerLeave ' + user.username + ' ' + user.id);
-        //const game = await this.pongService.findGame(user.id);
-        //if (game) {
-        //  const spectator = game.spectators.find(e => e.user.id == user.id);
-        //  if (spectator) {
-        //    spectator.socket.leave(game.spectatorRoom);
-        //    game.spectators.filter(e => e.user.id != user.id);
-        //  } else {
-        //    console.log('disconnecting player', user.id);
-        //    game.disconnectPlayer(user.id);
-        //    if ((!game.playerLeft || game.playerLeft.state == PlayerState.DISCONNECTED)
-        //      && (!game.playerRight || game.playerRight.state == PlayerState.DISCONNECTED)) {
-        //      await game.setState(GameState.OVER);
-        //      console.log('deleting game');
-        //      this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
-        //    }
-        //  }
-        //} else {
-        //  console.log('remove player from waiting list', user.id);
-        //  this.pongService.waitingPlayers.filter(e => e.user.id != user.id);
-        //}
     }
 
     @SubscribeMessage('playerMove')
@@ -491,6 +444,9 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);    // TODO: does not work if client changed name
         // console.log('>>>>> PONG: playerMove ' + user.username + ' ' + user.id);
         const game = this.pongService.findGame(user.id);
+        if (!game) {
+            return;
+        }
         const player = game.findPlayer(user.id);
         const opponent = game.findOpponent(user.id);
         player.move(opponent, data.x, data.y);

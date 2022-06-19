@@ -132,6 +132,9 @@ export default defineComponent({
       this.pong.context.fillText('YOU WIN', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
     },
     pausePage() {
+      if (this.state == State.WIN || this.state == State.LOSE) {
+        return;
+      }
       this.state = State.PAUSE;
       this.pong.context.fillStyle = this.options.theme.bgColor;
       this.pong.context.fillRect(0, 0, this.pong.canvas.width, this.pong.canvas.height);
@@ -232,17 +235,10 @@ export default defineComponent({
     },
     onReady() {
       this.pausePage();
-
-      if (this.isPlayer == true) {
-        this.socket.volatile.emit('playerReconnect');
-      }
-
-      // TODO: send connect
-      this.socket.on('pause', () => { this.pausePage(); });
-      this.socket.on('youWin', () => { this.winPage(); });
-      this.socket.on('youLose', () => { this.losePage(); });
-
       this.socket.on('start', async (options: GameOptionI, opponent: any, isLeftSide: boolean) => {
+        this.socket.on('pause', () => { this.pausePage(); });
+        this.socket.on('youWin', () => { this.winPage(); });
+        this.socket.on('youLose', () => { this.losePage(); });
         this.opponent = opponent;
         this.options = options;
         await this.getAvatars(this.user.userName, opponent.username);
@@ -330,6 +326,14 @@ export default defineComponent({
           return;
         }
       });
+      setTimeout(() => {
+        this.socket.volatile.emit('playerReconnect', (isReconnected: boolean) => {
+          if (isReconnected == false) {
+            this.$router.push('/');
+            return;
+          }
+        });
+      }, 100);
       this.onReady();
     } else if (this.$route.name == 'Spectate') {
       this.isPlayer = false;
