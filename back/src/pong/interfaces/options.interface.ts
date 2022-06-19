@@ -1,5 +1,6 @@
+import { Theme } from "./theme.interface";
+
 export interface Options {
-  bgColor: string;
-  fgColor: string;
+  theme: Theme;
   winScore: number;
 }

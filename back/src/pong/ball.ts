@@ -10,19 +10,23 @@ export class Ball {
   public pos: Point;
   private speed: Point;
   private maxSpeed: number;
-  // private radius: number;  // TODO: add radius to check collisions
+  private radius: number; // TODO: add radius to check collisions
 
   constructor(
     private event: Event
   ) {
-    this.pos = { x: WIDTH / 2, y: HEIGHT / 2 };
-    // this.radius = 2;
-    this.speed = { x: 1, y: 1 };
+    this.radius = 0.5;
     this.maxSpeed = 25;
+    this.resetPos();
+  }
+
+  resetSpeed() {
+    this.speed = { x: 0.5, y: 0.5 };
   }
 
   resetPos() {
     this.pos = { x: WIDTH / 2, y: HEIGHT / 2 };
+    this.resetSpeed();
   }
 
   poundSpeed() {
@@ -34,38 +38,33 @@ export class Ball {
   }
 
   randomDirection() {
-    this.speed.x = ((Math.random() * (100 - 45) + 45) / 100) * (Math.round(Math.random()) ? 1 : -1);
-    this.speed.y = ((Math.random() * (100 - 45) + 45) / 100) * (Math.round(Math.random()) ? 1 : -1);
+    // TODO: this breaks ball speed
+    // this.speed.x = ((Math.random() * (100 - 45) + 45) / 100) * (Math.round(Math.random()) ? 1 : -1);
+    // this.speed.y = ((Math.random() * (100 - 45) + 45) / 100) * (Math.round(Math.random()) ? 1 : -1);
   }
 
-  async move(playerLeft: Player, playerRight: Player): Promise<GameState> { // TODO: review
+  async move(playerLeft: Player, playerRight: Player) { // TODO: review
     // Rebounds on top and bottom
-    if (this.pos.y > HEIGHT || this.pos.y < 0) {
+    if (this.pos.y > HEIGHT - this.radius || this.pos.y < this.radius) {
       this.speed.y *= -1;
     }
     // Update ball pos
     this.pos.x += this.speed.x;
     this.pos.y += this.speed.y;
-    // Send start event
-    if (await this.event.emitBallMove(playerLeft.socket.id, this.pos) != 'ok') {
-      playerLeft.disconnect()
-      return GameState.PAUSE;
-    }
-    if (await this.event.emitBallMove(playerRight.socket.id, this.pos) != 'ok') {
-      playerRight.disconnect()
-      return GameState.PAUSE;
-    }
-    return GameState.PLAY;
+
+    // Send move event
+    this.event.emitBallMove(playerLeft.socket.id, this.pos);
+    this.event.emitBallMove(playerRight.socket.id, this.pos);
   }
 
   checkCollisions(game: Game, playerLeft: Player, playerRight: Player) {
     let player: Player;
     let opponent: Player;
 
-    if (this.pos.x < Player.size.x) {
+    if (this.pos.x < Player.size.x + this.radius) {
       player = playerLeft;
       opponent = playerRight;
-    } else if (this.pos.x > WIDTH - Player.size.x) {
+    } else if (this.pos.x > WIDTH - Player.size.x - this.radius) {
       player = playerRight;
       opponent = playerLeft;
     } else {
@@ -80,7 +79,7 @@ export class Ball {
       //this.pong.playerRight.y = this.pong.boardSize.y / 2 - this.pong.playerSize.y / 2;
       //this.pong.playerLeft.y = this.pong.boardSize.y / 2 - this.pong.playerSize.y / 2;
     } else {  // player hit the ball
-      this.speed.x *= -1.0; // TODO: increment ball speed
+      this.speed.x *= -1.1; // TODO: increment ball speed
       this.poundSpeed();
 
       // TODO: review

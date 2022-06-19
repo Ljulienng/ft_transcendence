@@ -8,19 +8,19 @@
         <div class="centered">
           <h4>points to victory</h4>
           <div>
-            <button class="left_arrow"></button>
-            <p class="point2win">3</p>
-            <button class="right_arrow"></button>
+            <button class="left_arrow" @click="decrementWinScore"></button>
+            <p class="point2win">{{ winScores.at(winScoreIndex) }}</p>
+            <button class="right_arrow" @click="incrementWinScore"></button>
           </div>
           <br />
           <h4>theme</h4>
           <div>
-            <button class="left_arrow"></button>
-            <p class="theme">classic</p>
-            <button class="right_arrow"></button>
+            <button class="left_arrow" @click="decrementTheme"></button>
+            <p class="theme">{{ themes.at(themeIndex).name }}</p>
+            <button class="right_arrow" @click="incrementTheme"></button>
           </div>
           <br />
-          <button class="mybtn">play</button>
+          <button class="mybtn" @click="play">play</button>
         </div>
       </div>
       <div class="rcol">
@@ -41,6 +41,8 @@ import "../assets/css/style.scss";
 import { defineComponent } from "@vue/runtime-core";
 import store from "../store";
 import http from "../http-common";
+import GameOptionI from "@/types/interfaces/gameoption.interface";
+/* eslint-disable */
 
 export interface UserProfile {
   id: number;
@@ -54,6 +56,14 @@ export default defineComponent({
   data() {
     return {
       getUserProfile: {} as UserProfile,
+      socket: store.getters['auth/getUserSocket'],
+      winScores: [3, 5],
+      winScoreIndex: 0,
+      themes: [
+        { name: 'dark', bgColor: '#1c1d21', fgColor: 'lightgrey' },
+        { name: 'light', bgColor: 'lightgrey', fgColor: '#1c1d21' }
+      ],
+      themeIndex: 0
     };
   },
 
@@ -61,14 +71,12 @@ export default defineComponent({
     setUser() {
       this.getUserProfile = store.getters["auth/getUserProfile"];
     },
-
     connectUser() {
       const userSocket = store.getters["auth/getUserSocket"].id;
 
       if (!userSocket) store.dispatch("auth/setUserSocket");
       store.dispatch("auth/setUserStatus", "Online");
     },
-
     getId() {
       const userId = store.getters["auth/getUserProfile"].id;
       const userSocket = store.getters["auth/getUserSocket"].id;
@@ -77,28 +85,68 @@ export default defineComponent({
       console.log("userSocket = ", userSocket);
       return userId;
     },
-
     setStatus() {
       http
         .post("/users/setstatus", { newStatus: "Online" })
-        .then((res) => {
+        .then((res: any) => {
           console.log(res);
         })
-        .catch((err) => {
+        .catch((err: Error) => {
           console.log(err);
         });
     },
+    incrementTheme() {
+      if (this.themeIndex < this.themes.length - 1) {
+        this.themeIndex += 1;
+      } else {
+        this.themeIndex = 0;
+      }
+    },
+    decrementTheme() {
+      if (this.themeIndex > 0) {
+        this.themeIndex -= 1;
+      } else {
+        this.themeIndex = this.themes.length - 1;
+      }
+    },
+    incrementWinScore() {
+      if (this.winScoreIndex < this.winScores.length - 1) {
+        this.winScoreIndex += 1;
+      } else {
+        this.winScoreIndex = 0;
+      }
+    },
+    decrementWinScore() {
+      if (this.winScoreIndex > 0) {
+        this.winScoreIndex -= 1;
+      } else {
+        this.winScoreIndex = this.winScores.length - 1;
+      }
+    },
+    async play() {
+      const options: GameOptionI = {
+        theme: this.themes[this.themeIndex],
+        winScore: this.winScores[this.winScoreIndex]
+      };
+      this.socket.volatile.emit('playerRegister', options);
+      this.$router.push('/play');
+    }
   },
-
-  // mounted() {
-  // },
-
+  beforeMount() {  // TODO: do earlier ?
+    // if player is in game, redirect it to its game
+    this.socket.volatile.emit('isPlayerInGame', (isPlayerInGame: boolean) => {
+      if (isPlayerInGame) {
+        this.socket.volatile.emit('playerReconnect');
+        this.$router.push('/play');
+      }
+    });
+  },
   created() {
     this.setUser();
     // if (this.getUserProfile.status === "Offline") this.connectUser();
-
   },
 });
 </script>
 
-<style src="../assets/css/home.css" scoped></style>
+<style src="../assets/css/home.css" scoped>
+</style>

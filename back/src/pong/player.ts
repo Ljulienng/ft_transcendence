@@ -4,6 +4,7 @@ import { Game, GameState, HEIGHT, WIDTH } from './game';
 import { Point } from './interfaces/point.interface';
 import { Socket } from 'socket.io'
 import { Event } from './event';
+import { Options } from './interfaces/options.interface';
 
 export enum PlayerState {
   DISCONNECTED,
@@ -22,7 +23,8 @@ export class Player {
   constructor(
     private event: Event,
     public socket: Socket,
-    public user: User) {
+    public user: User,
+    public options: Options) {
     Player.size = { x: WIDTH / 100, y: HEIGHT / 3.3 };
     this.y = HEIGHT / 2 - Player.size.y / 2;
     this.score = 0;
@@ -30,27 +32,22 @@ export class Player {
     this.disconnectedAt = null;
   }
 
-  async move(opponent: Player, y: number, canvasHeight: number): Promise<GameState> {
+  async move(opponent: Player, y: number, canvasHeight: number) {
     y = y / canvasHeight * HEIGHT;
     this.y = y;
-    if (await this.event.emitOpponentMove(opponent.socket.id, y) != 'ok') {
-      opponent.disconnect();
-      return GameState.PAUSE;
-    }
-    else {
-      return GameState.PLAY;
-    }
+    this.event.emitOpponentMove(opponent.socket.id, y);
   }
 
   goal(game: Game) {
     this.score += 1;
     game.sendScore();
-    if (this.score >= game.options.winScore) {
+    if (this.score >= this.options.winScore) {
       game.gameOver(this);
     }
   }
 
-  reconnect(socket: Socket) {
+  reconnect(user: User, socket: Socket) {
+    this.user = user;
     this.socket = socket;
     this.state = PlayerState.CONNECTED;
     this.disconnectedAt = null;
@@ -63,9 +60,9 @@ export class Player {
     }
   }
 
-  disconnectAndPause(gameId: string) {
+  async disconnectAndPause(gameId: string) {
     this.disconnect();
     this.event.emitPause(gameId);
+    // this.socket = null;
   }
-
 }

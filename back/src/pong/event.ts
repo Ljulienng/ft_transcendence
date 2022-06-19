@@ -9,57 +9,33 @@ import { Point } from './interfaces/point.interface';
 @Injectable()
 export class Event {
 
-  constructor(
-    private server: Server
-  ) {
-  }
+  constructor(private server: Server) { }
 
-  emitStart(options: Options, id: string, opponent: User, isLeftPlayer: boolean): Promise<string> {
-    return new Promise(resolve => this.server.timeout(1000).to(id).emit('start', options, opponent, isLeftPlayer, (err: Error, response: string) => {
-      if (err || response != 'ok') {
-        response = 'ko';
-      }
-      resolve(response);
-    }));
+  emitStart(options: Options, id: string, opponent: User, isLeftPlayer: boolean) {
+    this.server.to(id).volatile.emit('start', options, opponent, isLeftPlayer);
   }
 
   emitOpponentMove(id: string, y: number) {
-    return new Promise(resolve => this.server.timeout(1000).to(id).emit('opponentMove', y, (err: Error, response: string) => {
-      if (err || response != 'ok') {
-        response = 'ko';
-      }
-      resolve(response);
-    }));
+    this.server.to(id).volatile.emit('opponentMove', y);
   }
 
-  emitBallMove(id: string, pos: Point): Promise<string> {
-    return new Promise(resolve => this.server.volatile.timeout(1000).to(id).emit('ballMove', pos, (err: Error, response: string) => {
-      if (err || response != 'ok') {
-        response = 'ko';
-      }
-      resolve(response);
-    }));
+  emitBallMove(id: string, pos: Point) {
+    this.server.volatile.to(id).volatile.emit('ballMove', pos);
   }
 
   emitUpdateScore(id: string, score: Point) {
-    return new Promise(resolve => this.server.timeout(1000).to(id).emit('updateScore', score, (err: Error, response: string) => {
-      if (err || response != 'ok') {
-        response = 'ko';
-      }
-      resolve(response);
-    }));
+    this.server.to(id).volatile.emit('updateScore', score);
   }
 
   emitPause(id: string) {
-    console.log('emit pause');
-    this.server.to(id).emit('pause');
+    this.server.to(id).volatile.emit('pause');
   }
 
   emitYouWin(id: string) {
-    this.server.to(id).emit('youWin');
+    this.server.to(id).volatile.emit('youWin');
   }
 
   emitYouLose(id: string) {
-    this.server.to(id).emit('youLose');
+    this.server.to(id).volatile.emit('youLose');
   }
 }

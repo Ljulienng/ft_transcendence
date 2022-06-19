@@ -21,11 +21,11 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
   imports: [
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
-    ConfigModule.forRoot({isGlobal: true}),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({ // for PostGres 
       type: 'postgres',
-      url: process.env.DATABASE_URL,
-      //url: "postgres://user:password@localhost:5432/db",
+      //url: process.env.DATABASE_URL,
+      url: "postgres://user:password@localhost:5432/db",
       autoLoadEntities: true,
       synchronize: true // false for production, with true typeOrm creates tables every time we run the app
     }),
@@ -40,4 +40,4 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
   controllers: [AppController],
   providers: [AppService]
 })
-export class AppModule {}
+export class AppModule { }
