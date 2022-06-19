@@ -33,7 +33,7 @@ export class UserController {
 	constructor(private userService: UserService, private jwtService: JwtService) {}
 
 
-
+	
 	@Post()
 	add(@Body() user: User): any {
 		return this.userService.add(user);
