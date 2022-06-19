@@ -63,7 +63,7 @@ export class UserService {
  		return from(this.userRepository.save(user));
 	}
 
-	addStudent(user: Student): any {
+	async addStudent(user: Student): Promise<User> {
 		const tmp: User = this.userRepository.create(user);
 
 		console.log('Student Added');
@@ -71,7 +71,7 @@ export class UserService {
 		tmp.email = user.email;
 		tmp.status = 'Offline';
 
-		return from(this.userRepository.save(user));
+		return this.userRepository.save(user);
 	}
 
 	async delete(id: string) {
