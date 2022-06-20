@@ -38,9 +38,8 @@ export class Ball {
   }
 
   randomDirection() {
-    // TODO: this breaks ball speed
-    // this.speed.x = ((Math.random() * (100 - 45) + 45) / 100) * (Math.round(Math.random()) ? 1 : -1);
-    // this.speed.y = ((Math.random() * (100 - 45) + 45) / 100) * (Math.round(Math.random()) ? 1 : -1);
+    this.speed.x *= (Math.round(Math.random()) ? 1 : -1);
+    this.speed.y *= (Math.round(Math.random()) ? 1 : -1);
   }
 
   async move(playerLeft: Player, playerRight: Player, spectatorRoom: string) { // TODO: review

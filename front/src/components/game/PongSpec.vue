@@ -115,7 +115,9 @@ export default defineComponent({
         this.pong.context.fillText('Game aborted :(', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
       }
       setTimeout(() => {
-        this.$router.push('/');
+        if (this.$route.name == 'Spectate') {
+          this.$router.push('/');
+        }
       }, 3000);
     },
     pausePage() {

@@ -119,7 +119,9 @@ export default defineComponent({
       this.pong.context.textBaseline = "middle";
       this.pong.context.fillText('YOU LOSE', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
       setTimeout(() => {
-        this.$router.push('/');
+        if (this.$route.name == 'Pong') {
+          this.$router.push('/');
+        }
       }, 3000);
     },
     winPage() {
