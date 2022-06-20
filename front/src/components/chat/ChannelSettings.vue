@@ -359,7 +359,7 @@ import { defineComponent } from "@vue/runtime-core";
 import { Socket } from "socket.io-client";
 import http from "../../http-common";
 // import VueCrontab from 'vue-crontab's
-// import BanMuteModal from "./BanMuteModal.vue";
+import BanMuteModal from "./BanMuteModal.vue";
 
 export default defineComponent({
   components: {
@@ -388,8 +388,8 @@ export default defineComponent({
 
   data() {
     return {
-      // muteBanCounter: 0,
-      // name: "",
+      muteBanCounter: 0,
+      name: "",
       memberList: [],
       newChannelName: "",
       invitation: {
