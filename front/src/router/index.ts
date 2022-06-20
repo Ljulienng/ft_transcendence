@@ -53,7 +53,7 @@ const routes = [
 		path: '/authmodal',
 		component: AuthModal,
 		beforeEnter: async () => {
-			let userProfile = store.getters["auth/getUserProfile"];
+			let userProfile = await store.getters["auth/getUserProfile"];
 
 			if (userProfile.id === 0) {
 				await store.dispatch("auth/userProfile");
@@ -61,7 +61,8 @@ const routes = [
 				console.log("userprofile beforecreate = ", userProfile.id);
 			}
 
-			console.log("userprofile beforeEnter = ", userProfile.id)
+			console.log('beforeEnter = ', userProfile.id)
+
 			if (userProfile.id !== 0) router.push("http://localhost:3001/");
 			return true
 		}

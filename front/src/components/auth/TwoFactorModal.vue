@@ -147,7 +147,6 @@ export default defineComponent({
     },
 
     async activateTwoFA() {
-      console.log("twoFactorAuthenticationCode = ", this.twoFA);
       await http
         .post("/twofa/turn-on", this.twoFA)
         .then((response) => {

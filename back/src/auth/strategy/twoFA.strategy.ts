@@ -7,12 +7,13 @@ import { PassportStrategy } from "@nestjs/passport"
 import { UserService } from "src/user/service/user.service"
 import { User } from "src/user/models/user.entity"
 import { UserJwtPayload } from "../interfaces/jwt-payload.interface"
+import { ConfigService } from "@nestjs/config"
 
 @Injectable()
 export class TwoFaStrategy extends PassportStrategy(Strategy, 'twofa') {
-	constructor ( private userService: UserService ) {
+	constructor ( private userService: UserService, private configService: ConfigService) {
 		super({
-			secretOrKey: 'SECRET',
+			secretOrKey: configService.get('SECRET'),
 			ignoreExpiration: false,
 			jwtFromRequest: ExtractJwt.fromExtractors([
 				(request: Request) => {

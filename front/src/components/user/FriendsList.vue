@@ -1,42 +1,39 @@
 <template>
-  <ul class="list-group mb-2 mt-2">
-    <li
-      class="list-group-item bg-transparent border-0 text-grey d-flex justify-content-between"
-    >
-      <div class="col">username</div>
-      <div class="col align-middle">firstname</div>
-      <div class="col align-middle">lastname</div>
-      <div class="col align-middle">status</div>
-      <p class="invisible">del</p>
-      <p class="invisible">block</p>
-    </li>
-    <li
-      v-for="friend in friendList"
-      :key="friend"
-      class="list-group-item bg-transparent border-0 text-white d-flex justify-content-between"
-    >
-      <div class="col">
-        <!-- <SmallAvatar :v-bind:username="friend.username"> -->
-        <router-link :to="'/public/' + friend.username" class="button text-decoration-none">
-          {{ friend.username }}
-        </router-link>
-      </div>
-      <div class="col align-middle">{{ friend.firstname }}</div>
-      <div class="col align-middle">{{ friend.lastname }}</div>
-      <div class="col align-middle">{{ friend.status }}</div>
-      <button v-on:click="deleteFriend(friend.username)">
-        <span class="material-icons px-1">person_remove</span>
-        <!-- <span class="badge bg-primary rounded-pill">X</span> -->
-      </button>
-      <invitation-button
-        v-bind:userToInvite="friend.id"
-        v-bind:socket="socket"
-      />
-      <button v-on:click="blockUser(friend.id)">
-        <span class="material-icons px-1" style="color: red">block</span>
-      </button>
-    </li>
-  </ul>
+  <div class='mb-2 mt-2'>
+    <div class="container-fluid widebox">
+      <table class="table table-borderless" id="users">
+        <thead>
+          <tr>
+            <th scope="col" v-for="column in columns" :key="column" class='text-center'>
+              {{ column }}
+            </th>
+          </tr>
+        </thead>
+        <tbody v-for="friend in friendList" :key="friend">
+          <tr>
+            <Friend v-bind:username="friend.username" />
+            <td class="text-center">{{ friend.firstname }}</td>
+            <td class="text-center">{{ friend.lastname }}</td>
+            <td class="text-center">{{ friend.status }}</td>
+            <td class="text-center">
+              <button v-on:click="deleteFriend(friend.username)">
+                <span class="material-icons px-1">person_remove</span>
+                <!-- <span class="badge bg-primary rounded-pill">X</span> -->
+              </button>
+              <invitation-button
+                v-bind:userToInvite="friend.id"
+                v-bind:socket="socket"
+              />
+              <button v-on:click="blockUser(friend.id)">
+                <span class="material-icons px-1" style="color: red">block</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+   
+  </div>
 </template>
 
 <script lang="ts">
@@ -44,9 +41,13 @@ import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 import store from "../../store";
 import InvitationButton from "../game/InvitationButton.vue";
+import Friend from "./Friend.vue";
+
 export default defineComponent({
+  /* eslint-disable */
   components: {
     InvitationButton,
+    Friend,
   },
 
   data() {
@@ -56,6 +57,8 @@ export default defineComponent({
       userStatus: "",
       errorMsg: "",
       friendList: [],
+      columns: ['username', 'firstname', 'lastname', 'status', ''],
+
     };
   },
 
