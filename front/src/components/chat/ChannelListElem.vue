@@ -26,12 +26,14 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 
-export default defineComponent({
-  props: ["id",
-            "type",
-            "name",
-            "owner"],
-});
+  export default defineComponent({
+    props: {"id": Number,
+              "type": String,
+              "name": String,
+              "owner": String,
+            },
+  });
+
 </script>
 
 <style lang="scss" scoped>

@@ -1,15 +1,15 @@
 <template>
 
-  <div class="channelBox">
+  <div class="channelBox h-100">
 
     <div v-if="channelMember.banned">
       You can't access the channel [banned] ... but you can beg admins if you want to go back ...
     </div>
 
-    <div v-if="!channelMember.banned">
+    <div class="h-100" v-if="!channelMember.banned">
 
       <!-- <div v-if="channelMember.owner" class="boxhead" style="height: 10%;"> -->
-      <div class="boxhead" style="height: 10%;">
+      <div class="container-fluid boxhead" style="height: 10%;">
         <ChannelSettings
           v-bind:currentUser="currentUser"
           v-bind:channelId="channel"
