@@ -43,7 +43,7 @@ export class Ball {
     // this.speed.y = ((Math.random() * (100 - 45) + 45) / 100) * (Math.round(Math.random()) ? 1 : -1);
   }
 
-  async move(playerLeft: Player, playerRight: Player) { // TODO: review
+  async move(playerLeft: Player, playerRight: Player, spectatorRoom: string) { // TODO: review
     // Rebounds on top and bottom
     if (this.pos.y > HEIGHT - this.radius || this.pos.y < this.radius) {
       this.speed.y *= -1;
@@ -53,8 +53,9 @@ export class Ball {
     this.pos.y += this.speed.y;
 
     // Send move event
-    this.event.emitBallMove(playerLeft.socket.id, this.pos);
+    this.event.emitBallMove(playerLeft.socket.id, this.pos);  // TODO: emit to players room ?
     this.event.emitBallMove(playerRight.socket.id, this.pos);
+    this.event.emitBallMove(spectatorRoom, this.pos);
   }
 
   checkCollisions(game: Game, playerLeft: Player, playerRight: Player) {

@@ -374,7 +374,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('matchInvitation')
     async matchInvitation(client: Socket, userToInvite: number) {
         const user: User = this.socketList.find(socket => socket.socketId === client.id).user;
-
+        console.log('inviteMatch');
         this.server.to(client.id).emit("moveToMatch");
         this.server.emit('matchInvitation/' + userToInvite, { id: user.id, username: user.username } as unknown);
     }
@@ -382,12 +382,14 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @UseGuards(SocketGuard)
     @SubscribeMessage('matchAccepted')
     acceptMatch(client: Socket, otherUser: number) {
+        console.log('acceptMatch',);
         this.server.to(client.id).emit("moveToMatch");
     }
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('matchRefused')
     refuseMatch(client: Socket, otherUser: number) {
+        console.log('refuseMatch');
         this.server.emit("matchRefused/" + otherUser);
     }
 
@@ -448,6 +450,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         if ((!game.playerLeft || game.playerLeft.state == PlayerState.DISCONNECTED)
             && (!game.playerRight || game.playerRight.state == PlayerState.DISCONNECTED)) {
             game.setState(GameState.OVER);
+            game.event.emitGameOver(game.spectatorRoom, '');
             this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
         }
     }
@@ -462,7 +465,11 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
         const player = game.findPlayer(user.id);
         const opponent = game.findOpponent(user.id);
-        player.move(opponent, data.x, data.y);
+        let isLeftSide = false;
+        if (opponent == game.playerRight) {
+            isLeftSide = true;
+        }
+        player.move(opponent, data.x, data.y, game.spectatorRoom, isLeftSide);
     }
 
     @SubscribeMessage('duel') // TODO: test
@@ -487,17 +494,23 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('spectate') // TODO: test
     async spectate(client: Socket, userId: number) {
         this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
-        const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
+        const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);    // TODO: does not work if client changed name
+        const player: User = await this.userService.findOne({ id: userId });
+        if (!player) {
+            console.error('This player does not exist'); // TODO: err
+            return;
+        }
+        console.log(user.username + ' is trying to spectate ' + player.username);
         const game = this.pongService.findGame(userId);
         if (game == null) {
             // TODO: this player is not in a game
             console.error('Cannot spectate because this player is not in a game.')
-        } else {
-            const spectator: Spectator = {
-                socket: client,
-                user: user
-            };
-            game.connectSpectator(spectator);
+            return;
         }
+        const spectator: Spectator = {
+            socket: client,
+            user: user
+        };
+        game.connectSpectator(spectator, player);
     }
 }

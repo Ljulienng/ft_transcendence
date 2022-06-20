@@ -20,10 +20,8 @@
                 <span class="material-icons px-1">person_remove</span>
                 <!-- <span class="badge bg-primary rounded-pill">X</span> -->
               </button>
-              <invitation-button
-                v-bind:userToInvite="friend.id"
-                v-bind:socket="socket"
-              />
+              <spectate-button v-bind:userToSpectate="friend.id" v-bind:socket="socket" />
+              <invitation-button v-bind:userToInvite="friend.id" v-bind:socket="socket" />
               <button v-on:click="blockUser(friend.id)">
                 <span class="material-icons px-1" style="color: red">block</span>
               </button>
@@ -32,7 +30,7 @@
         </tbody>
       </table>
     </div>
-   
+
   </div>
 </template>
 
@@ -41,12 +39,14 @@ import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 import store from "../../store";
 import InvitationButton from "../game/InvitationButton.vue";
+import SpectateButton from "../game/SpectateButton.vue";
 import Friend from "./Friend.vue";
 
 export default defineComponent({
   /* eslint-disable */
   components: {
     InvitationButton,
+    SpectateButton,
     Friend,
   },
 

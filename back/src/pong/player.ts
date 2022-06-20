@@ -32,10 +32,11 @@ export class Player {
     this.disconnectedAt = null;
   }
 
-  async move(opponent: Player, y: number, canvasHeight: number) {
+  async move(opponent: Player, y: number, canvasHeight: number, spectatorRoom: string, isLeftSide: boolean) {
     y = y / canvasHeight * HEIGHT;
     this.y = y;
     this.event.emitOpponentMove(opponent.socket.id, y);
+    this.event.emitPlayerMove(spectatorRoom, isLeftSide, y);
   }
 
   goal(game: Game) {
@@ -60,9 +61,10 @@ export class Player {
     }
   }
 
-  async disconnectAndPause(gameId: string) {
+  async disconnectAndPause(gameId: string, spectatorRoom: string) {
     this.disconnect();
     this.event.emitPause(gameId);
+    this.event.emitPause(spectatorRoom);
     // this.socket = null;
   }
 }

@@ -12,32 +12,42 @@ export class Event {
   constructor(private server: Server) { }
 
   emitStart(options: Options, id: string, opponent: User, isLeftPlayer: boolean) {
-    this.server.to(id).volatile.emit('start', options, opponent, isLeftPlayer);
+    this.server.to(id).emit('start', options, opponent, isLeftPlayer);
+  }
+
+  emitStartSpec(options: Options, id: string, playerLeft: string, playerRight: string) {
+    this.server.to(id).emit('startSpec', options, playerLeft, playerRight);
   }
 
   emitOpponentMove(id: string, y: number) {
-    this.server.to(id).volatile.emit('opponentMove', y);
+    this.server.to(id).emit('opponentMove', y);
+  }
+
+  emitPlayerMove(id: string, isLeftSide: boolean, y: number) {
+    this.server.to(id).emit('playerMove', isLeftSide, y);
   }
 
   emitBallMove(id: string, pos: Point) {
-    this.server.volatile.to(id).volatile.emit('ballMove', pos);
+    this.server.to(id).emit('ballMove', pos);
   }
 
   emitUpdateScore(id: string, score: Point) {
-    this.server.to(id).volatile.emit('updateScore', score);
+    this.server.to(id).emit('updateScore', score);
   }
 
   emitPause(id: string) {
-    this.server.to(id).volatile.emit('pause');
+    this.server.to(id).emit('pause');
   }
 
   emitYouWin(id: string) {
-    console.log('emit youWin to', id);
     this.server.to(id).emit('youWin');
   }
 
+  emitGameOver(id: string, winner: string) {
+    this.server.to(id).emit('gameOver', winner);
+  }
+
   emitYouLose(id: string) {
-    console.log('emit youLose to', id);
     this.server.to(id).emit('youLose');
   }
 }

@@ -129,7 +129,7 @@ export class Game {
         clearInterval(interval);
         return;
       }
-      this.ball.move(this.playerLeft, this.playerRight);
+      this.ball.move(this.playerLeft, this.playerRight, this.spectatorRoom);
       this.ball.checkCollisions(this, this.playerLeft, this.playerRight);
     }, 1000 / FPS);
   }
@@ -137,25 +137,31 @@ export class Game {
   async gameOver(winner: Player) {
     this.setState(GameState.OVER);
     const opponent: Player = this.findOpponent(winner.user.id);
-    this.event.emitYouWin(winner.socket.id);
-    this.event.emitYouLose(opponent.socket.id);
-    await this.saveMatch(winner.user, opponent.user, false);
-    await this.saveUser(winner.user.id, 'Online', true, false, winner.score); // the winner wins his goals as points
-    await this.saveUser(opponent.user.id, 'Online', false, true, null);
+    this.sendGameOver(winner, opponent);
     winner.socket.leave(this.name);
     opponent.socket.leave(this.name);
     console.log(`PONG: GAME OVER ! ${winner.user.username} won the game !\n`);
   }
 
-  async sendStart() {
+  sendStart() {
     this.event.emitStart(this.playerLeft.options, this.playerLeft.socket.id, this.playerRight.user, true);
     this.event.emitStart(this.playerRight.options, this.playerRight.socket.id, this.playerLeft.user, false);
+    this.event.emitStartSpec(null, this.spectatorRoom, this.playerLeft.user.username, this.playerRight.user.username);
   }
 
   async sendScore() {
     await this.saveMatch(null, null, true);
     this.event.emitUpdateScore(this.playerLeft.socket.id, { x: this.playerLeft.score, y: this.playerRight.score });
     this.event.emitUpdateScore(this.playerRight.socket.id, { x: this.playerLeft.score, y: this.playerRight.score });
+    this.event.emitUpdateScore(this.spectatorRoom, { x: this.playerLeft.score, y: this.playerRight.score });
+  }
+  async sendGameOver(winner: Player, opponent: Player) {
+    this.event.emitYouWin(winner.socket.id);
+    this.event.emitYouLose(opponent.socket.id);
+    this.event.emitGameOver(this.spectatorRoom, winner.user.username);
+    await this.saveMatch(winner.user, opponent.user, false);
+    await this.saveUser(winner.user.id, 'Online', true, false, winner.score); // the winner wins his goals as points
+    await this.saveUser(opponent.user.id, 'Online', false, true, null);
   }
 
   reconnectPlayer(user: User, socket: Socket) {
@@ -171,7 +177,7 @@ export class Game {
   disconnectPlayer(userId: number) {
     // TODO: stop game if both are disconnected ?
     const player = this.findPlayer(userId);
-    player.disconnectAndPause(this.name);
+    player.disconnectAndPause(this.name, this.spectatorRoom);
     this.setState(GameState.PAUSE);
   }
 
@@ -181,8 +187,13 @@ export class Game {
     }
   }
 
-  connectSpectator(spectator: Spectator) {
+  connectSpectator(spectator: Spectator, user: User) {
     this.spectators.push(spectator);
     spectator.socket.join(this.spectatorRoom);
+    const player = this.findPlayer(user.id);
+    if (this.playerLeft.state == PlayerState.CONNECTED && this.playerRight.state == PlayerState.CONNECTED) {
+      this.event.emitStartSpec(player.options, spectator.socket.id, this.playerLeft.user.username, this.playerRight.user.username);
+      this.event.emitUpdateScore(this.spectatorRoom, { x: this.playerLeft.score, y: this.playerRight.score });
+    }
   }
 }
