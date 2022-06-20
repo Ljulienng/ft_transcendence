@@ -175,6 +175,7 @@ export default defineComponent({
     this.socket.on("/changeChannelNameError/", (data: string) => {
       this.show("channel", data, data, "CHANNEL", 'warn');
     });
+
   }
 });
 </script>

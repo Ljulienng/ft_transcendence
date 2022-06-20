@@ -214,8 +214,7 @@ export class ChannelService {
             id: invitation.channelId,
             type: "private",
             password: "" }, guest.id);
-        
-        return guest;
+
     }
 
     /*
