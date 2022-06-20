@@ -227,6 +227,129 @@
       </div>
     <!-- </form> -->
     
+      <!-- <div>
+        <button
+          @click="deleteChannel()"
+          class="btn-danger"
+        >
+          Delete channel
+        </button>
+        <div>
+          <button @click="changeChannelName()" class="btn-primary">
+            Change channel name :
+          </button>
+          <input
+            type="text"
+            maxlength="50"
+            v-model="newChannelName"
+            placeholder="new channel name"
+          />
+        </div>
+        <div v-if="channelType == 'protected'">
+          <button @click="changePassword()" class="btn-primary">
+            Change password :
+          </button>
+          <input
+            type="password"
+            maxlength="100"
+            v-model="passwordI.old"
+            class="inputMessage"
+            placeholder="old password"
+          />
+          <input
+            type="password"
+            maxlength="100"
+            v-model="passwordI.new"
+            class="inputMessage"
+            placeholder="new password"
+          />
+        </div>
+        <div v-if="channelType == 'public'">
+          <button @click="addPasswordToPublicChannel()" class="btn-primary">
+            Add a password :
+          </button>
+          <input
+            type="password"
+            maxlength="100"
+            v-model="passwordI.new"
+            class="inputMessage"
+            placeholder="password"
+          />
+        </div>
+        <div v-if="channelType == 'protected'">
+          <button @click="removePasswordToProtectedChannel()" class="btn-primary">
+            Remove the password
+          </button>
+        </div>
+        <div v-if="channelMember.admin && channelType == 'private'">
+          <button @click="invite()">Invite :</button>
+          <input
+            type="text"
+            maxlength="30"
+            v-model="invitation.guest"
+            class="inputMessage"
+            placeholder="username"
+          />
+        </div>
+      </div>
+    </div>
+
+    
+    <ul>
+      <li v-for="member in memberList" :key="member">
+        <template v-if="member.owner">OWNER = </template>
+        {{ member.user.username }}
+        <template v-if="channelMember.owner">
+          <button
+            @click="setMemberAsAdmin(member.user.username)"
+            class="btn-primary"
+            v-if="member.admin === false"
+          >
+            PROMOTE
+          </button>
+          <button
+            @click="unsetMemberAsAdmin(member.user.username)"
+            class="btn-primary"
+            v-if="member.admin === true && !member.owner"
+          >
+            DEMOTE
+          </button>
+        </template>
+        <template v-if="channelMember.admin">
+          <button
+            @click="kickMember(member.user.username)"
+            class="btn-danger"
+            v-if="member.admin === false"
+          >
+            Kick
+          </button>
+          <button
+            @click="kickMember(member.user.username)"
+            class="btn-danger"
+            v-if="member.admin && !member.owner && channelMember.owner"
+          >
+            Kick
+          </button>
+        </template>
+        <template v-if="channelMember.admin">
+          <BanMuteModal
+            v-bind:context="'mute'"
+            v-bind:member="member"
+            v-bind:socket="socket"
+            v-bind:channelId="channelId"
+          />
+          <BanMuteModal
+            v-bind:context="'ban'"
+            v-bind:member="member"
+            v-bind:socket="socket"
+            v-bind:channelId="channelId"
+          />
+        </template>
+        <template v-if="member.admin">(admin)</template>
+        <template v-if="member.muted">(muted)</template>
+        <template v-if="member.banned">(banned)</template>
+      </li>
+    </ul> -->
   </div>
 </template>
 
@@ -236,32 +359,37 @@ import { defineComponent } from "@vue/runtime-core";
 import { Socket } from "socket.io-client";
 import http from "../../http-common";
 // import VueCrontab from 'vue-crontab's
+// import BanMuteModal from "./BanMuteModal.vue";
 
 export default defineComponent({
+  components: {
+    BanMuteModal,
+  },
+
   props: {
     currentUser: {
       type: Object,
-      required: true
+      required: true,
     },
     channelId: {
       type: Number,
-      required: true
+      required: true,
     },
     channelType: String,
     socket: {
       type: Socket,
-      required: true
+      required: true,
     },
     channelMember: {
       type: Object,
-      required: true
+      required: true,
     },
   },
 
   data() {
     return {
-      muteBanCounter: 0,
-      name: "",
+      // muteBanCounter: 0,
+      // name: "",
       memberList: [],
       newChannelName: "",
       invitation: {
@@ -274,14 +402,6 @@ export default defineComponent({
         channelId: this.channelId,
       },
     };
-  },
-
-  computed: {
-  
-  },
-
-  watch: {
-    
   },
 
   methods: {
@@ -334,6 +454,17 @@ export default defineComponent({
       this.passwordI.new = "";
     },
 
+    // change channel type : public->protected
+    addPasswordToPublicChannel() {
+      this.socket.emit("addPasswordToPublicChannel", this.passwordI);
+      this.passwordI.new = "";
+    },
+
+    // change channel type : protected->public
+    removePasswordToProtectedChannel() {
+      this.socket.emit("removePasswordToProtectedChannel", this.channelId);
+    },
+
     kickMember(username: string) {
       const userToKick = {
         channelId: this.channelId,
@@ -359,13 +490,11 @@ export default defineComponent({
     },
 
     ban(username: string, timeToBan: number) {
-      console.log("test to mute for 1 minutes");
-      timeToBan = 1; // TEST 
       const update = {
         channelId: this.channelId,
         username: username,
         banned: true,
-        timeToBan: timeToBan == undefined ? null : timeToBan,
+        timeToBan: timeToBan,
       };
       this.socket.emit("muteban", update);
     },
@@ -380,13 +509,11 @@ export default defineComponent({
     },
 
     mute(username: string, timeToMute: number) {
-      console.log("test to mute for 1 minutes");
-      timeToMute = 1; // TEST 
       const update = {
         channelId: this.channelId,
         username: username,
         muted: true,
-        timeToMute: timeToMute == undefined ? null : timeToMute,
+        timeToMute: timeToMute,
       };
       this.socket.emit("muteban", update);
     },
@@ -402,9 +529,6 @@ export default defineComponent({
   },
 
   mounted() {
-    this.socket.on("passwordChanged", (data: string) => {
-      console.log("passwordChanged:", data);
-    });
     this.socket.on("/adminPromoted/" + this.channelId, () => {
       this.getChannelMembers();
     });
@@ -434,6 +558,9 @@ export default defineComponent({
     this.socket.on("/userUpdated/channel/", () => {
       console.log("user unmuted or unbanned");
       this.getChannelMembers();
+    });
+    this.socket.on("/passwordChanged/", (data: string) => {
+      this.getChannelMembers();   
     });
 
   },

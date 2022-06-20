@@ -7,6 +7,7 @@ import { Game } from './game';
 import { Event } from './event';
 import { Player } from './player';
 import { Ball } from './ball';
+import { Options } from './interfaces/options.interface';
 
 @Injectable()
 export class PongService {
@@ -15,6 +16,8 @@ export class PongService {
   public waitingPlayers: Player[];
 
   constructor(
+    @InjectRepository(User)
+    protected userRepository: Repository<User>,
     @InjectRepository(Match)
     protected matchRepository: Repository<Match>,
   ) {
@@ -22,7 +25,17 @@ export class PongService {
     this.waitingPlayers = [];
   }
 
-  matchmake(event: Event, playerLeft: Player) {
+  duel(event: Event, playerLeft: Player, playerRight: Player) { // TODO: test
+    const ball = new Ball(event);
+    const options = {
+      bgColor: '#1c1d21',
+      fgColor: 'lightgrey',
+      winScore: 5
+    };
+    this.games.push(new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, options)); // TODO: dynamic winScore
+  }
+
+  matchmake(event: Event, playerLeft: Player, options: Options) {
     // TODO: smarter matchmaking
     if (!this.waitingPlayers.length) {
       this.waitingPlayers.push(playerLeft);
@@ -30,11 +43,11 @@ export class PongService {
     }
     const playerRight = this.waitingPlayers.shift();
     const ball = new Ball(event);
-    this.games.push(new Game(this.matchRepository, event, ball, playerLeft, playerRight, 5)); // TODO: dynamic winScore
+    this.games.push(new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, options)); // TODO: dynamic winScore
   }
 
-  findGame(username: string): Game {
-    return this.games.find(e => (e.playerLeft && e.playerLeft.user.username == username) || (e.playerRight && e.playerRight.user.username == username));
+  findGame(userId: number): Game {
+    return this.games.find(e => (e.playerLeft && e.playerLeft.user.id == userId) || (e.playerRight && e.playerRight.user.id == userId));
   }
 
   async getMatchHistory(user: User): Promise<Match[]> {

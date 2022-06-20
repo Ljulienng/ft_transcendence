@@ -106,8 +106,8 @@ export class UserService {
 		await this.userRepository.save(currentUser);
 	}
 
-	findAll(): any {
-		return from(this.userRepository.find());
+	async findAll() {
+		return await this.userRepository.find();
 	}
 
 	async findByCookie(cookie: any): Promise<User> {
@@ -398,6 +398,7 @@ export class UserService {
 	// }
 
 	async checkIfBlocked(user: User, otherUserId: number) {
+		console.log(user);
 		if (user.blocked === null)
 			user.blocked = [];
 
@@ -421,7 +422,6 @@ export class UserService {
 
 	async getMatchHistory(user: User) {
 		const matchList =  await this.pongService.getMatchHistory(user);
-		
 		return await this.pongService.getMatchHistory(user)
 	}
 }

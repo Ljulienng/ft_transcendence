@@ -16,7 +16,8 @@
       class="list-group-item bg-transparent border-0 text-white d-flex justify-content-between"
     >
       <div class="col">
-        <router-link :to="'/public/' + friend.username" class="button">
+        <!-- <SmallAvatar :v-bind:username="friend.username"> -->
+        <router-link :to="'/public/' + friend.username" class="button text-decoration-none">
           {{ friend.username }}
         </router-link>
       </div>
@@ -27,6 +28,10 @@
         <span class="material-icons px-1">person_remove</span>
         <!-- <span class="badge bg-primary rounded-pill">X</span> -->
       </button>
+      <invitation-button
+        v-bind:userToInvite="friend.id"
+        v-bind:socket="socket"
+      />
       <button v-on:click="blockUser(friend.id)">
         <span class="material-icons px-1" style="color: red">block</span>
       </button>
@@ -38,13 +43,16 @@
 import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 import store from "../../store";
-
+import InvitationButton from "../game/InvitationButton.vue";
 export default defineComponent({
+  components: {
+    InvitationButton,
+  },
+
   data() {
     return {
       socket: store.getters["auth/getUserSocket"],
       currentUser: store.getters["auth/getUserProfile"],
-
       userStatus: "",
       errorMsg: "",
       friendList: [],
@@ -53,23 +61,14 @@ export default defineComponent({
 
   methods: {
     async getFriendList() {
-      try {
-        const response = await http.get("/users/friendlist");
-        this.friendList = response.data;
-      } catch (e) {
-        console.log(e);
-      }
+      const response = await http.get("/users/friendlist").catch((error) => {
+        console.log(error);
+      });
+      if (response) this.friendList = response.data;
     },
 
     blockUser(userToBlock: number) {
       this.socket.emit("blockUser", userToBlock);
-      // console.log("blockUser", userToBlock);
-      // eslint-disable-next-line
-      // const x: any = this.friendList.find(d => d["id"] === userToBlock)
-      // console.log("FRIENDLIST", x.username);
-      // this.deleteFriend(x.username);
-      // this.getFriendList();
-      // this.$forceUpdate();
     },
 
     async deleteFriend(friendUsername: string) {

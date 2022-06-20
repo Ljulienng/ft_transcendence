@@ -34,7 +34,6 @@ export class ChannelService {
         return (await this.channelRepository.find()).sort((a, b)=> b.createdTime.getTime() - a.createdTime.getTime());
     }
 
-    
     /* get channel by its id */
    async findChannelById(channelId: number): Promise<Channel> {
         return await this.channelRepository.findOne({
@@ -87,13 +86,17 @@ export class ChannelService {
 
     /* create channel */
    async createChannel(createChannel: CreateChannelDto, userId: number) {
+        const regex = /^[a-zA-Z0-9_]+$/
         const user = await this.userRepository.findOne({id: userId});
+
+        if (regex.test(createChannel.name) === false) {
+            throw new HttpException('Wrong format for chat name only underscore are allowed.', HttpStatus.FORBIDDEN);    
+        }
+        if (!createChannel.name || createChannel.name.length < 3 || createChannel.name.length > 20) {
+            throw new HttpException('chat name beetween 3 and 20 characters please', HttpStatus.FORBIDDEN); 
+        }
         if (!user) {
             throw new HttpException('user does not exist', HttpStatus.FORBIDDEN);
-        }
-
-        if (!createChannel.name) {
-            throw new HttpException('channel name cannot be null', HttpStatus.FORBIDDEN);
         }
 
         const isSameChatName = await this.channelRepository.findOne({name: createChannel.name});
@@ -112,10 +115,10 @@ export class ChannelService {
  
        if (newChannel.type === "protected") {
            if (!newChannel.password) {
-                throw new BadRequestException('need a password for protected channel');
+                throw new HttpException('need a password for protected channel', HttpStatus.FORBIDDEN);    
            }
-           if (newChannel.password.length < 8) {
-                throw new HttpException('password too short', HttpStatus.FORBIDDEN);
+           if (newChannel.password.length < 8 || newChannel.password.length > 20) {
+                throw new HttpException('password beetween 8 and 20 characters please', HttpStatus.FORBIDDEN);
            }
             const saltOrRounds = await bcrypt.genSalt();
             newChannel.password = await bcrypt.hash(newChannel.password, saltOrRounds);
@@ -136,12 +139,12 @@ export class ChannelService {
         const user2 = await this.userRepository.findOne({id: user2Id});
         
         if (!user1 || !user2) {
-            throw new UnauthorizedException('user does not exist');
+            throw new HttpException('user does not exist', HttpStatus.FORBIDDEN);    
         }
 
         const isSameChatName = await this.channelRepository.findOne({name: createChannel.name});
         if (isSameChatName) {
-            throw new UnauthorizedException('this name is already used');  
+            throw new HttpException('this name is already used', HttpStatus.FORBIDDEN);    
         }
 
         const newChannel = this.channelRepository.create({
@@ -177,14 +180,14 @@ export class ChannelService {
             if (welcomingChannel.password) {
                 const match = await this.checkPasswordMatch(joinChannel.password, welcomingChannel.password);
                 if (!match) {
-                    throw new UnauthorizedException('incorrect password');
+                    throw new HttpException('incorrect password', HttpStatus.FORBIDDEN);    
                 }
             }
         }
 
         const channelMember = await this.channelMemberService.findOne(user, welcomingChannel);
         if (channelMember) {
-            throw new UnauthorizedException('user already in this channel');
+            throw new HttpException('user already in this channel', HttpStatus.FORBIDDEN);    
         }
 
         await this.channelRepository.save(welcomingChannel);
@@ -202,13 +205,13 @@ export class ChannelService {
         const guest = await this.userRepository.findOne({username: invitation.guest});
 
         if (channel.owner.id !== user.id) {
-            throw new UnauthorizedException('you are not allowed to invite someone to join this channel');
+            throw new HttpException('you are not allowed to invite someone to join this channel', HttpStatus.FORBIDDEN);    
         }
         if (!guest) {
-            throw new UnauthorizedException('the guest you want to invite does not exist');
+            throw new HttpException('the guest you want to invite does not exist', HttpStatus.FORBIDDEN);    
         }
         if (await this.channelMemberService.findOne(guest, channel)) {
-            throw new UnauthorizedException('the guest is already in the channel');
+            throw new HttpException('the guest is already in the channel', HttpStatus.FORBIDDEN);    
         }
 
         await this.addUserToChannel({
@@ -231,7 +234,7 @@ export class ChannelService {
         const channelMember = await this.channelMemberService.findOne(user, channelToLeave);
 
         if (!channelMember) {
-            throw new UnauthorizedException('user not in this channel');
+            throw new HttpException('user not in this channel', HttpStatus.FORBIDDEN);    
         }
         
         // if the owner leave the channel, we delete the channel
@@ -252,7 +255,7 @@ export class ChannelService {
    **       - the new password is not too short (could increase the constraints...)
    **       - security check : old channel password == old password sent by owner
    */
-   async changePassword(/*channelId: number, */userId: number, passwordI: changePasswordDto)
+   async changePassword(userId: number, passwordI: changePasswordDto)
    {
         // console.log('user:', userId, ' changes password of channel:', channelId, ' [new pass:', passwords.newPassword,']');
         const user = await this.userRepository.findOne({id: userId});
@@ -273,6 +276,35 @@ export class ChannelService {
         const password = await bcrypt.hash(passwordI.new, saltOrRounds);
         this.channelRepository.update(channel.id, { password });
    }
+
+   async addPasswordToPublicChannel(owner: User, passwordI: changePasswordDto) {
+        const channel = await this.findChannelById(passwordI.channelId);
+        const channelMember = await this.channelMemberService.findOne(owner, channel);
+        
+        if (!channelMember.owner) {
+            throw new HttpException('you are not authorized to change the status of the channel', HttpStatus.FORBIDDEN);
+        }
+        if (passwordI.new.length < 8) {
+            throw new HttpException('new password too short', HttpStatus.FORBIDDEN);
+        }
+        const saltOrRounds = await bcrypt.genSalt();
+        const password = await bcrypt.hash(passwordI.new, saltOrRounds);
+        channel.password = password;
+        channel.type = "protected";
+        this.channelRepository.save(channel);
+   }
+
+   async removePasswordToProtectedChannel(owner: User, channelId: number) {
+        const channel = await this.findChannelById(channelId);
+        const channelMember = await this.channelMemberService.findOne(owner, channel);
+        
+        if (!channelMember.owner) {
+            throw new HttpException('you are not authorized to change the status of the channel', HttpStatus.FORBIDDEN);
+        }
+        channel.password = "";
+        channel.type = "public";
+        this.channelRepository.save(channel);
+    }
 
    async changeChannelName(owner: User, updates: updateChannelDto) {
     const channel = await this.findChannelById(updates.channelId);
@@ -305,7 +337,7 @@ export class ChannelService {
         const channelMember = await this.channelMemberService.findOne(user, channel);
 
         if (!channel) {
-            throw new NotFoundException();
+            throw new HttpException('channel not found', HttpStatus.FORBIDDEN);
         }
         if (!channelMember.owner) {
             throw new HttpException('only the owner can delete channels', HttpStatus.FORBIDDEN);

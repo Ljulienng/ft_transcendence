@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { Interval } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Channel } from "src/channel/models/channel.entity";
 import { User } from "src/user/models/user.entity";
@@ -59,7 +58,6 @@ export class ChannelMemberService {
         });
     }
     
-
     async findMembers(channel: Channel) {
         return await this.channelMemberRepository.find({
             where: {

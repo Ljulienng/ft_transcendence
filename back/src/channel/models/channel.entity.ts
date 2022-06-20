@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, OneToMany, ManyToOne, PrimaryGenerate
 import { MessageChannel } from "src/message/models/messageChannel.entity";
 import { User } from "src/user/models/user.entity";
 import { ChannelMember } from "src/channelMember/models/channelMember.entity";
+import { Exclude } from "class-transformer";
 
 // export enum ChannelType {
 // 	private,
@@ -21,6 +22,7 @@ export class Channel {
     @Column({ nullable: false, default: "public" })
     type: string;
 
+	@Exclude()
     @Column({ nullable: true, default: null }) 
 	password: string;
 

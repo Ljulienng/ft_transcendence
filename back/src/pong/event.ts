@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Server } from 'socket.io';
+import { User } from 'src/user/models/user.entity';
+import { Options } from './interfaces/options.interface';
 import { Point } from './interfaces/point.interface';
 
 // TODO: emit event individually to handle spectator mode
@@ -7,14 +9,13 @@ import { Point } from './interfaces/point.interface';
 @Injectable()
 export class Event {
 
-  private server: Server;
-
-  constructor(server: Server) {
-    this.server = server;
+  constructor(
+    private server: Server
+  ) {
   }
 
-  emitStart(id: string, isLeftPlayer: boolean): Promise<string> {
-    return new Promise(resolve => this.server.timeout(1000).to(id).emit('start', isLeftPlayer, (err: Error, response: string) => {
+  emitStart(options: Options, id: string, opponent: User, isLeftPlayer: boolean): Promise<string> {
+    return new Promise(resolve => this.server.timeout(1000).to(id).emit('start', options, opponent, isLeftPlayer, (err: Error, response: string) => {
       if (err || response != 'ok') {
         response = 'ko';
       }
@@ -32,7 +33,7 @@ export class Event {
   }
 
   emitBallMove(id: string, pos: Point): Promise<string> {
-    return new Promise(resolve => this.server.timeout(1000).to(id).emit('ballMove', pos, (err: Error, response: string) => {
+    return new Promise(resolve => this.server.volatile.timeout(1000).to(id).emit('ballMove', pos, (err: Error, response: string) => {
       if (err || response != 'ok') {
         response = 'ko';
       }
@@ -50,6 +51,7 @@ export class Event {
   }
 
   emitPause(id: string) {
+    console.log('emit pause');
     this.server.to(id).emit('pause');
   }
 

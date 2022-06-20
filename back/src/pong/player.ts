@@ -24,7 +24,7 @@ export class Player {
     public socket: Socket,
     public user: User) {
     Player.size = { x: WIDTH / 100, y: HEIGHT / 3.3 };
-    this.y = HEIGHT / 2 - Player.size.y / 2;  // TODO: + or - ?
+    this.y = HEIGHT / 2 - Player.size.y / 2;
     this.score = 0;
     this.state = PlayerState.CONNECTED;
     this.disconnectedAt = null;
@@ -45,7 +45,7 @@ export class Player {
   goal(game: Game) {
     this.score += 1;
     game.sendScore();
-    if (this.score >= game.winScore) {
+    if (this.score >= game.options.winScore) {
       game.gameOver(this);
     }
   }

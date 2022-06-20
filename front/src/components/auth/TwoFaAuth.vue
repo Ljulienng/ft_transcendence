@@ -50,11 +50,9 @@ export default defineComponent({
 
   methods: {
     async authenticateTwoFA() {
-      console.log("twoFactorAuthenticationCode = ", this.twoFA);
       await http
         .post("/twofa/authenticate", this.twoFA, { withCredentials: true })
-        .then((response) => {
-          console.log("went in then", response);
+        .then(() => {
           this.$store.dispatch("auth/setTwoFAauth");
           this.$router.push("http://localhost:3001/home");
         })
@@ -87,10 +85,6 @@ export default defineComponent({
       showModal,
       closeModal,
     };
-  },
-
-  created() {
-    console.log("isShow = ", this.isShow);
   },
 });
 </script>

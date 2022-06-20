@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '../store'
-import Pong from '@/components/Pong.vue'
+import Pong from '@/components/game/Pong.vue'
 import AuthModal from '@/components/auth/AuthModal.vue'
 import TwoFaAuth from '@/components/auth/TwoFaAuth.vue'
 import FriendList from '@/views/FriendList.vue'
@@ -14,7 +14,7 @@ import PublicUserProfile from '@/views/PublicUserProfile.vue'
 
 const routes = [
 
-  {
+	{
 		path: "/:catchAll(.*)",
 		name: "NotFound",
 		component: NotFound,
@@ -23,18 +23,29 @@ const routes = [
 		name: 'Root',
 		path: '/',
 		component: Home,
-		meta: {requiredAuth: true}
+		meta: { requiredAuth: true }
 	},
 	{
 		name: 'Home',
 		path: '/home',
 		alias: ['/'],
 		component: Home,
-		meta: {requiredAuth: true}
+		meta: { requiredAuth: true }
 	},
 	{
 		name: 'Play',
 		path: '/play',
+		component: Pong,
+		meta: { requiredAuth: true }
+	},
+	{
+		name: 'Spectate',
+		path: '/spectate',
+		component: Pong
+	},
+	{
+		name: 'Spectate',
+		path: '/spectate',
 		component: Pong
 	},
 	{
@@ -49,7 +60,7 @@ const routes = [
 				userProfile = store.getters["auth/getUserProfile"];
 				console.log("userprofile beforecreate = ", userProfile.id);
 			}
-		
+
 			console.log("userprofile beforeEnter = ", userProfile.id)
 			if (userProfile.id !== 0) router.push("http://localhost:3001/");
 			return true
@@ -64,73 +75,73 @@ const routes = [
 		name: 'FriendList',
 		path: '/friendlist',
 		component: FriendList,
-		meta: {requiredAuth: true}
+		meta: { requiredAuth: true }
 	},
 	{
 		name: 'chat',
 		path: '/chat',
 		component: Chat,
-		meta: {requiredAuth: true}
+		meta: { requiredAuth: true }
 	},
 	{
 		name: 'UserProfile',
 		path: '/userprofile',
 		component: UserProfile,
-		meta: {requiredAuth: true}
+		meta: { requiredAuth: true }
 	},
 	{
 		name: 'PublicProfile',
 		path: '/public/:username',
 		component: PublicUserProfile,
-		meta: {requiredAuth: true}
+		meta: { requiredAuth: true }
 	},
 	{
 		name: 'Leaderboard',
 		path: '/leaderboard',
 		component: Leaderboard,
-		meta: {requiredAuth: true}
+		meta: { requiredAuth: true }
 	},
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes,
+	history: createWebHistory(),
+	routes,
 })
 
 router.beforeEach(async (to, from, next) => {
-  if (to.meta.requiredAuth) {
-    let userProfile = store.getters["auth/getUserProfile"];
-    if (userProfile.id === 0) {
-      await store.dispatch("auth/userProfile");
-      userProfile = store.getters["auth/getUserProfile"];
-      if (userProfile.id === 0) {
-        return next({ path: "/authmodal" });
-      }
-      else {
-		store.dispatch("auth/setUserStatus", "Online");
+	if (to.meta.requiredAuth) {
+		let userProfile = store.getters["auth/getUserProfile"];
+		if (userProfile.id === 0) {
+			await store.dispatch("auth/userProfile");
+			userProfile = store.getters["auth/getUserProfile"];
+			if (userProfile.id === 0) {
+				return next({ path: "/authmodal" });
+			}
+			else {
+				store.dispatch("auth/setUserStatus", "Online");
 
-        if (userProfile.twoFAEnabled === true) {
-          let TwoFAauth = store.getters["auth/getTwoFAauth"];
+				if (userProfile.twoFAEnabled === true) {
+					let TwoFAauth = store.getters["auth/getTwoFAauth"];
 
-          if (TwoFAauth === false || undefined) {
-            await store.dispatch('auth/setTwoFAauth')
-            TwoFAauth = store.getters["auth/getTwoFAauth"];
+					if (TwoFAauth === false || undefined) {
+						await store.dispatch('auth/setTwoFAauth')
+						TwoFAauth = store.getters["auth/getTwoFAauth"];
 
-            if (TwoFAauth === true)
-              return next();
-            else
-              return next({ path: "/twofaauth" });
-          }
-          else
-            return next();
-        }
-        else {
-          return next();
-        }
-      }
-    }
-  }
-  return next();
+						if (TwoFAauth === true)
+							return next();
+						else
+							return next({ path: "/twofaauth" });
+					}
+					else
+						return next();
+				}
+				else {
+					return next();
+				}
+			}
+		}
+	}
+	return next();
 });
 
 export default router;

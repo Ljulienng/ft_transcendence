@@ -9,13 +9,13 @@
           <table class="table table-borderless" id="users">
             <thead>
               <tr>
-                <th scope="col" v-for="column in columns" :key="column">
+                <th scope="col" v-for="column in columns" :key="column" class='text-center'>
                   {{ column }}
                 </th>
               </tr>
             </thead>
             <tbody v-for="user in users" :key="user">
-              <Stats :user="user"/>
+                <Stats :user="user"/>
             </tbody>
           </table>
         </div>
@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-
+/* eslint-disable */
   import { defineComponent } from "@vue/runtime-core";
   import http from "../../http-common"
   import Stats from "./Stats.vue";
@@ -38,19 +38,20 @@
 
       data () {
           return {
+            ranking: 1,
             users: [],
             title: 'leaderboard',
-            columns: ['username', 'games played', 'victories', 'defeats', 'ranking', 'points'],
+            columns: ['ranking', 'player', 'games played', 'victories', 'defeats', 'points'],
           }
       },
 
       methods: {
           async getUsers() {
               try {
-                  const response  = await http.get('/users');
+                  const response  = await http.get('/users/leaderboard');
 
                   this.users = response.data;
-                  console.log("user list = ", this.users)
+                  this.users.forEach((user: any) => {user.ranking = this.ranking++})
               } catch (error) {
                   console.log(error);
               }
