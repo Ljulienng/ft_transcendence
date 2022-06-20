@@ -61,9 +61,10 @@ export class Player {
     }
   }
 
-  async disconnectAndPause(gameId: string, spectatorRoom: string) {
+  async disconnectAndPause(userLeftId: string, userRightId: string, spectatorRoom: string) {
     this.disconnect();
-    this.event.emitPause(gameId);
+    this.event.emitPause(userLeftId);
+    this.event.emitPause(userRightId);
     this.event.emitPause(spectatorRoom);
     // this.socket = null;
   }

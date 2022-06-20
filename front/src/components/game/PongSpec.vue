@@ -186,7 +186,7 @@ export default defineComponent({
         this.winner = winner;
         this.overPage();
         setTimeout(() => {
-          if (this.$route.name == 'Spectate') {
+          if (this.$route.name == 'Spectate') { // TODO: do not work
             this.$router.push('/');
           }
         }, 3000);

@@ -11,7 +11,7 @@ import { Options } from './interfaces/options.interface';
 
 export const WIDTH = 100;
 export const HEIGHT = 66;
-const FPS = 30;
+const FPS = 60;
 const FORFAIT_TIMEOUT = 30;
 
 export enum GameState {
@@ -24,7 +24,7 @@ export enum GameState {
 export class Game {
 
   public state: GameState;
-  public name: string;
+  // public name: string;
   private id: number;
   public spectators: Spectator[];
   public spectatorRoom: string;
@@ -38,12 +38,12 @@ export class Game {
     public playerRight: Player,
     public winScore: number) {
     this.state = GameState.PLAY;
-    this.name = 'game_' + playerLeft.user.id + '_' + playerRight.user.id;
+    // this.name = 'game_' + playerLeft.user.id + '_' + playerRight.user.id;
     this.id = null;
     this.spectators = [];
     this.spectatorRoom = 'spec_' + playerLeft.user.id + '_' + playerRight.user.id;
-    this.playerLeft.socket.join(this.name);
-    this.playerRight.socket.join(this.name);
+    // this.playerLeft.socket.join(this.name);
+    // this.playerRight.socket.join(this.name);
     this.start();
   }
 
@@ -138,8 +138,8 @@ export class Game {
     this.setState(GameState.OVER);
     const opponent: Player = this.findOpponent(winner.user.id);
     this.sendGameOver(winner, opponent);
-    winner.socket.leave(this.name);
-    opponent.socket.leave(this.name);
+    // winner.socket.leave(this.name);
+    // opponent.socket.leave(this.name);
     console.log(`PONG: GAME OVER ! ${winner.user.username} won the game !\n`);
   }
 
@@ -177,7 +177,7 @@ export class Game {
   disconnectPlayer(userId: number) {
     // TODO: stop game if both are disconnected ?
     const player = this.findPlayer(userId);
-    player.disconnectAndPause(this.name, this.spectatorRoom);
+    player.disconnectAndPause(this.playerLeft.socket.id, this.playerRight.socket.id, this.spectatorRoom);
     this.setState(GameState.PAUSE);
   }
 

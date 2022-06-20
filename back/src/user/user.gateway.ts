@@ -417,9 +417,26 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('matchAccepted')
-    acceptMatch(client: Socket, otherUser: number) {
-        console.log('acceptMatch',);
+    async acceptMatch(client: Socket, otherUserId: number) {
+        console.log('acceptMatch');
         this.server.to(client.id).emit("moveToMatch");
+        // TODO: send notif to emitter to join game
+        
+        // this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
+        // const event = new Event(this.server);
+        // const options = {
+        //     theme: {
+        //         name: 'dark',
+        //         bgColor: '#1c1d21',
+        //         fgColor: 'lightgrey'
+        //     },
+        //     winScore: 5
+        // };
+        // const userLeft = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);    // TODO: does not work if client changed name
+        // const playerLeft = new Player(event, client, userLeft, options);
+        // const userRight = await this.userService.findOne({ id: otherUserId });
+        // const playerRight = new Player(event, null, userRight, options);
+        // this.pongService.duel(event, playerLeft, playerRight);
     }
 
     @UseGuards(SocketGuard)
@@ -431,6 +448,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     /* ============= PONG ============*/
 
+    @UseGuards(SocketGuard)
     @SubscribeMessage('isPlayerInGame') // TODO: test
     async isPlayerInGame(client: Socket) {
         this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
@@ -439,23 +457,25 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         return (game ? true : false);
     }
 
+    @UseGuards(SocketGuard)
     @SubscribeMessage('playerRegister') // TODO: test
     async playerRegister(client: Socket, options: Options) {
         this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
         const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);    // TODO: does not work if client changed name
-        console.log('playerRegister:', user.username, 'with a score of', options.winScore);
+        // console.log('playerRegister:', user.username, 'with a score of', options.winScore);
         const event = new Event(this.server);
         const player = new Player(event, client, user, options);
         this.pongService.matchmake(event, player);
     }
 
+    @UseGuards(SocketGuard)
     @SubscribeMessage('playerReconnect') // TODO: test
     async playerReconnect(client: Socket) {
         // TODO: if client is already in game join it
 
         this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
         const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);    // TODO: does not work if client changed name
-        console.log('playerReconnect:', user.username);
+        // console.log('playerReconnect:', user.username);
         const game = this.pongService.findGame(user.id);
         // console.log('findGame ret', game);
         if (game) {
@@ -466,11 +486,12 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         return (player ? true : false);
     }
 
+    @UseGuards(SocketGuard)
     @SubscribeMessage('playerLeave')
     async playerLeave(client: Socket) {
         this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
         const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);    // TODO: does not work if client changed name
-        console.log('playerLeave:', user.username);
+        // console.log('playerLeave:', user.username);
         const game = this.pongService.findGame(user.id);
         if (!game) {
             this.pongService.waitingPlayers = this.pongService.waitingPlayers.filter(e => e.user.id != user.id);
@@ -491,6 +512,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
+    @UseGuards(SocketGuard)
     @SubscribeMessage('playerMove')
     async playerMove(client: Socket, data: Point) {
         const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);    // TODO: does not work if client changed name
@@ -508,25 +530,26 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         player.move(opponent, data.x, data.y, game.spectatorRoom, isLeftSide);
     }
 
-    @SubscribeMessage('duel') // TODO: test
-    async duel(client: Socket, userRightId: number) {
-        this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
-        const event = new Event(this.server);
-        const userLeft = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);    // TODO: does not work if client changed name
-        const options = {
-            theme: {
-                name: 'dark',
-                bgColor: '#1c1d21',
-                fgColor: 'lightgrey'
-            },
-            winScore: 5
-        };
-        const playerLeft = new Player(event, client, userLeft, options);
-        const userRight = await this.userService.findOne({ id: userRightId });
-        const playerRight = new Player(event, null, userRight, options);
-        this.pongService.duel(event, playerLeft, playerRight);
-    }
+    // @SubscribeMessage('duel') // TODO: test
+    // async duel(client: Socket, userLeftId: number, userRightId: number) {
+    //     this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
+    //     const event = new Event(this.server);
+    //     const options = {
+    //         theme: {
+    //             name: 'dark',
+    //             bgColor: '#1c1d21',
+    //             fgColor: 'lightgrey'
+    //         },
+    //         winScore: 5
+    //     };
+    //     const userLeft = await this.userService.findOne({ id: userLeftId });
+    //     const playerLeft = new Player(event, client, userLeft, options);
+    //     const userRight = await this.userService.findOne({ id: userRightId });
+    //     const playerRight = new Player(event, null, userRight, options);
+    //     this.pongService.duel(event, playerLeft, playerRight);
+    // }
 
+    @UseGuards(SocketGuard)
     @SubscribeMessage('spectate') // TODO: test
     async spectate(client: Socket, userId: number) {
         this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);

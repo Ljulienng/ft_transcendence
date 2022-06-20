@@ -118,14 +118,14 @@ export default defineComponent({
   created() {
       this.socket.on("moveToMatch", () => {
         this.$router.push("/play");
-      });  
+      });
     this.socket.on('matchRefused/' + this.currentUser.id, () => {console.log('REFUSED')})
 
     // eslint-disable-next-line
     this.socket.on("matchInvitation/" + this.currentUser.id, (data: any) => {
       this.show("game", data.username + " invited you to a game !", data, "GAME");
     });
-  
+
     this.socket.on("Connected", () => {
       this.show("auth", "Logged in !", null, "Authenticated", 'success');
     });

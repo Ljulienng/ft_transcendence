@@ -25,10 +25,11 @@ export class PongService {
     this.waitingPlayers = [];
   }
 
-
   duel(event: Event, playerLeft: Player, playerRight: Player) { // TODO: test
     const ball = new Ball(event);
-    this.games.push(new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, playerLeft.options.winScore));
+    console.log(playerLeft.user.username + ' WANTS TO FIGHT ' + playerRight.user.username);
+    const game = new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, playerLeft.options.winScore);
+    this.games.push(game);
   }
 
   matchmake(event: Event, playerLeft: Player) {
