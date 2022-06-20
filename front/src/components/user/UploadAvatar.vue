@@ -1,6 +1,6 @@
 <template>
   <div class="uploadAvatar">
-    <div class="img-container">
+    <div class="img-container mx-auto">
       <img :src="this.image" class="profile_avatar_private"/>
       <div class="modify_avatar" type="button" data-bs-toggle="modal" data-bs-target="#twoFaModal">
         <div class="modify_avatar_icon"><i style="color: #fff774" class="material-icons">edit</i></div>
@@ -62,14 +62,18 @@ export default defineComponent({
 
     onUpload() {
       let file = new FormData();
+      if (this.selectedFile === null)
+        return ;
       file.append("image", this.selectedFile, this.selectedFile.name);
 
+      if (file === null)
+        return;
       http
         .post("/users/uploadavatar", file)
         .then((res) => {
           console.log(res), (this.success = true);
           this.getAvatar();
-
+          this.$emit('updateAvatar')
         })
         .catch((error) => {
           console.log("error on upload = ", error);

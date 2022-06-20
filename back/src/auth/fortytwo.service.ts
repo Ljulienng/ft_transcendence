@@ -10,7 +10,7 @@ import { Observable } from "rxjs";
 export class FortyTwoService {
 	constructor(protected userService: UserService, private jwtService: JwtService) {}
 
-	createUser(user: Student): Observable<User> {
+	async createUser(user: Student): Promise<User> {
 		return this.userService.addStudent(user);
 	}
 
