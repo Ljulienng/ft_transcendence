@@ -9,16 +9,13 @@ import {
     WebSocketServer
 } from "@nestjs/websockets";
 import { UserService } from "./service/user.service";
-import { Channel } from "src/channel/models/channel.entity"
 import { CreateMessageDto } from "src/message/models/message.dto";
 import { CreateMessageUserDto } from "src/messageUser/models/messageUser.dto";
 import { channelInvitationDto, JoinChannelDto, updateMemberDto, changePasswordDto, updateChannelDto } from "src/channel/models/channel.dto";
-import { SocketUserI } from "src/chat/chat.gateway";
 import { ChannelService } from "src/channel/service/channel.service";
 import { SocketGuard } from "src/auth/guards/socket.guard";
 import { UseGuards } from "@nestjs/common";
 import { CreateChannelDto } from "src/channel/models/channel.dto";
-import { Observable } from 'rxjs'
 import { User } from "./models/user.entity";
 import { UpdateMemberChannelDto } from "src/channelMember/models/channelMember.dto";
 import { OnEvent } from '@nestjs/event-emitter'
@@ -29,10 +26,12 @@ import { Player, PlayerState } from "src/pong/player";
 import { Event } from "src/pong/event";
 import { Options } from "src/pong/interfaces/options.interface";
 import { PongService } from "src/pong/pong.service";
-// export type UserSocket = {
-// 	socketId: string,
-// 	userId: number,
-// }
+
+export interface SocketUserI {
+    socketId: string;
+    socket: Socket;
+    user: User;
+}
 
 @WebSocketGateway({
     cors: {
@@ -138,11 +137,14 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('createChannel')
     async createChannel(client: Socket, createChannel: CreateChannelDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
-
-        const channelId = await this.channelService.createChannel(createChannel, user.id);
-        client.join(String(channelId));
-        this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user))
+        const channelId = await this.channelService.createChannel(createChannel, user.id)
+            .then(async () => { 
+                this.server.emit("updateChannel");
+            })
+            .catch(error => {
+                this.server.to(client.id).emit("/createChannelError/", error.response)
+            })
+            client.join(String(channelId));
     }
 
     @UseGuards(SocketGuard)
@@ -151,8 +153,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const user = this.socketList.find(socket => socket.socketId === client.id).user
 
         await this.channelService.deleteChannel(user.id, channelId);
-        this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.to(String(channelId)).emit("updateMembersJoinedChannels");
+        this.server.emit("updateChannel");
         this.server.emit("/userLeft/channel/" + channelId);
     }
 
@@ -160,6 +161,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('updateJoinedChannels')
     async updateJoinedChannels(client: Socket) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
+        // this.server.emit("updateChannel", await this.channelService.findAll());
         this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
     }
 
@@ -168,11 +170,30 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
 
-        await this.channelService.addUserToChannel(joinChannel, user.id);
-        client.join(String(joinChannel.id));
-        this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
-        this.server.emit("/userJoined/channel/" + joinChannel.id);
+        await this.channelService.addUserToChannel(joinChannel, user.id)
+            .then(async () => {
+                client.join(String(joinChannel.id));
+                this.server.emit("updateChannel");
+                this.server.emit("/userJoined/channel/" + joinChannel.id);
+                this.server.emit("/userJoined/" + user.username, (await this.channelService.findChannelById(joinChannel.id)).name);
+            })
+            .catch(error => {
+                this.server.to(client.id).emit("/joinChannelError/", error.response)
+            })
+        
+    }
+
+    // @UseGuards(JwtAuthGuard, TwoFAAuth)
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('leaveChannel') 
+    async leaveChannel(client: Socket, channelId: number) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+
+        this.server.emit("/userLeft/" + user.username, (await this.channelService.findChannelById(channelId)).name);
+        await this.channelService.deleteChannelMember(channelId, user.id);
+        this.server.emit("updateChannel");
+        client.leave(String(channelId));
+        this.server.emit("/userLeft/channel/" + channelId);
     }
 
     @UseGuards(SocketGuard)
@@ -183,7 +204,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
         const guestSocket = (this.socketList.find(s => s.user.id === guest.id)).socket;
         guestSocket.join(String(invitation.channelId));
-        this.server.to(guestSocket.id).emit("updateJoinedChannel", await this.userService.joinedChannel(guest));
+        this.server.emit("updateChannel");
+        this.server.emit("/invitationChannel/" + guest.username, (await this.channelService.findChannelById(invitation.channelId)).name);
     }
 
     @UseGuards(SocketGuard)
@@ -224,26 +246,13 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.to(userToUpdateSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToUpdate, channel));
         this.server.emit('messageUpdate/' + channel.id);
         this.server.emit("/userUpdated/channel/" + channel.id);
+        this.server.emit("/muteorban/" + userToUpdate.username, (await this.channelService.findChannelById(channel.id)).name);
     }
 
     @OnEvent('unmutedOrUnbannedMember')
     sendDataToFront() {
-        console.log("On event unmutedOrUnbannedMember");
+        this.server.emit("channelMembersInfo");
         this.server.emit("/userUpdated/channel/");
-
-    }
-
-    // @UseGuards(JwtAuthGuard, TwoFAAuth)
-    @UseGuards(SocketGuard)
-    @SubscribeMessage('leaveChannel')
-    async leaveChannel(client: Socket, channelId: number) {
-        const user = this.socketList.find(socket => socket.socketId === client.id).user
-
-        await this.channelService.deleteChannelMember(channelId, user.id);
-        this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.to(String(channelId)).emit("updateMembersJoinedChannels");
-        client.leave(String(channelId));
-        this.server.emit("/userLeft/channel/" + channelId);
     }
 
     @UseGuards(SocketGuard)
@@ -259,9 +268,40 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('changePassword')
     async changePassword(client: Socket, passwordI: changePasswordDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user
-        await this.channelService.changePassword(user.id, passwordI);
-        // need to inform members of the channel of this change !
-        this.server.to(client.id).emit("passwordChanged", "password is changed");
+        await this.channelService.changePassword(user.id, passwordI)
+            .then(() => {
+                this.server.to(client.id).emit("/passwordChanged/", "password is changed")
+            })
+            .catch(error => {
+                this.server.to(client.id).emit("/passwordError/", error.response)
+            })
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('addPasswordToPublicChannel')
+    async addPasswordToPublicChannel(client: Socket, passwordI: changePasswordDto) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.addPasswordToPublicChannel(user, passwordI)
+            .then(async () => {
+                this.server.emit("updateChannel")
+            })
+            .catch(error => {
+                this.server.to(client.id).emit("/passwordAddedError/", error.response)
+            })
+    }
+
+    @UseGuards(SocketGuard)
+    @SubscribeMessage('removePasswordToProtectedChannel')
+    async removePasswordToProtectedChannel(client: Socket, channelId: number) {
+        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        await this.channelService.removePasswordToProtectedChannel(user, channelId)
+            .then(async () => {
+                this.server.emit("updateChannel")
+            })
+            .catch(error => {
+                this.server.to(client.id).emit("/passwordRemovedError/", error.response)
+            })
+            
     }
 
     @UseGuards(SocketGuard)
@@ -271,16 +311,12 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this.channelService.changeChannelName(owner, updates);
 
         this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.to(String(updates.channelId)).emit("updateMembersJoinedChannels");
     }
 
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('sendMessageToServer')
     async sendMessage(client: Socket, createMessageDto: CreateMessageDto /*message: string, channelId: number*/) {
-        // console.log('Message sent to the back in channel ', createMessageDto);
-        // client.emit('messageUpdate', message, channelId);
-        // this.server.emit('sendMessageToClient', createMessageDto.content);
         await this.channelService.saveMessage(createMessageDto.userId, createMessageDto);
         this.server.emit('messageUpdate/' + createMessageDto.channelId);
     }

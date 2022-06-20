@@ -58,7 +58,7 @@ export default defineComponent({
     socketChannel: {
       type: Socket,
     },
-  },
+  },  
 
   data() {
     /* eslint-disable */
@@ -107,15 +107,24 @@ export default defineComponent({
     this.socket.on(
       "getChannelMessages" + this.currentUser.id,
       (data: MessageI[]) => {
-        console.log("getChannelMessages");
+        // console.log("getChannelMessages");
         this.messageList = data;
       }
     );
 
-    this.socket.on("channelMemberInfo", (data: any) => {
-      console.log("update channelMemberInfo : ", this.channelMember);
-      this.channelMember = data;
-    });
+    this.socket.on(
+      "channelMemberInfo", (data: any) => {
+          // console.log("update channelMemberInfo : ", this.channelMember)
+          this.channelMember = data;
+        }
+    );
+
+    this.socket.on(
+      "channelMembersInfo", () => {
+        this.socket.emit("getChannelMemberInfo", this.channel);
+      }
+    );
+
   },
 
   // unmounted() {

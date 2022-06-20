@@ -7,7 +7,6 @@
         <button
           @click="deleteChannel()"
           class="btn-danger"
-          v-if="channelMember.owner"
         >
           Delete channel
         </button>
@@ -41,6 +40,25 @@
             class="inputMessage"
             placeholder="new password"
           />
+        </div>
+        <div v-if="channelType == 'public'">
+          <!-- change channel type : public->protected -->
+          <button @click="addPasswordToPublicChannel()" class="btn-primary">
+            Add a password :
+          </button>
+          <input
+            type="password"
+            maxlength="100"
+            v-model="passwordI.new"
+            class="inputMessage"
+            placeholder="password"
+          />
+        </div>
+        <div v-if="channelType == 'protected'">
+          <!-- change channel type : public->protected -->
+          <button @click="removePasswordToProtectedChannel()" class="btn-primary">
+            Remove the password
+          </button>
         </div>
         <div v-if="channelMember.admin && channelType == 'private'">
           <!-- invitations only by admins -->
@@ -122,7 +140,6 @@
 import { defineComponent } from "@vue/runtime-core";
 import { Socket } from "socket.io-client";
 import http from "../../http-common";
-import VueCrontab from "vue-crontab";
 import BanMuteModal from "./BanMuteModal.vue";
 
 export default defineComponent({
@@ -152,7 +169,6 @@ export default defineComponent({
 
   data() {
     return {
-      muteBanCounter: 0,
       memberList: [],
       newChannelName: "",
       invitation: {
@@ -166,10 +182,6 @@ export default defineComponent({
       },
     };
   },
-
-  computed: {},
-
-  watch: {},
 
   methods: {
     async getChannelMembers() {
@@ -208,6 +220,17 @@ export default defineComponent({
       this.passwordI.new = "";
     },
 
+    // change channel type : public->protected
+    addPasswordToPublicChannel() {
+      this.socket.emit("addPasswordToPublicChannel", this.passwordI);
+      this.passwordI.new = "";
+    },
+
+    // change channel type : protected->public
+    removePasswordToProtectedChannel() {
+      this.socket.emit("removePasswordToProtectedChannel", this.channelId);
+    },
+
     kickMember(username: string) {
       const userToKick = {
         channelId: this.channelId,
@@ -233,13 +256,11 @@ export default defineComponent({
     },
 
     ban(username: string, timeToBan: number) {
-      console.log("test to mute for 1 minutes");
-      timeToBan = 1; // TEST
       const update = {
         channelId: this.channelId,
         username: username,
         banned: true,
-        timeToBan: timeToBan == undefined ? null : timeToBan,
+        timeToBan: timeToBan,
       };
       this.socket.emit("muteban", update);
     },
@@ -254,13 +275,11 @@ export default defineComponent({
     },
 
     mute(username: string, timeToMute: number) {
-      console.log("test to mute for 1 minutes");
-      timeToMute = 1; // TEST
       const update = {
         channelId: this.channelId,
         username: username,
         muted: true,
-        timeToMute: timeToMute == undefined ? null : timeToMute,
+        timeToMute: timeToMute,
       };
       this.socket.emit("muteban", update);
     },
@@ -276,9 +295,6 @@ export default defineComponent({
   },
 
   mounted() {
-    this.socket.on("passwordChanged", (data: string) => {
-      console.log("passwordChanged:", data);
-    });
     this.socket.on("/adminPromoted/" + this.channelId, () => {
       this.getChannelMembers();
     });
@@ -309,6 +325,10 @@ export default defineComponent({
       console.log("user unmuted or unbanned");
       this.getChannelMembers();
     });
+    this.socket.on("/passwordChanged/", (data: string) => {
+      this.getChannelMembers();   
+    });
+
   },
 
   created() {
