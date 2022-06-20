@@ -114,11 +114,6 @@ export default defineComponent({
         this.pong.context.fillStyle = 'yellow';
         this.pong.context.fillText('Game aborted :(', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
       }
-      setTimeout(() => {
-        if (this.$route.name == 'Spectate') {
-          this.$router.push('/');
-        }
-      }, 3000);
     },
     pausePage() {
       if (this.state == State.OVER) {
@@ -138,7 +133,7 @@ export default defineComponent({
         case State.PAUSE:
           return this.pausePage();
         case State.OVER:
-          return;
+          return this.overPage();
       }
 
       // Draw fields
@@ -190,6 +185,11 @@ export default defineComponent({
       this.socket.on('gameOver', (winner: string) => {
         this.winner = winner;
         this.overPage();
+        setTimeout(() => {
+          if (this.$route.name == 'Spectate') {
+            this.$router.push('/');
+          }
+        }, 3000);
       });
       this.socket.on('playerMove', async (isLeftSide: boolean, y: number) => {
         if (isLeftSide) {

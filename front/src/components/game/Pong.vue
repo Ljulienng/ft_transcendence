@@ -118,11 +118,6 @@ export default defineComponent({
       this.pong.context.textAlign = 'center';
       this.pong.context.textBaseline = "middle";
       this.pong.context.fillText('YOU LOSE', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
-      setTimeout(() => {
-        if (this.$route.name == 'Pong') {
-          this.$router.push('/');
-        }
-      }, 3000);
     },
     winPage() {
       this.state = State.WIN;
@@ -157,9 +152,9 @@ export default defineComponent({
         case State.PAUSE:
           return this.pausePage();
         case State.WIN:
-          return;
+          return this.winPage();
         case State.LOSE:
-          return;
+          return this.losePage();
       }
 
       // Draw fields
@@ -241,8 +236,22 @@ export default defineComponent({
     },
     onReady() {
       this.socket.on('pause', () => { this.pausePage(); });
-      this.socket.on('youWin', () => { this.winPage(); });
-      this.socket.on('youLose', () => { this.losePage(); });
+      this.socket.on('youWin', () => {
+        this.winPage();
+        setTimeout(() => {
+          if (this.$route.name == 'Pong') {
+            this.$router.push('/');
+          }
+        }, 3000);
+      });
+      this.socket.on('youLose', () => {
+        this.losePage();
+        setTimeout(() => {
+          if (this.$route.name == 'Pong') {
+            this.$router.push('/');
+          }
+        }, 3000);
+      });
       this.socket.on('opponentMove', async (y: number) => {
         y = y / 66 * this.pong.canvas.height;
         await this.$nextTick();
