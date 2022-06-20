@@ -47,6 +47,14 @@
             <i style="color: #fff774" class="material-icons">send</i>
           </button>
         </div>
+      <!-- <div v-if="!channelMember.muted">
+        <button @click="sendMessage" class="btn-primary">Send message</button>
+        <input
+          type="text"
+          maxlength="100"
+          v-model="message.content"
+          class="inputMessage"
+        /> -->
       </div>
 
     </div>
@@ -81,7 +89,7 @@ export default defineComponent({
     socketChannel: {
       type: Socket,
     },
-  },
+  },  
 
   data() {
     /* eslint-disable */
@@ -119,11 +127,10 @@ export default defineComponent({
         this.messageList = data;
       });
     },
-
   },
 
   mounted() {
-    this.socket.on("messageUpdate", () => {
+    this.socket.on("messageUpdate/" + this.channel, () => {
       console.log("messageUpdate");
       this.socket.emit("getChannelMsg", this.channel);
     });
@@ -131,16 +138,22 @@ export default defineComponent({
     this.socket.on(
       "getChannelMessages" + this.currentUser.id,
       (data: MessageI[]) => {
-        console.log("getChannelMessages");
+        // console.log("getChannelMessages");
         this.messageList = data;
       }
     );
 
     this.socket.on(
       "channelMemberInfo", (data: any) => {
-          console.log("update channelMemberInfo : ", this.channelMember)
+          // console.log("update channelMemberInfo : ", this.channelMember)
           this.channelMember = data;
         }
+    );
+
+    this.socket.on(
+      "channelMembersInfo", () => {
+        this.socket.emit("getChannelMemberInfo", this.channel);
+      }
     );
 
   },

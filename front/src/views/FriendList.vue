@@ -7,7 +7,7 @@
       <button
         class="btn"
         data-bs-toggle="modal"
-        data-bs-target="#addFriendModal"
+        data-bs-target="#friendModal"
       >
         <i style="color: #fff774" class="material-icons">person_add_alt_1</i>
       </button>
@@ -16,15 +16,16 @@
     <!-- Modal -->
     <div
       class="modal fade"
-      id="addFriendModal"
+      id="friendModal"
+      ref="Modal"
       tabindex="-1"
-      aria-labelledby="addFriendModalLabel"
+      aria-labelledby="friendModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="addFriendModalLabel">Add friend</h5>
+            <h5 class="modal-title" id="friendModalLabel">Add friend</h5>
             <button
               id="closeModalButton"
               type="button"
@@ -49,6 +50,7 @@
                       type="text"
                       name="id"
                       placeholder="Username..."
+                      @input="test"
                       required
                     />
                   </div>
@@ -63,7 +65,7 @@
                 </div>
                 <div class="col-auto">
                   <div class="mb-4 mt-4 text-center">
-                    <button type="submit" data-bs-dismiss="modal" aria-label="Close">
+                    <button v-if="errorMsg === ''" type="submit" data-bs-dismiss="modal" aria-label="Close">
                       <i style="color: #fff774" class="material-icons">send</i>
                     </button>
                   </div>
@@ -117,14 +119,18 @@ export default defineComponent({
   },
 
   methods: {
+    // closeModal() {
+    // }, 
+    test() {
+      console.log('test')
+      this.errorMsg = ''
+    },
     async getFriendList() {
-      try {
-        const response = await http.get("/users/friendlist");
-        this.friendList = response.data;
+        const response = await http.get("/users/friendlist").catch(() =>{console.log('rien')});
+        if (response)
+          this.friendList = response.data;
         this.updateComp++;
-      } catch (e) {
-        console.log(e);
-      }
+
     },
 
     async addFriend() {
@@ -134,11 +140,19 @@ export default defineComponent({
     blockUser(userToBlock: number) {
       this.socket.emit("blockUser", userToBlock);
     },
+
   },
 
   mounted() {
     this.socket.on("friendAdded", () => {
       this.getFriendList();
+      this.errorMsg = ''; 
+    });
+
+    // eslint-disable-next-line
+    this.socket.on("friendAddedError", (data: any) => {
+      console.log('errorfriend')
+      this.errorMsg = data;
     });
 
     this.socket.on("friendDeleted", () => {

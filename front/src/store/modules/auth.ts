@@ -82,15 +82,17 @@ const actions = {
 	},
 
 	async userProfile({commit}: {commit: Commit}){
-		const response = await http.get("userinfo", {withCredentials: true})
-		.catch((err) => {
-			console.log(err);
+		await http.get("userinfo", {withCredentials: true})
+		.then((response) => {
+			if(response && response.data){
+				console.log("userinfo =", response.data)
+				commit("setUserProfile", response.data)
+			}
+		})
+		.catch(() => {
+			console.log("");
 		});
 
-		if(response && response.data){
-			console.log("userinfo =", response.data)
-			commit("setUserProfile", response.data)
-		}
 	}
 };
 
@@ -134,7 +136,8 @@ const mutations = {
 		};
 		state.userProfile = userProfile
 		if (!state.socket && userProfile.id !== 0 )
-			state.socket = io('http://localhost:3000/user', {  withCredentials: true });
+			state.socket = io('http://localhost:3000/', {  withCredentials: true });
+
 	}
 };
 

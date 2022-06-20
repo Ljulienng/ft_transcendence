@@ -3,7 +3,10 @@
     <div>
 
         <button class="input-group-btn" type="button" data-bs-toggle="modal" data-bs-target="#chanListModal">
-          <i style="color: #fff774" class="material-icons">forum</i>
+            <div class="row">
+                <i style="color: #fff774" class="col-auto material-icons">forum</i>
+                <h4 class="col">join existing channel</h4>
+            </div>   
         </button>
 
         <div class="modal fade" id="chanListModal" tabindex="-1" aria-labelledby="chanListModal" aria-hidden="true">

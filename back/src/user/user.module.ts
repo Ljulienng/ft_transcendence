@@ -14,6 +14,7 @@ import { UserGateway } from './user.gateway';
 import { ChannelMemberModule } from 'src/channelMember/channelMember.module';
 import { PongModule } from 'src/pong/pong.module';
 import { Match } from 'src/pong/models/match.entity';
+import { PongService } from 'src/pong/pong.service';
 
 
 @Module({
@@ -30,8 +31,8 @@ import { Match } from 'src/pong/models/match.entity';
     // TypeOrmModule.forFeature([UserRepository]),
   ],
   controllers: [UserController],
-  providers: [UserService, UserGateway],
+  providers: [PongService, UserService, UserGateway],
   exports: [UserService]
 
 })
-export class UserModule {}
+export class UserModule { }
