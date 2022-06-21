@@ -22,7 +22,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
     ConfigModule.forRoot({isGlobal: true}),
-    TypeOrmModule.forRoot({ // for PostGres 
+    TypeOrmModule.forRoot({ // for PostGres
       type: 'postgres',
       // url: process.env.DATABASE_URL,
       url: "postgres://user:password@localhost:5432/db",

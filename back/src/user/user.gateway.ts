@@ -282,6 +282,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.addPasswordToPublicChannel(user, passwordI)
             .then(async () => {
+                console.log("now a protected channel");
                 this.server.emit("updateChannel")
             })
             .catch(error => {
@@ -295,6 +296,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.removePasswordToProtectedChannel(user, channelId)
             .then(async () => {
+                console.log("now a public channel");
                 this.server.emit("updateChannel")
             })
             .catch(error => {

@@ -49,7 +49,7 @@
 
     </div>
 
-    <div v-if="channelMember.admin">
+    <div v-if="channelMember.owner">
 
         <!-- CHANGE PASSWORD -->
         <button v-if="channelType == 'protected'" type="button" data-bs-toggle="modal" data-bs-target="#chanpwdModal">
@@ -98,7 +98,7 @@
 
       </div>
 
-      <div v-if="channelMember.admin">
+      <div v-if="channelMember.owner">
 
         <!-- ADD PASSWORD -->
         
@@ -119,7 +119,7 @@
                         id="name"
                         class="form-control"
                         maxlength="100"
-                        v-model="passwordI.old"
+                        v-model="passwordI.new"
                         type="password"
                         name="name"
                         placeholder="password"
