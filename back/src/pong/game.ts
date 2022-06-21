@@ -120,6 +120,7 @@ export class Game {
     this.sendStart();
     this.sendScore();
     this.ball.randomDirection();
+    console.log('GAME IS STARTING');
     const interval = setInterval(async () => {
       if (this.state == GameState.PAUSE) {
         this.checkForfait();

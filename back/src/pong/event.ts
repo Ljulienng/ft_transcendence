@@ -20,15 +20,15 @@ export class Event {
   }
 
   emitOpponentMove(id: string, y: number) {
-    this.server.to(id).emit('opponentMove', y);
+    this.server.to(id).volatile.emit('opponentMove', y);
   }
 
   emitPlayerMove(id: string, isLeftSide: boolean, y: number) {
-    this.server.to(id).emit('playerMove', isLeftSide, y);
+    this.server.to(id).volatile.emit('playerMove', isLeftSide, y);
   }
 
   emitBallMove(id: string, pos: Point) {
-    this.server.to(id).emit('ballMove', pos);
+    this.server.to(id).volatile.emit('ballMove', pos);
   }
 
   emitUpdateScore(id: string, score: Point) {
