@@ -134,15 +134,15 @@ export default defineComponent({
   },
   beforeMount() {  // TODO: do earlier ?
     // if player is in game, redirect it to its game
-    this.socket.volatile.emit('isPlayerInGame', (isPlayerInGame: boolean) => {
-      if (isPlayerInGame) {
+    this.socket.volatile.emit('amIInGame', (amIInGame: boolean) => {
+      if (amIInGame == true) {
         this.socket.volatile.emit('playerReconnect');
         this.$router.push('/play');
       }
     });
     setTimeout(() => {
-      this.socket.volatile.emit('isPlayerInGame', (isPlayerInGame: boolean) => {
-        if (isPlayerInGame) {
+      this.socket.volatile.emit('amIInGame', (amIInGame: boolean) => {
+        if (amIInGame == true) {
           this.socket.volatile.emit('playerReconnect');
           this.$router.push('/play');
         }

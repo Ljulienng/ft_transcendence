@@ -12,8 +12,12 @@ export default defineComponent({
 
   methods: {
     matchSpectate() {
-      this.socket.emit("spectate", this.userToSpectate);
-      this.$router.push('/spectate');
+      this.socket.volatile.emit('isPlaying', { id: this.userToSpectate, notify: true }, (isPlayerInGame: boolean) => {
+        if (isPlayerInGame) {
+          this.socket.emit("spectate", this.userToSpectate);
+          this.$router.push('/spectate');
+        }
+      });
     }
   }
 })

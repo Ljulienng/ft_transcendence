@@ -37,7 +37,7 @@ export class Game {
     public playerLeft: Player,
     public playerRight: Player,
     public winScore: number) {
-    this.state = GameState.PLAY;
+    this.state = GameState.PAUSE;
     // this.name = 'game_' + playerLeft.user.id + '_' + playerRight.user.id;
     this.id = null;
     this.spectators = [];
@@ -145,15 +145,23 @@ export class Game {
   }
 
   sendStart() {
-    this.event.emitStart(this.playerLeft.options, this.playerLeft.socket.id, this.playerRight.user, true);
-    this.event.emitStart(this.playerRight.options, this.playerRight.socket.id, this.playerLeft.user, false);
+    if (this.playerLeft.socket && this.playerLeft.socket.id) {
+      this.event.emitStart(this.playerLeft.options, this.playerLeft.socket.id, this.playerRight.user, true);
+    }
+    if (this.playerRight.socket && this.playerRight.socket.id) {
+      this.event.emitStart(this.playerRight.options, this.playerRight.socket.id, this.playerLeft.user, false);
+    }
     this.event.emitStartSpec(null, this.spectatorRoom, this.playerLeft.user.username, this.playerRight.user.username);
   }
 
   async sendScore() {
     await this.saveMatch(null, null, true);
-    this.event.emitUpdateScore(this.playerLeft.socket.id, { x: this.playerLeft.score, y: this.playerRight.score });
-    this.event.emitUpdateScore(this.playerRight.socket.id, { x: this.playerLeft.score, y: this.playerRight.score });
+    if (this.playerLeft.socket && this.playerLeft.socket.id) {
+      this.event.emitUpdateScore(this.playerLeft.socket.id, { x: this.playerLeft.score, y: this.playerRight.score });
+    }
+    if (this.playerRight.socket && this.playerRight.socket.id) {
+      this.event.emitUpdateScore(this.playerRight.socket.id, { x: this.playerLeft.score, y: this.playerRight.score });
+    }
     this.event.emitUpdateScore(this.spectatorRoom, { x: this.playerLeft.score, y: this.playerRight.score });
   }
   async sendGameOver(winner: Player, opponent: Player) {
