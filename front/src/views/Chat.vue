@@ -11,7 +11,10 @@
                 </div>
                 
                 <div class="container-fluid widebox" style="height: 70rem">
-                    <ChatTests @conv="getConv" @type="getType" @privacy="getPrivacy"/>
+                    <ChatTests @conv="getConv"
+                                @type="getType" 
+                                @privacy="getPrivacy"
+                    />
                 </div>
             </div>
 
@@ -33,6 +36,7 @@
                     :key="componentKey"
                     :is="true"
                     @close="updateComponent"
+                    @update="updateComponent_"
                 ></ChannelBox>
             </div>
             
@@ -80,6 +84,13 @@
             updateComponent() {
                 this.convToShow = 0;
                 this.componentKey += 1;
+                console.log("emit updateChannel in Chat.vue for close event")
+                this.socket.emit("updateChannel");
+            },
+
+            updateComponent_() {
+                console.log("emit updateChannel in Chat.vue")
+                this.socket.emit("updateChannel");
             },
 
             getType(value: string) {

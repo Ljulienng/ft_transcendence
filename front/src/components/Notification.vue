@@ -116,7 +116,9 @@ export default defineComponent({
   // },
 
   created() {
-    
+      this.socket.on("moveToMatch", () => {
+        this.$router.push("/play");
+      });  
     this.socket.on('matchRefused/' + this.currentUser.id, () => {console.log('REFUSED')})
 
     // eslint-disable-next-line

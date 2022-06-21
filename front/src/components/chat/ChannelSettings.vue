@@ -1,7 +1,6 @@
 <template>
   <div class="input-group align-items-center justify-content-between">
-    <!--=========================== ADMIN SETTINGS ===========================-->
-
+    
     <h2>{{ name }}</h2>
 
     <div v-if="channelMember.admin">
@@ -27,6 +26,7 @@
                         type="text"
                         name="name"
                         placeholder="new channel name"
+                        maxlength="50"
                       />
                   </div>
                   <div class="modal-footer">
@@ -83,10 +83,51 @@
                         name="name"
                         placeholder="new password"
                       />
+                      <button @click="removePasswordToProtectedChannel()" class="btn-primary">
+                        Remove the password
+                      </button>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Change</button>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </form>
+
+      </div>
+
+      <div v-if="channelMember.admin">
+
+        <!-- ADD PASSWORD -->
+        
+        <button v-if="channelType == 'public'" type="button" data-bs-toggle="modal" data-bs-target="#addpwdModal">
+          <i style="color: grey" class="material-icons">key</i>
+        </button>
+
+        <form v-if="channelType == 'public'" v-on:submit.prevent="addPasswordToPublicChannel">
+          <div class="modal fade" id="addpwdModal" tabindex="-1" aria-labelledby="addpwdModal" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="addpwdModal">Add password</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                  <div class="modal-body">
+                      <input
+                        id="name"
+                        class="form-control"
+                        maxlength="100"
+                        v-model="passwordI.old"
+                        type="password"
+                        name="name"
+                        placeholder="password"
+                      />
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
                   </div>
               </div>
             </div>
@@ -225,131 +266,6 @@
           </div>
         </div>
       </div>
-    <!-- </form> -->
-    
-      <!-- <div>
-        <button
-          @click="deleteChannel()"
-          class="btn-danger"
-        >
-          Delete channel
-        </button>
-        <div>
-          <button @click="changeChannelName()" class="btn-primary">
-            Change channel name :
-          </button>
-          <input
-            type="text"
-            maxlength="50"
-            v-model="newChannelName"
-            placeholder="new channel name"
-          />
-        </div>
-        <div v-if="channelType == 'protected'">
-          <button @click="changePassword()" class="btn-primary">
-            Change password :
-          </button>
-          <input
-            type="password"
-            maxlength="100"
-            v-model="passwordI.old"
-            class="inputMessage"
-            placeholder="old password"
-          />
-          <input
-            type="password"
-            maxlength="100"
-            v-model="passwordI.new"
-            class="inputMessage"
-            placeholder="new password"
-          />
-        </div>
-        <div v-if="channelType == 'public'">
-          <button @click="addPasswordToPublicChannel()" class="btn-primary">
-            Add a password :
-          </button>
-          <input
-            type="password"
-            maxlength="100"
-            v-model="passwordI.new"
-            class="inputMessage"
-            placeholder="password"
-          />
-        </div>
-        <div v-if="channelType == 'protected'">
-          <button @click="removePasswordToProtectedChannel()" class="btn-primary">
-            Remove the password
-          </button>
-        </div>
-        <div v-if="channelMember.admin && channelType == 'private'">
-          <button @click="invite()">Invite :</button>
-          <input
-            type="text"
-            maxlength="30"
-            v-model="invitation.guest"
-            class="inputMessage"
-            placeholder="username"
-          />
-        </div>
-      </div>
-    </div>
-
-    
-    <ul>
-      <li v-for="member in memberList" :key="member">
-        <template v-if="member.owner">OWNER = </template>
-        {{ member.user.username }}
-        <template v-if="channelMember.owner">
-          <button
-            @click="setMemberAsAdmin(member.user.username)"
-            class="btn-primary"
-            v-if="member.admin === false"
-          >
-            PROMOTE
-          </button>
-          <button
-            @click="unsetMemberAsAdmin(member.user.username)"
-            class="btn-primary"
-            v-if="member.admin === true && !member.owner"
-          >
-            DEMOTE
-          </button>
-        </template>
-        <template v-if="channelMember.admin">
-          <button
-            @click="kickMember(member.user.username)"
-            class="btn-danger"
-            v-if="member.admin === false"
-          >
-            Kick
-          </button>
-          <button
-            @click="kickMember(member.user.username)"
-            class="btn-danger"
-            v-if="member.admin && !member.owner && channelMember.owner"
-          >
-            Kick
-          </button>
-        </template>
-        <template v-if="channelMember.admin">
-          <BanMuteModal
-            v-bind:context="'mute'"
-            v-bind:member="member"
-            v-bind:socket="socket"
-            v-bind:channelId="channelId"
-          />
-          <BanMuteModal
-            v-bind:context="'ban'"
-            v-bind:member="member"
-            v-bind:socket="socket"
-            v-bind:channelId="channelId"
-          />
-        </template>
-        <template v-if="member.admin">(admin)</template>
-        <template v-if="member.muted">(muted)</template>
-        <template v-if="member.banned">(banned)</template>
-      </li>
-    </ul> -->
   </div>
 </template>
 
@@ -434,12 +350,15 @@ export default defineComponent({
     },
 
     changeChannelName() {
+      this.name = this.newChannelName;
       const changeChannelName = {
         channelId: this.channelId,
         name: this.newChannelName,
       };
       this.socket.emit("changeChannelName", changeChannelName);
       this.newChannelName = "";
+      this.$emit("update");
+      console.log("emit update in ChannelSettings, name=", this.name);
     },
 
     invite() {

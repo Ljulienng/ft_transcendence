@@ -11,6 +11,7 @@ import { JwtService } from "@nestjs/jwt"
 import { TwoFAAuth } from './guards/twoFA.guard';
 import { UserService } from 'src/user/service/user.service';
 import { ClassSerializerInterceptor } from '@nestjs/common';
+import { ReturningStatementNotSupportedError } from 'typeorm';
 
 @Controller()
 export class AuthController {
@@ -18,7 +19,8 @@ export class AuthController {
 
   @UseGuards(FortyTwoAuthGuard)
   @Get('/auth/42')
-  async FortyTwoAuth(@Req() req)  {
+  FortyTwoAuth(@Req() req)  {
+    console.log("auth/42")
   }
 
   // @UseGuards(FortyTwoAuthGuard)
@@ -52,16 +54,20 @@ export class AuthController {
     }
     const test = await this.userService.findByUsername(tmp)
 
-    // console.log("new user = ", test, tmp)
 
     const payload = { username: tmp, auth: false };
 		const accessToken = await this.jwtService.signAsync(payload);
 		res.cookie('jwt', accessToken, {httpOnly: true})
   }
 
-  @UseGuards(FortyTwoAuthGuard)
+
   @Get('/auth/42/callback')
+  @UseGuards(FortyTwoAuthGuard)
   async FortyTwoAuthRedirect(@Req() req, @Res({passthrough: true}) res) {
+    if (!req.user['username']) {
+      res.redirect('http://localhost:3001/authmodal');
+      return ;
+    }
     const payload = { username: req.user['username'], auth: false };
 		const accessToken = await this.jwtService.signAsync(payload);
     if (req.user.status === 'Offline')
@@ -72,6 +78,7 @@ export class AuthController {
 
   @UseInterceptors(ClassSerializerInterceptor)
 	@UseGuards(JwtAuthGuard)
+  @HttpCode(200)
   @Get('userinfo')
   async userinfo(@Req() req) {
     try {
@@ -100,14 +107,12 @@ export class AuthController {
   async turnOnTwoFactorAuthentication(
     @Req() req,
     @Body() twoFactorAuthenticationCode) {
-      // console.log('twoFactorAuthenticationCode = ', twoFactorAuthenticationCode.twoFactorAuthenticationCode);
     const isCodeValid = this.twoFAService.isTwoFactorAuthenticationCodeValid(
       twoFactorAuthenticationCode.twoFactorAuthenticationCode, req.user
     );
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
-    // console.log('double FA ACTIVATED FOR ', req.user.username)
     await this.userService.turnOnTwoFactorAuthentication(req.user.id);
   }
 
@@ -118,7 +123,6 @@ export class AuthController {
     @Req() req,
     @Res({passthrough: true}) res,
     @Body() twoFactorAuthenticationCode) {
-      // console.log('twoFactorAuthenticationCode = ', twoFactorAuthenticationCode.twoFactorAuthenticationCodeTwo);
     const user: User = req.user;
     const isCodeValid = this.twoFAService.isTwoFactorAuthenticationCodeValid(
       twoFactorAuthenticationCode.twoFactorAuthenticationCodeTwo, req.user
@@ -127,7 +131,6 @@ export class AuthController {
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
-    // console.log('double FA DEACTIVATED FOR ', req.user.username)
     await this.userService.turnOffTwoFactorAuthentication(req.user.id);
   
     const payload = { username: req.user['username'], auth: false };
@@ -146,21 +149,18 @@ export class AuthController {
     @Body() twoFactorAuthenticationCode) {
     const user: User = req.user;
 
-      // console.log('twoFactorAuthenticationCode = ', twoFactorAuthenticationCode.twoFactorAuthenticationCode);
     const isCodeValid = this.twoFAService.isTwoFactorAuthenticationCodeValid(
       twoFactorAuthenticationCode.twoFactorAuthenticationCode, req.user
     );
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
-    // console.log('TWOFA AUTHENTICATE =', req.user.username, user.twoFASecret)
 
     const payload = { username: req.user['username'], auth: true };
 		const accessToken = await this.jwtService.signAsync(payload);
 		// res.clearCookie('jwt');
     
     res.cookie('jwt', accessToken, {httpOnly: true})
-    // console.log('check payload ', payload)
     // console.log('check accessToken ', accessToken)
 		// res.redirect('http://localhost:3001/home');
   }

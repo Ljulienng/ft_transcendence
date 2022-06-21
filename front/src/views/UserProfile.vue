@@ -1,10 +1,9 @@
 <template>
   <div class="userProfile mx-auto p-4">
-    <button class="logout" @click="logout">Logout</button>
     <TwoFactorModal />
     <div class="d-flex mx-auto justify-content-evenly" style="width:70%">
-      <div class="d-block">
-        <UploadAvatar />
+      <div class="d-block text-center">
+        <UploadAvatar v-on:updateAvatar="updateAvatar"/>
         <UsernameModal />
         <router-link :to="'/public/' + currentUser.userName" class="button text-decoration-none">
           <small> public profile </small> 
@@ -19,7 +18,7 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import http from "../http-common";
+// import http from "../http-common";
 import TwoFactorModal from "../components/auth/TwoFactorModal.vue";
 // import UsernameModal from "../components/user/UsernameModal.vue";
 import UsernameModal from "../components/user/UsernameModal.vue";
@@ -37,45 +36,18 @@ export default defineComponent({
 
   data() {
     return {
+      socket: store.getters['auth/getUserSocket'],
       currentUser: store.getters["auth/getUserProfile"],
     };
   },
 
   methods: {
-    setStatus() {
-      http.post("/users/setstatus", { newStatus: "Offline" });
-      // .then((res) => {
-      //   console.log(res);
-      // })
-      // .catch((err) => {
-      //   console.log(err);
-      // });
-    },
+    updateAvatar() {
+      this.socket.emit('updateAvatar')
+    }
+  }
 
-    logout() {
-      const userSocket = store.getters["auth/getUserSocket"].id;
 
-      if (!userSocket) store.dispatch("auth/setUserSocket");
-      store.dispatch("auth/setUserStatus", "Offline");
-      http
-        .delete("/logout")
-        .then((res) => {
-          console.log(res);
-          window.location.reload();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-  },
-
-  // created() {
-  //   console.log("currentUser = ", this.currentUser);
-  // },
-
-  // beforeCreate() {
-  //   console.log("getUserprofile  = ", this.userProfile);
-  // },
 });
 </script>
 

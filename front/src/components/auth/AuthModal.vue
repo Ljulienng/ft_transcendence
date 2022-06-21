@@ -3,10 +3,7 @@
     <div class="signup">
       <div class="signup-connect">
         <h1>Create your account</h1>
-        <a
-          href="http://localhost:3000/auth/42"
-          class="btn btn-social btn-42"
-          v-on:click="ftAuth"
+        <a :href="ftAuth()" class="btn btn-social btn-42" v-on:click="ftAuth"
           ><i class="fa fa-user"></i> Sign in with 42</a
         >
         <a v-on:click="norminetAuth" class="btn btn-social btn-google"
@@ -43,7 +40,7 @@ export default defineComponent({
   },
 
   methods: {
-    ftAuth() {
+    ftAuth(): string {
       return "http://localhost:3000/auth/42";
     },
     norminetAuth() {
