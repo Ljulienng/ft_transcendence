@@ -51,8 +51,7 @@ export default defineComponent({
   },
 
   created() {
-    if (store.getters["auth/getUserProfile"].id !== 0)
-      window.addEventListener("beforeunload", this.setOffline);
+    window.addEventListener("beforeunload", this.setOffline);
     // if (this.getUserProfile.status === "Offline") store.dispatch("auth/setUserStatus", "Online");
     // console.log('user status', store.getters["auth/getUserProfile"].status)
   },
