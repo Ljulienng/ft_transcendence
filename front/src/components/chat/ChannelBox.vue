@@ -119,6 +119,7 @@ export default defineComponent({
         this.message.content
       );
       this.socket.emit("sendMessageToServer", this.message);
+      this.$emit("update");
     },
 
     async getMessages() {
@@ -126,6 +127,7 @@ export default defineComponent({
       this.socket.on("getChannelMessages", (data: MessageI[]) => {
         this.messageList = data;
       });
+      this.$emit("update");
     },
   },
 

@@ -27,6 +27,7 @@
                         type="text"
                         name="name"
                         placeholder="new channel name"
+                        maxlength="50"
                       />
                   </div>
                   <div class="modal-footer">
@@ -83,10 +84,51 @@
                         name="name"
                         placeholder="new password"
                       />
+                      <button @click="removePasswordToProtectedChannel()" class="btn-primary">
+                        Remove the password
+                      </button>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Change</button>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </form>
+
+      </div>
+
+      <div v-if="channelMember.admin">
+
+        <!-- ADD PASSWORD -->
+        
+        <button v-if="channelType == 'public'" type="button" data-bs-toggle="modal" data-bs-target="#addpwdModal">
+          <i style="color: grey" class="material-icons">key</i>
+        </button>
+
+        <form v-if="channelType == 'public'" v-on:submit.prevent="addPasswordToPublicChannel">
+          <div class="modal fade" id="addpwdModal" tabindex="-1" aria-labelledby="addpwdModal" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="addpwdModal">Add password</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                  <div class="modal-body">
+                      <input
+                        id="name"
+                        class="form-control"
+                        maxlength="100"
+                        v-model="passwordI.old"
+                        type="password"
+                        name="name"
+                        placeholder="password"
+                      />
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
                   </div>
               </div>
             </div>

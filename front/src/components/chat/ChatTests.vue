@@ -19,16 +19,16 @@
           Channels -->
         <!-- </button> -->
         <button
-          class="nav-link"
+          class="nav-link active"
           id="nav-friends-tab"
           data-bs-toggle="tab"
           data-bs-target="#nav-friends"
           type="button"
           role="tab"
           aria-controls="nav-friends"
-          aria-selected="false"
+          aria-selected="true"
         >
-          Friends
+          friends
         </button>
         <button
           class="nav-link"
@@ -40,17 +40,17 @@
           aria-controls="nav-joinedChannel"
           aria-selected="false"
         >
-          My channels
+          channels
         </button>
       </div>
     </nav>
     <div class="tab-content" id="nav-tabContent">
-      <div
+      <!-- <div
         class="tab-pane fade show active"
-        id="nav-channel"
+        id="nav-friends"
         role="tabpanel"
-        aria-labelledby="nav-channel-tab"
-      >
+        aria-labelledby="nav-friends-tab"
+      > -->
         <!-- CHANNEL LIST -->
         <!-- <div>
           <ChannelList @join="joinChannel"/>
@@ -81,11 +81,11 @@
             ></ChannelBox>
           </div> 
         </div> -->
-      </div>
+      <!-- </div> -->
 
       <!-- PRIVATE CHATS -->
       <div
-        class="tab-pane fade"
+        class="tab-pane fade show active"
         id="nav-friends"
         role="tabpanel"
         aria-labelledby="nav-friends-tab"
@@ -258,7 +258,10 @@ export default defineComponent({
         password: this.password,
       };
       this.socket.emit("joinChannel", channelToJoin);
+      this.$emit("update");
       this.password = "";
+      this.getJoinedChannelList();
+      this.getChannelList();
     },
 
     leaveChannel(channelId: number) {

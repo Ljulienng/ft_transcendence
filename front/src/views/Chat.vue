@@ -7,11 +7,16 @@
             <div class="container-fluid col-5 h-100">
                 <div class="d-flex align-items-center" style="height: 5rem">
                     <h3>chat</h3>
-                    <CreateChannel/>
+                    <CreateChannel @update="updateComponent_" :key="componentKey"/>
                 </div>
                 
                 <div class="container-fluid widebox" style="height: 70rem">
-                    <ChatTests @conv="getConv" @type="getType" @privacy="getPrivacy"/>
+                    <ChatTests @conv="getConv"
+                                @type="getType" 
+                                @privacy="getPrivacy" 
+                                @update="updateComponent_" 
+                                :key="componentKey"
+                    />
                 </div>
             </div>
 
@@ -79,6 +84,10 @@
 
             updateComponent() {
                 this.convToShow = 0;
+                this.componentKey += 1;
+            },
+
+            updateComponent_() {
                 this.componentKey += 1;
             },
 
