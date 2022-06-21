@@ -77,9 +77,7 @@
       </div>
     </div>
 
-    <div class="container-fluid widebox">
-      <FriendsList :key="updateComp" />
-    </div>
+    <FriendsList :key="updateComp" />
 
     <div class="d-flex align-items-center mt-4">
       <h3>blocked users</h3>

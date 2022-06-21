@@ -1,8 +1,13 @@
 <template>
-  <div class="d-flex align-items-center">
-    <img :src="this.image" class="small_profile_avatar" />
-    <p class="mx-3">{{ userInfo.username }}</p>
-  </div>
+  <th class="text-left" style="width: 11rem">
+    <router-link
+      :to="'/public/' + username"
+      class="button text-decoration-none"
+    >
+      <img :src="this.image" class="profile_avatar_small" />
+      {{ username }}
+    </router-link>
+  </th>
 </template>
 
 <script lang="ts">
@@ -10,31 +15,17 @@ import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 
 export default defineComponent({
-  props: ["username", "isSelected"],
+  /* eslint-disable */
+
+  props: ["username"],
 
   data() {
     return {
-      userInfo: {
-        username: "",
-      },
-      // eslint-disable-next-line
       image: null as any,
     };
   },
 
   methods: {
-    async getuserInfo() {
-      await http
-        .get("/users/public/" + this.username)
-        .then((response) => {
-          console.log("reponse = ", response);
-          this.userInfo = response.data;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-
     async getAvatar() {
       http
         .get("/users/avatar/" + this.username, {
@@ -42,6 +33,7 @@ export default defineComponent({
         })
         .then((response) => {
           const blob = response.data;
+
           this.image = URL.createObjectURL(blob);
         })
         .catch((error) => {
@@ -51,7 +43,6 @@ export default defineComponent({
   },
 
   created() {
-    this.getuserInfo();
     this.getAvatar();
   },
 });

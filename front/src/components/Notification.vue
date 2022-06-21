@@ -83,9 +83,8 @@ export default defineComponent({
     };
   },
   methods: {
-    // eslint-disable-next-line
     show(group: string, text: string, data = null as any, title = "", type = "") {
-      // console.log(group, text, data, title, type)
+      console.log(group, text, data, title, type)
       this.$notify({
         id: this.id++,
         group,
@@ -116,7 +115,9 @@ export default defineComponent({
   // },
 
   created() {
-    
+      this.socket.on("moveToMatch", () => {
+        this.$router.push("/play");
+      });  
     this.socket.on('matchRefused/' + this.currentUser.id, () => {console.log('REFUSED')})
 
     // eslint-disable-next-line

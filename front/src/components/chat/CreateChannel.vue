@@ -120,6 +120,7 @@
                 this.name = "";
                 this.type = "public";
                 this.password = "";
+                this.$emit("update");
             },
         },
     })

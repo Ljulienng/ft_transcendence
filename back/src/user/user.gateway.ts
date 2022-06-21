@@ -76,7 +76,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async handleDisconnect(client: Socket) {
         this.playerLeave(client);
         const index = this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
-        const user = this.socketList.find((socket) => socket.socketId === client.id).user
+        // const user = this.socketList.find((socket) => socket.socketId === client.id).user
         // console.log(this.socketList[index].user.username ,'has disconnected from the server');
 
         if (index > -1)
@@ -94,7 +94,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.userService.setStatus(user, 'Online');
         this.server.to(client.id).emit("Connected");
         this.socketList.forEach(async (socket) => {
-            if (await this.userService.checkIfFriend(user.id, socket.user.id))
+            if (this.userService.checkIfFriend(user.id, socket.user.id))
                 this.server.to(socket.socketId).emit("friendConnected");
         })
     }
@@ -107,12 +107,16 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             return;
         console.log('user:', user.username, 'is disconnected');
         this.userService.setStatus(user, "Offline");
-        this.socketList.forEach(async (socket) => {
-            if (await this.userService.checkIfFriend(user.id, socket.user.id))
+        this.socketList.forEach((socket) => {
+            if (this.userService.checkIfFriend(user.id, socket.user.id))
                 this.server.to(socket.socketId).emit("friendDisconnected");
         })
     }
 
+    @SubscribeMessage("updateAvatar")
+    updateAvatar(client: Socket) {
+        this.server.to(client.id).emit('updateAvatar')
+    }
 
 
     /* ============= CHANNEL CHAT PART ============*/
