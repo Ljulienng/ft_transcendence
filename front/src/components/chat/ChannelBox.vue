@@ -17,6 +17,7 @@
           v-bind:socket="socketChannel"
           v-bind:channelMember="channelMember"
           @close="$emit('close')"
+          @update="update"
         />
       </div>
 
@@ -119,6 +120,11 @@ export default defineComponent({
         this.message.content
       );
       this.socket.emit("sendMessageToServer", this.message);
+      this.$emit("update");
+    },
+
+    update() {
+      console.log("emit update in ChannelBox");
       this.$emit("update");
     },
 

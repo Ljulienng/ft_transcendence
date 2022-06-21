@@ -16,8 +16,7 @@
             showChatBox = false;
           "
         >
-          Channels -->
-        <!-- </button> -->
+        </button> -->
         <button
           class="nav-link active"
           id="nav-friends-tab"
@@ -47,9 +46,9 @@
     <div class="tab-content" id="nav-tabContent">
       <!-- <div
         class="tab-pane fade show active"
-        id="nav-friends"
+        id="nav-chan"
         role="tabpanel"
-        aria-labelledby="nav-friends-tab"
+        aria-labelledby="nav-chan-tab"
       > -->
         <!-- CHANNEL LIST -->
         <!-- <div>

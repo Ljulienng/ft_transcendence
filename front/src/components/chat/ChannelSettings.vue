@@ -483,6 +483,8 @@ export default defineComponent({
       };
       this.socket.emit("changeChannelName", changeChannelName);
       this.newChannelName = "";
+      this.$emit("update");
+      console.log("emit update in ChannelSettings");
     },
 
     invite() {
