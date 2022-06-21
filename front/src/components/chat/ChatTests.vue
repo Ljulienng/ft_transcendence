@@ -1,35 +1,23 @@
 <template>
   <div id="chat">
+
+    <!-- TABS HEADERS -->
     <nav>
       <div class="nav nav-tabs" id="nav-tab" role="tablist">
+
         <button
           class="nav-link active"
-          id="nav-channel-tab"
-          data-bs-toggle="tab"
-          data-bs-target="#nav-channel"
-          type="button"
-          role="tab"
-          aria-controls="nav-channel"
-          aria-selected="true"
-          @click="
-            showBox = false;
-            showChatBox = false;
-          "
-        >
-          Channels
-        </button>
-        <button
-          class="nav-link"
           id="nav-friends-tab"
           data-bs-toggle="tab"
           data-bs-target="#nav-friends"
           type="button"
           role="tab"
           aria-controls="nav-friends"
-          aria-selected="false"
+          aria-selected="true"
         >
-          Friends
+          friends
         </button>
+
         <button
           class="nav-link"
           id="nav-joinedChannel-tab"
@@ -40,105 +28,58 @@
           aria-controls="nav-joinedChannel"
           aria-selected="false"
         >
-          My channels
+          channels
         </button>
+
       </div>
     </nav>
+
+    <!-- TABS CONTENT -->
     <div class="tab-content" id="nav-tabContent">
+
+      <!-- PRIVATE CHATS -->
       <div
         class="tab-pane fade show active"
-        id="nav-channel"
-        role="tabpanel"
-        aria-labelledby="nav-channel-tab"
-      >
-        <!-- CHANNEL LIST -->
-        <div class="channelListWithoutPrivate">
-          <ul>
-            <li v-for="channel in channelListWithoutPrivate" :key="channel">
-              <!-- <div v-if="this.joinedChannelList.includes(channel.id) === false"> -->
-              {{ channel.id }} [{{ channel.type }}] : channel "{{
-                channel.name
-              }}" : created by {{ channel.owner.username }}
-              <button @click="joinChannel(channel.id, channel.type)">
-                join channel
-              </button>
-              <input
-                v-if="channel.type == 'protected'"
-                type="password"
-                maxlength="20"
-                v-model="password"
-                placeholder="password"
-              />
-            </li>
-          </ul>
-          <div v-if="showBox === true">
-            <ChannelBox
-              v-bind:channel="selectedChannel"
-              v-bind:socketChannel="socket"
-              @close="showBox = false"
-            ></ChannelBox>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="tab-pane fade"
         id="nav-friends"
         role="tabpanel"
         aria-labelledby="nav-friends-tab"
       >
         <div class="friendList">
-          <div
-            class="btn-group-vertical col-12 mx-auto"
-            role="group"
-            aria-label="Basic example"
-          >
-            <button
-              type="button"
-              class="btn"
-              v-for="friend in friendList"
-              :key="friend"
-              @click="showUser(friend.id)"
-            >
-              <UserBox :username="friend.username" :is-selected="false" />
-            </button>
-          </div>
 
-          <div v-if="selectedUser > 0">
-            <PrivateChatBox
-              v-bind:receiverId="selectedUser"
-              :is="showChatBox"
-            ></PrivateChatBox>
+          <div class="btn-group-vertical col-12 mx-auto" role="group" aria-label="Basic example">
+            <button type="button" class="btn" v-for="friend in friendList" :key="friend" @click="showUser(friend.id)">
+              <PrivateChatListElem :username="friend.username" :is-selected="friend.id===selectedUser"/>
+            </button>
           </div>
 
         </div>
       </div>
 
+
+      <!-- CHANNELS -->
       <div
         class="tab-pane fade"
         id="nav-joinedChannel"
         role="tabpanel"
         aria-labelledby="nav-joinedChannel-tab"
       >
+        <div class="row my-2">
+          <ChannelList :channelList="channelListWithoutPrivate" @join="joinChannel"/>
+        </div>
+
         <div class="joinedChannelList">
-          <ul>
-            <li v-for="channel in joinedChannelList" :key="channel">
-              {{ channel.id }} [{{ channel.type }}] - "{{ channel.name }}" :
-              created by {{ channel.owner.username }}
-              <button @click="showChannel(channel.id, channel.type)">
-                show channel
-              </button>
-              <button @click="leaveChannel(channel.id)">leave channel</button>
-            </li>
-          </ul>
-          <div v-if="showBox === true">
-            <ChannelBox
-              v-bind:channel="selectedChannel"
-              v-bind:channelType="selectedChannelType"
-              v-bind:socketChannel="socket"
-              :is="showBox"
-            ></ChannelBox>
+
+          <div class="btn-group-vertical col-12 mx-auto" role="group" aria-label="channels">
+            <button type="button" class="btn" v-for="channel in joinedChannelList" :key="channel" @click="showChannel(channel.id, channel.type)">
+              <ChannelListElem 
+                :id="channel.id"
+                :type="channel.type"
+                :name="channel.name"
+                :owner="channel.owner.username"
+              />
+            </button>
           </div>
+
         </div>
       </div>
     </div>
@@ -152,14 +93,18 @@ import http from "../../http-common";
 import ChannelI from "../../types/interfaces/channel.interface";
 import ChannelBox from "./ChannelBox.vue";
 import PrivateChatBox from "./PrivateChatBox.vue";
-import UserBox from "./UserBox.vue";
+import PrivateChatListElem from "./PrivateChatListElem.vue";
+import ChannelListElem from "./ChannelListElem.vue";
+import ChannelList from "./ChannelList.vue";
 import store from "../../store";
 
 export default defineComponent({
   components: {
     PrivateChatBox,
-    UserBox,
+    PrivateChatListElem,
     ChannelBox,
+    ChannelListElem,
+    ChannelList,
   },
 
   data() {
@@ -182,7 +127,6 @@ export default defineComponent({
       name: "",
       password: "",
       passwordJoinChannel: "",
-      // type: "public",
       channelId: 0,
       selectedChannel: 0,
       selectedChannelType: "",
@@ -203,28 +147,15 @@ export default defineComponent({
     },
 
     showUser(userId: number) {
-      this.$emit("conv", userId);
-      // if (this.showChatBox === true && userId === this.selectedUser) {
-      //   this.showChatBox = false;
-      // } else if (this.showChatBox === true && userId !== this.selectedUser) {
-      //   this.selectedUser = userId;
-      // } else {
-      //   this.showChatBox = true;
-      //   this.selectedUser = userId;
-      // }
+      this.$emit('type', "priv");
+      this.$emit('conv', userId);
+      this.$emit('privacy', "private");
     },
 
     showChannel(channelId: number, channelType: string) {
-      this.selectedChannelType = channelType;
-      if (this.showBox === true && channelId === this.selectedChannel) {
-        this.showBox = false;
-      } else if (this.showBox === true && channelId !== this.selectedChannel) {
-        this.selectedChannel = channelId;
-      } else {
-        this.showBox = true;
-        this.selectedChannel = channelId;
-      }
-      console.log("this selected channel = ", this.selectedChannel);
+      this.$emit('type', "chan");
+      this.$emit('conv', channelId);
+      this.$emit('privacy', channelType);
     },
 
     updateChannelListWithoutPrivate() {
@@ -258,14 +189,19 @@ export default defineComponent({
       }
     },
 
-    joinChannel(channelId: number, channelType: string) {
+    joinChannel(channelId: number, channelType: string, pwd: string) {
+      this.password = pwd;
+      console.log('joinChannel parent ', channelId, channelType);
       const channelToJoin = {
         id: channelId,
         type: channelType,
         password: this.password,
       };
       this.socket.emit("joinChannel", channelToJoin);
+      this.$emit("update");
       this.password = "";
+      this.getJoinedChannelList();
+      this.getChannelList();
     },
 
     leaveChannel(channelId: number) {
@@ -279,7 +215,7 @@ export default defineComponent({
     }
 
     this.socket.on("updateChannel", () => {
-      console.log("updateChannel");
+      console.log("updateChannel DELETE");
       this.getChannelList();
       this.getJoinedChannelList();
       this.socket.emit("updateJoinedChannels");
