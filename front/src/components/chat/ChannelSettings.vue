@@ -1,7 +1,6 @@
 <template>
   <div class="input-group align-items-center justify-content-between">
-    <!--=========================== ADMIN SETTINGS ===========================-->
-
+    
     <h2>{{ name }}</h2>
 
     <div v-if="channelMember.admin">
@@ -267,132 +266,7 @@
           </div>
         </div>
       </div>
-    <!-- </form> -->
-    
-      <!-- <div>
-        <button
-          @click="deleteChannel()"
-          class="btn-danger"
-        >
-          Delete channel
-        </button>
-        <div>
-          <button @click="changeChannelName()" class="btn-primary">
-            Change channel name :
-          </button>
-          <input
-            type="text"
-            maxlength="50"
-            v-model="newChannelName"
-            placeholder="new channel name"
-          />
-        </div>
-        <div v-if="channelType == 'protected'">
-          <button @click="changePassword()" class="btn-primary">
-            Change password :
-          </button>
-          <input
-            type="password"
-            maxlength="100"
-            v-model="passwordI.old"
-            class="inputMessage"
-            placeholder="old password"
-          />
-          <input
-            type="password"
-            maxlength="100"
-            v-model="passwordI.new"
-            class="inputMessage"
-            placeholder="new password"
-          />
-        </div>
-        <div v-if="channelType == 'public'">
-          <button @click="addPasswordToPublicChannel()" class="btn-primary">
-            Add a password :
-          </button>
-          <input
-            type="password"
-            maxlength="100"
-            v-model="passwordI.new"
-            class="inputMessage"
-            placeholder="password"
-          />
-        </div>
-        <div v-if="channelType == 'protected'">
-          <button @click="removePasswordToProtectedChannel()" class="btn-primary">
-            Remove the password
-          </button>
-        </div>
-        <div v-if="channelMember.admin && channelType == 'private'">
-          <button @click="invite()">Invite :</button>
-          <input
-            type="text"
-            maxlength="30"
-            v-model="invitation.guest"
-            class="inputMessage"
-            placeholder="username"
-          />
-        </div>
-      </div>
-    </div> -->
 
-    <!--=========================== USER LIST ===========================-->
-
-    <!-- <ul>
-      <li v-for="member in memberList" :key="member">
-        <template v-if="member.owner">OWNER = </template>
-        {{ member.user.username }}
-        <template v-if="channelMember.owner">
-          <button
-            @click="setMemberAsAdmin(member.user.username)"
-            class="btn-primary"
-            v-if="member.admin === false"
-          >
-            PROMOTE
-          </button>
-          <button
-            @click="unsetMemberAsAdmin(member.user.username)"
-            class="btn-primary"
-            v-if="member.admin === true && !member.owner"
-          >
-            DEMOTE
-          </button>
-        </template>
-        <template v-if="channelMember.admin">
-          <button
-            @click="kickMember(member.user.username)"
-            class="btn-danger"
-            v-if="member.admin === false"
-          >
-            Kick
-          </button>
-          <button
-            @click="kickMember(member.user.username)"
-            class="btn-danger"
-            v-if="member.admin && !member.owner && channelMember.owner"
-          >
-            Kick
-          </button>
-        </template>
-        <template v-if="channelMember.admin">
-          <BanMuteModal
-            v-bind:context="'mute'"
-            v-bind:member="member"
-            v-bind:socket="socket"
-            v-bind:channelId="channelId"
-          />
-          <BanMuteModal
-            v-bind:context="'ban'"
-            v-bind:member="member"
-            v-bind:socket="socket"
-            v-bind:channelId="channelId"
-          />
-        </template>
-        <template v-if="member.admin">(admin)</template>
-        <template v-if="member.muted">(muted)</template>
-        <template v-if="member.banned">(banned)</template>
-      </li>
-    </ul> -->
   </div>
 </template>
 
@@ -477,6 +351,7 @@ export default defineComponent({
     },
 
     changeChannelName() {
+      this.name = this.newChannelName;
       const changeChannelName = {
         channelId: this.channelId,
         name: this.newChannelName,
@@ -484,7 +359,7 @@ export default defineComponent({
       this.socket.emit("changeChannelName", changeChannelName);
       this.newChannelName = "";
       this.$emit("update");
-      console.log("emit update in ChannelSettings");
+      console.log("emit update in ChannelSettings, name=", this.name);
     },
 
     invite() {

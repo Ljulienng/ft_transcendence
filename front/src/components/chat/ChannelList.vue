@@ -22,13 +22,13 @@
                     
                     <div class="modal-body text-dark">
 
-                        <div class="row my-2" v-for="channel in channelListWithoutPrivate" :key="channel">
+                        <div class="row my-2" v-for="channel in channelList" :key="channel">
                             <div class="col-auto">
                                 <ChannelListElem 
-                                :id="channel.id"
-                                :type="channel.type"
-                                :name="channel.name"
-                                :owner="channel.owner.username"
+                                    :id="channel.id"
+                                    :type="channel.type"
+                                    :name="channel.name"
+                                    :owner="channel.owner.username"
                                 />
                             </div>
                             
@@ -61,11 +61,10 @@
 
     import { defineComponent } from "@vue/runtime-core";
     import ChannelListElem from "./ChannelListElem.vue";
-    import ChannelI from "../../types/interfaces/channel.interface";
-    import http from "../../http-common";
-    import store from "../../store";
 
     export default defineComponent({
+
+        props: ['channelList'],
 
         components: {
             ChannelListElem,
@@ -73,60 +72,18 @@
 
         data() {
             return {
-                socket: store.getters["auth/getUserSocket"],
-                channelList: [] as any[],
-                channelListWithoutPrivate: [] as any[],
                 password: "",
             };
         },
 
         methods: {
 
-            async getChannelList() {
-                try {
-                    const response = await http.get("/channel");
-                    this.channelList = response.data;
-                    this.updateChannelListWithoutPrivate();
-                } catch (error) {
-                    console.log(error);
-                }
-            },
-
-            updateChannelListWithoutPrivate() {
-                this.channelListWithoutPrivate = [];
-                for (var channel of this.channelList) {
-                    if (channel.type !== "private") {
-                        this.channelListWithoutPrivate.push(channel);
-                    }
-                }
-            },
-
             joinChannel(channelId: number, channelType: string) {
-                console.log('joinChannel child');
                 this.$emit('join', channelId, channelType, this.password);
                 this.password = "";
-                this.getChannelList();
             },
 
         },
-
-        mounted() {
-            if (this.socket === undefined) {
-                this.socket = store.getters["auth/getUserSocket"];
-            }
-
-            this.socket.on("updateChannel", (data: ChannelI[]) => {
-                this.channelList = data;
-                this.updateChannelListWithoutPrivate();
-                this.socket.emit("updateJoinedChannels");
-            });
-            
-        },
-
-        created() {
-            this.getChannelList();
-        },
-
         
     })
 
