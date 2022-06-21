@@ -61,7 +61,7 @@ const routes = [
 				console.log("userprofile beforecreate = ", userProfile.id);
 			}
 
-			console.log('beforeEnter = ', userProfile.id)
+			// console.log('beforeEnter = ', userProfile.id)
 
 			if (userProfile.id !== 0) router.push("http://localhost:3001/");
 			return true
