@@ -187,7 +187,7 @@ export default defineComponent({
         this.pong.canvas.width
       );
     },
-    draw(): void {
+    draw() {
       switch (this.state) {
         case State.INIT:
           return this.startPage();
@@ -201,12 +201,7 @@ export default defineComponent({
 
       // Draw fields
       this.pong.context.fillStyle = this.options.theme.bgColor;
-      this.pong.context.fillRect(
-        0,
-        0,
-        this.pong.canvas.width,
-        this.pong.canvas.height
-      );
+      this.pong.context.fillRect(0, 0, this.pong.canvas.width, this.pong.canvas.height);
 
       // Draw middle lines
       this.pong.context.strokeStyle = this.options.theme.fgColor;
@@ -236,13 +231,18 @@ export default defineComponent({
         this.pong.canvas.width
       );
 
+      // Draw pictures
+      if (this.imageUser) {
+        this.pong.context.drawImage(this.pong.isLeftSide ? this.imageUser : this.imageOpponent, this.pong.canvas.width / 4 - 25, this.pong.canvas.height / 2 + 55, 50, 50);
+      }
+      if (this.imageOpponent) {
+        this.pong.context.drawImage(this.pong.isLeftSide ? this.imageOpponent : this.imageUser, this.pong.canvas.width / 4 * 3 - 25, this.pong.canvas.height / 2 + 55, 50, 50);
+      }
       // Draw usernames
-
       this.pong.context.fillStyle = this.options.theme.fgColor;
       this.pong.context.font = "32px Orbitron";
       this.pong.context.textAlign = "center";
       this.pong.context.textBaseline = "middle";
-      // this.pong.context.globalCompositeOperation = 'xor';
       this.pong.context.globalAlpha = 0.5;
       this.pong.context.fillText(
         this.pong.isLeftSide ? this.user.userName : this.opponent.username,
@@ -257,6 +257,8 @@ export default defineComponent({
         this.pong.canvas.width
       );
       this.pong.context.globalAlpha = 1;
+      this.pong.context.beginPath();
+
 
       // Draw playerLeft
       this.pong.context.fillStyle = this.options.theme.fgColor;
@@ -431,9 +433,10 @@ export default defineComponent({
         .get("/users/avatar/" + player, {
           responseType: "blob",
         })
-        .then((response: any) => {
+        .then(async (response: any) => {
           const blob = response.data;
-          this.imageUser = URL.createObjectURL(blob);
+          //this.imageUser = URL.createObjectURL(blob);
+          this.imageUser = await createImageBitmap(blob, { resizeWidth: 50, resizeHeight: 50, resizeQuality: 'high' });
         })
         .catch((error: Error) => {
           console.log(error);
@@ -442,9 +445,10 @@ export default defineComponent({
         .get("/users/avatar/" + opponent, {
           responseType: "blob",
         })
-        .then((response: any) => {
+        .then(async (response: any) => {
           const blob = response.data;
-          this.imageOpponent = URL.createObjectURL(blob);
+          this.imageOpponent = await createImageBitmap(blob, { resizeWidth: 50, resizeHeight: 50, resizeQuality: 'high' });
+          // this.imageOpponent = URL.createObjectURL(blob);
         })
         .catch((error: Error) => {
           console.log(error);
