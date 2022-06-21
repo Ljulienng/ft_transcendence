@@ -25,9 +25,9 @@
         <span class="text">Chat</span>
       </router-link>
       <!-- <router-link to="/userprofile" class="button">
-                <span class="material-icons">account_circle</span>
-                <span class="text">User Profile</span>
-            </router-link> -->
+				<span class="material-icons">account_circle</span>
+				<span class="text">User Profile</span>
+			</router-link> -->
       <router-link to="/play" class="button">
         <span class="material-icons">videogame_asset</span>
         <span class="text">Play</span>
@@ -41,7 +41,7 @@
           <span>
             <img :src="this.avatar" class="sidebar_profile_avatar" />
           </span>
-          <span class="text" style='margin-left: 1rem'>Profile</span>
+          <span class="text" style="margin-left: 1rem">Profile</span>
         </router-link>
       </template>
     </div>
@@ -49,20 +49,19 @@
     <div class="flex"></div>
 
     <div class="menu" v-if="getUserProfile.id !== 0">
-      <button class="button" @click='logout'>
+      <button class="button" @click="logout">
         <span class="material-icons">power_settings_new</span>
         <span class="text">Chat</span>
       </button>
     </div>
-
   </aside>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import { mapGetters } from "vuex";
-import http from '../http-common'
-import store from '../store'
+import http from "../http-common";
+import store from "../store";
 
 export default defineComponent({
   computed: {
@@ -75,8 +74,8 @@ export default defineComponent({
     return {
       socket: store.getters["auth/getUserSocket"],
       // eslint-disable-next-line
-      avatar: null as any
-    }
+      avatar: null as any,
+    };
   },
 
   methods: {
@@ -99,39 +98,35 @@ export default defineComponent({
   },
 
   mounted() {
-    this.socket.on('updateAvatar', () => {
-      store.dispatch('auth/setUserAvatar').then(() => {
-        this.avatar = store.getters['auth/getUserAvatar']
-      })
-    })
+    this.socket.on("updateAvatar", () => {
+      store.dispatch("auth/setUserAvatar").then(() => {
+        this.avatar = store.getters["auth/getUserAvatar"];
+      });
+    });
   },
 
   async created() {
     if (this.getUserProfile.id !== 0) {
-      if (!store.getters['auth/getUserAvatar']) {
-        await store.dispatch('auth/setUserAvatar')
+      if (!store.getters["auth/getUserAvatar"]) {
+        await store.dispatch("auth/setUserAvatar");
         // console.log('test', store.getters['auth/getUserAvatar'])
-        this.avatar = store.getters['auth/getUserAvatar']
+        this.avatar = store.getters["auth/getUserAvatar"];
       }
-
     }
-  }
-})
+  },
+});
 </script>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 /* tslint:disable:no-unused-variable */
-import logoURL from '../assets/42_Logo.svg.png'
-const is_expanded = ref(localStorage.getItem("is_expanded") === "true")
+import logoURL from "../assets/42_Logo.svg.png";
+const is_expanded = ref(localStorage.getItem("is_expanded") === "true");
 const ToggleMenu = () => {
-  is_expanded.value = !is_expanded.value
-  localStorage.setItem("is_expanded", is_expanded.value)
-}
+  is_expanded.value = !is_expanded.value;
+  localStorage.setItem("is_expanded", is_expanded.value);
+};
 </script>
-
-
-
 
 <style lang="scss">
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");

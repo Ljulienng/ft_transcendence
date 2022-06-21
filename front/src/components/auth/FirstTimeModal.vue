@@ -184,7 +184,6 @@ export default defineComponent({
 
     updateUser() {
       http.post("/users/firsttime", this.userInfo);
-      console.log("uzu = ", this.userInfo);
       store.dispatch("auth/userProfile");
       this.$emit("test");
     },
