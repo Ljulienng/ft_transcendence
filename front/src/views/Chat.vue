@@ -14,6 +14,7 @@
                     <ChatTests @conv="getConv"
                                 @type="getType" 
                                 @privacy="getPrivacy"
+                                @close="updateComponent"
                     />
                 </div>
             </div>

@@ -71,13 +71,21 @@
 
           <div class="btn-group-vertical col-12 mx-auto" role="group" aria-label="channels">
             <button type="button" class="btn" v-for="channel in joinedChannelList" :key="channel" @click="showChannel(channel.id, channel.type)">
-              <ChannelListElem 
-                :id="channel.id"
-                :type="channel.type"
-                :name="channel.name"
-                :owner="channel.owner.username"
-              />
+              <div class="col">
+                <ChannelListElem 
+                  :id="channel.id"
+                  :type="channel.type"
+                  :name="channel.name"
+                  :owner="channel.owner.username"
+                  :leave="true"
+                  @leave="leaveChannel"
+                />
+              </div>
+
             </button>
+
+            
+
           </div>
 
         </div>
@@ -202,6 +210,7 @@ export default defineComponent({
 
     leaveChannel(channelId: number) {
       this.socket.emit("leaveChannel", channelId);
+      this.$emit('close');
     },
   },
 
