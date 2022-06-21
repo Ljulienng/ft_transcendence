@@ -1,18 +1,20 @@
 <template>
 
-    <div class="d-flex align-items-center" v-if="!isSelected">
-      <img :src="this.image" class="small_profile_avatar" />
-      <p class="mx-3">{{ userInfo.username }}</p>
-    </div>
+  <Friend v-bind:username="userInfo.username" />
 
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
+import Friend from "../user/Friend.vue";
 
 export default defineComponent({
   props: ["username", "isSelected"],
+
+  components: {
+      Friend,
+  },
 
   data() {
     return {

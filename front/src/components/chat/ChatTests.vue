@@ -91,8 +91,6 @@
 import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 import ChannelI from "../../types/interfaces/channel.interface";
-import ChannelBox from "./ChannelBox.vue";
-import PrivateChatBox from "./PrivateChatBox.vue";
 import PrivateChatListElem from "./PrivateChatListElem.vue";
 import ChannelListElem from "./ChannelListElem.vue";
 import ChannelList from "./ChannelList.vue";
@@ -100,9 +98,7 @@ import store from "../../store";
 
 export default defineComponent({
   components: {
-    PrivateChatBox,
     PrivateChatListElem,
-    ChannelBox,
     ChannelListElem,
     ChannelList,
   },

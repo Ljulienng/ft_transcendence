@@ -1,10 +1,10 @@
 <template>
-  <th class="text-left" style="width: 11rem">
+  <th class="text-left">
     <router-link
       :to="'/public/' + username"
       class="button text-decoration-none"
     >
-      <img :src="this.image" class="profile_avatar_small" />
+      <img :src="this.image" class="small_profile_avatar" />
       {{ username }}
     </router-link>
   </th>
