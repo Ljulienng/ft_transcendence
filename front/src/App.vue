@@ -1,6 +1,6 @@
 <template>
   <div class="app">
-    <Sidebar v-if="getUserProfile.id !== 0"/>
+    <Sidebar v-if="getUserProfile.id !== 0" />
     <FirstTimeModal
       v-if="getUserProfile.firstTime === true"
       v-bind:currentUser="getUserProfile"
@@ -46,23 +46,9 @@ export default defineComponent({
     },
 
     updateAvatar() {
-      console.log('updateavatar')
-    }
+      console.log("updateavatar");
+    },
   },
-
-  // async beforeCreate() {
-  //   let userProfile = store.getters["auth/getUserProfile"];
-
-  //   if (userProfile.id === 0) {
-  //     await store.dispatch("auth/userProfile");
-  //     userProfile = store.getters["auth/getUserProfile"];
-  //     console.log("userprofile beforecreate = ", userProfile.id);
-  //   }
-
-  //   if (userProfile.id === 0) router.push("http://localhost:3001/authmodal");
-  //   // const user = store.getters["auth/getUserProfile"];
-
-  // },
 
   created() {
     if (store.getters["auth/getUserProfile"].id !== 0)

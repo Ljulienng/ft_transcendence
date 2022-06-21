@@ -109,7 +109,6 @@ export default defineComponent({
     if (this.getUserProfile.id !== 0) {
       if (!store.getters["auth/getUserAvatar"]) {
         await store.dispatch("auth/setUserAvatar");
-        // console.log('test', store.getters['auth/getUserAvatar'])
         this.avatar = store.getters["auth/getUserAvatar"];
       }
     }
