@@ -1,10 +1,15 @@
 <template>
-  <div class='mb-2 mt-2'>
+  <div class="mb-2 mt-2">
     <div class="container-fluid widebox">
       <table class="table table-borderless" id="users">
         <thead>
           <tr>
-            <th scope="col" v-for="column in columns" :key="column" class='text-center'>
+            <th
+              scope="col"
+              v-for="column in columns"
+              :key="column"
+              class="text-center"
+            >
               {{ column }}
             </th>
           </tr>
@@ -25,14 +30,15 @@
                 v-bind:socket="socket"
               />
               <button v-on:click="blockUser(friend.id)">
-                <span class="material-icons px-1" style="color: red">block</span>
+                <span class="material-icons px-1" style="color: red"
+                  >block</span
+                >
               </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-   
   </div>
 </template>
 
@@ -57,8 +63,7 @@ export default defineComponent({
       userStatus: "",
       errorMsg: "",
       friendList: [],
-      columns: ['username', 'firstname', 'lastname', 'status', ''],
-
+      columns: ["username", "firstname", "lastname", "status", ""],
     };
   },
 

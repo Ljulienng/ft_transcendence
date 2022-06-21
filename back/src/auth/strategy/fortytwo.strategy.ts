@@ -20,7 +20,7 @@ import { FortyTwoService } from "../fortytwo.service"
 
 	 async validate(accessToken: string, refreshToken: string, profile: any, cb: VerifyCallback): Promise<User> {
 		const { name } = profile
-		// console.log("userinfo: ",profile);
+		console.log("userinfotest ");
 
 		const userIdentity =  {
 			username: profile['username'],
@@ -29,6 +29,8 @@ import { FortyTwoService } from "../fortytwo.service"
 			email: profile['emails'][0]['value'],
 
 		}
+
+
 		return this.fortyTwoService.validateUser(userIdentity);
 	}
  }
