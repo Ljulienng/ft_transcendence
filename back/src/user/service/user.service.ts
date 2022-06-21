@@ -222,9 +222,7 @@ export class UserService {
 		}
 		const tmp = user.friends?.find(el => el === String(friend.id))
 		if (tmp) {
-			// console.log("friend id deleted= ", String(friend.id))
 			const index = user.friends.indexOf(tmp, 0);
-			// console.log("friend index = ", index)
 			user.friends.splice(index, 1); 
 		}
 		else
@@ -407,8 +405,6 @@ export class UserService {
 		let ifUserHasBeenBlocked: string;
 		if (otherUser.blocked !== null)
 			ifUserHasBeenBlocked = otherUser.blocked.find(el => el === String(user.id));
-
-		console.log("User and other", ifOtherIsBlocked, ifUserHasBeenBlocked);
 
 		if (!otherUser)
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'Other user doesn\'t exist.');
