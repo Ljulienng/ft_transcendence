@@ -55,7 +55,7 @@
           maxlength="100"
           v-model="message.content"
           class="inputMessage"
-        /> -->
+        />  -->
       </div>
 
     </div>
