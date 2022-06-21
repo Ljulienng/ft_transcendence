@@ -18,6 +18,12 @@
         <p class="owner mx-3">created by {{ owner }}</p>
 
       </div>
+
+      <div v-if="leave===true" class="col-auto">
+        <button type="button" @click="$emit('leave', id)">
+          <i style="color: red" class="material-icons">logout</i>
+        </button>
+      </div>
       
     </div>
 
@@ -31,6 +37,9 @@ import { defineComponent } from "@vue/runtime-core";
               "type": String,
               "name": String,
               "owner": String,
+              "leave": {
+                default: false,
+              }
             },
   });
 

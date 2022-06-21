@@ -23,7 +23,7 @@
                     <div class="modal-body text-dark">
 
                         <div class="row my-2" v-for="channel in channelList" :key="channel">
-                            <div class="col-auto">
+                            <div class="col-10 mx-auto">
                                 <ChannelListElem 
                                     :id="channel.id"
                                     :type="channel.type"
