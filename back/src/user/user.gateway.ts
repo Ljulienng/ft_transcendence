@@ -240,9 +240,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.updateMember(user, update);
         const userToUpdate = await this.userService.findByUsername(update.username);
-        const userToUpdateSocket = (this.socketList.find(s => s.user.id === userToUpdate.id)).socket;
         const channel = await this.channelService.findChannelById(update.channelId);
-        this.server.to(userToUpdateSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToUpdate, channel));
         this.server.emit('messageUpdate/' + channel.id);
         this.server.emit("/userUpdated/channel/" + channel.id);
         this.server.emit("/muteorban/" + userToUpdate.username, (await this.channelService.findChannelById(channel.id)).name);
