@@ -355,7 +355,6 @@ export default defineComponent({
       });
       this.socket.on("youLose", () => {
         setTimeout(() => {
-          console.log(this.$route.name);
           if (this.$route.name == "Pong") {
             this.$router.push("/"); // TODO: do not work
           }

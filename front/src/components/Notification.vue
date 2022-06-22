@@ -115,7 +115,6 @@ export default defineComponent({
 
     // eslint-disable-next-line
     this.socket.on("matchInvitation/" + this.currentUser.id, (data: any) => {
-      console.log('data = ', data);
       this.show("game", data.username + " invited you to a game !", data, "GAME");
     });
 
