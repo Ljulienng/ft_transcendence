@@ -291,7 +291,7 @@ export class ChannelService {
    async removePasswordToProtectedChannel(owner: User, channelId: number) {
         const channel = await this.findChannelById(channelId);
         const channelMember = await this.channelMemberService.findOne(owner, channel);
-        
+        console.log("removePasswordToProtectedChannel");
         if (!channelMember.owner) {
             throw new HttpException('you are not authorized to change the status of the channel', HttpStatus.FORBIDDEN);
         }

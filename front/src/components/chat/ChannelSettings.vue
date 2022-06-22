@@ -479,7 +479,7 @@ export default defineComponent({
       // console.log("user unmuted or unbanned");
       this.getChannelMembers();
     });
-    this.socket.on("/passwordChanged/", (data: string) => {
+    this.socket.on("/passwordChanged/", () => {
       this.getChannelMembers();   
     });
 
