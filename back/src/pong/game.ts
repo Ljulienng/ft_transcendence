@@ -102,11 +102,11 @@ export class Game {
 
   checkForfait() {
     if (this.playerLeft.state == PlayerState.DISCONNECTED
-      && new Date().getTime() - this.playerLeft.disconnectedAt.getTime() >= FORFAIT_TIMEOUT * 1000
+      && this.playerLeft.disconnectedAt && new Date().getTime() - this.playerLeft.disconnectedAt.getTime() >= FORFAIT_TIMEOUT * 1000
       && (this.playerRight.state != PlayerState.DISCONNECTED
         || this.playerRight.disconnectedAt > this.playerLeft.disconnectedAt)) {
       this.gameOver(this.playerRight);
-    } else if (this.playerRight.state == PlayerState.DISCONNECTED
+    } else if (this.playerRight.state == PlayerState.DISCONNECTED && this.playerRight.disconnectedAt
       && new Date().getTime() - this.playerRight.disconnectedAt.getTime() >= FORFAIT_TIMEOUT * 1000
       && (this.playerLeft.state != PlayerState.DISCONNECTED
         || this.playerLeft.disconnectedAt > this.playerRight.disconnectedAt)) {
@@ -120,7 +120,6 @@ export class Game {
     this.sendStart();
     this.sendScore();
     this.ball.randomDirection();
-    console.log('GAME IS STARTING');
     const interval = setInterval(async () => {
       if (this.state == GameState.PAUSE) {
         this.checkForfait();

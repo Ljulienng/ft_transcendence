@@ -1,6 +1,6 @@
 <template>
   <button @click="matchSpectate()">
-    <span class="material-icons px-1" style="color: white">visibility</span>
+    <span class="material-icons px-0" style="color: white">visibility</span>
   </button>
 </template>
 

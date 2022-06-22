@@ -16,15 +16,25 @@
             <td class="text-center">{{ friend.lastname }}</td>
             <td class="text-center">{{ friend.status }}</td>
             <td class="text-center">
-              <button v-on:click="deleteFriend(friend.username)">
-                <span class="material-icons px-1">person_remove</span>
-                <!-- <span class="badge bg-primary rounded-pill">X</span> -->
-              </button>
-              <spectate-button v-bind:userToSpectate="friend.id" v-bind:socket="socket" />
-              <invitation-button v-bind:userToInvite="friend.id" v-bind:socket="socket" />
-              <button v-on:click="blockUser(friend.id)">
-                <span class="material-icons px-1" style="color: red">block</span>
-              </button>
+              <div class="container">
+                <div class="row align-items-start">
+                  <div class="col px-0">
+                    <button v-on:click="deleteFriend(friend.username)">
+                      <span class="material-icons px-0">person_remove</span>
+                      <!-- <span class="badge bg-primary rounded-pill">X</span> -->
+                    </button>
+                  </div>
+                  <div class="col px-0">
+                    <spectate-button v-bind:userToSpectate="friend.id" v-bind:socket="socket" />
+                  </div>
+                  <invitation-button v-bind:userToInvite="friend.id" v-bind:socket="socket" />
+                  <div class="col px-0">
+                    <button v-on:click="blockUser(friend.id)">
+                      <span class="material-icons px-0" style="color: red">block</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </td>
           </tr>
         </tbody>

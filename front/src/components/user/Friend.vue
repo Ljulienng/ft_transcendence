@@ -1,9 +1,6 @@
 <template>
   <th class="text-left" style="width: 11rem">
-    <router-link
-      :to="'/public/' + username"
-      class="button text-decoration-none"
-    >
+    <router-link :to="'/public/' + username" class="button text-decoration-none">
       <img :src="this.image" class="profile_avatar_small" />
       {{ username }}
     </router-link>
@@ -18,7 +15,6 @@ export default defineComponent({
   /* eslint-disable */
 
   props: ["username"],
-
   data() {
     return {
       image: null as any,

@@ -5,7 +5,7 @@ import { Match } from './models/match.entity';
 import { User } from 'src/user/models/user.entity';
 import { Game, GameState } from './game';
 import { Event } from './event';
-import { Player } from './player';
+import { Player, PlayerState } from './player';
 import { Ball } from './ball';
 import { Options } from './interfaces/options.interface';
 
@@ -27,8 +27,11 @@ export class PongService {
 
   duel(event: Event, playerLeft: Player, playerRight: Player) { // TODO: test
     const ball = new Ball(event);
-    console.log(playerLeft.user.username + ' WANTS TO FIGHT ' + playerRight.user.username);
     const game = new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, playerLeft.options.winScore);
+    game.playerLeft.state = PlayerState.DISCONNECTED;
+    game.playerLeft.disconnectedAt = null;
+    game.playerRight.state = PlayerState.DISCONNECTED;
+    game.playerLeft.disconnectedAt = null;
     this.games.push(game);
   }
 

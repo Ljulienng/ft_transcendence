@@ -12,7 +12,7 @@
             </div>
             <div class="custom-template-text" v-html="item.text" />
           </div>
-          <button type="button" class="btn-primary" @click="acceptGame(item.data.id, item.id)">
+          <button type="button" class="btn-primary" @click="acceptGame(item.data.id, item.id, item.data.options)">
             <span class="material-icons px-1">done</span>
 
           </button>
@@ -33,6 +33,7 @@
 import { defineComponent } from "@vue/runtime-core";
 import store from "../store";
 // import Notifications from "@kyvg/vue3-notification"
+/* eslint-disable */
 
 export default defineComponent({
   props: ["currentUser"],
@@ -76,8 +77,8 @@ export default defineComponent({
       this.$notify.close(notifId);
     },
 
-    acceptGame(userId: number, notifId: number) {
-      this.socket.emit("matchAccepted", userId)
+    acceptGame(userId: number, notifId: number, options: any) {
+      this.socket.emit("matchAccepted", [userId, options]);
       this.$notify.close(notifId);
     }
   },
@@ -114,6 +115,7 @@ export default defineComponent({
 
     // eslint-disable-next-line
     this.socket.on("matchInvitation/" + this.currentUser.id, (data: any) => {
+      console.log('data = ', data);
       this.show("game", data.username + " invited you to a game !", data, "GAME");
     });
 

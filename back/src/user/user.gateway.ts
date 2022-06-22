@@ -408,33 +408,24 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('matchInvitation')
-    async matchInvitation(client: Socket, userToInvite: number) {
+    async matchInvitation(client: Socket, data: any) {
         const user: User = this.socketList.find(socket => socket.socketId === client.id).user;
-        console.log('inviteMatch');
-        this.server.emit('matchInvitation/' + userToInvite, { id: user.id, username: user.username } as unknown);
+        this.server.emit('matchInvitation/' + data[0], { id: user.id, username: user.username, options: data[1] } as unknown);
         // this.server.to(client.id).emit("moveToMatch");
     }
 
     @UseGuards(SocketGuard)
     @SubscribeMessage('matchAccepted')
-    async acceptMatch(client: Socket, otherUserId: number) {
+    async acceptMatch(client: Socket, data: any) {
         this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
         const event = new Event(this.server);
-        const options = {
-            theme: {
-                name: 'dark',
-                bgColor: '#1c1d21',
-                fgColor: 'lightgrey'
-            },
-            winScore: 5
-        };
         const userLeft = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);    // TODO: does not work if client changed name
-        const playerLeft = new Player(event, client, userLeft, options);
-        const userRight = await this.userService.findOne({ id: otherUserId });
-        const playerRight = new Player(event, null, userRight, options);
+        const playerLeft = new Player(event, client, userLeft, data[1]);
+        const userRight = await this.userService.findOne({ id: data[0] });
+        const playerRight = new Player(event, null, userRight, data[1]);
         this.pongService.duel(event, playerLeft, playerRight);
         this.server.to(client.id).emit("moveToMatch");
-        this.server.emit('invitationAccepted/' + otherUserId);
+        this.server.emit('invitationAccepted/' + data[0]);
     }
 
     @UseGuards(SocketGuard)
@@ -479,13 +470,10 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @UseGuards(SocketGuard)
     @SubscribeMessage('playerReconnect') // TODO: test
     async playerReconnect(client: Socket) {
-        // TODO: if client is already in game join it
-
         this.pongService.games = this.pongService.games.filter(e => e.state != GameState.OVER);
         const user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);    // TODO: does not work if client changed name
-        console.log('playerReconnect:', user.username);
+        // console.log('playerReconnect:', user.username);
         const game = this.pongService.findGame(user.id);
-        console.log('findGame ret', game.spectatorRoom);
         if (game) {
             game.reconnectPlayer(user, client);
             return (true);
