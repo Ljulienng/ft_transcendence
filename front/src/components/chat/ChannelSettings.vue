@@ -210,7 +210,18 @@
                       </template>
 
                       <template v-if="channelMember.admin">
-                        <button
+                        <BanMuteModal
+                          :context="'mute'"
+                          :member="member"
+                          :socket="socket"
+                          :channelId="channelId"
+                        />
+                        <BanMuteModal
+                          :member="member"
+                          :socket="socket"
+                          :channelId="channelId"
+                        />
+                        <!-- <button
                           @click="mute(member.user.username)"
                           v-if="!member.admin && !member.muted"
                         >
@@ -233,7 +244,7 @@
                           v-if="!member.admin && member.banned"
                         >
                           <span class="material-icons" style="color: red">block</span>
-                        </button>
+                        </button> -->
                       </template>
 
                       <template v-if="channelMember.admin">
@@ -409,43 +420,43 @@ export default defineComponent({
       this.socket.emit("downgradeMember", downgradeMember);
     },
 
-    ban(username: string, timeToBan: number) {
-      const update = {
-        channelId: this.channelId,
-        username: username,
-        banned: true,
-        timeToBan: timeToBan,
-      };
-      this.socket.emit("muteban", update);
-    },
+  //   ban(username: string, timeToBan: number) {
+  //     const update = {
+  //       channelId: this.channelId,
+  //       username: username,
+  //       banned: true,
+  //       timeToBan: timeToBan,
+  //     };
+  //     this.socket.emit("muteban", update);
+  //   },
 
-    unban(username: string) {
-      const update = {
-        channelId: this.channelId,
-        username: username,
-        banned: false,
-      };
-      this.socket.emit("muteban", update);
-    },
+  //   unban(username: string) {
+  //     const update = {
+  //       channelId: this.channelId,
+  //       username: username,
+  //       banned: false,
+  //     };
+  //     this.socket.emit("muteban", update);
+  //   },
 
-    mute(username: string, timeToMute: number) {
-      const update = {
-        channelId: this.channelId,
-        username: username,
-        muted: true,
-        timeToMute: timeToMute,
-      };
-      this.socket.emit("muteban", update);
-    },
+  //   mute(username: string, timeToMute: number) {
+  //     const update = {
+  //       channelId: this.channelId,
+  //       username: username,
+  //       muted: true,
+  //       timeToMute: timeToMute,
+  //     };
+  //     this.socket.emit("muteban", update);
+  //   },
 
-    unmute(username: string) {
-      const update = {
-        channelId: this.channelId,
-        username: username,
-        muted: false,
-      };
-      this.socket.emit("muteban", update);
-    },
+  //   unmute(username: string) {
+  //     const update = {
+  //       channelId: this.channelId,
+  //       username: username,
+  //       muted: false,
+  //     };
+  //     this.socket.emit("muteban", update);
+  //   },
   },
 
   mounted() {

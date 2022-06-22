@@ -3,19 +3,17 @@
     <template v-if="context === 'mute'">
       <button
         type="button"
-        class="btn btn-secondary"
         @click="createModal"
         v-if="!member.admin && !member.muted"
       >
-        mute
+        <span class="material-icons" style="color: grey">volume_off</span>
       </button>
 
       <button
         @click="unmute"
-        class="btn-secondary"
         v-if="!member.admin && member.muted"
       >
-        Unmute
+        <span class="material-icons" style="color: red">volume_off</span>
       </button>
       <form v-on:submit.prevent="mute">
         <div
@@ -80,18 +78,17 @@
     <template v-else>
       <button
         type="button"
-        class="btn-secondary"
         @click="createModal"
         v-if="!member.admin && !member.banned"
       >
-        Ban
+        <span class="material-icons" style="color: grey">block</span>
       </button>
       <button
+        type="button"
         @click="unban"
-        class="btn-secondary"
         v-if="!member.admin && member.banned"
       >
-        Unban
+        <span class="material-icons" style="color: red">block</span>
       </button>
 
       <form v-on:submit.prevent="ban">
@@ -157,14 +154,32 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import { Modal } from "bootstrap";
+import { Socket } from "socket.io-client";
 
 export default defineComponent({
   /* eslint-disable */
 
-  props: ["context", "member", "socket", "channelId"],
+  // props: ["context", "member", "socket", "channelId"],
+
+  props: {
+    context: String,
+    member: {
+      type: Object,
+      required: true,
+    },
+    socket: {
+      type: Socket,
+      required: true,
+    },
+    channelId: {
+      type: Number,
+      required: true,
+    },
+  },
 
   data() {
     return {
+      update: 0,
       rangeValue: 0,
       timeToMute: 0,
       timeToBan: 0,
