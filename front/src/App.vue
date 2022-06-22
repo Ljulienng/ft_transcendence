@@ -85,7 +85,7 @@ body {
   background-image: url("~@/assets/background.jpg");
   background-repeat: no-repeat;
   background-size: cover;
-  height: 100vh;
+  height: 100%;
   // overflow-y: scroll;
 }
 button {
