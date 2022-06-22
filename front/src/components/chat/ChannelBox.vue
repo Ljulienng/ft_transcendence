@@ -98,6 +98,7 @@ export default defineComponent({
       // test: io('http://localhost:3000/channel', {  withCredentials: true}),
       currentUser: store.getters["auth/getUserProfile"],
       channelMember: {} as any,
+      errorMsg: "",
       message: {
         userId: 0,
         username: "",
