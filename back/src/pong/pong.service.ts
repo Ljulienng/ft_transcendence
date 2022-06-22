@@ -3,9 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Match } from './models/match.entity';
 import { User } from 'src/user/models/user.entity';
-import { Game } from './game';
+import { Game, GameState } from './game';
 import { Event } from './event';
-import { Player } from './player';
+import { Player, PlayerState } from './player';
 import { Ball } from './ball';
 import { Options } from './interfaces/options.interface';
 
@@ -27,24 +27,32 @@ export class PongService {
 
   duel(event: Event, playerLeft: Player, playerRight: Player) { // TODO: test
     const ball = new Ball(event);
-    const options = {
-      bgColor: '#1c1d21',
-      fgColor: 'lightgrey',
-      winScore: 5
-    };
-    this.games.push(new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, options)); // TODO: dynamic winScore
+    const game = new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, playerLeft.options.winScore);
+    game.playerLeft.state = PlayerState.DISCONNECTED;
+    game.playerLeft.disconnectedAt = null;
+    game.playerRight.state = PlayerState.DISCONNECTED;
+    game.playerLeft.disconnectedAt = null;
+    this.games.push(game);
   }
 
-  matchmake(event: Event, playerLeft: Player, options: Options) {
-    // TODO: smarter matchmaking
-    if (!this.waitingPlayers.length) {
+  matchmake(event: Event, playerLeft: Player) {
+    if (this.waitingPlayers.length == 0) {
       this.waitingPlayers.push(playerLeft);
       return;
     }
-    const playerRight = this.waitingPlayers.shift();
+    const playerRight = this.waitingPlayers.find(e => e.options.winScore == playerLeft.options.winScore && e.user.id != playerLeft.user.id);
+    if (playerRight == undefined) {
+      if (!this.waitingPlayers.find(e => e.user.id == playerLeft.user.id)) {
+        this.waitingPlayers.push(playerLeft);
+      }
+      return;
+    }
+    this.waitingPlayers.splice(this.waitingPlayers.indexOf(playerRight), 1);
     const ball = new Ball(event);
-    this.games.push(new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, options)); // TODO: dynamic winScore
+    const game = new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, playerLeft.options.winScore);
+    this.games.push(game);
   }
+
 
   findGame(userId: number): Game {
     return this.games.find(e => (e.playerLeft && e.playerLeft.user.id == userId) || (e.playerRight && e.playerRight.user.id == userId));
@@ -53,8 +61,8 @@ export class PongService {
   async getMatchHistory(user: User): Promise<Match[]> {
     return await this.matchRepository.find({
       where: [
-        { playerOne: user },
-        { playerTwo: user }
+        { playerOne: user.id },
+        { playerTwo: user.id }
       ]
     });
   }
