@@ -275,6 +275,7 @@
 import { defineComponent } from "@vue/runtime-core";
 import { Socket } from "socket.io-client";
 import http from "../../http-common";
+import { ChannelType } from "../../types/interfaces/channel.interface";
 // import VueCrontab from 'vue-crontab's
 import BanMuteModal from "./BanMuteModal.vue";
 
@@ -319,17 +320,6 @@ export default defineComponent({
         channelId: this.channelId,
       },
     };
-  },
-
-  watch: {
-    channelType (val, oldVal) {
-      if (val !== oldVal)
-        console.log("channelsettings watch channelType change", val, oldVal)
-    },
-    channelMember (val, oldVal) {
-      if (val !== oldVal)
-        console.log("channelsettings watch channelMember change", val, oldVal)
-    } 
   },
 
   methods: {

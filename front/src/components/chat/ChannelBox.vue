@@ -111,6 +111,7 @@ export default defineComponent({
   },
 
   methods: {
+    
     sendMessage() {
       this.message.userId = this.currentUser.id;
       this.message.username = this.currentUser.username;
@@ -126,6 +127,7 @@ export default defineComponent({
     update() {
       console.log("emit update in ChannelBox");
       this.$emit("update");
+      this.socket.emit("updateChannel"); //TEST
     },
 
     async getMessages() {
