@@ -52,11 +52,11 @@
     <div v-if="channelMember.owner">
 
         <!-- CHANGE PASSWORD -->
-        <button v-if="channelType == 'protected'" type="button" data-bs-toggle="modal" data-bs-target="#chanpwdModal">
+        <button v-if="type == 'protected'" type="button" data-bs-toggle="modal" data-bs-target="#chanpwdModal">
           <i style="color: #fff774" class="material-icons">key</i>
         </button>
 
-        <form v-if="channelType == 'protected'" v-on:submit.prevent="changePassword">
+        <form v-if="type == 'protected'" v-on:submit.prevent="changePassword">
           <div class="modal fade" id="chanpwdModal" tabindex="-1" aria-labelledby="chanpwdModal" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
@@ -83,9 +83,9 @@
                         name="name"
                         placeholder="new password"
                       />
-                      <button @click="removePasswordToProtectedChannel()" class="btn-primary">
+                      <!-- <button @click="removePasswordToProtectedChannel()" class="btn-primary">
                         Remove the password
-                      </button>
+                      </button> -->
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -98,15 +98,24 @@
 
       </div>
 
+      <div v-if="channelMember.owner && type == 'protected'">
+
+        <!-- REMOVE PASSWORD -->
+        <button @click="removePasswordToProtectedChannel()" type="button">
+          <span class="material-icons px-1" style="color: red">key_off</span>
+        </button>
+
+      </div>
+
       <div v-if="channelMember.owner">
 
         <!-- ADD PASSWORD -->
         
-        <button v-if="channelType == 'public'" type="button" data-bs-toggle="modal" data-bs-target="#addpwdModal">
+        <button v-if="type == 'public'" type="button" data-bs-toggle="modal" data-bs-target="#addpwdModal">
           <i style="color: grey" class="material-icons">key</i>
         </button>
 
-        <form v-if="channelType == 'public'" v-on:submit.prevent="addPasswordToPublicChannel">
+        <form v-if="type == 'public'" v-on:submit.prevent="addPasswordToPublicChannel">
           <div class="modal fade" id="addpwdModal" tabindex="-1" aria-labelledby="addpwdModal" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
@@ -139,11 +148,11 @@
       <div v-if="channelMember.admin">
 
         <!-- INVITE -->
-        <button v-if="channelMember.admin && channelType == 'private'" type="button" data-bs-toggle="modal" data-bs-target="#inviteModal" class="primary text-decoration-none display-5">
+        <button v-if="channelMember.admin && type == 'private'" type="button" data-bs-toggle="modal" data-bs-target="#inviteModal" class="primary text-decoration-none display-5">
           <i style="color: #fff774" class="material-icons">person_add</i>
         </button>
 
-        <form v-if="channelMember.admin && channelType == 'private'" v-on:submit.prevent="invite">
+        <form v-if="channelMember.admin && type == 'private'" v-on:submit.prevent="invite">
           <div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModal" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
@@ -301,6 +310,7 @@ export default defineComponent({
     return {
       muteBanCounter: 0,
       name: "",
+      type: this.channelType,
       memberList: [],
       newChannelName: "",
       invitation: {
@@ -372,11 +382,13 @@ export default defineComponent({
     addPasswordToPublicChannel() {
       this.socket.emit("addPasswordToPublicChannel", this.passwordI);
       this.passwordI.new = "";
+      this.type = "protected";
     },
 
     // change channel type : protected->public
     removePasswordToProtectedChannel() {
       this.socket.emit("removePasswordToProtectedChannel", this.channelId);
+      this.type = "public";
     },
 
     kickMember(username: string) {
