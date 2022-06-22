@@ -7,7 +7,6 @@ import { Repository } from 'typeorm';
 import { Match } from './models/match.entity';
 import { User } from 'src/user/models/user.entity';
 import { Spectator } from './interfaces/spectator.interface';
-import { Options } from './interfaces/options.interface';
 
 export const WIDTH = 100;
 export const HEIGHT = 66;
@@ -58,6 +57,7 @@ export class Game {
 
   async saveMatch(winner: User, loser: User, inProgress: boolean) {
     let match: Match;
+    console.log('save match params', winner, loser, inProgress);
     if (this.id) {
       match = await this.matchRepository.findOne({ id: this.id });
       match.playerOneScore = this.playerLeft.score;
@@ -137,10 +137,12 @@ export class Game {
   async gameOver(winner: Player) {
     this.setState(GameState.OVER);
     const opponent: Player = this.findOpponent(winner.user.id);
-    this.sendGameOver(winner, opponent);
-    // winner.socket.leave(this.name);
-    // opponent.socket.leave(this.name);
-    console.log(`PONG: GAME OVER ! ${winner.user.username} won the game !\n`);
+    this.event.emitYouWin(winner.socket.id);
+    this.event.emitYouLose(opponent.socket.id);
+    this.event.emitGameOver(this.spectatorRoom, winner.user.username);
+    await this.saveMatch(winner.user, opponent.user, false);
+    await this.saveUser(winner.user.id, 'Online', true, false, winner.score); // the winner wins his goals as points
+    await this.saveUser(opponent.user.id, 'Online', false, true, null);
   }
 
   sendStart() {
@@ -163,14 +165,6 @@ export class Game {
     }
     this.event.emitUpdateScore(this.spectatorRoom, { x: this.playerLeft.score, y: this.playerRight.score });
   }
-  async sendGameOver(winner: Player, opponent: Player) {
-    this.event.emitYouWin(winner.socket.id);
-    this.event.emitYouLose(opponent.socket.id);
-    this.event.emitGameOver(this.spectatorRoom, winner.user.username);
-    await this.saveMatch(winner.user, opponent.user, false);
-    await this.saveUser(winner.user.id, 'Online', true, false, winner.score); // the winner wins his goals as points
-    await this.saveUser(opponent.user.id, 'Online', false, true, null);
-  }
 
   reconnectPlayer(user: User, socket: Socket) {
     const player = this.findPlayer(user.id);
@@ -183,7 +177,6 @@ export class Game {
   }
 
   disconnectPlayer(userId: number) {
-    // TODO: stop game if both are disconnected ?
     const player = this.findPlayer(userId);
     player.disconnectAndPause(this.playerLeft.socket.id, this.playerRight.socket.id, this.spectatorRoom);
     this.setState(GameState.PAUSE);

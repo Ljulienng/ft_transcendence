@@ -1,22 +1,5 @@
 <template lang="html">
   <div class="container board" ref="board">
-    <!-- <div class="d-flex ustify-content-between" :width="width"> -->
-    <!-- <img :src="this.imageUser" class="profile_avatar_public"
-      v-if="state > State.INIT && imageUser && pong.isLeftSide" /> -->
-    <!-- <div class="col right" v-if="state > State.INIT && imageOpponent && pong.isLeftSide">
-          <img :src="this.imageOpponent" class="profile_avatar_public mx-auto d-block mb-1"
-            :style="{ 'top: 50px; left': width / 2 - 50 + 'px' }" />
-        </div> -->
-
-
-    <!-- <div class="col right" v-if="state > State.INIT && imageOpponent && !pong.isLeftSide">
-        <img :src="this.imageOpponent" class="profile_avatar_public" />
-      </div> -->
-    <!-- <div class="col left" v-if="state > State.INIT && imageUser && !pong.isLeftSide">
-          <img :src="this.imageUser" class="profile_avatar_public mx-auto d-block mb-1"
-            :style="{ 'top: 50px; left': width / 2 - 50 + 'px' }" />
-        </div> -->
-    <!-- </div> -->
     <canvas id="canvas" ref="canvas" :width="width" :height="height">
       {{ unsupportedMsg }}
     </canvas>
@@ -31,10 +14,6 @@ import PongI from '../../types/interfaces/pong.interface'
 import GameOptionI from '../../types/interfaces/gameoption.interface'
 import http from "../../http-common";
 /* eslint-disable */
-
-// TODO: waiting for opponent animation
-// TODO: Countdown before game start
-// TODO: menu for 'win by forfait'
 
 const State = {
   INIT: 0,
@@ -186,7 +165,7 @@ export default defineComponent({
         this.winner = winner;
         this.overPage();
         setTimeout(() => {
-          if (this.$route.name == 'Spectate') { // TODO: do not work
+          if (this.$route.name == 'Spectate') {
             this.$router.push('/');
           }
         }, 3000);
@@ -213,7 +192,7 @@ export default defineComponent({
         this.playerLeftName = playerLeft;
         this.playerRightName = playerRight;
         this.state = State.PLAY;
-        await this.getAvatars(this.playerLeftName, this.playerRightName); // TODO:
+        await this.getAvatars(this.playerLeftName, this.playerRightName);
         this.play();
       });
     },
