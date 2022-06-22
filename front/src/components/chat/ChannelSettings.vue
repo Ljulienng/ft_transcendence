@@ -192,7 +192,12 @@
             <div class="modal-body">
                 <ul>
                   <li v-for="member in memberList" :key="member" class="text-dark">
-                      {{ member.user.username }}
+                    <div class="row">
+                      <div class="col">
+                        {{ member.user.username }}
+                      </div>
+
+                      <div class="col">
                       <template v-if="channelMember.owner">
                         <button
                           @click="setMemberAsAdmin(member.user.username)"
@@ -207,47 +212,24 @@
                         >
                           <span class="material-icons" style="color: #fff774">star</span>
                         </button>
-                      </template>
+                      </template></div>
 
                       <template v-if="channelMember.admin">
-                        <BanMuteModal
-                          :context="'mute'"
-                          :member="member"
-                          :socket="socket"
-                          :channelId="channelId"
-                        />
-                        <BanMuteModal
-                          :member="member"
-                          :socket="socket"
-                          :channelId="channelId"
-                        />
-                        <!-- <button
-                          @click="mute(member.user.username)"
-                          v-if="!member.admin && !member.muted"
-                        >
-                          <span class="material-icons" style="color: grey">volume_off</span>
-                        </button>
-                        <button
-                          @click="unmute(member.user.username)"
-                          v-if="!member.admin && member.muted"
-                        >
-                          <span class="material-icons" style="color: grey">volume_up</span>
-                        </button>
-                        <button
-                          @click="ban(member.user.username)"
-                          v-if="!member.admin && !member.banned"
-                        >
-                          <span class="material-icons" style="color: grey">block</span>
-                        </button>
-                        <button
-                          @click="unban(member.user.username)"
-                          v-if="!member.admin && member.banned"
-                        >
-                          <span class="material-icons" style="color: red">block</span>
-                        </button> -->
+                          <BanMuteModal class="col"
+                            :context="'mute'"
+                            :member="member"
+                            :socket="socket"
+                            :channelId="channelId"
+                          />
+                          <BanMuteModal class="col"
+                            :member="member"
+                            :socket="socket"
+                            :channelId="channelId"
+                          />
                       </template>
 
-                      <template v-if="channelMember.admin">
+                        
+                      <div class="col"><template v-if="channelMember.admin">
                         <button
                           @click="kickMember(member.user.username)"
                           v-if="member.admin === false"
@@ -261,11 +243,12 @@
                         >
                           <span class="material-icons" style="color: red">close</span>
                         </button>
-                      </template>
+                      </template></div>
 
                       <template v-if="member.admin">(admin)</template>
                       <template v-if="member.muted">(muted)</template>
                       <template v-if="member.banned">(banned)</template>
+                    </div>
                   </li>
                 </ul>
 
@@ -420,43 +403,6 @@ export default defineComponent({
       this.socket.emit("downgradeMember", downgradeMember);
     },
 
-  //   ban(username: string, timeToBan: number) {
-  //     const update = {
-  //       channelId: this.channelId,
-  //       username: username,
-  //       banned: true,
-  //       timeToBan: timeToBan,
-  //     };
-  //     this.socket.emit("muteban", update);
-  //   },
-
-  //   unban(username: string) {
-  //     const update = {
-  //       channelId: this.channelId,
-  //       username: username,
-  //       banned: false,
-  //     };
-  //     this.socket.emit("muteban", update);
-  //   },
-
-  //   mute(username: string, timeToMute: number) {
-  //     const update = {
-  //       channelId: this.channelId,
-  //       username: username,
-  //       muted: true,
-  //       timeToMute: timeToMute,
-  //     };
-  //     this.socket.emit("muteban", update);
-  //   },
-
-  //   unmute(username: string) {
-  //     const update = {
-  //       channelId: this.channelId,
-  //       username: username,
-  //       muted: false,
-  //     };
-  //     this.socket.emit("muteban", update);
-  //   },
   },
 
   mounted() {
