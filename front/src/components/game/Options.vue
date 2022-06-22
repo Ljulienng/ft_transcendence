@@ -14,7 +14,7 @@
 			<button class="right_arrow" @click="incrementTheme"></button>
 		</div>
 		<br />
-		<button class="mybtn mb-4" @click="play" data-bs-dismiss="modal" aria-label="Close">{{ button }}</button>
+		<button type="button" class="btn btn-outline-primary btn-lg" @click="play" data-bs-dismiss="modal" aria-label="Close">{{ button }}</button>
 	</div>
 </template>
 
@@ -112,4 +112,5 @@ export default defineComponent({
 </script>
 
 <style src="../../assets/css/home.css" scoped>
+
 </style>
