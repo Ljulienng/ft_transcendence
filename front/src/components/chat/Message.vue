@@ -1,20 +1,22 @@
 <template>
   <div>
+
     <div v-if="sender !== currentUser">
-      <p class="username">{{ sender }}</p>
+      <div class="username">{{ sender }}</div>
 
-      <div class="container-sm from">
+      <div class="from text-break">
         {{ content }}
       </div>
     </div>
 
-    <div v-if="sender === currentUser">
-      <p class="username">you</p>
+    <div class="w-100" style="display: inline-block;" v-if="sender === currentUser">
+        <div class="username text-end">you</div>
 
-      <div class="container to">
-        {{ content }}
-      </div>
+        <div class="to text-break float-end">
+          {{ content }}
+        </div>
     </div>
+
   </div>
 </template>
 
@@ -40,11 +42,19 @@ export default defineComponent({
   background-color: #c4c4c480;
   border-radius: 20px;
   padding: 10px;
+  width: fit-content;
+  max-width: 60%;
+  padding-left: 3%;
+  padding-right: 3%;
 }
 
 .to {
   background-color: #fff774;
   border-radius: 20px;
   padding: 10px;
+  width: fit-content;
+  max-width: 60%;
+  padding-left: 3%;
+  padding-right: 3%;
 }
 </style>

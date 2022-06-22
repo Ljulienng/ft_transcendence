@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateMessageUserDto } from '../models/messageUser.dto';
 import { MessageUser } from '../models/messageUser.entity';
-import { Channel } from 'src/channel/models/channel.entity';
 import { User } from 'src/user/models/user.entity';
 
 @Injectable()
