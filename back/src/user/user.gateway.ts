@@ -157,14 +157,6 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @UseGuards(SocketGuard)
-    @SubscribeMessage('updateJoinedChannels')
-    async updateJoinedChannels(client: Socket) {
-        const user = this.socketList.find(socket => socket.socketId === client.id).user
-        // this.server.emit("updateChannel", await this.channelService.findAll());
-        this.server.to(client.id).emit("updateJoinedChannel", await this.userService.joinedChannel(user));
-    }
-
-    @UseGuards(SocketGuard)
     @SubscribeMessage('joinChannel')
     async joinChannel(client: Socket, joinChannel: JoinChannelDto) {
         const user = this.socketList.find(socket => socket.socketId === client.id).user

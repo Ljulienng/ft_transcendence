@@ -98,7 +98,6 @@
 /* eslint-disable */
 import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
-import ChannelI from "../../types/interfaces/channel.interface";
 import PrivateChatListElem from "./PrivateChatListElem.vue";
 import ChannelListElem from "./ChannelListElem.vue";
 import ChannelList from "./ChannelList.vue";
@@ -218,11 +217,6 @@ export default defineComponent({
     this.socket.on("updateChannel", () => {
       this.getChannelList();
       this.getJoinedChannelList();
-      this.socket.emit("updateJoinedChannels");
-    });
-
-    this.socket.on("updateJoinedChannel", (data: ChannelI[]) => {
-      this.getChannelList();
     });
 
     this.socket.on("/userKicked/" + this.currentUser.userName, () => {

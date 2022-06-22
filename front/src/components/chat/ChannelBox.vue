@@ -156,7 +156,7 @@ export default defineComponent({
 
     this.socket.on(
       "channelMemberInfo", (data: any) => {
-          console.log("update channelMemberInfo : ", this.channelMember)
+          // console.log("update channelMemberInfo : ", this.channelMember)
           this.channelMember = data;
         }
     );

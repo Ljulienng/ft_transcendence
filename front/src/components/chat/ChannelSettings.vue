@@ -269,8 +269,6 @@
 import { defineComponent } from "@vue/runtime-core";
 import { Socket } from "socket.io-client";
 import http from "../../http-common";
-import { ChannelType } from "../../types/interfaces/channel.interface";
-// import VueCrontab from 'vue-crontab's
 import BanMuteModal from "./BanMuteModal.vue";
 
 export default defineComponent({
@@ -429,12 +427,12 @@ export default defineComponent({
     });
 
     this.socket.on("/userUpdated/channel/" + this.channelId, () => {
-      // console.log("user muted or banned");
+      // console.log("user (un)muted or (un)banned");
       this.getChannelMembers();
     });
 
     this.socket.on("/userUpdated/channel/", () => {
-      // console.log("user unmuted or unbanned");
+      // console.log("user unmuted or unbanned after a limited time");
       this.getChannelMembers();
     });
     this.socket.on("/passwordChanged/", () => {
