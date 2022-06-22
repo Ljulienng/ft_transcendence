@@ -5,12 +5,12 @@
             
             <!-- LEFT -->
             <div class="container-fluid col-5 h-100">
-                <div class="d-flex align-items-center" style="height: 5rem">
+                <div class="d-flex align-items-center" style="height: 5%;max-height: 5rem;">
                     <h3>chat</h3>
                     <CreateChannel/>
                 </div>
                 
-                <div class="container-fluid widebox" style="height: 70rem">
+                <div class="container-fluid widebox" style="height: 95%;max-height: 52rem;">
                     <ChatTests @conv="getConv"
                                 @type="getType" 
                                 @privacy="getPrivacy"
@@ -23,7 +23,7 @@
             <div class="col-7 colorbox h-100" v-if="convToShow === 0">
                 Select a conversation
             </div>
-            <div class="col-7 colorbox h-100" style="height: 75rem; padding: 0%;" v-if="convToShow > 0">
+            <div class="col-7 colorbox vh-100" style="height: 100%; padding: 0%; max-height: 55rem;" v-if="convToShow > 0">
                 <PrivateChatBox v-if="type==='priv'"
                     :receiverId="convToShow"
                     :key="componentKey"

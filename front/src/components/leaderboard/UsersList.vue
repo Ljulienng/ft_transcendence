@@ -5,7 +5,7 @@
           <h3>{{ title }}</h3>
         </div>
 
-        <div class="container-fluid widebox">
+        <div class="container-fluid widebox" style="height: 100%; max-height: 55rem;">
           <table class="table table-borderless" id="users">
             <thead>
               <tr>

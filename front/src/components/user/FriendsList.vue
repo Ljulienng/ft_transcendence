@@ -1,6 +1,6 @@
 <template>
   <div class="mb-2 mt-2">
-    <div class="container-fluid widebox">
+    <div class="container-fluid widebox" style="max-height: 40rem;">
       <table class="table table-borderless" id="users">
         <thead>
           <tr>
