@@ -79,29 +79,24 @@
             getConv(value: number) {
                 this.convToShow = value;
                 this.componentKey += 1;
-                console.log("conv= ", value);
             },
 
             updateComponent() {
                 this.convToShow = 0;
                 this.componentKey += 1;
-                console.log("emit updateChannel in Chat.vue for close event")
                 this.socket.emit("updateChannel");
             },
 
             updateComponent_() {
-                console.log("emit updateChannel in Chat.vue")
                 this.socket.emit("updateChannel");
             },
 
             getType(value: string) {
                 this.type = value;
-                console.log("type= ", value);
             },
 
             getPrivacy(value: string) {
                 this.privacy = value;
-                console.log("privacy= ", value);
             },
         },
 
