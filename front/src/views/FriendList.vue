@@ -83,7 +83,7 @@
       <h3>blocked users</h3>
     </div>
 
-    <div class="container-fluid widebox">
+    <div class="container-fluid widebox" style="max-height: 10rem;">
       <BlockedUser :key="updateComp" />
     </div>
   </div>

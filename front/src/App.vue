@@ -5,13 +5,13 @@
       v-if="getUserProfile.firstTime === true"
       v-bind:currentUser="getUserProfile"
     />
+    <!-- <TwoFaModal /> -->
     <Notification
       v-if="getUserProfile.id !== 0"
       v-bind:currentUser="getUserProfile"
     />
     <router-view />
     <!-- <teleport :to="someVar" v-if="someVar"> -->
-    <div id="my-modals" />
     <!-- <MyModal /> -->
   </div>
 </template>
@@ -29,6 +29,7 @@ export default defineComponent({
   computed: {
     ...mapGetters("auth", {
       getUserProfile: "getUserProfile",
+      TwoFactor: "getTwoFAauth",
     }),
   },
 
@@ -85,7 +86,7 @@ body {
   background-image: url("~@/assets/background.jpg");
   background-repeat: no-repeat;
   background-size: cover;
-  height: 100vh;
+  height: 100%;
   // overflow-y: scroll;
 }
 button {
