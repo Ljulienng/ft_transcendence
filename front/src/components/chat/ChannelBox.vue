@@ -135,11 +135,12 @@ export default defineComponent({
       });
       this.$emit("update");
     },
+
   },
 
   mounted() {
     this.socket.on("messageUpdate/" + this.channel, () => {
-      console.log("messageUpdate");
+      // console.log("messageUpdate");
       this.socket.emit("getChannelMsg", this.channel);
     });
 
@@ -153,7 +154,7 @@ export default defineComponent({
 
     this.socket.on(
       "channelMemberInfo", (data: any) => {
-          // console.log("update channelMemberInfo : ", this.channelMember)
+          console.log("update channelMemberInfo : ", this.channelMember)
           this.channelMember = data;
         }
     );

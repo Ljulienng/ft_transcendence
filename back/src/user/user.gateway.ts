@@ -240,9 +240,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const user = this.socketList.find(socket => socket.socketId === client.id).user
         await this.channelService.updateMember(user, update);
         const userToUpdate = await this.userService.findByUsername(update.username);
-        const userToUpdateSocket = (this.socketList.find(s => s.user.id === userToUpdate.id)).socket;
         const channel = await this.channelService.findChannelById(update.channelId);
-        this.server.to(userToUpdateSocket.id).emit("channelMemberInfo", await this.channelService.findMember(userToUpdate, channel));
         this.server.emit('messageUpdate/' + channel.id);
         this.server.emit("/userUpdated/channel/" + channel.id);
         this.server.emit("/muteorban/" + userToUpdate.username, (await this.channelService.findChannelById(channel.id)).name);
@@ -283,6 +281,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this.channelService.addPasswordToPublicChannel(user, passwordI)
             .then(async () => {
                 this.server.emit("updateChannel")
+                this.server.emit("updateChannelType")
             })
             .catch(error => {
                 this.server.to(client.id).emit("/passwordError/", error.response)
@@ -296,6 +295,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this.channelService.removePasswordToProtectedChannel(user, channelId)
             .then(async () => {
                 this.server.emit("updateChannel")
+                this.server.emit("updateChannelType")
             })
             .catch(error => {
                 this.server.to(client.id).emit("/passwordRemovedError/", error.response)

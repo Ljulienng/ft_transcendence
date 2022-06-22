@@ -321,6 +321,17 @@ export default defineComponent({
     };
   },
 
+  watch: {
+    channelType (val, oldVal) {
+      if (val !== oldVal)
+        console.log("channelsettings watch channelType change", val, oldVal)
+    },
+    channelMember (val, oldVal) {
+      if (val !== oldVal)
+        console.log("channelsettings watch channelMember change", val, oldVal)
+    } 
+  },
+
   methods: {
     async getChannelMembers() {
       this.memberList = await http
