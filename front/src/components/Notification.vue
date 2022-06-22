@@ -10,51 +10,22 @@
             <div class="custom-template-title">
               {{ item.title }}
             </div>
-            <div
-              class="custom-template-text"
-              v-html="item.text"
-            />
+            <div class="custom-template-text" v-html="item.text" />
           </div>
-          <button
-            type="button"
-            class="btn-primary"
-            @click="acceptGame(item.data.id, item.id)"
-          >
+          <button type="button" class="btn-primary" @click="acceptGame(item.data.id, item.id, item.data.options)">
             <span class="material-icons px-1">done</span>
-         
+
           </button>
-          <button
-            type="button"
-            class="btn-primary"
-            @click="refuseGame(item.data.id, item.id)"
-          >
+          <button type="button" class="btn-primary" @click="refuseGame(item.data.id, item.id)">
             <span class="material-icons px-1">close</span>
-         
+
           </button>
         </div>
       </template>
     </notifications>
-    <notifications
-      group="auth"
-      position="top center"
-      :max="1"
-      :speed="300"
-      width="50%"
-    />
-    <notifications
-      group="channel"
-      position="top center"
-      :max="3"
-      :speed="300"
-      width="50%"
-    />
-    <notifications
-      group="friend"
-      position="top center"
-      :max="3"
-      :speed="300"
-      width="50%"
-    />
+    <notifications group="auth" position="top center" :max="1" :speed="300" width="50%" />
+    <notifications group="channel" position="top center" :max="3" :speed="300" width="50%" />
+    <notifications group="friend" position="top center" :max="3" :speed="300" width="50%" />
   </div>
 </template>
 
@@ -62,6 +33,7 @@
 import { defineComponent } from "@vue/runtime-core";
 import store from "../store";
 // import Notifications from "@kyvg/vue3-notification"
+/* eslint-disable */
 
 export default defineComponent({
   props: ["currentUser"],
@@ -100,14 +72,14 @@ export default defineComponent({
       this.$notify({ group, clean: true });
     },
 
-    refuseGame(userId: number, id: number) {
+    refuseGame(userId: number, notifId: number) {
       this.socket.emit("matchRefused", userId)
-      this.$notify.close(id);
+      this.$notify.close(notifId);
     },
 
-    acceptGame(userId: number, id: number) {
-      this.socket.emit("matchAccepted", userId)
-      this.$notify.close(id);
+    acceptGame(userId: number, notifId: number, options: any) {
+      this.socket.emit("matchAccepted", [userId, options]);
+      this.$notify.close(notifId);
     }
   },
 
@@ -116,16 +88,36 @@ export default defineComponent({
   // },
 
   created() {
-      this.socket.on("moveToMatch", () => {
+    this.socket.on("moveToMatch", () => {
+      setTimeout(() => {
+        if (this.$route.name != 'Pong')
+          this.$router.push("/play");
+      }, 500);
+    });
+
+    this.socket.on('notPlaying', () => {
+      this.show("friend", "This player is not in a game.", "", "", "warn");
+    });
+
+    this.socket.on('invitationAccepted/' + this.currentUser.id, () => {
+      this.show("auth", "Your invitation to play has been accepted.", "", "", "GAME");
+      setTimeout(() => {
         this.$router.push("/play");
-      });  
-    this.socket.on('matchRefused/' + this.currentUser.id, () => {console.log('REFUSED')})
+      }, 500);
+    });
+
+    this.socket.on('matchRefused/' + this.currentUser.id, () => {
+      if (this.$route.name == 'Pong') {
+        this.$router.push('/friendlist');
+      }
+      this.show("friend", "Your invitation to play has been declined.", "", "", "GAME");
+    });
 
     // eslint-disable-next-line
     this.socket.on("matchInvitation/" + this.currentUser.id, (data: any) => {
       this.show("game", data.username + " invited you to a game !", data, "GAME");
     });
-  
+
     this.socket.on("Connected", () => {
       this.show("auth", "Logged in !", null, "Authenticated", 'success');
     });
@@ -193,11 +185,15 @@ export default defineComponent({
   margin-bottom: 0;
   align-items: center;
   justify-content: center;
-  &, & > div {
+
+  &,
+  &>div {
     box-sizing: border-box;
   }
+
   background: #fff774;
   opacity: 1;
+
   // border: 2px solid #D0F2E1;
   .custom-template-icon {
     flex: 0 1 auto;
@@ -205,19 +201,23 @@ export default defineComponent({
     font-size: 32px;
     padding: 0 10px;
   }
+
   .custom-template-close {
     flex: 0 1 auto;
     padding: 0 20px;
     font-size: 16px;
     opacity: 0.2;
     cursor: pointer;
+
     &:hover {
       opacity: 0.8;
     }
   }
+
   .custom-template-content {
     padding: 10px;
     flex: 1 0 auto;
+
     .custom-template-title {
       letter-spacing: 1px;
       text-transform: uppercase;

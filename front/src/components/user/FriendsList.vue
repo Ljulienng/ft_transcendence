@@ -4,12 +4,7 @@
       <table class="table table-borderless" id="users">
         <thead>
           <tr>
-            <th
-              scope="col"
-              v-for="column in columns"
-              :key="column"
-              class="text-center"
-            >
+            <th scope="col" v-for="column in columns" :key="column" class="text-center">
               {{ column }}
             </th>
           </tr>
@@ -21,19 +16,25 @@
             <td class="text-center">{{ friend.lastname }}</td>
             <td class="text-center">{{ friend.status }}</td>
             <td class="text-center">
-              <button v-on:click="deleteFriend(friend.username)">
-                <span class="material-icons px-1">person_remove</span>
-                <!-- <span class="badge bg-primary rounded-pill">X</span> -->
-              </button>
-              <invitation-button
-                v-bind:userToInvite="friend.id"
-                v-bind:socket="socket"
-              />
-              <button v-on:click="blockUser(friend.id)">
-                <span class="material-icons px-1" style="color: red"
-                  >block</span
-                >
-              </button>
+              <div class="container">
+                <div class="row align-items-start">
+                  <div class="col px-0">
+                    <button v-on:click="deleteFriend(friend.username)">
+                      <span class="material-icons px-0">person_remove</span>
+                      <!-- <span class="badge bg-primary rounded-pill">X</span> -->
+                    </button>
+                  </div>
+                  <div class="col px-0">
+                    <spectate-button v-bind:userToSpectate="friend.id" v-bind:socket="socket" />
+                  </div>
+                  <invitation-button v-bind:userToInvite="friend.id" v-bind:socket="socket" />
+                  <div class="col px-0">
+                    <button v-on:click="blockUser(friend.id)">
+                      <span class="material-icons px-0" style="color: red">block</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -47,12 +48,14 @@ import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 import store from "../../store";
 import InvitationButton from "../game/InvitationButton.vue";
+import SpectateButton from "../game/SpectateButton.vue";
 import Friend from "./Friend.vue";
 
 export default defineComponent({
   /* eslint-disable */
   components: {
     InvitationButton,
+    SpectateButton,
     Friend,
   },
 

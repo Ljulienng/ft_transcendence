@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '../store'
 import Pong from '@/components/game/Pong.vue'
+import PongSpec from '@/components/game/PongSpec.vue'
 import AuthModal from '@/components/auth/AuthModal.vue'
 import TwoFaAuth from '@/components/auth/TwoFaAuth.vue'
 import FriendList from '@/views/FriendList.vue'
@@ -41,12 +42,8 @@ const routes = [
 	{
 		name: 'Spectate',
 		path: '/spectate',
-		component: Pong
-	},
-	{
-		name: 'Spectate',
-		path: '/spectate',
-		component: Pong
+		component: PongSpec,
+		meta: { requiredAuth: true }
 	},
 	{
 		name: 'AuthModal',
