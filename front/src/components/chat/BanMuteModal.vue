@@ -174,8 +174,6 @@ export default defineComponent({
 
   methods: {
     ban() {
-      console.log("test to ban for", this.timeToBan, "minutes");
-      const timeToBan = this.timeToBan; // TEST
       const update = {
         channelId: this.channelId,
         username: this.member.user.username,
@@ -195,8 +193,6 @@ export default defineComponent({
     },
 
     mute() {
-      console.log("test to mute for", this.timeToMute, "minutes");
-      const timeToMute = this.timeToMute; // TEST
       const update = {
         channelId: this.channelId,
         username: this.member.user.username,
