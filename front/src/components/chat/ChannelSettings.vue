@@ -49,17 +49,6 @@
 
     </div>
 
-    <div v-if="channelMember.owner && type == 'protected'">
-
-        <!-- REMOVE PASSWORD -->
-        <button @click="removePasswordToProtectedChannel()" class="btn-primary">
-          Remove the password
-        </button>
-        <!-- <button @click="deleteChannel()">
-          <span class="material-icons px-1" style="color: red">delete</span>
-        </button> -->
-    </div>
-
     <div v-if="channelMember.owner">
 
         <!-- CHANGE PASSWORD -->
@@ -106,6 +95,15 @@
             </div>
           </div>
         </form>
+
+      </div>
+
+      <div v-if="channelMember.owner && type == 'protected'">
+
+        <!-- REMOVE PASSWORD -->
+        <button @click="removePasswordToProtectedChannel()" type="button">
+          <span class="material-icons px-1" style="color: red">key_off</span>
+        </button>
 
       </div>
 
