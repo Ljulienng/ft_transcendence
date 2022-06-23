@@ -3,6 +3,7 @@ import App from "./App.vue";
 import Sidebar from "./components/Sidebar.vue";
 import UploadAvatar from "./components/user/UploadAvatar.vue"
 import ChatTests from "./components/chat/ChatTests.vue"
+import ChannelBox from "./components/chat/ChannelBox.vue";
 import router from "./router";
 import store from "./store";
 import 'vue-universal-modal/dist/index.css'
@@ -19,6 +20,7 @@ app.component("Sidebar", Sidebar);
 app.component("UploadAvatar", UploadAvatar);
 app.use(Notifications);
 app.component("ChatTests", ChatTests);
+app.component("ChannelBox", ChannelBox);
 app.use(VueUniversalModal, {
 	teleportTarget: '#my-modals',
 	modalComponent: 'MyModal',
