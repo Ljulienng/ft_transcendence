@@ -123,7 +123,7 @@ const mutations = {
 
 	setUserSocket(state: State) {
 		if (!state.socket)
-			state.socket = io('http://localhost:3000/user', {  withCredentials: true });
+			state.socket = io(process.env.VUE_APP_API_ENDPOINT, {  withCredentials: true });
 	},
 	setTwoFAauth(state: State, data: boolean) {
 		state.twoFAauth = data;
@@ -159,7 +159,7 @@ const mutations = {
 		};
 		state.userProfile = userProfile
 		if (!state.socket && userProfile.id !== 0 )
-			state.socket = io('http://localhost:3000/', {  withCredentials: true });
+			state.socket = io(process.env.VUE_APP_API_ENDPOINT, {  withCredentials: true });
 
 	}
 };

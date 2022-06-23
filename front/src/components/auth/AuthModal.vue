@@ -38,14 +38,14 @@ export default defineComponent({
 
   methods: {
     ftAuth(): string {
-      return "http://localhost:3000/auth/42";
+      return process.env.VUE_APP_API_ENDPOINT + "auth/42";
     },
     norminetAuth() {
       http
         .get("/norminet")
         .then((res) => {
           console.log(res);
-          this.$router.push("http://localhost:3001/home");
+          this.$router.push(process.env.VUE_APP_ENDPOINT + "home");
         })
         .catch((err) => {
           console.log("err norminet = ", err);
@@ -56,7 +56,7 @@ export default defineComponent({
         .post("/testsignin", { newUsername: this.newUsername })
         .then((res) => {
           console.log(res);
-          this.$router.push("http://localhost:3001/home");
+          this.$router.push(process.env.VUE_APP_ENDPOINT + "home");
         })
         .catch((err) => {
           console.log("err testAuth = ", err);

@@ -65,7 +65,7 @@ export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
   async FortyTwoAuthRedirect(@Req() req, @Res({passthrough: true}) res) {
     if (!req.user['username']) {
-      res.redirect('http://localhost:3001/authmodal');
+      res.redirect(process.env.VUE_APP_ENDPOINT + 'authmodal');
       return ;
     }
     const payload = { username: req.user['username'], auth: false };
@@ -73,7 +73,7 @@ export class AuthController {
     if (req.user.status === 'Offline')
       req.user.status = 'Online';
 		res.cookie('jwt', accessToken, {httpOnly: true})
-		res.redirect('http://localhost:3001/home');
+		res.redirect( process.env.VUE_APP_ENDPOINT + 'home');
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
