@@ -60,7 +60,7 @@ const routes = [
 
 			// console.log('beforeEnter = ', userProfile.id)
 
-			if (userProfile.id !== 0) router.push("http://localhost:3001/");
+			if (userProfile.id !== 0) router.push(process.env.VUE_APP_ENDPOINT);
 			return true
 		}
 	},

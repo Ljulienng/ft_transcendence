@@ -1,6 +1,5 @@
 <template>
   <div id="users_list" class="pl-6" style="padding-right: 20px">
-
     <div class="d-flex align-items-center mt-4">
       <h3>{{ title }}</h3>
     </div>
@@ -17,17 +16,23 @@
         <tbody v-for="match in matchList" :key="match">
           <tr>
             <!-- <th scope="row">{{ currentUser.userName }}</th> -->
-            <td scope="row" v-if="match.playerOne.username === username">{{ match.playerTwo.username }}</td>
+            <td scope="row" v-if="match.playerOne.username === username">
+              {{ match.playerTwo.username }}
+            </td>
             <td v-else>{{ match.playerOne.username }}</td>
             <td>{{ match.playerOneScore }}:{{ match.playerTwoScore }}</td>
-            <td v-if="match.winner && username === match.winner.username" style="color: green">Victory</td>
+            <td
+              v-if="match.winner && username === match.winner.username"
+              style="color: green"
+            >
+              Victory
+            </td>
             <td v-else style="color: red">Defeat</td>
             <td>0</td>
           </tr>
         </tbody>
       </table>
     </div>
-
   </div>
 </template>
 
@@ -36,13 +41,13 @@ import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 
 export default defineComponent({
-  props: ['username'],
+  props: ["username"],
   data() {
     return {
       matchList: [],
       // currentUser: store.getters["auth/getUserProfile"],
-      title: 'match history',
-      columns: ['Opponent', 'Score', 'result', 'points', ""],
+      title: "match history",
+      columns: ["Opponent", "Score", "result", "points", ""],
     };
   },
 
@@ -52,7 +57,7 @@ export default defineComponent({
         .get("/users/matchhistory/" + this.username)
         .then((response) => {
           console.log(response.data);
-          this.matchList = response.data;
+          this.matchList = response.data.reverse();
         })
         .catch((error) => {
           console.log("match history error = ", error);
@@ -65,5 +70,4 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

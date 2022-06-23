@@ -75,7 +75,7 @@ export default defineComponent({
         .then(() => {
           store.dispatch("auth/setTwoFAauth");
           this.modal.dispose();
-          this.$router.push("http://localhost:3001/home");
+          this.$router.push(process.env.VUE_APP_ENDPOINT + "home");
           this.socket.emit("updateAvatar");
         })
         .catch((error) => {
