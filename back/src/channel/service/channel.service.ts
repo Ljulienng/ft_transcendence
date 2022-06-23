@@ -305,8 +305,8 @@ export class ChannelService {
     const channel = await this.findChannelById(updates.channelId);
     const member = await this.channelMemberService.findOne(owner, channel);
     
-    if (!member.owner) {
-        throw new HttpException('only owner can update the channel', HttpStatus.FORBIDDEN);
+    if (!member.admin) {
+        throw new HttpException('only admin can update the channel', HttpStatus.FORBIDDEN);
     }
     if (!updates.name || updates.name.length < 3 || updates.name.length > 20) {
         throw new HttpException('chat name beetween 3 and 20 characters please', HttpStatus.FORBIDDEN);

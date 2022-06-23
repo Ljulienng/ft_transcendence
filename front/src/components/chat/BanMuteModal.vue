@@ -198,7 +198,7 @@ export default defineComponent({
       this.socket.emit("muteban", update);
     },
 
-    unban(username: string) {
+    unban() {
       const update = {
         channelId: this.channelId,
         username: this.member.user.username,
