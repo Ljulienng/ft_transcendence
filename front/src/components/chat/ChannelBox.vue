@@ -123,6 +123,7 @@ export default defineComponent({
       );
       this.socket.emit("sendMessageToServer", this.message);
       this.$emit("update");
+      this.message.content = "";
     },
 
     update() {

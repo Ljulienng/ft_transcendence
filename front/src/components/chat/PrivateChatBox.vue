@@ -75,6 +75,7 @@ export default defineComponent({
       this.message.receiverId = this.receiverId;
 
       this.socket.emit("sendMessageToUser", this.message);
+      this.message.content = "";
       console.log("sendMessage:", this.message);
     },
 
