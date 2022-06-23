@@ -5,11 +5,10 @@
     <div class="col">
       <Friend v-bind:username="userInfo.username" />
     </div>
-
     <div class="col">
-      <invitation-button v-bind:userToInvite="userInfo.id" v-bind:socket="socket" />
+      <invitation-button v-bind:userToInvite="id" v-bind:socket="socket" />
     </div>
-    
+
   </div>
 
 </template>
@@ -22,7 +21,7 @@ import Friend from "../user/Friend.vue";
 import InvitationButton from "../game/InvitationButton.vue";
 
 export default defineComponent({
-  props: ["username", "isSelected"],
+  props: ["username", "id", "isSelected"],
 
   components: {
       Friend,
