@@ -40,7 +40,7 @@
 
     </div>
 
-    <div v-if="channelMember.admin">
+    <div v-if="channelMember.owner">
 
         <!-- DELETE -->
         <button @click="deleteChannel()">
