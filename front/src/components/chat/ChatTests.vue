@@ -48,7 +48,7 @@
 
           <div class="btn-group-vertical col-12 mx-auto" role="group" aria-label="Basic example">
             <button type="button" class="btn" v-for="friend in friendList" :key="friend" @click="showUser(friend.id)">
-              <PrivateChatListElem :username="friend.username" :is-selected="friend.id===selectedUser"/>
+              <PrivateChatListElem :username="friend.username" :id="friend.id" :is-selected="friend.id===selectedUser"/>
             </button>
           </div>
 

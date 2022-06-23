@@ -123,7 +123,7 @@
                 this.$emit("update");
             },
         },
-    })
+    });
 </script>
 
 <style scoped>

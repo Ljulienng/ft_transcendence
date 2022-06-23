@@ -41,7 +41,7 @@
             class="form-control"
             placeholder="say something (interesting)..." 
           />
-          <p v-if="errorMsg !== ''" style="color: red">{{ errorMsg }}</p>
+          <p v-if="errorMsg !== ''" style="color: red;">{{ errorMsg }}</p>
         </div>
         <div class="col-auto">
           <button @click="sendMessage">
