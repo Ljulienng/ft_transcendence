@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Game, GameState, HEIGHT, WIDTH } from './game';
+import { Game, HEIGHT, WIDTH } from './game';
 import { Point } from './interfaces/point.interface';
 import { Event } from './event';
 import { Player } from './player';
@@ -10,7 +10,7 @@ export class Ball {
   public pos: Point;
   private speed: Point;
   private maxSpeed: number;
-  private radius: number; // TODO: add radius to check collisions
+  private radius: number;
 
   constructor(
     private event: Event
@@ -42,7 +42,7 @@ export class Ball {
     this.speed.y *= (Math.round(Math.random()) ? 1 : -1);
   }
 
-  async move(playerLeft: Player, playerRight: Player, spectatorRoom: string) { // TODO: review
+  async move(playerLeft: Player, playerRight: Player, spectatorRoom: string) {
     // Rebounds on top and bottom
     if (this.pos.y > HEIGHT - this.radius || this.pos.y < this.radius) {
       this.speed.y *= -1;
@@ -52,7 +52,7 @@ export class Ball {
     this.pos.y += this.speed.y;
 
     // Send move event
-    this.event.emitBallMove(playerLeft.socket.id, this.pos);  // TODO: emit to players room ?
+    this.event.emitBallMove(playerLeft.socket.id, this.pos);
     this.event.emitBallMove(playerRight.socket.id, this.pos);
     this.event.emitBallMove(spectatorRoom, this.pos);
   }
@@ -75,23 +75,9 @@ export class Ball {
       opponent.goal(game);
       this.resetPos();
       this.randomDirection();
-      // Reset players pos
-      //this.pong.playerRight.y = this.pong.boardSize.y / 2 - this.pong.playerSize.y / 2;
-      //this.pong.playerLeft.y = this.pong.boardSize.y / 2 - this.pong.playerSize.y / 2;
     } else {  // player hit the ball
-      this.speed.x *= -1.1; // TODO: increment ball speed
+      this.speed.x *= -1.2;
       this.poundSpeed();
-
-      // TODO: review
-      // Add a ratio to increment ball speed depending on the paddle impact position
-      //let y = playerLeft.y;
-      //if (this.pos.x > WIDTH / 2) {
-      //  y = playerRight.y;
-      //}
-      //const distanceFromPaddleMiddle = this.pos.y - y - Player.size.y / 2;
-      //const ratio = 100 / (Player.size.y / 2);
-      //this.speed.y = Math.round(distanceFromPaddleMiddle * ratio / 50);
-      //this.poundSpeed();
     }
   }
 }

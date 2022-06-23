@@ -73,7 +73,7 @@ export default defineComponent({
       await http
         .post("/twofa/authenticate", this.twoFA, { withCredentials: true })
         .then(() => {
-          this.$store.dispatch("auth/setTwoFAauth");
+          store.dispatch("auth/setTwoFAauth");
           this.modal.dispose();
           this.$router.push("http://localhost:3001/home");
           this.socket.emit("updateAvatar");
