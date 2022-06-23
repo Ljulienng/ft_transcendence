@@ -3,16 +3,16 @@
     <TwoFactorModal />
     <div class="d-flex mx-auto justify-content-evenly" style="width:70%">
       <div class="d-block text-center">
-        <UploadAvatar v-on:updateAvatar="updateAvatar"/>
+        <UploadAvatar v-on:updateAvatar="updateAvatar" />
         <UsernameModal />
         <router-link :to="'/public/' + currentUser.userName" class="button text-decoration-none">
-          <small> public profile </small> 
+          <small> public profile </small>
         </router-link>
 
       </div>
-      <UserStats v-bind:username="currentUser.userName"/>
+      <UserStats v-bind:username="currentUser.userName" />
     </div>
-    <GameHistory v-bind:username="currentUser.userName"/>
+    <GameHistory v-bind:username="currentUser.userName" />
   </div>
 </template>
 
@@ -64,6 +64,7 @@ export default defineComponent({
   color: arial;
   padding: 5px 10px;
 }
+
 .logout:hover {
   background: red;
   cursor: pointer;

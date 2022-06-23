@@ -18,7 +18,7 @@
       </router-link>
       <router-link to="/friendlist" class="button">
         <span class="material-icons">group</span>
-        <span class="text">Show users</span>
+        <span class="text">Friends</span>
       </router-link>
       <router-link to="/chat" class="button">
         <span class="material-icons">chat</span>
@@ -28,10 +28,6 @@
 				<span class="material-icons">account_circle</span>
 				<span class="text">User Profile</span>
 			</router-link> -->
-      <router-link to="/play" class="button">
-        <span class="material-icons">videogame_asset</span>
-        <span class="text">Play</span>
-      </router-link>
       <router-link to="/leaderboard" class="button">
         <span class="material-icons">emoji_events</span>
         <span class="text">Leaderboard</span>
@@ -51,7 +47,7 @@
     <div class="menu" v-if="getUserProfile.id !== 0">
       <button class="button" @click="logout">
         <span class="material-icons">power_settings_new</span>
-        <span class="text">Chat</span>
+        <span class="text">Logout</span>
       </button>
     </div>
   </aside>

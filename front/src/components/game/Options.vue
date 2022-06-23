@@ -3,18 +3,20 @@
 		<h4 class="mt-3">points to victory</h4>
 		<div>
 			<button class="left_arrow" @click="decrementWinScore"></button>
-			<p class="point2win">{{ winScores.at(winScoreIndex) }}</p>
+			<p class="point2win" @click="incrementWinScore">{{ winScores.at(winScoreIndex) }}</p>
 			<button class="right_arrow" @click="incrementWinScore"></button>
 		</div>
 		<br />
 		<h4>theme</h4>
 		<div>
 			<button class="left_arrow" @click="decrementTheme"></button>
-			<p class="theme">{{ themes.at(themeIndex).name }}</p>
+			<p class="theme" @click="incrementTheme">{{ themes.at(themeIndex).name }}</p>
 			<button class="right_arrow" @click="incrementTheme"></button>
 		</div>
 		<br />
-		<button type="button" class="btn btn-outline-primary btn-lg" @click="play" data-bs-dismiss="modal" aria-label="Close">{{ button }}</button>
+		<button class="mybtn mb-4" @click="play" v-if="$route.name == 'FriendList'" data-bs-dismiss="modal"
+			aria-label="Close">{{ button }}</button>
+		<button class="mybtn mb-4" @click="play" v-if="$route.name != 'FriendList'">{{ button }}</button>
 	</div>
 </template>
 
@@ -37,14 +39,18 @@ export default defineComponent({
 	data() {
 		return {
 			socket: store.getters['auth/getUserSocket'],
-			winScores: [3, 5],
+			winScores: [3, 5, 10, 1],
 			winScoreIndex: 0,
 			themes: [
 				{ name: 'dark', bgColor: '#1c1d21', fgColor: 'lightgrey' },
-				{ name: 'light', bgColor: 'lightgrey', fgColor: '#1c1d21' }
+				{ name: 'light', bgColor: 'lightgrey', fgColor: '#1c1d21' },
+				{ name: 'ocean', bgColor: '#006d77', fgColor: '#ffc300' },
+				{ name: 'earth', bgColor: '#6a994e', fgColor: '#f2e8cf' },
+				{ name: 'ground', bgColor: '#895737', fgColor: '#f3e9dc' }
+
 			],
 			themeIndex: 0,
-			button: this.$route.name == 'FriendList' ? 'invit' : 'play'
+			button: this.$route.name == 'FriendList' ? 'invite' : 'play'
 		};
 	},
 
@@ -91,7 +97,7 @@ export default defineComponent({
 			}
 		}
 	},
-	beforeMount() {  // TODO: do earlier ?
+	beforeMount() {
 		// if player is in game, redirect it to its game
 		this.socket.volatile.emit('amIInGame', (amIInGame: boolean) => {
 			if (amIInGame == true) {
@@ -112,5 +118,4 @@ export default defineComponent({
 </script>
 
 <style src="../../assets/css/home.css" scoped>
-
 </style>

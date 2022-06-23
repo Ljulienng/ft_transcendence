@@ -1,33 +1,33 @@
 <template>
   <div id="users_list" class="pl-6" style="padding-right: 20px">
-      
-      <div class="d-flex align-items-center mt-4">
-        <h3>{{ title }}</h3>
-      </div>
 
-      <div class="container-fluid widebox" style="max-height: 25rem;">
-        <table class="table table-borderless" id="users">
-          <thead>
-            <tr>
-              <th scope="col" v-for="column in columns" :key="column">
-                {{ column }}
-              </th>
-            </tr>
-          </thead>
-          <tbody v-for="match in matchList" :key="match">
-            <tr>
-                <!-- <th scope="row">{{ currentUser.userName }}</th> -->
-                <td scope="row" v-if="match.playerOne.username === username">{{ match.playerTwo.username }}</td>
-                <td v-else>{{ match.playerOne.username }}</td>
-                <td>{{ match.playerOneScore }}:{{ match.playerTwoScore }}</td>
-                <td v-if="username === match.winner.username" style="color: green">Victory</td>
-                <td v-else style="color: red">Defeat</td>
-                <td>0</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      
+    <div class="d-flex align-items-center mt-4">
+      <h3>{{ title }}</h3>
+    </div>
+
+    <div class="container-fluid widebox">
+      <table class="table table-borderless" id="users">
+        <thead>
+          <tr>
+            <th scope="col" v-for="column in columns" :key="column">
+              {{ column }}
+            </th>
+          </tr>
+        </thead>
+        <tbody v-for="match in matchList" :key="match">
+          <tr>
+            <!-- <th scope="row">{{ currentUser.userName }}</th> -->
+            <td scope="row" v-if="match.playerOne.username === username">{{ match.playerTwo.username }}</td>
+            <td v-else>{{ match.playerOne.username }}</td>
+            <td>{{ match.playerOneScore }}:{{ match.playerTwoScore }}</td>
+            <td v-if="match.winner && username === match.winner.username" style="color: green">Victory</td>
+            <td v-else style="color: red">Defeat</td>
+            <td>0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 </template>
 
@@ -65,4 +65,5 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+</style>

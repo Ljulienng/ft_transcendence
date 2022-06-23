@@ -4,8 +4,6 @@ import { User } from 'src/user/models/user.entity';
 import { Options } from './interfaces/options.interface';
 import { Point } from './interfaces/point.interface';
 
-// TODO: emit event individually to handle spectator mode
-
 @Injectable()
 export class Event {
 
