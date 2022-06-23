@@ -25,7 +25,7 @@ export class PongService {
     this.waitingPlayers = [];
   }
 
-  duel(event: Event, playerLeft: Player, playerRight: Player) { // TODO: test
+  duel(event: Event, playerLeft: Player, playerRight: Player) {
     const ball = new Ball(event);
     const game = new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, playerLeft.options.winScore);
     game.playerLeft.state = PlayerState.DISCONNECTED;
@@ -63,7 +63,7 @@ export class PongService {
       where: [
         { playerOne: user.id },
         { playerTwo: user.id }
-      ]
+      ] // TODO: sort
     });
   }
 }

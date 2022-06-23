@@ -44,11 +44,11 @@ text {
     height: 50px;
     width: 200px;
     color: #fff774;
-    font-size: 1.5rem;
+    font-size: 1.5rem !important;
     outline: none;
-    border-radius: 20px;
+    border-radius: 20px !important;
     border: 2px solid #fff774;
-    margin: 5px;
+    // margin: 5px;
     background: none;
 }
 .mybtn:hover {
@@ -60,7 +60,7 @@ text {
     outline: none;
     border-radius: 20px;
     border: 2px solid #fff774;
-    margin: 5px;
+    // margin: 5px;
 }
 .box {
     height: 900px;

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/user/models/user.entity';
-import { Game, GameState, HEIGHT, WIDTH } from './game';
+import { Game, HEIGHT, WIDTH } from './game';
 import { Point } from './interfaces/point.interface';
 import { Socket } from 'socket.io'
 import { Event } from './event';
@@ -25,7 +25,7 @@ export class Player {
     public socket: Socket,
     public user: User,
     public options: Options) {
-    Player.size = { x: WIDTH / 100, y: HEIGHT / 3.3 };
+    Player.size = { x: WIDTH / 100, y: HEIGHT / 6.6 };
     this.y = HEIGHT / 2 - Player.size.y / 2;
     this.score = 0;
     this.state = PlayerState.CONNECTED;
