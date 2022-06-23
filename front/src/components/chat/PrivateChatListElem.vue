@@ -1,16 +1,12 @@
 <template>
-
   <div class="row">
-
     <div class="col">
-      <Friend v-bind:username="userInfo.username" />
+      <Friend v-bind:username="username" />
     </div>
     <div class="col">
       <invitation-button v-bind:userToInvite="id" v-bind:socket="socket" />
     </div>
-
   </div>
-
 </template>
 
 <script lang="ts">
@@ -24,8 +20,8 @@ export default defineComponent({
   props: ["username", "id", "isSelected"],
 
   components: {
-      Friend,
-      InvitationButton,
+    Friend,
+    InvitationButton,
   },
 
   data() {
