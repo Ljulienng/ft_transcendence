@@ -75,7 +75,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     async handleDisconnect(client: Socket) {
         this.playerLeave(client);
-        const index = this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
+        const index = this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id));
         // const user = this.socketList.find((socket) => socket.socketId === client.id).user
         // console.log(this.socketList[index].user.username ,'has disconnected from the server');
 
@@ -124,13 +124,13 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @UseGuards(SocketGuard)
     @SubscribeMessage('getChannelMsg')
     async getChannelMsg(client: Socket, channelId: number) {
-        const user = this.socketList.find(socket => socket.socketId === client.id).user
+        const user = this.socketList.find(socket => socket.socketId === client.id).user;
         const channel = await this.channelService.findChannelById(channelId);
-        const messages = await this.channelService.findChannelMessagesByChannelName(user, channel.name)
-        const index = this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id))
+        const messages = await this.channelService.findChannelMessagesByChannelName(user, channel.name);
+        const index = this.socketList.indexOf(this.socketList.find(socket => socket.socketId === client.id));
         // console.log(this.socketList[index].user.username ,'wants the msgs');
 
-        this.server.emit('getChannelMessages' + this.socketList[index].user.id, messages)
+        this.server.emit('getChannelMessages' + this.socketList[index].user.id, messages);
     }
 
     @UseGuards(SocketGuard)

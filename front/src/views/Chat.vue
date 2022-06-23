@@ -48,58 +48,60 @@
 
 <script lang="ts">
 
-    import { defineComponent } from "@vue/runtime-core";
-    import CreateChannel from "../components/chat/CreateChannel.vue";
-    import ChatTests from "../components/chat/ChatTests.vue";
-    import PrivateChatBox from "../components/chat/PrivateChatBox.vue";
-    import ChannelBox from "../components/chat/ChannelBox.vue";
-    import store from "../store";
+import CreateChannel from "../components/chat/CreateChannel.vue";
+import ChatTests from "../components/chat/ChatTests.vue";
+import PrivateChatBox from "../components/chat/PrivateChatBox.vue";
+import ChannelBox from "../components/chat/ChannelBox.vue";
+import { defineComponent } from "@vue/runtime-core";
+import store from "../store";
 
-    export default defineComponent({
+export default defineComponent({
 
-        components: {
-            CreateChannel,
-            ChatTests,
-            PrivateChatBox,
-            ChannelBox,
+    components: {
+        CreateChannel,
+        ChatTests,
+        PrivateChatBox,
+        ChannelBox,
+    },
+
+    data() {
+        return {
+            convToShow: 0,
+            componentKey: 0,
+            type: "priv",
+            privacy: "public",
+            socket: store.getters["auth/getUserSocket"],
+        };
+    },
+
+    methods: {
+
+        getConv(value: number) {
+            this.convToShow = value;
+            this.componentKey += 1;
         },
 
-        data() {
-            return {
-                convToShow: 0,
-                componentKey: 0,
-                type: "priv",
-                privacy: "public",
-                socket: store.getters["auth/getUserSocket"],
-            };
+        updateComponent() {
+            this.convToShow = 0;
+            this.componentKey += 1;
+            this.socket.emit("updateChannel");
         },
 
-        methods: {
-
-            getConv(value: number) {
-                this.convToShow = value;
-                this.componentKey += 1;
-            },
-
-            updateComponent() {
-                this.convToShow = 0;
-                this.componentKey += 1;
-                this.socket.emit("updateChannel");
-            },
-
-            updateComponent_() {
-                this.socket.emit("updateChannel");
-            },
-
-            getType(value: string) {
-                this.type = value;
-            },
-
-            getPrivacy(value: string) {
-                this.privacy = value;
-            },
+        updateComponent_() {
+            this.socket.emit("updateChannel");
         },
 
-    });
+        getType(value: string) {
+            this.type = value;
+        },
+
+        getPrivacy(value: string) {
+            this.privacy = value;
+        },
+    },
+
+});
 
 </script>
+
+<style lang="scss"></style>
