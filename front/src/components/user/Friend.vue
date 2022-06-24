@@ -28,8 +28,8 @@ export default defineComponent({
           responseType: "blob",
         })
         .then((response) => {
+          console.log("FRIEND avatar: ", response)
           const blob = response.data;
-
           this.image = URL.createObjectURL(blob);
         })
         .catch((error) => {
