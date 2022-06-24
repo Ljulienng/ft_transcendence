@@ -5,29 +5,13 @@
     <nav>
       <div class="nav nav-tabs" id="nav-tab" role="tablist">
 
-        <button
-          class="nav-link active"
-          id="nav-friends-tab"
-          data-bs-toggle="tab"
-          data-bs-target="#nav-friends"
-          type="button"
-          role="tab"
-          aria-controls="nav-friends"
-          aria-selected="true"
-        >
+        <button class="nav-link active" id="nav-friends-tab" data-bs-toggle="tab" data-bs-target="#nav-friends"
+          type="button" role="tab" aria-controls="nav-friends" aria-selected="true">
           friends
         </button>
 
-        <button
-          class="nav-link"
-          id="nav-joinedChannel-tab"
-          data-bs-toggle="tab"
-          data-bs-target="#nav-joinedChannel"
-          type="button"
-          role="tab"
-          aria-controls="nav-joinedChannel"
-          aria-selected="false"
-        >
+        <button class="nav-link" id="nav-joinedChannel-tab" data-bs-toggle="tab" data-bs-target="#nav-joinedChannel"
+          type="button" role="tab" aria-controls="nav-joinedChannel" aria-selected="false">
           channels
         </button>
 
@@ -38,18 +22,18 @@
     <div class="tab-content" id="nav-tabContent">
 
       <!-- PRIVATE CHATS -->
-      <div
-        class="tab-pane fade show active"
-        id="nav-friends"
-        role="tabpanel"
-        aria-labelledby="nav-friends-tab"
-      >
+      <div class="tab-pane fade show active" id="nav-friends" role="tabpanel" aria-labelledby="nav-friends-tab">
         <div class="friendList">
-
-          <div class="btn-group-vertical col-12 mx-auto" role="group" aria-label="Basic example">
-            <button type="button" class="btn" v-for="friend in friendList" :key="friend" @click="showUser(friend.id)">
-              <PrivateChatListElem :username="friend.username" :id="friend.id" :is-selected="friend.id===selectedUser"/>
-            </button>
+          <div class="btn-group-vertical col-12 mx-auto row" role="group" aria-label="Basic example">
+            <span class="row" v-for="friend in friendList" :key="friend">
+              <button type="button" class="btn col" @click="showUser(friend.id)">
+                <PrivateChatListElem :username="friend.username" :id="friend.id"
+                  :is-selected="friend.id === selectedUser" />
+              </button>
+              <div class="col d-flex align-items-center justify-content-end" style="display:block">
+                <invitation-button v-bind:userToInvite="friend.id" v-bind:socket="socket" />
+              </div>
+            </span>
           </div>
 
         </div>
@@ -57,34 +41,24 @@
 
 
       <!-- CHANNELS -->
-      <div
-        class="tab-pane fade"
-        id="nav-joinedChannel"
-        role="tabpanel"
-        aria-labelledby="nav-joinedChannel-tab"
-      >
+      <div class="tab-pane fade" id="nav-joinedChannel" role="tabpanel" aria-labelledby="nav-joinedChannel-tab">
         <div class="row my-2">
-          <ChannelList :channelList="channelListWithoutPrivate" @join="joinChannel"/>
+          <ChannelList :channelList="channelListWithoutPrivate" @join="joinChannel" />
         </div>
 
         <div class="joinedChannelList">
 
           <div class="btn-group-vertical col-12 mx-auto" role="group" aria-label="channels">
-            <button type="button" class="btn" v-for="channel in joinedChannelList" :key="channel" @click="showChannel(channel.id, channel.type)">
+            <button type="button" class="btn" v-for="channel in joinedChannelList" :key="channel"
+              @click="showChannel(channel.id, channel.type)">
               <div class="col">
-                <ChannelListElem 
-                  :id="channel.id"
-                  :type="channel.type"
-                  :name="channel.name"
-                  :owner="channel.owner.username"
-                  :leave="true"
-                  @leave="leaveChannel"
-                />
+                <ChannelListElem :id="channel.id" :type="channel.type" :name="channel.name"
+                  :owner="channel.owner.username" :leave="true" @leave="leaveChannel" />
               </div>
 
             </button>
 
-            
+
 
           </div>
 
@@ -102,12 +76,14 @@ import PrivateChatListElem from "./PrivateChatListElem.vue";
 import ChannelListElem from "./ChannelListElem.vue";
 import ChannelList from "./ChannelList.vue";
 import store from "../../store";
+import InvitationButton from "../game/InvitationButton.vue";
 
 export default defineComponent({
   components: {
     PrivateChatListElem,
     ChannelListElem,
     ChannelList,
+    InvitationButton,
   },
 
   data() {
@@ -237,9 +213,11 @@ export default defineComponent({
 div {
   color: white;
 }
+
 ul {
   padding-left: 10%;
 }
+
 button {
   color: white;
   border: thin solid #cccccc;

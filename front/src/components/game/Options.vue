@@ -14,9 +14,10 @@
 			<button class="right_arrow" @click="incrementTheme"></button>
 		</div>
 		<br />
-		<button class="mybtn mb-4" @click="play" v-if="$route.name == 'FriendList'" data-bs-dismiss="modal"
-			aria-label="Close">{{ button }}</button>
-		<button class="mybtn mb-4" @click="play" v-if="$route.name != 'FriendList'">{{ button }}</button>
+		<button class="mybtn mb-4" @click="play" v-if="$route.name == 'FriendList' || $route.name == 'chat'"
+			data-bs-dismiss="modal" aria-label="Close">{{ button }}</button>
+		<button class="mybtn mb-4" @click="play" v-if="$route.name != 'FriendList' && $route.name != 'chat'">{{ button
+		}}</button>
 	</div>
 </template>
 
@@ -50,7 +51,7 @@ export default defineComponent({
 
 			],
 			themeIndex: 0,
-			button: this.$route.name == 'FriendList' ? 'invite' : 'play'
+			button: this.$route.name == 'FriendList' || this.$route.name == 'chat' ? 'invite' : 'play'
 		};
 	},
 
@@ -84,7 +85,7 @@ export default defineComponent({
 			}
 		},
 		async play() {
-			if (this.$route.name == 'FriendList') {
+			if (this.$route.name == 'FriendList' || this.$route.name == 'chat') {
 				const options = { theme: this.themes[this.themeIndex], winScore: this.winScores[this.winScoreIndex] };
 				this.$emit('invitation', options);
 			} else {

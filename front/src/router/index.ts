@@ -21,12 +21,6 @@ const routes = [
 		component: NotFound,
 	},
 	{
-		name: 'Root',
-		path: '/',
-		component: Home,
-		meta: { requiredAuth: true }
-	},
-	{
 		name: 'Home',
 		path: '/home',
 		alias: ['/'],

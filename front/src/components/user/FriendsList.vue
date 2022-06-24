@@ -4,7 +4,7 @@
       <table class="table table-borderless" id="users">
         <thead>
           <tr>
-            <th scope="col" v-for="column in columns" :key="column" class="text-center">
+            <th scope="col" v-for="column in columns" :key="column" class="text-center align-middle">
               {{ column }}
             </th>
           </tr>
@@ -12,10 +12,10 @@
         <tbody v-for="friend in friendList" :key="friend">
           <tr>
             <Friend v-bind:username="friend.username" />
-            <td class="text-center">{{ friend.firstname }}</td>
-            <td class="text-center">{{ friend.lastname }}</td>
-            <td class="text-center">{{ friend.status }}</td>
-            <td class="text-center">
+            <td class="text-center align-middle">{{ friend.firstname }}</td>
+            <td class="text-center align-middle">{{ friend.lastname }}</td>
+            <td class="text-center align-middle">{{ friend.status }}</td>
+            <td class="text-center align-middle">
               <div class="container">
                 <div class="row align-items-start">
                   <div class="col px-0">
@@ -27,7 +27,9 @@
                   <div class="col px-0">
                     <spectate-button v-bind:userToSpectate="friend.id" v-bind:socket="socket" />
                   </div>
-                  <invitation-button v-bind:userToInvite="friend.id" v-bind:socket="socket" />
+                  <div class="col px-0">
+                    <invitation-button v-bind:userToInvite="friend.id" v-bind:socket="socket" />
+                  </div>
                   <div class="col px-0">
                     <button v-on:click="blockUser(friend.id)">
                       <span class="material-icons px-0" style="color: red">block</span>
