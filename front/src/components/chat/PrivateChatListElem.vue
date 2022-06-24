@@ -3,9 +3,7 @@
     <div class="col">
       <Friend v-bind:username="username" />
     </div>
-    <div class="col">
-      <invitation-button v-bind:userToInvite="id" v-bind:socket="socket" />
-    </div>
+    <!-- <invitation-button v-bind:userToInvite="id" v-bind:socket="socket" /> -->
   </div>
 </template>
 
@@ -14,14 +12,14 @@ import { defineComponent } from "@vue/runtime-core";
 import http from "../../http-common";
 import store from "../../store";
 import Friend from "../user/Friend.vue";
-import InvitationButton from "../game/InvitationButton.vue";
+// import InvitationButton from "../game/InvitationButton.vue";
 
 export default defineComponent({
   props: ["username", "id", "isSelected"],
 
   components: {
     Friend,
-    InvitationButton,
+    // InvitationButton,
   },
 
   data() {
