@@ -6,12 +6,9 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { FortyTwoService } from './auth/fortytwo.service';
 import { FortyTwoStrategy } from './auth/strategy/fortytwo.strategy';
-import { UserService } from './user/service/user.service';
 import { UserModule } from './user/user.module';
-import { ChannelModule } from './channel/channel.module';
 import { MessageModule } from './message/message.module';
 import { PongModule } from './pong/pong.module';
-import { ChatModule } from './chat/chat.module';
 import { ChannelMemberModule } from './channelMember/channelMember.module';
 import { MessageUserModule } from './messageUser/messageUser.module';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -33,7 +30,6 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
     UserModule,
     AuthModule,
     MessageModule,
-    ChatModule,
     ChannelMemberModule,
     PongModule
   ],

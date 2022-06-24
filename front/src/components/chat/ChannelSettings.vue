@@ -381,13 +381,17 @@ export default defineComponent({
     addPasswordToPublicChannel() {
       this.socket.emit("addPasswordToPublicChannel", this.passwordI);
       this.passwordI.new = "";
-      this.type = "protected";
+      this.socket.on("updateChannelType", () => {
+        this.type = "protected";
+      });
     },
 
     // change channel type : protected->public
     removePasswordToProtectedChannel() {
       this.socket.emit("removePasswordToProtectedChannel", this.channelId);
-      this.type = "public";
+      this.socket.on("updateChannelType", () => {
+        this.type = "public";
+      });
     },
 
     kickMember(username: string) {

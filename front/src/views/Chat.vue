@@ -18,7 +18,7 @@
           class="container-fluid widebox"
           style="height: 95%; max-height: 52rem"
         >
-          <ChatTests
+          <ChatIndex
             @conv="getConv"
             @type="getType"
             @privacy="getPrivacy"
@@ -61,7 +61,7 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import CreateChannel from "../components/chat/CreateChannel.vue";
-import ChatTests from "../components/chat/ChatTests.vue";
+import ChatIndex from "../components/chat/ChatIndex.vue";
 import PrivateChatBox from "../components/chat/PrivateChatBox.vue";
 // import ChannelBox from "../components/chat/ChannelBox.vue";
 import store from "../store";
@@ -69,7 +69,7 @@ import store from "../store";
 export default defineComponent({
   components: {
     CreateChannel,
-    ChatTests,
+    ChatIndex,
     PrivateChatBox,
     // ChannelBox,
   },
