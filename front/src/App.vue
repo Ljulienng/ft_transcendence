@@ -40,6 +40,7 @@ export default defineComponent({
 
   methods: {
     setOffline() {
+      if (this.getUserProfile.id === 0) return;
       const userSocket = store.getters["auth/getUserSocket"].id;
 
       if (!userSocket) store.dispatch("auth/setUserSocket");

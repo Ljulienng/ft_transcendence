@@ -17,10 +17,6 @@ services:
     volumes:
       - "./back:/usr/src/app-back"
       - "/usr/src/app-back/node_modules"
-    # volumes:
-    #   - type: bind
-    #     source: ./back
-    #     target: /usr/src/app-back
     # networks:
     #   - db
     #   - app
@@ -37,10 +33,6 @@ services:
     volumes:
       - "./front:/usr/src/app-front"
       - "/usr/src/app-front/node_modules"
-    # volumes:
-    #   - type: bind
-    #     source: ./front
-    #     target: /usr/src/app-front
 
   postgres:
     image: postgres
