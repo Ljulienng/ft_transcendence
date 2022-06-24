@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { Match } from './models/match.entity';
 import { User } from 'src/user/models/user.entity';
 import { Spectator } from './interfaces/spectator.interface';
+import { SocketUserI } from 'src/user/user.gateway';
+import { UserService } from 'src/user/service/user.service';
 
 export const WIDTH = 100;
 export const HEIGHT = 66;
@@ -29,8 +31,10 @@ export class Game {
   public spectatorRoom: string;
 
   constructor(
-    private userRepository: Repository<User>,
     private matchRepository: Repository<Match>,
+    private userRepository: Repository<User>,
+    private userService: UserService,
+    private socketList: SocketUserI[],
     public event: Event,
     private ball: Ball,
     public playerLeft: Player,
@@ -53,11 +57,16 @@ export class Game {
     if (lost) { user.gameLost += 1; }
     if (points) { user.points += points; }
     this.userRepository.save(user);
+    this.socketList.forEach(async (socket) => {
+      if (this.userService.checkIfFriend(user.id, socket.user.id)) {
+        this.event.emitFriendPlaying(socket.socketId);
+      }
+    })
   }
 
   async saveMatch(winner: User, loser: User, inProgress: boolean) {
     let match: Match;
-    console.log('save match params', winner, loser, inProgress);
+    // console.log('save match params', winner, loser, inProgress);
     if (this.id) {
       match = await this.matchRepository.findOne({ id: this.id });
       match.playerOneScore = this.playerLeft.score;
