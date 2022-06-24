@@ -2,7 +2,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import Sidebar from "./components/Sidebar.vue";
 import UploadAvatar from "./components/user/UploadAvatar.vue"
-import ChatTests from "./components/chat/ChatTests.vue"
+import ChatIndex from "./components/chat/ChatIndex.vue"
 import ChannelBox from "./components/chat/ChannelBox.vue";
 import router from "./router";
 import store from "./store";
@@ -19,7 +19,7 @@ app.use(store);
 app.component("Sidebar", Sidebar);
 app.component("UploadAvatar", UploadAvatar);
 app.use(Notifications);
-app.component("ChatTests", ChatTests);
+app.component("ChatIndex", ChatIndex);
 app.component("ChannelBox", ChannelBox);
 app.use(VueUniversalModal, {
 	teleportTarget: '#my-modals',
