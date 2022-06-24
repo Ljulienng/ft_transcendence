@@ -21,7 +21,7 @@
         />
       </div>
 
-      <div class="flex-box" style="height: 80%; overflow-y: scroll; overflow-x: hidden; display:flex; flex-direction:column-reverse;">
+      <div class="container-fluid" style="height: 80%; overflow-y: scroll; overflow-x: hidden;">
         <p v-for="msg in messageList.slice()" :key="msg">
           <!-- {{ msg.sender.username }}: {{ msg.content }} -->
           <Message
