@@ -40,6 +40,7 @@
                 type="text"
                 username="username"
                 class="form-control"
+                maxlength="20"
               />
               <label for="username">Username</label>
               </div>

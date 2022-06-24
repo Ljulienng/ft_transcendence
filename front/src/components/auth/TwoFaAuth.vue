@@ -30,6 +30,7 @@
                 v-model="twoFA.twoFactorAuthenticationCode"
                 type="text"
                 username="TwoFA"
+                maxlength="100"
               />
             </p>
           </div>

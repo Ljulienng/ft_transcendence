@@ -49,6 +49,7 @@
                       v-model="friendToAdd.friendUsername"
                       type="text"
                       name="id"
+                      maxlength="20"
                       placeholder="Username..."
                       @input="test"
                       required

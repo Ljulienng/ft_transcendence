@@ -69,6 +69,7 @@
                                         type="password"
                                         class="form-control"
                                         minlength="8"
+                                        maxlength="20"
                                         v-model="password"
                                         placeholder="Password..."
                                         required

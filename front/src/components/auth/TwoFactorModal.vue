@@ -41,6 +41,7 @@
                     v-model="twoFA.twoFactorAuthenticationCode"
                     type="text"
                     twoFactorAuthenticationCode="twoFactorAuthenticationCode"
+                    maxlength="100"
                   />
                   <label
                     for="twoFAcodeActivate"

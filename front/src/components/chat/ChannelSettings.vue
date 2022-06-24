@@ -26,7 +26,7 @@
                         type="text"
                         name="name"
                         placeholder="new channel name"
-                        maxlength="50"
+                        maxlength="20"
                       />
                   </div>
                   <div class="modal-footer">
@@ -68,7 +68,7 @@
                       <input
                         id="name"
                         class="form-control"
-                        maxlength="100"
+                        maxlength="20"
                         v-model="passwordI.old"
                         type="password"
                         name="name"
@@ -77,7 +77,7 @@
                       <input
                         id="name"
                         class="form-control"
-                        maxlength="100"
+                        maxlength="20"
                         v-model="passwordI.new"
                         type="password"
                         name="name"
@@ -127,7 +127,7 @@
                       <input
                         id="name"
                         class="form-control"
-                        maxlength="100"
+                        maxlength="20"
                         v-model="passwordI.new"
                         type="password"
                         name="name"
@@ -164,7 +164,7 @@
                       <input
                         id="name"
                         class="form-control"
-                        maxlength="50"
+                        maxlength="20"
                         v-model="invitation.guest"
                         type="text"
                         name="name"

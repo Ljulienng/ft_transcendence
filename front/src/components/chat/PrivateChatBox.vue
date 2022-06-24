@@ -16,6 +16,7 @@
       <div class="col">
         <input
           type="text"
+          minlength="1"
           maxlength="100"
           v-model="message.content"
           class="form-control"

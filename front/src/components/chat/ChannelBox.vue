@@ -21,7 +21,7 @@
         />
       </div>
 
-      <div class="container-fluid" style="height: 80%; overflow-y: scroll; overflow-x: hidden;">
+      <div class="flex-box" style="height: 80%; overflow-y: scroll; overflow-x: hidden; display:flex; flex-direction:column-reverse;">
         <p v-for="msg in messageList.slice()" :key="msg">
           <!-- {{ msg.sender.username }}: {{ msg.content }} -->
           <Message
@@ -178,6 +178,8 @@ export default defineComponent({
   created() {
     this.getMessages();
     this.socket.emit("getChannelMemberInfo", this.channel);
+    // var container = this.$el.querySelector("#container");
+    // container.scrollTop = container.scrollHeight;
   },
   // setup() {
   // },

@@ -66,6 +66,7 @@
                 type="text"
                 :placeholder="currentUser.userName"
                 username="username"
+                maxlength="20"
               />
               <br />
               <small class="text-muted"
@@ -116,6 +117,7 @@
                 type="text"
                 firstName="firstName"
                 :placeholder="currentUser.firstName"
+                maxlength="20"
               />
               <br />
               <label for="lastName">Last name</label>
@@ -126,6 +128,7 @@
                 type="text"
                 :placeholder="currentUser.lastName"
                 lastName="lastName"
+                maxlength="20"
               />
               <br />
               <label for="email">Email</label>
@@ -136,6 +139,7 @@
                 type="text"
                 :placeholder="currentUser.email"
                 email="email"
+                maxlength="20"
               />
               <br />
               <small class="text-muted">Same here</small>

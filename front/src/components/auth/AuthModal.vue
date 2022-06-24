@@ -15,6 +15,7 @@
             v-model="newUsername"
             type="text"
             username="TwoFA"
+            maxlength="20"
           />
         </p>
         <p>
