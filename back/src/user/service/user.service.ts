@@ -1,6 +1,6 @@
 import { ConsoleLogger, HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { from, Observable, of, switchMap, map, tap} from 'rxjs';
+import { from, Observable, of, switchMap, map, tap } from 'rxjs';
 import { getConnection, Repository } from 'typeorm';
 import { UserDto } from '../models/user.dto';
 import { Student } from "src/user/dto/student.dto"
@@ -34,7 +34,7 @@ export class UserService {
 		private pongService: PongService,
 		@InjectRepository(Match)
 		protected matchRepository: Repository<Match>,
-	) {}
+	) { }
 
 	async onModuleInit(): Promise<void> {
 		let user: Student = {
@@ -42,9 +42,9 @@ export class UserService {
 			email: "norminet@cat.42.fr",
 		}
 
-		const userTmp = await this.userRepository.findOne({email: user.email});
+		const userTmp = await this.userRepository.findOne({ email: user.email });
 		if (userTmp)
-			return ;
+			return;
 		const tmp: User = this.userRepository.create(user);
 
 		console.log('Norminet Added');
@@ -56,11 +56,11 @@ export class UserService {
 	}
 
 	add(user: User): any {
-		user.firstname = uniqueNamesGenerator({dictionaries: [names]})
-		user.lastname = uniqueNamesGenerator({dictionaries: [names]})
+		user.firstname = uniqueNamesGenerator({ dictionaries: [names] })
+		user.lastname = uniqueNamesGenerator({ dictionaries: [names] })
 		user.status = "Offline"
 
- 		return from(this.userRepository.save(user));
+		return from(this.userRepository.save(user));
 	}
 
 	async addStudent(user: Student): Promise<User> {
@@ -86,15 +86,15 @@ export class UserService {
 		delete user.status;
 
 		return from(this.userRepository.update(id, user)).pipe(
-			switchMap(() => this.userRepository.findOne({id: id}))
+			switchMap(() => this.userRepository.findOne({ id: id }))
 		)
 	}
 
 	async setUsername(currentUser: User, newUsername: string) {
 		// const currentUser = await this.userRepository.findOne({id: userId});
-		const tmp = await this.userRepository.findOne({username: newUsername})
+		const tmp = await this.userRepository.findOne({ username: newUsername })
 		const regex = /^[a-zA-Z0-9_]+$/
-		
+
 		// console.log("currentUser.username = ",currentUser.username , 'newUsername', newUsername )
 		if (currentUser.username === newUsername)
 			throw new HttpException('You already took this username', HttpStatus.FORBIDDEN);
@@ -112,12 +112,12 @@ export class UserService {
 
 	async findByCookie(cookie: any): Promise<User> {
 		// Decode cookie to a payload then search within rep using username from payload
-		const user = await this.userRepository.findOne({username: this.jwtService.decode(cookie)["username"]});
+		const user = await this.userRepository.findOne({ username: this.jwtService.decode(cookie)["username"] });
 		return user;
 	}
 
 	findByUserId(userId: number): Observable<User> {
-		return from(this.userRepository.findOne({id: userId})).pipe(
+		return from(this.userRepository.findOne({ id: userId })).pipe(
 			map((user: User) => {
 				if (!user) {
 					throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -129,7 +129,7 @@ export class UserService {
 	}
 
 	async findByUsername(name: string): Promise<User> {
-		return await this.userRepository.findOne({username: name});
+		return await this.userRepository.findOne({ username: name });
 	}
 
 	async findOne(object: any): Promise<User> {
@@ -138,17 +138,17 @@ export class UserService {
 
 	async validateStudent(user: Student): Promise<User> {
 		let userTmp: User = undefined;
-		
+
 		const { username } = user;
 
-		userTmp = await this.userRepository.findOne({username: username});
+		userTmp = await this.userRepository.findOne({ username: username });
 		if (userTmp) {
 			if (userTmp.status === 'Offline')
 				userTmp.status = 'Online';
 			return userTmp;
 		}
 		const { email } = user;
-		userTmp = await this.userRepository.findOne({email: email});
+		userTmp = await this.userRepository.findOne({ email: email });
 		if (userTmp) {
 			if (userTmp.status === 'Offline')
 				userTmp.status = 'Online';
@@ -170,13 +170,13 @@ export class UserService {
 		if (infoToUpdate.email !== "")
 			currentUser.email = infoToUpdate.email;
 		await this.userRepository.save(currentUser);
-	
+
 	}
 
 	// ================ FRIENDS ===================
 
 	async addFriend(user: User, friendToAdd: any) {
-		const friend = await this.userRepository.findOne({username: friendToAdd.friendUsername});
+		const friend = await this.userRepository.findOne({ username: friendToAdd.friendUsername });
 
 		if (user.friends === null)
 			user.friends = []
@@ -191,15 +191,15 @@ export class UserService {
 		if (tmp)
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user is already in your friendlist.')
 		else if (friend.id === user.id)
-		throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'You are trying to add yourself, make some friends.')
-		else { 
+			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'You are trying to add yourself, make some friends.')
+		else {
 			user.friends.push(String(friend.id))
 		}
 		await this.userRepository.save(user);
 	}
 
 	async checkIfFriend(userId: number, otherUserId: number) {
-		const user = await this.userRepository.findOne({id: userId});
+		const user = await this.userRepository.findOne({ id: userId });
 		if (user.friends === null)
 			user.friends = []
 		const tmp = user.friends.find((friend) => {
@@ -214,7 +214,7 @@ export class UserService {
 	}
 
 	async deleteFriend(user: User, friendToDelete: string) {
-		const friend = await this.userRepository.findOne({username: friendToDelete});
+		const friend = await this.userRepository.findOne({ username: friendToDelete });
 
 
 		if (!friend) {
@@ -223,7 +223,7 @@ export class UserService {
 		const tmp = user.friends?.find(el => el === String(friend.id))
 		if (tmp) {
 			const index = user.friends.indexOf(tmp, 0);
-			user.friends.splice(index, 1); 
+			user.friends.splice(index, 1);
 		}
 		else
 			throw new UnauthorizedException(HttpStatus.FORBIDDEN, 'The user isn\'t in your friendlist.')
@@ -234,8 +234,8 @@ export class UserService {
 		let friendInfo: User = undefined;
 		if (isNaN(+friendId))
 			return friendInfo;
-		friendInfo = await this.userRepository.findOne({id: +friendId});
-		
+		friendInfo = await this.userRepository.findOne({ id: +friendId });
+
 		if (friendInfo !== undefined) {
 
 			let friend: Friend = {
@@ -265,7 +265,7 @@ export class UserService {
 		let friend;
 
 		for (let i = 0; user.friends[i]; i++) {
-			if ((friend = await this.retrieveFriendInfo(user.friends[i])) !== undefined){
+			if ((friend = await this.retrieveFriendInfo(user.friends[i])) !== undefined) {
 				friendList.push(friend);
 			}
 		}
@@ -283,11 +283,11 @@ export class UserService {
 		const channelMembers = await this.channelMemberService.findChannelsByUser(user);
 		const channelsId: number[] = [];
 		const channels: Channel[] = [];
-		
+
 		channelMembers.forEach(cm => {
 			channelsId.push(cm.channelId);
 		});
-		for (const id in channelsId)  {
+		for (const id in channelsId) {
 			channels.push(await this.channelService.findChannelById(channelsId[id]));
 		}
 		return channels;
@@ -300,7 +300,7 @@ export class UserService {
 		// if (newStatus !== 'Online'  'Offline'  'In game'  'Away'  'Occupied')
 		// 	throw new HttpException("Incorrect user status", HttpStatus.FORBIDDEN)
 		if (newStatus === 'Online' || 'Offline')
-			console.log("user", user.username , "is", newStatus)
+			console.log("user", user.username, "is", newStatus)
 		user.status = newStatus;
 		this.userRepository.save(user)
 	}
@@ -326,18 +326,18 @@ export class UserService {
 
 
 	async saveMessage(userId: number, createMessageUserDto: CreateMessageUserDto) {
-        const sender = await this.userRepository.findOne({id: userId});
-        const receiver = await this.userRepository.findOne({id: createMessageUserDto.receiverId});
+		const sender = await this.userRepository.findOne({ id: userId });
+		const receiver = await this.userRepository.findOne({ id: createMessageUserDto.receiverId });
 
-        if (!receiver)
-            throw new HttpException('this user doesn\'t exist', HttpStatus.FORBIDDEN);
-        return await this.messageUserService.saveMessage(sender, receiver, createMessageUserDto);
+		if (!receiver)
+			throw new HttpException('this user doesn\'t exist', HttpStatus.FORBIDDEN);
+		return await this.messageUserService.saveMessage(sender, receiver, createMessageUserDto);
 	}
 
 	async getMessage(senderId: number, receiverId: number) {
-		const sender = await this.userRepository.findOne({id: senderId});
-		const receiver = await this.userRepository.findOne({id: receiverId});
-		const messages =  await this.messageUserService.getMessages(sender, receiver);
+		const sender = await this.userRepository.findOne({ id: senderId });
+		const receiver = await this.userRepository.findOne({ id: receiverId });
+		const messages = await this.messageUserService.getMessages(sender, receiver);
 
 		return messages;
 	}
@@ -351,7 +351,7 @@ export class UserService {
 		let blockedUser;
 
 		for (let i = 0; user.blocked[i]; i++) {
-			if ((blockedUser = await this.retrieveFriendInfo(user.blocked[i])) !== undefined){
+			if ((blockedUser = await this.retrieveFriendInfo(user.blocked[i])) !== undefined) {
 				blockedList.push(blockedUser);
 			}
 		}
@@ -363,7 +363,7 @@ export class UserService {
 			user.blocked = [];
 
 		if (await this.checkIfFriend(user.id, userId)) {
-			await this.deleteFriend(user, (await this.userRepository.findOne({id: userId})).username)
+			await this.deleteFriend(user, (await this.userRepository.findOne({ id: userId })).username)
 		}
 
 		if (await this.checkIfBlocked(user, userId))
@@ -400,7 +400,7 @@ export class UserService {
 		if (user.blocked === null)
 			user.blocked = [];
 
-		const otherUser = await this.userRepository.findOne({id: otherUserId});
+		const otherUser = await this.userRepository.findOne({ id: otherUserId });
 		const ifOtherIsBlocked = user.blocked.find(el => el === String(otherUserId));
 		let ifUserHasBeenBlocked: string;
 		if (otherUser.blocked !== null)
@@ -417,7 +417,7 @@ export class UserService {
 	// ================ GAME ===================
 
 	async getMatchHistory(user: User) {
-		const matchList =  await this.pongService.getMatchHistory(user);
+		// const matchList =  await this.pongService.getMatchHistory(user);
 		return await this.pongService.getMatchHistory(user)
 	}
 }

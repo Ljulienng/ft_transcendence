@@ -66,7 +66,6 @@ export class Game {
 
   async saveMatch(winner: User, loser: User, inProgress: boolean) {
     let match: Match;
-    // console.log('save match params', winner, loser, inProgress);
     if (this.id) {
       match = await this.matchRepository.findOne({ id: this.id });
       match.playerOneScore = this.playerLeft.score;
