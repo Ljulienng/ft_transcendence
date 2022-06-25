@@ -13,6 +13,9 @@ RUN npm install
 
 COPY front/ .
 
-EXPOSE 8080 3001
+RUN npm run build
 
-CMD ["npm", "run", "serve"]
+ENV PORT=8080
+EXPOSE 8080
+
+CMD ["serve", "-s", "./dist/"]
