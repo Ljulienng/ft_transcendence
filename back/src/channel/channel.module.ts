@@ -8,6 +8,7 @@ import { UserModule } from 'src/user/user.module';
 import { User } from 'src/user/models/user.entity';
 import { MessageChannel } from 'src/message/models/messageChannel.entity';
 import { ChannelMemberModule } from 'src/channelMember/channelMember.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ChannelMemberModule } from 'src/channelMember/channelMember.module';
     forwardRef(() => MessageModule), 
     forwardRef(() => UserModule),
     forwardRef(() => ChannelMemberModule),
+    forwardRef(() => AuthModule),
   ],
   controllers: [ChannelController], 
   providers: [ChannelService],

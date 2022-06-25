@@ -3,6 +3,7 @@ import { ChannelService } from '../service/channel.service';
 import { CreateChannelDto } from '../models/channel.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdateMemberChannelDto } from 'src/channelMember/models/channelMember.dto';
+import { TwoFAAuth } from 'src/auth/guards/twoFA.guard';
 
 @Controller('channel')
 export class ChannelController {
@@ -10,16 +11,20 @@ export class ChannelController {
         private readonly channelService: ChannelService,
     ) {}
 
+
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
     @Get()
     async findAll() {
         return await this.channelService.findAll();
     }
 
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
     @Get(':channelId')
     async findChannelById(@Param('channelId') channelId: number) {
         return await this.channelService.findChannelById(channelId);
     }
 
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
     @Get(':name')
     async findChannelByName(@Param('name') name: string) {
         return await this.channelService.findChannelByName(name);
@@ -30,17 +35,19 @@ export class ChannelController {
     //     const channel = await this.channelService.findChannelById(channelId);
     //     return this.channelService.findChannelMessagesByChannelId(channel.id);
     // } 
-
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
     @Get(':channelId/members')
     async findChannelMembersByChannelId(@Param('channelId') channelId: number) {
         return this.channelService.findMembers(channelId);
     }
 
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
     @Get(':channelId/owner')
     async findChannelOwner(@Param('channelId') channelId: number) {
         return this.channelService.findOwner(channelId);
     }
 
+	@UseGuards(JwtAuthGuard, TwoFAAuth)
     @Get(':channelId/admins')
     async findChannelAdmins(@Param('channelId') channelId: number) {
         return this.channelService.findAdmins(channelId);
