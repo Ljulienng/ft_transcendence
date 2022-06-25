@@ -14,19 +14,12 @@
           </tr>
         </thead>
         <tbody v-for="match in matchList" :key="match">
-          <tr>
+          <tr v-if="match.winner">
             <!-- <th scope="row">{{ currentUser.userName }}</th> -->
-            <td scope="row" v-if="match.playerOne.username === username">
-              {{ match.playerTwo.username }}
-            </td>
+            <td scope="row" v-if="match.playerOne.username === username"> {{ match.playerTwo.username }} </td>
             <td v-else>{{ match.playerOne.username }}</td>
-            <td>{{ match.playerOneScore }}:{{ match.playerTwoScore }}</td>
-            <td
-              v-if="match.winner && username === match.winner.username"
-              style="color: green"
-            >
-              Victory
-            </td>
+            <td>{{ match.playerOneScore }} : {{ match.playerTwoScore }}</td>
+            <td v-if="username === match.winner.username" style="color: green">Victory</td>
             <td v-else style="color: red">Defeat</td>
             <td>0</td>
           </tr>
@@ -46,7 +39,7 @@ export default defineComponent({
     return {
       matchList: [],
       // currentUser: store.getters["auth/getUserProfile"],
-      title: "match history",
+      title: "Match history",
       columns: ["Opponent", "Score", "result", "points", ""],
     };
   },
@@ -56,18 +49,18 @@ export default defineComponent({
       http
         .get("/users/matchhistory/" + this.username)
         .then((response) => {
-          console.log(response.data);
-          this.matchList = response.data.reverse();
+          this.matchList = response.data;
         })
         .catch((error) => {
           console.log("match history error = ", error);
         });
     },
   },
-  created() {
+  beforeMount() {
     this.getMatchList();
   },
 });
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+</style>

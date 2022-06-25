@@ -48,4 +48,8 @@ export class Event {
   emitYouLose(id: string) {
     this.server.to(id).emit('youLose');
   }
+
+  emitFriendPlaying(id: string) {
+    this.server.to(id).emit("friendPlaying");
+  }
 }

@@ -419,7 +419,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const playerLeft = new Player(event, client, userLeft, data[1]);
         const userRight = await this.userService.findOne({ id: data[0] });
         const playerRight = new Player(event, null, userRight, data[1]);
-        this.pongService.duel(event, playerLeft, playerRight);
+        this.pongService.duel(event, playerLeft, playerRight, this.socketList);
         this.server.to(client.id).emit("moveToMatch");
         this.server.emit('invitationAccepted/' + data[0]);
     }
@@ -465,7 +465,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
         const event = new Event(this.server);
         const player = new Player(event, client, user, options);
-        this.pongService.matchmake(event, player);
+        this.pongService.matchmake(event, player, this.socketList);
     }
 
     @UseGuards(SocketGuard)

@@ -1,13 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Match } from './models/match.entity';
 import { User } from 'src/user/models/user.entity';
-import { Game, GameState } from './game';
+import { Game } from './game';
 import { Event } from './event';
 import { Player, PlayerState } from './player';
 import { Ball } from './ball';
-import { Options } from './interfaces/options.interface';
+import { UserService } from 'src/user/service/user.service';
+import { SocketUserI } from 'src/user/user.gateway';
 
 @Injectable()
 export class PongService {
@@ -16,18 +17,20 @@ export class PongService {
   public waitingPlayers: Player[];
 
   constructor(
-    @InjectRepository(User)
-    protected userRepository: Repository<User>,
     @InjectRepository(Match)
     protected matchRepository: Repository<Match>,
+    @InjectRepository(User)
+    protected userRepository: Repository<User>,
+    @Inject(forwardRef(() => UserService))
+    protected userService: UserService
   ) {
     this.games = [];
     this.waitingPlayers = [];
   }
 
-  duel(event: Event, playerLeft: Player, playerRight: Player) {
+  duel(event: Event, playerLeft: Player, playerRight: Player, socketList: SocketUserI[]) {
     const ball = new Ball(event);
-    const game = new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, playerLeft.options.winScore);
+    const game = new Game(this.matchRepository, this.userRepository, this.userService, socketList, event, ball, playerLeft, playerRight, playerLeft.options.winScore);
     game.playerLeft.state = PlayerState.DISCONNECTED;
     game.playerLeft.disconnectedAt = null;
     game.playerRight.state = PlayerState.DISCONNECTED;
@@ -35,7 +38,7 @@ export class PongService {
     this.games.push(game);
   }
 
-  matchmake(event: Event, playerLeft: Player) {
+  matchmake(event: Event, playerLeft: Player, socketList: SocketUserI[]) {
     if (this.waitingPlayers.length == 0) {
       this.waitingPlayers.push(playerLeft);
       return;
@@ -49,7 +52,7 @@ export class PongService {
     }
     this.waitingPlayers.splice(this.waitingPlayers.indexOf(playerRight), 1);
     const ball = new Ball(event);
-    const game = new Game(this.userRepository, this.matchRepository, event, ball, playerLeft, playerRight, playerLeft.options.winScore);
+    const game = new Game(this.matchRepository, this.userRepository, this.userService, socketList, event, ball, playerLeft, playerRight, playerLeft.options.winScore);
     this.games.push(game);
   }
 
@@ -59,11 +62,13 @@ export class PongService {
   }
 
   async getMatchHistory(user: User): Promise<Match[]> {
-    return await this.matchRepository.find({
+    const ret = await this.matchRepository.find({
       where: [
-        { playerOne: user.id },
-        { playerTwo: user.id }
-      ] // TODO: sort
+        { playerOne: user.id, inProgress: false },
+        { playerTwo: user.id, inProgress: false },
+      ],
+      order: { id: "DESC" }
     });
+    return ret;
   }
 }

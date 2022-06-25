@@ -98,6 +98,10 @@ export default defineComponent({
       this.getFriendList();
     });
 
+    this.socket.on("friendPlaying", () => {
+      this.getFriendList();
+    });
+
     this.socket.on("updateBlocked/" + this.currentUser.id, () => {
       this.getFriendList();
     });
