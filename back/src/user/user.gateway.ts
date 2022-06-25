@@ -64,7 +64,8 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
         // Link client socket to his user entity
         newSocket.socketId = client.id;
-        newSocket.user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
+        if (client.handshake.headers.cookie)
+            newSocket.user = await this.userService.findByCookie(client.handshake.headers.cookie.split('=')[1]);
         if (newSocket.user)
             console.log('client connected to the Server, user = ', newSocket.user.username);
         else
@@ -90,7 +91,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
         if (!user)
             return;
-        console.log('user:', user.username, 'is connected');
+        // console.log('user:', user.username, 'is connected');
         this.userService.setStatus(user, 'Online');
         this.server.to(client.id).emit("Connected");
         this.socketList.forEach(async (socket) => {
@@ -105,7 +106,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
         if (!user)
             return;
-        console.log('user:', user.username, 'is disconnected');
+        // console.log('user:', user.username, 'is disconnected');
         this.userService.setStatus(user, "Offline");
         this.socketList.forEach((socket) => {
             if (this.userService.checkIfFriend(user.id, socket.user.id))
@@ -330,7 +331,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @UseGuards(SocketGuard)
     @SubscribeMessage('sendMessageToUser')
     async sendMessageUser(client: Socket, createMessageUserDto: CreateMessageUserDto) {
-        console.log('Message sent to the back in User ', createMessageUserDto);
+        // console.log('Message sent to the back in User ', createMessageUserDto);
         const senderSocket = this.socketList.find(socket => socket.user.id === createMessageUserDto.senderId)
         // VERIFY IF THE USER IS BLOCKED 
         if (await this.userService.checkIfBlocked(senderSocket.user, createMessageUserDto.receiverId)) {
@@ -382,7 +383,7 @@ export class UserGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 this.server.emit('/friendAdded/' + userId.friendUsername, user.username)
             })
             .catch((error) => {
-                console.log('error friend - ', error.response)
+                // console.log('error friend - ', error.response)
                 this.server.to(client.id).emit('friendAddedError', error.response.error)
 
             })

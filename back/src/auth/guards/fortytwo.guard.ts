@@ -8,7 +8,7 @@ export class FortyTwoAuthGuard extends AuthGuard('42') {
 		super();
 	}
 	handleRequest(err: any, user: any, info: any, context: any, status: any) {
-		console.log('errorGuard', err);
+		// console.log('errorGuard', err);
 		return user;
 	  }
 } 

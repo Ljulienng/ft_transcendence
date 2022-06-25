@@ -19,7 +19,7 @@
               </h5>
               <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
             </div>
-            <div class="modal-body">
+            <div class="modal-body text-dark">
               Your default informations are the one from 42. You can still
               change them right here or whenever you want from your profile !
             </div>
@@ -58,7 +58,7 @@
               </h5>
             </div>
             <div class="modal-body">
-              <label for="username">Username</label>
+              <label for="username" class="text-dark">Username</label>
               <br />
               <input
                 id="username"
@@ -109,7 +109,7 @@
               </h5>
             </div>
             <div class="modal-body">
-              <label for="firstName">First name</label>
+              <label for="firstName" class="text-dark">First name</label>
               <br />
               <input
                 id="firstName"
@@ -120,7 +120,7 @@
                 maxlength="20"
               />
               <br />
-              <label for="lastName">Last name</label>
+              <label for="lastName" class="text-dark">Last name</label>
               <br />
               <input
                 id="lastName"
@@ -131,7 +131,7 @@
                 maxlength="20"
               />
               <br />
-              <label for="email">Email</label>
+              <label for="email" class="text-dark">Email</label>
               <br />
               <input
                 id="email"

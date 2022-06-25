@@ -47,7 +47,7 @@ export class UserService {
 			return;
 		const tmp: User = this.userRepository.create(user);
 
-		console.log('Norminet Added');
+		// console.log('Norminet Added');
 		tmp.username = user.username;
 		tmp.email = user.email;
 
@@ -66,7 +66,7 @@ export class UserService {
 	async addStudent(user: Student): Promise<User> {
 		const tmp: User = this.userRepository.create(user);
 
-		console.log('Student Added');
+		// console.log('Student Added');
 		tmp.username = user.username;
 		tmp.email = user.email;
 		tmp.status = 'Offline';
@@ -396,7 +396,7 @@ export class UserService {
 	// }
 
 	async checkIfBlocked(user: User, otherUserId: number) {
-		console.log(user);
+		// console.log(user);
 		if (user.blocked === null)
 			user.blocked = [];
 

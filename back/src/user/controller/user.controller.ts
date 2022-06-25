@@ -81,7 +81,7 @@ export class UserController {
 	async firstTimeAuth(@Res({passthrough: true}) res, @Req() req, @Body() userInfo) {
 		try {
 			const user = await this.userService.findByUsername(req.user.username);
-			console.log("firstime info - ", userInfo)
+			// console.log("firstime info - ", userInfo)
 
 			await this.userService.firstUpdate(user, userInfo)
 			const payload = { username: (await this.userService.findOne({id: user.id})).username, auth: false };

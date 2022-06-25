@@ -15,6 +15,10 @@ import GameOptionI from '../../types/interfaces/gameoption.interface'
 import http from "../../http-common";
 /* eslint-disable */
 
+const WIDTH = 100;
+const HEIGHT = 66;
+
+
 const State = {
   INIT: 0,
   PAUSE: 1,
@@ -41,8 +45,8 @@ export default defineComponent({
       options: {} as GameOptionI,
       state: State.INIT,
       unsupportedMsg: 'Sorry, your browser does not support canvas.',
-      width: 640,
-      height: 480,
+      width: 1000,
+      height: 660,
       winner: '',
       playerLeftName: '',
       playerRightName: ''
@@ -53,23 +57,23 @@ export default defineComponent({
       this.pong.canvas = document.getElementById('canvas') as HTMLCanvasElement;
       this.pong.context = this.pong.canvas.getContext('2d') as CanvasRenderingContext2D;
       this.pong.playerSize = {
-        x: this.pong.canvas.width / 128,
-        y: this.pong.canvas.height / 8
+        x: this.width / 1000,
+        y: this.height / 66,
       };
       this.pong.playerRight = {
-        y: this.pong.canvas.height / 2 - this.pong.playerSize.y / 2,
-        score: 0
+        y: this.height / 2 - this.pong.playerSize.y / 2,
+        score: 0,
       };
       this.pong.playerLeft = {
-        y: this.pong.canvas.height / 2 - this.pong.playerSize.y / 2,
-        score: 0
+        y: this.height / 2 - this.pong.playerSize.y / 2,
+        score: 0,
       };
       this.pong.ball = {
         pos: {
-          x: this.pong.canvas.width / 2,
-          y: this.pong.canvas.width / 2
+          x: this.width / 2,
+          y: this.width / 2,
         },
-        radius: 5
+        radius: 5,
       };
       this.state = State.INIT;
       this.options = {
@@ -82,16 +86,16 @@ export default defineComponent({
     overPage() {
       this.state = State.OVER;
       this.pong.context.fillStyle = this.options.theme.bgColor;
-      this.pong.context.fillRect(0, 0, this.pong.canvas.width, this.pong.canvas.height);
+      this.pong.context.fillRect(0, 0, this.width, this.height);
       this.pong.context.font = '64px Orbitron';
       this.pong.context.textAlign = 'center';
       this.pong.context.textBaseline = "middle";
       if (this.winner && this.winner != '') {
         this.pong.context.fillStyle = 'green';
-        this.pong.context.fillText(this.winner.toLocaleUpperCase() + ' WIN', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
+        this.pong.context.fillText(this.winner.toLocaleUpperCase() + ' WIN', this.width / 2, this.height / 2, this.width);
       } else {
         this.pong.context.fillStyle = 'yellow';
-        this.pong.context.fillText('Game aborted :(', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
+        this.pong.context.fillText('Game aborted :(', this.width / 2, this.height / 2, this.width);
       }
     },
     pausePage() {
@@ -100,12 +104,12 @@ export default defineComponent({
       }
       this.state = State.PAUSE;
       this.pong.context.fillStyle = this.options.theme.bgColor;
-      this.pong.context.fillRect(0, 0, this.pong.canvas.width, this.pong.canvas.height);
+      this.pong.context.fillRect(0, 0, this.width, this.height);
       this.pong.context.fillStyle = this.options.theme.fgColor;
       this.pong.context.textAlign = 'center';
       this.pong.context.font = '40px Orbitron';
       this.pong.context.textBaseline = "middle";
-      this.pong.context.fillText('Waiting for players...', this.pong.canvas.width / 2, this.pong.canvas.height / 2, this.pong.canvas.width);
+      this.pong.context.fillText('Waiting for players...', this.width / 2, this.height / 2, this.width);
     },
     draw(): void {
       switch (this.state) {
@@ -117,13 +121,13 @@ export default defineComponent({
 
       // Draw fields
       this.pong.context.fillStyle = this.options.theme.bgColor;
-      this.pong.context.fillRect(0, 0, this.pong.canvas.width, this.pong.canvas.height);
+      this.pong.context.fillRect(0, 0, this.width, this.height);
 
       // Draw middle lines
       this.pong.context.strokeStyle = this.options.theme.fgColor;
       this.pong.context.beginPath();
-      this.pong.context.moveTo(this.pong.canvas.width / 2, 0);
-      this.pong.context.lineTo(this.pong.canvas.width / 2, this.pong.canvas.height);
+      this.pong.context.moveTo(this.width / 2, 0);
+      this.pong.context.lineTo(this.width / 2, this.height);
       this.pong.context.stroke();
 
       // Draw scores
@@ -131,17 +135,24 @@ export default defineComponent({
       this.pong.context.font = '32px Orbitron';
       this.pong.context.textAlign = 'center';
       this.pong.context.textBaseline = "middle";
-      this.pong.context.fillText(this.pong.playerLeft.score.toString(), this.pong.canvas.width / 4, 32, this.pong.canvas.width);
-      this.pong.context.fillText(this.pong.playerRight.score.toString(), (this.pong.canvas.width / 4) * 3, 32, this.pong.canvas.width);
+      this.pong.context.fillText(this.pong.playerLeft.score.toString(), this.width / 4, 32, this.width);
+      this.pong.context.fillText(this.pong.playerRight.score.toString(), (this.width / 4) * 3, 32, this.width);
 
+      // Draw pictures
+      if (this.imageUser) {
+        this.pong.context.drawImage(this.pong.isLeftSide ? this.imageUser : this.imageOpponent, this.width / 4 - 25, this.height / 2 + 55, 50, 50);
+      }
+      if (this.imageOpponent) {
+        this.pong.context.drawImage(this.pong.isLeftSide ? this.imageOpponent : this.imageUser, this.width / 4 * 3 - 25, this.height / 2 + 55, 50, 50);
+      }
       // Draw usernames
       this.pong.context.fillStyle = this.options.theme.fgColor;
       this.pong.context.font = '32px Orbitron';
       this.pong.context.textAlign = 'center';
       this.pong.context.textBaseline = "middle";
       this.pong.context.globalAlpha = 0.5;
-      this.pong.context.fillText(this.playerLeftName, this.pong.canvas.width / 4, this.pong.canvas.height / 2, this.pong.canvas.width);
-      this.pong.context.fillText(this.playerRightName, (this.pong.canvas.width / 4) * 3, this.pong.canvas.height / 2, this.pong.canvas.width);
+      this.pong.context.fillText(this.playerLeftName, this.width / 4, this.height / 2, this.width);
+      this.pong.context.fillText(this.playerRightName, (this.width / 4) * 3, this.height / 2, this.width);
       this.pong.context.globalAlpha = 1;
 
       // Draw playerLeft
@@ -150,7 +161,7 @@ export default defineComponent({
 
       // Draw playerRight
       this.pong.context.fillStyle = this.options.theme.fgColor;
-      this.pong.context.fillRect(this.pong.canvas.width - this.pong.playerSize.x, this.pong.playerRight.y, this.pong.playerSize.x, this.pong.playerSize.y);
+      this.pong.context.fillRect(this.width - this.pong.playerSize.x, this.pong.playerRight.y, this.pong.playerSize.x, this.pong.playerSize.y);
 
       // Draw ball
       this.pong.context.beginPath();
@@ -171,15 +182,16 @@ export default defineComponent({
         }, 3000);
       });
       this.socket.on('playerMove', async (isLeftSide: boolean, y: number) => {
+        y = (y / HEIGHT) * this.height;
         if (isLeftSide) {
-          this.pong.playerLeft.y = y / 66 * this.pong.canvas.height;
+          this.pong.playerLeft.y = y;
         } else {
-          this.pong.playerRight.y = y / 66 * this.pong.canvas.height;
+          this.pong.playerRight.y = y;
         }
       });
       this.socket.on('ballMove', (pos: PointI) => {
-        this.pong.ball.pos.x = pos.x / 100 * this.pong.canvas.width;
-        this.pong.ball.pos.y = pos.y / 66 * this.pong.canvas.height;
+        this.pong.ball.pos.x = (pos.x / WIDTH) * this.width;
+        this.pong.ball.pos.y = (pos.y / HEIGHT) * this.height;
       });
       this.socket.on('updateScore', (score: PointI) => {
         this.pong.playerLeft.score = score.x;
@@ -214,34 +226,26 @@ export default defineComponent({
       }
       await this.$nextTick();
       this.pong.playerSize.x = this.pong.canvas.width / 100;
-      this.pong.playerSize.y = this.pong.canvas.height / 3.3;
+      this.pong.playerSize.y = this.pong.canvas.height / 6.6;
       this.pong.ball.radius = this.pong.canvas.width / 100;
       await this.$nextTick();
       this.draw();
     },
     async getAvatars(player: string, opponent: string) {
       await http
-        .get("/users/avatar/" + player, {
-          responseType: "blob",
-        })
-        .then((response: any) => {
+        .get("/users/avatar/" + player, { responseType: "blob", })
+        .then(async (response: any) => {
           const blob = response.data;
-          this.imageUser = URL.createObjectURL(blob);
+          this.imageUser = await createImageBitmap(blob, { resizeWidth: 50, resizeHeight: 50, resizeQuality: 'high' });
         })
-        .catch((error: Error) => {
-          console.log(error);
-        });
+        .catch((error: Error) => { console.log(error); });
       await http
-        .get("/users/avatar/" + opponent, {
-          responseType: "blob",
-        })
-        .then((response: any) => {
+        .get("/users/avatar/" + opponent, { responseType: "blob", })
+        .then(async (response: any) => {
           const blob = response.data;
-          this.imageOpponent = URL.createObjectURL(blob);
+          this.imageOpponent = await createImageBitmap(blob, { resizeWidth: 50, resizeHeight: 50, resizeQuality: 'high' });
         })
-        .catch((error: Error) => {
-          console.log(error);
-        });
+        .catch((error: Error) => { console.log(error); });
     },
   },
   async mounted() {
