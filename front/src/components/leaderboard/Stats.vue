@@ -1,7 +1,7 @@
 <template>
   <tr>
     <th scope="row" class="text-center">{{ userStats.ranking }}</th>
-    <td class="text-left" style="width: 11rem">
+    <td class="text-left" style="width: 17rem">
       <router-link
         :to="'/public/' + currentUser.username"
         class="button text-right text-decoration-none"
