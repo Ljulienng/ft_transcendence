@@ -1,6 +1,9 @@
 <template>
-  <th class="text-left">
-    <router-link :to="'/public/' + username" class="button text-decoration-none">
+  <th class="text-center">
+    <router-link
+      :to="'/public/' + username"
+      class="button text-decoration-none"
+    >
       <img :src="this.image" class="small_profile_avatar" />
       {{ username }}
     </router-link>
@@ -28,7 +31,7 @@ export default defineComponent({
           responseType: "blob",
         })
         .then((response) => {
-          console.log("FRIEND avatar: ", response)
+          console.log("FRIEND avatar: ", response);
           const blob = response.data;
           this.image = URL.createObjectURL(blob);
         })

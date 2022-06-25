@@ -161,13 +161,17 @@ export class UserService {
 
 	async firstUpdate(currentUser: User, infoToUpdate: any) {
 		currentUser.firstTime = false;
-		if (infoToUpdate.username !== "")
+		const regex = /^[a-zA-Z0-9_]+$/
+		const regex2 = /^[a-z ,.'-]+$/i
+		const emailReg =  /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+
+		if (infoToUpdate.username !== "" && regex.test(infoToUpdate.username) === true)
 			currentUser.username = infoToUpdate.username;
-		if (infoToUpdate.firstName !== "")
+		if (infoToUpdate.firstName !== "" && regex2.test(infoToUpdate.firstname) === true)
 			currentUser.firstname = infoToUpdate.firstName;
-		if (infoToUpdate.lastName !== "")
+		if (infoToUpdate.lastName !== "" && regex2.test(infoToUpdate.lastname) === true)
 			currentUser.lastname = infoToUpdate.lastName;
-		if (infoToUpdate.email !== "")
+		if (infoToUpdate.email !== "" && emailReg.test(infoToUpdate.email) === true)
 			currentUser.email = infoToUpdate.email;
 		await this.userRepository.save(currentUser);
 
