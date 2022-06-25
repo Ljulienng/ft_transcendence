@@ -1,8 +1,10 @@
-FROM node:16
+FROM node:17
 
+
+# RUN npm install -g http-server
 WORKDIR /usr/src/app-front
 
-COPY front/package*.json ./
+COPY ./front/package*.json ./
 
 RUN npm install @vue/cli-service
 # RUN npm install --location=global @vue/cli
@@ -11,8 +13,13 @@ RUN npm install
 # RUN npm audit fix --force
 
 
-COPY front/ .
+COPY ./front/ .
 
-EXPOSE 8080 3001
+RUN npm run build -- --mode production
 
-CMD ["npm", "run", "serve"]
+ENV PORT=8080
+EXPOSE 8080
+# RUN ls ./dist
+# CMD ["serve", "-s", "./dist/"]
+# CMD [ "http-server", "dist" ]
+CMD ["npm", "run", "serve", "--", "--mode", "production"]

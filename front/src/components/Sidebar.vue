@@ -35,7 +35,7 @@
       <template v-if="getUserProfile.id !== 0">
         <router-link to="/userprofile" class="button">
           <span>
-            <img :src="this.avatar" class="sidebar_profile_avatar" />
+            <img :src="avatar" class="sidebar_profile_avatar" />
           </span>
           <span class="text" style="margin-left: 1rem">Profile</span>
         </router-link>

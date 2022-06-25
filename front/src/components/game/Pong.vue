@@ -190,8 +190,6 @@ export default defineComponent({
       this.pong.context.fillText(this.pong.isLeftSide ? this.user.userName : this.opponent.username, this.width / 4, this.height / 2, this.width);
       this.pong.context.fillText(this.pong.isLeftSide ? this.opponent.username : this.user.userName, (this.width / 4) * 3, this.height / 2, this.width);
       this.pong.context.globalAlpha = 1;
-      this.pong.context.beginPath();
-
 
       // Draw playerLeft
       this.pong.context.fillStyle = this.options.theme.fgColor;
@@ -258,7 +256,6 @@ export default defineComponent({
       });
       this.socket.on("opponentMove", async (y: number) => {
         y = (y / HEIGHT) * this.height;
-        await this.$nextTick();
         if (this.pong.isLeftSide) {
           this.pong.playerRight.y = y;
         } else {
@@ -317,7 +314,6 @@ export default defineComponent({
         .get("/users/avatar/" + player, { responseType: "blob", })
         .then(async (response: any) => {
           const blob = response.data;
-          //this.imageUser = URL.createObjectURL(blob);
           this.imageUser = await createImageBitmap(blob, { resizeWidth: 50, resizeHeight: 50, resizeQuality: 'high' });
         })
         .catch((error: Error) => { console.log(error); });
@@ -326,7 +322,6 @@ export default defineComponent({
         .then(async (response: any) => {
           const blob = response.data;
           this.imageOpponent = await createImageBitmap(blob, { resizeWidth: 50, resizeHeight: 50, resizeQuality: 'high' });
-          // this.imageOpponent = URL.createObjectURL(blob);
         })
         .catch((error: Error) => { console.log(error); });
     },
