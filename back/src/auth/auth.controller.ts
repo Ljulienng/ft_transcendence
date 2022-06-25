@@ -20,7 +20,6 @@ export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
   @Get('/auth/42')
   FortyTwoAuth(@Req() req)  {
-    console.log("auth/42")
   }
 
   // @UseGuards(FortyTwoAuthGuard)

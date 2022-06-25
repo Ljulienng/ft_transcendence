@@ -103,7 +103,7 @@ const actions = {
 		await http.get("userinfo", {withCredentials: true})
 		.then((response: any) => {
 			if(response && response.data){
-				console.log("userinfo =", response.data)
+				// console.log("userinfo =", response.data)
 				commit("setUserProfile", response.data)
 			}
 		})

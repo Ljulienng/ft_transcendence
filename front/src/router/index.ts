@@ -49,7 +49,7 @@ const routes = [
 			if (userProfile.id === 0) {
 				await store.dispatch("auth/userProfile");
 				userProfile = store.getters["auth/getUserProfile"];
-				console.log("userprofile beforecreate = ", userProfile.id);
+				// console.log("userprofile beforecreate = ", userProfile.id);
 			}
 
 			// console.log('beforeEnter = ', userProfile.id)

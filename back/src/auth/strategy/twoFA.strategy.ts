@@ -29,7 +29,7 @@ export class TwoFaStrategy extends PassportStrategy(Strategy, 'twofa') {
 	}
 
 	async validate(payload: any): Promise<User> {
-		console.log('twofa validate');
+		// console.log('twofa validate');
 		const { username, auth } = payload;
 		const user = await this.userService.findByUsername(username); // to change\
 		// console.log("twoFAEnabled =", user.twoFAEnabled)
