@@ -27,6 +27,9 @@ services:
     # volumes:
     #   - '.:/app'
     #   - '/app/node_modules'
+    environment:
+      NODE_ENV: production
+      PORT: 8080
     ports:
       - "3001:8080"
     restart: always
