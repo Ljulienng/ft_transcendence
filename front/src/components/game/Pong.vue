@@ -65,6 +65,7 @@ export default defineComponent({
       unsupportedMsg: "Sorry, your browser does not support canvas.",
       width: 1000,
       height: 660,
+      lastEmited: new Date()
     };
   },
   methods: {
@@ -207,6 +208,7 @@ export default defineComponent({
     },
     onMove(e: Event) {
       if (this.state != State.PLAY) return;
+      if (new Date().getTime() - this.lastEmited.getTime() <= 10) return ;
       const playerToMove = this.pong.isLeftSide ? this.pong.playerLeft : this.pong.playerRight;
       if (e.type == "mousemove") {
         let rect = this.pong.canvas.getBoundingClientRect();
@@ -235,6 +237,7 @@ export default defineComponent({
       }
       this.draw();
       this.socket.volatile.emit("playerMove", { x: playerToMove.y, y: this.height, });
+      this.lastEmited = new Date();
     },
     onReady() {
       this.socket.on("pause", () => { this.pausePage(); });

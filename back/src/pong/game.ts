@@ -164,7 +164,7 @@ export class Game {
   }
 
   async sendScore() {
-    await this.saveMatch(null, null, true);
+    // await this.saveMatch(null, null, true);
     if (this.playerLeft.socket && this.playerLeft.socket.id) {
       this.event.emitUpdateScore(this.playerLeft.socket.id, { x: this.playerLeft.score, y: this.playerRight.score });
     }

@@ -62,6 +62,9 @@ export class PongService {
   }
 
   async getMatchHistory(user: User): Promise<Match[]> {
+    if (!user) {
+      return;
+    }
     const ret = await this.matchRepository.find({
       where: [
         { playerOne: user.id, inProgress: false },
