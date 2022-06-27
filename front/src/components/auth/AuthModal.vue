@@ -7,7 +7,7 @@
           ><i class="fa fa-user"></i> Sign in with 42</a
         >
       </div>
-      <form v-on:submit.prevent="testAuth">
+      <!-- <form v-on:submit.prevent="testAuth">
         <p>
           <label for="twoFA"></label>
           <input
@@ -21,7 +21,7 @@
         <p>
           <input type="submit" value="Submit" />
         </p>
-      </form>
+      </form> -->
     </div>
   </div>
 </template>
